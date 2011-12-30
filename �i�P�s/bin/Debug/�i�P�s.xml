@@ -1,0 +1,203 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+進銷存
+</name>
+</assembly>
+<members>
+<member name="M:進銷存.Database.Access.File.ConnectBase(System.String)">
+	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.ConnectSales(System.String)">
+	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.Open(System.String)">
+	<summary>連接資料庫，回傳所連接的資料庫元件</summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.CreateFileBase(System.String)">
+	<summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.CreateFileSales(System.String)">
+	<summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.CreateAccessFile(System.Object)">
+	<summary>
+ 新增Access檔案
+ </summary>
+	<param name="FilePath">檔案路徑</param>
+</member><member name="M:進銷存.Database.Access.File.CreateTable(System.String,進銷存.Database.Column[],System.Data.OleDb.OleDbConnection)">
+	<summary>
+ 新增Alarm資料表
+ </summary>
+	<param name="Table">資料表名稱</param>
+	<param name="DBControl">資料庫元件</param>
+</member><member name="M:進銷存.Database.Access.File.CreateIndex(System.String,System.String,System.String,System.Data.OleDb.OleDbConnection)">
+	<summary>
+ 加入索引
+ </summary>
+	<param name="TableName">資料表名塞</param>
+	<param name="IndexName">索引名稱</param>
+	<param name="IndexClumnList">欲加入索引之欄位</param>
+	<param name="DBControl">資料庫元件</param>
+</member><member name="M:進銷存.Database.Access.File.Command(System.String,System.Data.OleDb.OleDbConnection)">
+	<summary>對資料庫下達SQL指令</summary>
+	<param name="newCMD">SQL字串</param>
+	<param name="DBControl">資料庫名稱</param>
+</member><member name="M:進銷存.Database.Access.File.CommandBase(System.String,System.String)">
+	<summary>對資料庫下達SQL指令</summary>
+	<param name="SqlCommand">SQL字串</param>
+	<param name="File">檔按路徑</param>
+</member><member name="M:進銷存.Database.Access.File.CommandSales(System.String,System.String)">
+	<summary>對資料庫下達SQL指令</summary>
+	<param name="SqlCommand">SQL字串</param>
+	<param name="File">檔按路徑</param>
+</member><member name="M:進銷存.Database.Access.AddSupplier(進銷存.Database.StructureBase.Supplier)">
+	<summary>新增供應商</summary>
+</member><member name="M:進銷存.Database.Access.AddCustomer(進銷存.Database.StructureBase.Customer)">
+	<summary>新增客戶</summary>
+</member><member name="M:進銷存.Database.Access.AddPersonnel(進銷存.Database.StructureBase.Personnel)">
+	<summary>新增員工</summary>
+</member><member name="M:進銷存.Database.Access.AddGoods(進銷存.Database.StructureBase.Goods)">
+	<summary>新增商品</summary>
+</member><member name="M:進銷存.Database.Access.AddMobile(進銷存.Database.StructureBase.Mobile)">
+	<summary>新增門號</summary>
+</member><member name="M:進銷存.Database.Access.AddStock(進銷存.Database.StructureBase.Stock)">
+	<summary>新增庫存</summary>
+</member><member name="M:進銷存.Database.Access.AddSales(進銷存.Database.StructureBase.Sales)">
+	<summary>新增銷貨單</summary>
+</member><member name="M:進銷存.Database.Access.AddOrder(進銷存.Database.StructureBase.Order)">
+	<summary>新增訂單</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Label">
+	<summary>供應商識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Name">
+	<summary>名稱</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Tel1">
+	<summary>電話1</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Tel2">
+	<summary>電話2</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Addr">
+	<summary>地址</summary>
+</member><member name="F:進銷存.Database.StructureBase.Supplier.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Supplier">
+	<summary>供應商</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Label">
+	<summary>客戶識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Name">
+	<summary>姓名</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Tel1">
+	<summary>電話1</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Tel2">
+	<summary>電話2</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Addr">
+	<summary>地址</summary>
+</member><member name="F:進銷存.Database.StructureBase.Customer.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Customer">
+	<summary>客戶</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Label">
+	<summary>員工識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Name">
+	<summary>姓名</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Tel1">
+	<summary>電話1</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Tel2">
+	<summary>電話2</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Addr">
+	<summary>地址</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Personnel">
+	<summary>員工</summary>
+</member><member name="F:進銷存.Database.StructureBase.Goods.Label">
+	<summary>商品識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Goods.Name">
+	<summary>品名</summary>
+</member><member name="F:進銷存.Database.StructureBase.Goods.Kind">
+	<summary>種類</summary>
+</member><member name="F:進銷存.Database.StructureBase.Goods.Brand">
+	<summary>品牌</summary>
+</member><member name="F:進銷存.Database.StructureBase.Goods.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Goods">
+	<summary>商品</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Label">
+	<summary>門號識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Name">
+	<summary>名稱</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Commission">
+	<summary>佣金</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Discount">
+	<summary>折扣</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Mobile">
+	<summary>門號</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Label">
+	<summary>庫存識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.GoodsLabel">
+	<summary>商品識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.SupplierLabel">
+	<summary>供應商識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Date">
+	<summary>進貨日期</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.IMEI">
+	<summary>IMEI碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Cost">
+	<summary>進貨價</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Price">
+	<summary>定價</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Number">
+	<summary>數量</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Stock">
+	<summary>庫存</summary>
+</member><member name="T:進銷存.Database.StructureBase.TypeOfPayment">
+	<summary>付款方式</summary>
+</member><member name="T:進銷存.Database.StructureBase.TypeOfGoods">
+	<summary>商品種類：商品/門號</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.Label">
+	<summary>單號識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.Date">
+	<summary>銷貨日期</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.StockLabel">
+	<summary>庫存識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.MobileLabel">
+	<summary>門號識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.CustomerLabel">
+	<summary>客戶識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.PersonnelLabel">
+	<summary>員工識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.SellingPrice">
+	<summary>最終售價</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.Deposit">
+	<summary>訂金</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.TypeOfPayment">
+	<summary>付款方式</summary>
+</member><member name="F:進銷存.Database.StructureBase.Sales.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Sales">
+	<summary>銷貨</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.Label">
+	<summary>訂單識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.Date">
+	<summary>下訂日期</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.GoodsLabel">
+	<summary>商品識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.SellingPrice">
+	<summary>最終售價</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.Deposit">
+	<summary>訂金</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.CustomerLabel">
+	<summary>客戶識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.PersonnelLabel">
+	<summary>員工識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Order.Note">
+	<summary>備註</summary>
+</member><member name="T:進銷存.Database.StructureBase.Order">
+	<summary>訂單</summary>
+</member>
+</members>
+</doc>

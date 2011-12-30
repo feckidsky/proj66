@@ -1,0 +1,425 @@
+﻿Imports 進銷存.Database.Access
+
+Namespace Database
+
+    Public Module StructureBase
+
+        Dim DBTypeIMEI As String = "char(20)"
+        Dim DBTypeLabel As String = "char(20)"
+        Dim DBTypeName As String = "char(10)"
+        Dim DBTypeNote As String = "char(20)"
+        Dim DBTypeTel As String = "char(15)"
+        Dim DBTypeAddr As String = "char(30)"
+        Dim DBTypeDate As String = "date"
+        Dim DBTypeSingle As String = "single"
+        Dim DBTypeInteger As String = "int"
+
+        Dim TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
+
+        Private Function Bracket(ByVal Text As String) As String
+            Return "'" & Text & """"
+        End Function
+
+        Class MyDataRow
+            Dim Row As Data.DataRow
+            Sub New(ByVal Row As Data.DataRow)
+                Me.Row = Row
+            End Sub
+            Default Public ReadOnly Property Item(ByVal Label As String)
+                Get
+                    Return RTrim(Row.Item(Label))
+                End Get
+            End Property
+
+        End Class
+
+#Region "供應商/客戶/員工"
+        ''' <summary>供應商</summary>
+        Structure Supplier
+            Shared Table As String = "Supplier"
+            ''' <summary>供應商識別碼</summary>
+            Dim Label As String
+            ''' <summary>名稱</summary>
+            Dim Name As String
+            ''' <summary>電話1</summary>
+            Dim Tel1 As String
+            ''' <summary>電話2</summary>
+            Dim Tel2 As String
+            ''' <summary>地址</summary>
+            Dim Addr As String
+            ''' <summary>備註</summary>
+            Dim Note As String
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Name", DBTypeName))
+                Columns.Add(New Column("Tel1", DBTypeTel))
+                Columns.Add(New Column("Tel2", DBTypeTel))
+                Columns.Add(New Column("Addr", DBTypeAddr))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Supplier
+                Dim R As New MyDataRow(Row)
+                Dim data As Supplier
+                data.Label = R("Label")
+                data.Name = R("Name")
+                data.Tel1 = R("Tel1")
+                data.Tel2 = R("Tel2")
+                data.Addr = R("Addr")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+        ''' <summary>客戶</summary>
+        Structure Customer
+            Shared Table As String = "Customer"
+            ''' <summary>客戶識別碼</summary>
+            Dim Label As String
+            ''' <summary>姓名</summary>
+            Dim Name As String
+            ''' <summary>電話1</summary>
+            Dim Tel1 As String
+            ''' <summary>電話2</summary>
+            Dim Tel2 As String
+            ''' <summary>地址</summary>
+            Dim Addr As String
+            ''' <summary>備註</summary>
+            Dim Note As String
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Name", DBTypeName))
+                Columns.Add(New Column("Tel1", DBTypeTel))
+                Columns.Add(New Column("Tel2", DBTypeTel))
+                Columns.Add(New Column("Addr", DBTypeAddr))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+            Function ToObjects() As Object()
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+            End Function
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Customer
+                Dim R As New MyDataRow(Row)
+                Dim data As Customer
+                data.Label = R("Label")
+                data.Name = R("Name")
+                data.Tel1 = R("Tel1")
+                data.Tel2 = R("Tel2")
+                data.Addr = R("Addr")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+        ''' <summary>員工</summary>
+        Structure Personnel
+            Shared Table As String = "Personnel"
+            ''' <summary>員工識別碼</summary>
+            Dim Label As String
+            ''' <summary>姓名</summary>
+            Dim Name As String
+            ''' <summary>電話1</summary>
+            Dim Tel1 As String
+            ''' <summary>電話2</summary>
+            Dim Tel2 As String
+            ''' <summary>地址</summary>
+            Dim Addr As String
+            ''' <summary>備註</summary>
+            Dim Note As String
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Name", DBTypeName))
+                Columns.Add(New Column("Tel1", DBTypeTel))
+                Columns.Add(New Column("Tel2", DBTypeTel))
+                Columns.Add(New Column("Addr", DBTypeAddr))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+            Function ToObjects() As Object()
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+            End Function
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Personnel
+                Dim R As New MyDataRow(Row)
+                Dim data As Personnel
+                data.Label = R("Label")
+                data.Name = R("Name")
+                data.Tel1 = R("Tel1")
+                data.Tel2 = R("Tel2")
+                data.Addr = R("Addr")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+#End Region
+
+
+        ''' <summary>商品</summary>
+        Structure Goods
+            Shared Table As String = "Goods"
+            ''' <summary>商品識別碼</summary>
+            Dim Label As String
+            ''' <summary>品名</summary>
+            Dim Name As String
+            ''' <summary>種類</summary>
+            Dim Kind As String
+            ''' <summary>品牌</summary>
+            Dim Brand As String
+            ''' <summary>備註</summary>
+            Dim Note As String
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Name", DBTypeName))
+                Columns.Add(New Column("Kind", "char(10)"))
+                Columns.Add(New Column("Brand", "char(10)"))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+            Function ToObjects() As Object()
+                Return New Object() {Label, Name, Kind, Brand, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Goods
+                Dim R As New MyDataRow(Row)
+                Dim data As Goods
+                data.Label = R("Label")
+                data.Name = R("Name")
+                data.Kind = R("Kind")
+                data.Brand = R("Brand")
+                data.Note = R("Note")
+                Return data
+            End Function
+
+        End Structure
+
+        ''' <summary>門號</summary>
+        Structure Mobile
+            Shared Table As String = "Mobile"
+            ''' <summary>門號識別碼</summary>
+            Dim Label As String
+            ''' <summary>名稱</summary>
+            Dim Name As String
+            ''' <summary>佣金</summary>
+            Dim Commission As Single
+            ''' <summary>折扣</summary>
+            Dim Discount As Single
+            ''' <summary>備註</summary>
+            Dim Note As String
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Name", DBTypeName))
+                Columns.Add(New Column("Commission", DBTypeSingle))
+                Columns.Add(New Column("Discount", DBTypeSingle))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+            Function ToObjects() As Object()
+                Return New Object() {Label, Name, Commission, Discount, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Mobile
+                Dim R As New MyDataRow(Row)
+                Dim data As Mobile
+                data.Label = R("Label")
+                data.Name = R("Name")
+                data.Commission = R("Commission")
+                data.Discount = R("Discount")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+        ''' <summary>庫存</summary>
+        Structure Stock
+            Shared Table As String = "Stock"
+            ''' <summary>庫存識別碼</summary>
+            Dim Label As String
+            ''' <summary>商品識別碼</summary>
+            Dim GoodsLabel As String
+            ''' <summary>供應商識別碼</summary>
+            Dim SupplierLabel As String
+            ''' <summary>進貨日期</summary>
+            Dim [Date] As Date
+            ''' <summary>IMEI碼</summary>
+            Dim IMEI As String
+            ''' <summary>進貨價</summary>
+            Dim Cost As Single
+            ''' <summary>定價</summary>
+            Dim Price As Single
+            ''' <summary>數量</summary>
+            Dim Number As Integer
+            ''' <summary>備註</summary>
+            Dim Note As String
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+                Columns.Add(New Column("SupplierLabel", DBTypeLabel))
+                Columns.Add(New Column("Date", DBTypeDate))
+                Columns.Add(New Column("IMEI", DBTypeIMEI))
+                Columns.Add(New Column("Cost", DBTypeSingle))
+                Columns.Add(New Column("Price", DBTypeSingle))
+                Columns.Add(New Column("Number", DBTypeInteger))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date], IMEI, Cost, Price, Number, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Stock
+                Dim R As New MyDataRow(Row)
+                Dim data As Stock
+                data.Label = R("Label")
+                data.GoodsLabel = R("Name")
+                data.SupplierLabel = R("Commission")
+                data.Date = R("Date")
+                data.IMEI = R("IMEI")
+                data.Cost = R("Cost")
+                data.Price = R("Price")
+                data.Number = R("Number")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+        ''' <summary>付款方式</summary>
+        Enum TypeOfPayment
+            Cash = 0
+            Card = 1
+            Commission = 2
+        End Enum
+
+        ''' <summary>商品種類：商品/門號</summary>
+        Enum TypeOfGoods
+            Goods = 0
+            MobileNumber = 1
+        End Enum
+
+        ''' <summary>銷貨</summary>
+        Structure Sales
+            Shared Table As String = "Sales"
+            ''' <summary>單號識別碼</summary>
+            Dim Label As String
+            ''' <summary>銷貨日期</summary>
+            Dim [Date] As Date
+            ''' <summary>庫存識別碼</summary>
+            Dim StockLabel As String
+            ''' <summary>門號識別碼</summary>
+            Dim MobileLabel As String
+            ''' <summary>客戶識別碼</summary>
+            Dim CustomerLabel As String
+            ''' <summary>員工識別碼</summary>
+            Dim PersonnelLabel As String
+            ''' <summary>最終售價</summary>
+            Dim SellingPrice As Single
+            ''' <summary>訂金</summary>
+            Dim Deposit As Single
+            ''' <summary>付款方式</summary>
+            Dim TypeOfPayment As TypeOfPayment
+            ''' <summary>備註</summary>
+            Dim Note As String
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Date", DBTypeDate))
+                Columns.Add(New Column("StockLabel", DBTypeLabel))
+                Columns.Add(New Column("MobileLabel", DBTypeLabel))
+                Columns.Add(New Column("CustomerLabel", DBTypeLabel))
+                Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
+                Columns.Add(New Column("SellingPrice", DBTypeSingle))
+                Columns.Add(New Column("Deposit", DBTypeSingle))
+                Columns.Add(New Column("TypeOfPayment", DBTypeInteger))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {Label, [Date], StockLabel, MobileLabel, CustomerLabel, PersonnelLabel, SellingPrice, Deposit, TypeOfPayment, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Sales
+                Dim R As New MyDataRow(Row)
+                Dim data As Sales
+                data.Label = R("Label")
+                data.Date = R("Date")
+                data.StockLabel = R("StockLabel")
+                data.MobileLabel = R("MobileLabel")
+                data.CustomerLabel = R("CustomerLabel")
+                data.PersonnelLabel = R("PersonnelLabel")
+                data.SellingPrice = R("SellingPrice")
+                data.Deposit = R("Deposit")
+                data.TypeOfPayment = R("TypeOfPayment")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+        ''' <summary>訂單</summary>
+        Structure Order
+            Shared Table As String = "Order"
+            ''' <summary>訂單識別碼</summary>
+            Dim Label As String
+            ''' <summary>下訂日期</summary>
+            Dim [Date] As Date
+            ''' <summary>商品識別碼</summary>
+            Dim GoodsLabel As String
+            ''' <summary>最終售價</summary>
+            Dim SellingPrice As Single
+            ''' <summary>訂金</summary>
+            Dim Deposit As Single
+            ''' <summary>客戶識別碼</summary>
+            Dim CustomerLabel As String
+            ''' <summary>員工識別碼</summary>
+            Dim PersonnelLabel As String
+            ''' <summary>備註</summary>
+            Dim Note As String
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Date", DBTypeDate))
+                Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+                Columns.Add(New Column("SellingPrice", DBTypeSingle))
+                Columns.Add(New Column("Deposit", DBTypeSingle))
+                Columns.Add(New Column("CustomerLabel", DBTypeLabel))
+                Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
+                Columns.Add(New Column("Note", DBTypeNote))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {Label, [Date], GoodsLabel, SellingPrice, Deposit, CustomerLabel, PersonnelLabel, Note}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Order
+                Dim R As New MyDataRow(Row)
+                Dim data As Order
+                data.Label = R("Label")
+                data.Date = R("Date")
+                data.GoodsLabel = R("GoodsLabel")
+                data.SellingPrice = R("SellingPrice")
+                data.Deposit = R("Deposit")
+                data.CustomerLabel = R("CustomerLabel")
+                data.PersonnelLabel = R("PersonnelLabel")
+                data.Note = R("Note")
+                Return data
+            End Function
+        End Structure
+
+    End Module
+End Namespace
