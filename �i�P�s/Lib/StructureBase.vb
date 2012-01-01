@@ -160,7 +160,7 @@ Namespace Database
         End Structure
 #End Region
 
-
+#Region "商品"
         ''' <summary>商品</summary>
         Structure Goods
             Shared Table As String = "Goods"
@@ -200,7 +200,8 @@ Namespace Database
             End Function
 
         End Structure
-
+#End Region
+#Region "門號"
         ''' <summary>門號</summary>
         Structure Mobile
             Shared Table As String = "Mobile"
@@ -239,7 +240,9 @@ Namespace Database
                 Return data
             End Function
         End Structure
+#End Region
 
+#Region "庫存"
         ''' <summary>庫存</summary>
         Structure Stock
             Shared Table As String = "Stock"
@@ -259,6 +262,8 @@ Namespace Database
             Dim Price As Single
             ''' <summary>數量</summary>
             Dim Number As Integer
+            ''' <summary>狀態(入庫/出貨)</summary>
+            Dim Statu As String
             ''' <summary>備註</summary>
             Dim Note As String
 
@@ -272,12 +277,13 @@ Namespace Database
                 Columns.Add(New Column("Cost", DBTypeSingle))
                 Columns.Add(New Column("Price", DBTypeSingle))
                 Columns.Add(New Column("Number", DBTypeInteger))
+                Columns.Add(New Column("Statu", DBTypeNote))
                 Columns.Add(New Column("Note", DBTypeNote))
                 Return Columns.ToArray
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date], IMEI, Cost, Price, Number, Note}
+                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date], IMEI, Cost, Price, Number, Statu, Note}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Stock
@@ -291,23 +297,66 @@ Namespace Database
                 data.Cost = R("Cost")
                 data.Price = R("Price")
                 data.Number = R("Number")
+                data.Statu = R("Statu")
                 data.Note = R("Note")
                 Return data
             End Function
         End Structure
+#End Region
+
 
         ''' <summary>付款方式</summary>
         Enum TypeOfPayment
-            Cash = 0
-            Card = 1
-            Commission = 2
+            Unpaid = 0
+            Cash = 1
+            Card = 2
+            Commission = 3
         End Enum
+
+        Public TypeOfPaymentsDescribe As String() = New String() {"未付", "現金", "刷卡", "訂金"}
+
 
         ''' <summary>商品種類：商品/門號</summary>
         Enum TypeOfGoods
             Goods = 0
             MobileNumber = 1
         End Enum
+
+        Structure SalesGoods
+            Shared Table As String = "SalesGoods"
+            ''' <summary>單號識別碼</summary>
+            Dim SalesLabel As String
+            ''' <summary>庫存識別碼</summary>
+            Dim StockLabel As String
+            ''' <summary>單價</summary>
+            Dim SellingPrice As Single
+            ''' <summary>數量</summary>
+            Dim Number As Integer
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("SalesLabel", DBTypeLabel))
+                Columns.Add(New Column("StockLabel", DBTypeLabel))
+                Columns.Add(New Column("SellingPrice", DBTypeSingle))
+                Columns.Add(New Column("Number", DBTypeInteger))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {SalesLabel, StockLabel, SellingPrice, Number}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesGoods
+                Dim R As New MyDataRow(Row)
+                Dim data As SalesGoods
+                data.SalesLabel = R("SalesLabel")
+                data.StockLabel = R("StockLabel")
+                data.SellingPrice = R("SellingPrice")
+                data.Number = R("Number")
+                Return data
+            End Function
+
+        End Structure
 
         ''' <summary>銷貨</summary>
         Structure Sales
@@ -316,16 +365,10 @@ Namespace Database
             Dim Label As String
             ''' <summary>銷貨日期</summary>
             Dim [Date] As Date
-            ''' <summary>庫存識別碼</summary>
-            Dim StockLabel As String
-            ''' <summary>門號識別碼</summary>
-            Dim MobileLabel As String
             ''' <summary>客戶識別碼</summary>
             Dim CustomerLabel As String
             ''' <summary>員工識別碼</summary>
             Dim PersonnelLabel As String
-            ''' <summary>最終售價</summary>
-            Dim SellingPrice As Single
             ''' <summary>訂金</summary>
             Dim Deposit As Single
             ''' <summary>付款方式</summary>
@@ -337,11 +380,8 @@ Namespace Database
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
                 Columns.Add(New Column("Date", DBTypeDate))
-                Columns.Add(New Column("StockLabel", DBTypeLabel))
-                Columns.Add(New Column("MobileLabel", DBTypeLabel))
                 Columns.Add(New Column("CustomerLabel", DBTypeLabel))
                 Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
-                Columns.Add(New Column("SellingPrice", DBTypeSingle))
                 Columns.Add(New Column("Deposit", DBTypeSingle))
                 Columns.Add(New Column("TypeOfPayment", DBTypeInteger))
                 Columns.Add(New Column("Note", DBTypeNote))
@@ -349,19 +389,21 @@ Namespace Database
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, [Date], StockLabel, MobileLabel, CustomerLabel, PersonnelLabel, SellingPrice, Deposit, TypeOfPayment, Note}
+                Return New Object() {Label, [Date], CustomerLabel, PersonnelLabel, Deposit, CType(TypeOfPayment, Int16), Note}
             End Function
+
+            'Private Function GetTypeOfPaymentNumber() As Integer
+            '    TypeOfPayment.
+            'End Function
+
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Sales
                 Dim R As New MyDataRow(Row)
                 Dim data As Sales
                 data.Label = R("Label")
                 data.Date = R("Date")
-                data.StockLabel = R("StockLabel")
-                data.MobileLabel = R("MobileLabel")
                 data.CustomerLabel = R("CustomerLabel")
                 data.PersonnelLabel = R("PersonnelLabel")
-                data.SellingPrice = R("SellingPrice")
                 data.Deposit = R("Deposit")
                 data.TypeOfPayment = R("TypeOfPayment")
                 data.Note = R("Note")
@@ -369,6 +411,9 @@ Namespace Database
             End Function
         End Structure
 
+
+
+#Region "訂單"
         ''' <summary>訂單</summary>
         Structure Order
             Shared Table As String = "Order"
@@ -420,6 +465,6 @@ Namespace Database
                 Return data
             End Function
         End Structure
-
+#End Region
     End Module
 End Namespace

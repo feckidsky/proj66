@@ -24,6 +24,19 @@ Namespace Database
             File.SalesPath = File.Dir & "\sales.mdb"
         End Sub
 
+        ''' <summary>取得庫存清單</summary>
+        Public Function GetStockList() As Data.DataTable
+            Dim SQLCommand As String = "SELECT a.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+
+        Public Function GetSalesList() As Data.DataTable
+            Dim SQLCommand As String = "SELECT * FROM Sales, SalesGoods;"
+
+        End Function
+
         Public Class File
 
             Public Shared Dir As String
@@ -33,9 +46,6 @@ Namespace Database
             Shared DBWriteLock As String = " DBWriteLock"
 
 #Region "Connect - Access連線"
-
-
-
             ''' <summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
             ''' <param name="FilePath">檔案路徑</param>
             Public Shared Function ConnectBase(ByVal FilePath As String) As OleDb.OleDbConnection
@@ -96,8 +106,12 @@ Namespace Database
                 CreateTable(Goods.Table, Goods.ToColumns, DBControl)
                 CreateTable(Mobile.Table, Mobile.ToColumns, DBControl)
                 CreateTable(Stock.Table, Stock.ToColumns, DBControl)
+                CreateTable(Sales.Table, Sales.ToColumns, DBControl)
+                CreateTable(SalesGoods.Table, SalesGoods.ToColumns, DBControl)
                 Return DBControl
             End Function
+
+
 
             ''' <summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
             ''' <param name="FilePath">檔案路徑</param>
@@ -123,7 +137,7 @@ Namespace Database
             ''' </summary>
             ''' <param name="Table">資料表名稱</param>
             ''' <param name="DBControl">資料庫元件</param>
-            Private Shared Function CreateTable(ByVal Table As String, ByVal Columns() As Column, ByVal DBControl As OleDb.OleDbConnection) As String
+            Public Shared Function CreateTable(ByVal Table As String, ByVal Columns() As Column, ByVal DBControl As OleDb.OleDbConnection) As String
                 Dim RowList() As String = Array.ConvertAll(Columns, Function(c As Column) "[" & c.Name & "] " & c.Type)
                 Dim RowText As String = Join(RowList, ",")
 
@@ -261,7 +275,11 @@ Namespace Database
 
             Public Shared Function Read(Of T)(ByVal Table As String, ByVal C As Conv(Of T)) As T()
                 Dim DT As Data.DataTable = Read(Supplier.Table, BasePath, GetSqlSelect(Table))
+
                 Dim lstData As New List(Of T)
+
+
+                If DT Is Nothing Then Return lstData.ToArray
                 For i As Integer = 0 To DT.Rows.Count - 1
                     lstData.Add(C(DT.Rows(i)))
                 Next
@@ -391,4 +409,6 @@ Namespace Database
 
 
     End Class
+
+
 End Namespace

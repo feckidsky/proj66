@@ -6,7 +6,9 @@
 </name>
 </assembly>
 <members>
-<member name="M:進銷存.Database.Access.File.ConnectBase(System.String)">
+<member name="M:進銷存.Database.Access.GetStockList">
+	<summary>取得庫存清單</summary>
+</member><member name="M:進銷存.Database.Access.File.ConnectBase(System.String)">
 	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
 	<param name="FilePath">檔案路徑</param>
 </member><member name="M:進銷存.Database.Access.File.ConnectSales(System.String)">
@@ -150,6 +152,8 @@
 	<summary>定價</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Number">
 	<summary>數量</summary>
+</member><member name="F:進銷存.Database.StructureBase.Stock.Statu">
+	<summary>狀態(入庫/出貨)</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Note">
 	<summary>備註</summary>
 </member><member name="T:進銷存.Database.StructureBase.Stock">
@@ -158,20 +162,22 @@
 	<summary>付款方式</summary>
 </member><member name="T:進銷存.Database.StructureBase.TypeOfGoods">
 	<summary>商品種類：商品/門號</summary>
+</member><member name="F:進銷存.Database.StructureBase.SalesGoods.SalesLabel">
+	<summary>單號識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.SalesGoods.StockLabel">
+	<summary>庫存識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.SalesGoods.SellingPrice">
+	<summary>單價</summary>
+</member><member name="F:進銷存.Database.StructureBase.SalesGoods.Number">
+	<summary>數量</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.Label">
 	<summary>單號識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.Date">
 	<summary>銷貨日期</summary>
-</member><member name="F:進銷存.Database.StructureBase.Sales.StockLabel">
-	<summary>庫存識別碼</summary>
-</member><member name="F:進銷存.Database.StructureBase.Sales.MobileLabel">
-	<summary>門號識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.CustomerLabel">
 	<summary>客戶識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.PersonnelLabel">
 	<summary>員工識別碼</summary>
-</member><member name="F:進銷存.Database.StructureBase.Sales.SellingPrice">
-	<summary>最終售價</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.Deposit">
 	<summary>訂金</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.TypeOfPayment">

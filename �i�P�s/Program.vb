@@ -2,19 +2,27 @@
 
 Public Module Program
     Public DB As New Database.Access
+
+    '供應商
     Public Supplies As Supplier()
+    '員工
     Public Personnels As Personnel()
+    '商品
     Public Goodsies As Goods()
+    '門號
     Public Mobiles As Mobile()
 
    
-
-
     Public Sub InitialProgram()
         Supplies = DB.ReadSupplier
         Personnels = DB.ReadPersonnel
         Goodsies = DB.ReadGoods
         Mobiles = DB.ReadMobile
+
+
+        'Dim d As OleDb.OleDbConnection = DB.File.ConnectBase(DB.File.BasePath)
+        'DB.File.CreateTable(Sales.Table, Sales.ToColumns, d)
+        'DB.File.CreateTable(SalesGoods.Table, SalesGoods.ToColumns, d)
     End Sub
 
     Public Function NewSupplier() As Supplier
