@@ -28,6 +28,7 @@ Partial Class winMain
         Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -35,6 +36,10 @@ Partial Class winMain
         Me.Customer = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cDposit = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cmsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.銷貨AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.修改CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.刪除DToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.dtpEnd = New System.Windows.Forms.DateTimePicker
@@ -42,19 +47,17 @@ Partial Class winMain
         Me.rToday = New System.Windows.Forms.RadioButton
         Me.rUserTime = New System.Windows.Forms.RadioButton
         Me.r30Day = New System.Windows.Forms.RadioButton
-        Me.cmsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.銷貨AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.修改CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.刪除DToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.其他資訊ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.供應商ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
         Me.cmsEdit.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.銷貨ToolStripMenuItem, Me.庫存ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.銷貨ToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.其他資訊ToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(795, 24)
@@ -69,7 +72,7 @@ Partial Class winMain
         '
         '庫存ToolStripMenuItem
         '
-        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem})
+        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
         Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
         Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
         Me.庫存ToolStripMenuItem.Text = "庫存"
@@ -77,14 +80,20 @@ Partial Class winMain
         '進貨記錄ToolStripMenuItem1
         '
         Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(124, 22)
-        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄"
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(141, 22)
+        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
         '
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(124, 22)
-        Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存"
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
+        '
+        '商品項目GToolStripMenuItem
+        '
+        Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
         '
         'dgSales
         '
@@ -146,6 +155,30 @@ Partial Class winMain
         Me.cPrice.Name = "cPrice"
         Me.cPrice.ReadOnly = True
         Me.cPrice.Width = 54
+        '
+        'cmsEdit
+        '
+        Me.cmsEdit.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.銷貨AToolStripMenuItem, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
+        Me.cmsEdit.Name = "cmsEdit"
+        Me.cmsEdit.Size = New System.Drawing.Size(118, 70)
+        '
+        '銷貨AToolStripMenuItem
+        '
+        Me.銷貨AToolStripMenuItem.Name = "銷貨AToolStripMenuItem"
+        Me.銷貨AToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.銷貨AToolStripMenuItem.Text = "銷貨(&A)"
+        '
+        '修改CToolStripMenuItem
+        '
+        Me.修改CToolStripMenuItem.Name = "修改CToolStripMenuItem"
+        Me.修改CToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.修改CToolStripMenuItem.Text = "修改(&C)"
+        '
+        '刪除DToolStripMenuItem
+        '
+        Me.刪除DToolStripMenuItem.Name = "刪除DToolStripMenuItem"
+        Me.刪除DToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.刪除DToolStripMenuItem.Text = "刪除(&D)"
         '
         'GroupBox1
         '
@@ -219,29 +252,18 @@ Partial Class winMain
         Me.r30Day.Text = "30天以內"
         Me.r30Day.UseVisualStyleBackColor = True
         '
-        'cmsEdit
+        '其他資訊ToolStripMenuItem
         '
-        Me.cmsEdit.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.銷貨AToolStripMenuItem, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
-        Me.cmsEdit.Name = "cmsEdit"
-        Me.cmsEdit.Size = New System.Drawing.Size(153, 92)
+        Me.其他資訊ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.供應商ToolStripMenuItem})
+        Me.其他資訊ToolStripMenuItem.Name = "其他資訊ToolStripMenuItem"
+        Me.其他資訊ToolStripMenuItem.Size = New System.Drawing.Size(68, 20)
+        Me.其他資訊ToolStripMenuItem.Text = "其他資訊"
         '
-        '銷貨AToolStripMenuItem
+        '供應商ToolStripMenuItem
         '
-        Me.銷貨AToolStripMenuItem.Name = "銷貨AToolStripMenuItem"
-        Me.銷貨AToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.銷貨AToolStripMenuItem.Text = "銷貨(&A)"
-        '
-        '修改CToolStripMenuItem
-        '
-        Me.修改CToolStripMenuItem.Name = "修改CToolStripMenuItem"
-        Me.修改CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.修改CToolStripMenuItem.Text = "修改(&C)"
-        '
-        '刪除DToolStripMenuItem
-        '
-        Me.刪除DToolStripMenuItem.Name = "刪除DToolStripMenuItem"
-        Me.刪除DToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.刪除DToolStripMenuItem.Text = "刪除(&D)"
+        Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
+        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.供應商ToolStripMenuItem.Text = "供應商"
         '
         'winMain
         '
@@ -257,9 +279,9 @@ Partial Class winMain
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.cmsEdit.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        Me.cmsEdit.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -287,4 +309,7 @@ Partial Class winMain
     Friend WithEvents 銷貨AToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 修改CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 刪除DToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 商品項目GToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 其他資訊ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 供應商ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

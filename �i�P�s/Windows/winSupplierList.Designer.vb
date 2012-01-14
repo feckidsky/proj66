@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class winGoodsList
+Partial Class winSupplierList
     Inherits System.Windows.Forms.Form
 
     'Form 覆寫 Dispose 以清除元件清單。
@@ -23,32 +23,56 @@ Partial Class winGoodsList
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Me.dgGoodsList = New System.Windows.Forms.DataGridView
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
-        Me.新增AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.dgList = New System.Windows.Forms.DataGridView
         Me.cmsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.新增CToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.修改CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.刪除DToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        CType(Me.dgGoodsList, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.MenuStrip1.SuspendLayout()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
+        Me.新增AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        CType(Me.dgList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'dgGoodsList
+        'dgList
         '
-        Me.dgGoodsList.AllowUserToAddRows = False
-        Me.dgGoodsList.AllowUserToDeleteRows = False
-        Me.dgGoodsList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
-        Me.dgGoodsList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgGoodsList.ContextMenuStrip = Me.cmsEdit
-        Me.dgGoodsList.Location = New System.Drawing.Point(12, 30)
-        Me.dgGoodsList.Name = "dgGoodsList"
-        Me.dgGoodsList.ReadOnly = True
-        Me.dgGoodsList.RowTemplate.Height = 24
-        Me.dgGoodsList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgGoodsList.Size = New System.Drawing.Size(577, 350)
-        Me.dgGoodsList.TabIndex = 0
+        Me.dgList.AllowUserToAddRows = False
+        Me.dgList.AllowUserToDeleteRows = False
+        Me.dgList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgList.ContextMenuStrip = Me.cmsEdit
+        Me.dgList.Location = New System.Drawing.Point(12, 30)
+        Me.dgList.Name = "dgList"
+        Me.dgList.ReadOnly = True
+        Me.dgList.RowTemplate.Height = 24
+        Me.dgList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgList.Size = New System.Drawing.Size(577, 350)
+        Me.dgList.TabIndex = 0
+        '
+        'cmsEdit
+        '
+        Me.cmsEdit.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.新增CToolStripMenuItem1, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
+        Me.cmsEdit.Name = "cmsEdit"
+        Me.cmsEdit.Size = New System.Drawing.Size(118, 70)
+        '
+        '新增CToolStripMenuItem1
+        '
+        Me.新增CToolStripMenuItem1.Name = "新增CToolStripMenuItem1"
+        Me.新增CToolStripMenuItem1.Size = New System.Drawing.Size(117, 22)
+        Me.新增CToolStripMenuItem1.Text = "新增(&A)"
+        '
+        '修改CToolStripMenuItem
+        '
+        Me.修改CToolStripMenuItem.Name = "修改CToolStripMenuItem"
+        Me.修改CToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.修改CToolStripMenuItem.Text = "修改(&C)"
+        '
+        '刪除DToolStripMenuItem
+        '
+        Me.刪除DToolStripMenuItem.Name = "刪除DToolStripMenuItem"
+        Me.刪除DToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
+        Me.刪除DToolStripMenuItem.Text = "刪除(&D)"
         '
         'MenuStrip1
         '
@@ -65,49 +89,25 @@ Partial Class winGoodsList
         Me.新增AToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
         Me.新增AToolStripMenuItem.Text = "新增(&A)"
         '
-        'cmsEdit
-        '
-        Me.cmsEdit.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.新增CToolStripMenuItem1, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
-        Me.cmsEdit.Name = "cmsEdit"
-        Me.cmsEdit.Size = New System.Drawing.Size(118, 70)
-        '
-        '新增CToolStripMenuItem1
-        '
-        Me.新增CToolStripMenuItem1.Name = "新增CToolStripMenuItem1"
-        Me.新增CToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-        Me.新增CToolStripMenuItem1.Text = "新增(&A)"
-        '
-        '修改CToolStripMenuItem
-        '
-        Me.修改CToolStripMenuItem.Name = "修改CToolStripMenuItem"
-        Me.修改CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.修改CToolStripMenuItem.Text = "修改(&C)"
-        '
-        '刪除DToolStripMenuItem
-        '
-        Me.刪除DToolStripMenuItem.Name = "刪除DToolStripMenuItem"
-        Me.刪除DToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.刪除DToolStripMenuItem.Text = "刪除(&D)"
-        '
-        'winGoodsList
+        'winSupplierList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(601, 392)
-        Me.Controls.Add(Me.dgGoodsList)
+        Me.Controls.Add(Me.dgList)
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Name = "winGoodsList"
-        Me.Text = "商品項目清單"
-        CType(Me.dgGoodsList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Name = "winSupplierList"
+        Me.Text = "供應商"
+        CType(Me.dgList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.cmsEdit.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
-        Me.cmsEdit.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents dgGoodsList As System.Windows.Forms.DataGridView
+    Friend WithEvents dgList As System.Windows.Forms.DataGridView
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents 新增AToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsEdit As System.Windows.Forms.ContextMenuStrip

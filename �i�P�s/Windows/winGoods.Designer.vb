@@ -123,7 +123,7 @@ Partial Class winGoods
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(29, 12)
         Me.Label4.TabIndex = 14
-        Me.Label4.Text = "品牌"
+        Me.Label4.Text = "廠牌"
         '
         'winGoods
         '

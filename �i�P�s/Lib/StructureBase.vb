@@ -76,6 +76,27 @@ Namespace Database
                 data.Note = R("Note")
                 Return data
             End Function
+
+            Public Shared Function Null() As Supplier
+                Dim s As New Supplier
+                s.Label = ""
+                Return s
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note"}
+                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, Note}
+                Return File.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+            End Function
+
+            Public Overrides Function ToString() As String
+                If IsNull() Then Return ""
+                Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
+            End Function
         End Structure
 
         ''' <summary>客戶</summary>
@@ -200,7 +221,27 @@ Namespace Database
                 Return data
             End Function
 
-        End Structure
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Name", "Kind", "Brand", "Note"}
+                Dim Value As String() = New String() {Name, Kind, Brand, Note}
+                Return File.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
+            Public Shared Function Null() As Goods
+                Dim g As New Goods
+                g.Label = ""
+                Return g
+            End Function
+
+            Public Overrides Function ToString() As String
+                If IsNull() Then Return ""
+                Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
+            End Function
+End Structure
 #End Region
 #Region "門號"
         ''' <summary>門號</summary>
@@ -299,16 +340,23 @@ Namespace Database
                 Return data
             End Function
 
+
             Public Function GetUpdateSqlCommand()
                 Dim SQLCommand As String = "UPDATE " & Table & " SET "
                 Dim label() As String = New String() {"GoodsLabel", "SupplierLabel", "Date", "IMEI", "Cost", "Price", "Number", "Note"}
                 Dim value() As String = New String() {"'" & GoodsLabel & "'", "'" & SupplierLabel & "'", [Date].ToString("#yyyy/MM/dd HH:mm:ss#"), "'" & IMEI & "'", Cost, Price, Number, "'" & Note & "'"}
 
-                SQLCommand &= GetColumnChange(label, value) & " WHERE Label='" & Me.Label & "';"
+                SQLCommand &= GetSqlColumnChangePart(label, value) & " WHERE Label='" & Me.Label & "';"
                 Return SQLCommand
             End Function
 
-            Private Function GetColumnChange(ByVal Label() As String, ByVal value() As String) As String
+            Public Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn As String, ByVal ConditionText As String) As String
+                Dim SQLCommand As String = "UPDATE " & Table & " SET "
+                SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]='" & ConditionText & "';"
+                Return SQLCommand
+            End Function
+
+            Private Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As String) As String
                 Dim lst As New List(Of String)
 
                 For i As Integer = 0 To Label.Length - 1

@@ -142,6 +142,12 @@
     <Compile Include="Windows\winStockInLog.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\winSupplierList.Designer.vb">
+      <DependentUpon>winSupplierList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winSupplierList.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Windows\winGoods.resx">
@@ -184,6 +190,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winStockIn.resx">
       <DependentUpon>winStockIn.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winSupplierList.resx">
+      <DependentUpon>winSupplierList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

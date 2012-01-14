@@ -1,5 +1,4 @@
-﻿
-Namespace Database
+﻿Namespace Database
 
     Public Structure Column
         Dim Name As String
@@ -21,6 +20,14 @@ Namespace Database
         Event ChangedStock(ByVal stock As Stock)
         Event DeletedStock(ByVal stock As Stock)
 
+        Event CreatedGoods(ByVal goods As Goods)
+        Event ChangedGoods(ByVal goods As Goods)
+        Event DeletedGoods(ByVal goods As Goods)
+
+        Event CreatedSupplier(ByVal sup As Supplier)
+        Event ChangedSupplier(ByVal sup As Supplier)
+        Event DeletedSupplier(ByVal sup As Supplier)
+
         Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
         Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
         Event DeletedSales(ByVal sales As Sales)
@@ -33,9 +40,30 @@ Namespace Database
 
         Public Function GetGoodsList() As Data.DataTable
             Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & ";"
-            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
-            Return DT
+            Return File.Read("table", File.BasePath, SQLCommand)
         End Function
+
+        Public Function GetGoods(ByVal Label As String) As Goods
+            Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & " WHERE Label='" & Label & "';"
+            Dim dt As DataTable = File.Read("table", File.BasePath, SQLCommand)
+            If dt.Rows.Count = 0 Then Return Goods.Null()
+            Return Goods.GetFrom(dt.Rows(0))
+        End Function
+
+        Public Function GetSupplierList() As Data.DataTable
+            Dim SQLCommand As String = "SELECT * FROM " & Supplier.Table & ";"
+            Return File.Read("table", File.BasePath, SQLCommand)
+        End Function
+
+        Public Function GetSupplier(ByVal Label As String) As Supplier
+            Dim SQLCommand As String = "SELECT * FROM " & Supplier.Table & " WHERE Label='" & Label & "';"
+            Dim dt As DataTable = File.Read("table", File.BasePath, SQLCommand)
+            If dt.Rows.Count = 0 Then Return Supplier.Null()
+            Return Supplier.GetFrom(dt.Rows(0))
+
+        End Function
+
+
 
         '更新庫存內容
         Public Sub ChangeStock(ByVal newStock As Stock)
@@ -71,16 +99,32 @@ Namespace Database
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
 
 
-            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SqlCommand)
             Return DT
         End Function
 
 
         ''' <summary>取得進貨記錄</summary>
         Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Supplier.Name as 供應商, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
             " WHERE (((Stock.[date]) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        Public Function GetStockLogByGoodsLabel(ByVal label As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
+            " WHERE Stock.GoodsLabel='" & label & "';"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        Public Function GetStockLogBySupplierLabel(ByVal label As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
+            " WHERE Stock.SupplierLabel='" & label & "';"
             Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
             Return DT
         End Function
@@ -168,6 +212,7 @@ Namespace Database
             Public Shared Dir As String
             Public Shared BasePath As String
             Public Shared SalesPath As String
+            Public Shared Password As String = "36363636"
 
             Shared DBWriteLock As String = " DBWriteLock"
 
@@ -207,7 +252,8 @@ Namespace Database
                 Dim DBControl As OleDb.OleDbConnection
 
                 '指定檔案路徑
-                DBControl = New OleDb.OleDbConnection("PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath)
+                DBControl = New OleDb.OleDbConnection("PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password)
+
                 Try
                     DBControl.Open() '開啟與資料庫的連線 
                 Catch
@@ -254,7 +300,7 @@ Namespace Database
             ''' <param name="FilePath">檔案路徑</param>
             Private Shared Function CreateAccessFile(ByVal FilePath) As String
                 Dim newDatabase As New ADOX.Catalog
-                Try : newDatabase.Create("PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath) : Catch : End Try
+                Try : newDatabase.Create("PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password) : Catch : End Try
                 Return Err.Description
             End Function
 
@@ -362,7 +408,7 @@ Namespace Database
                 Return DS.Tables(Table)
             End Function
 
-            Shared Function GetSqlSelect(ByVal Table As String)
+            Shared Function GetSqlSelect(ByVal Table As String) As String
                 Return "SELECT * FROM [" & Table & "];"
             End Function
 
@@ -374,6 +420,25 @@ Namespace Database
                 Dim ColumnText As String = Table & "(" & Join(Array.ConvertAll(Columns, Function(c As Column) "[" & c.Name & "]"), ",") & ")"
                 Dim ValueText As String = Join(Array.ConvertAll(objects, AddressOf GetSqlValue), ",")
                 Return "INSERT INTO " & ColumnText & " VALUES (" & ValueText & ");"
+            End Function
+
+            Shared Function GetSqlDelete(ByVal Table As String, ByVal ColumnName As String, ByVal Text As String) As String
+                Return "DELETE FROM " & Table & " WHERE [" & ColumnName & "]='" & Text & "';"
+            End Function
+
+            Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn As String, ByVal ConditionText As String) As String
+                Dim SQLCommand As String = "UPDATE " & Table & " SET "
+                SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]='" & ConditionText & "';"
+                Return SQLCommand
+            End Function
+
+            Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As String) As String
+                Dim lst As New List(Of String)
+
+                For i As Integer = 0 To Label.Length - 1
+                    lst.Add("[" & Label(i) & "]='" & value(i) & "'")
+                Next i
+                Return Join(lst.ToArray, ",")
             End Function
 
             Shared Function GetSqlValue(ByVal obj As Object) As String
@@ -476,6 +541,17 @@ Namespace Database
         Public Sub AddSupplier(ByVal data As Supplier)
             File.AddBase(data)
             SupplierList.Add(data)
+            RaiseEvent CreatedSupplier(data)
+        End Sub
+
+        Public Sub DeleteSupplier(ByVal data As Supplier)
+            File.Command(File.GetSqlDelete(Supplier.Table, "Label", data.Label), File.BasePath)
+            RaiseEvent DeletedSupplier(data)
+        End Sub
+
+        Public Sub ChangeSupplier(ByVal data As Supplier)
+            File.Command(data.GetUpdateSqlCommand(), File.BasePath)
+            RaiseEvent ChangedSupplier(data)
         End Sub
 
         ''' <summary>新增客戶</summary>
@@ -493,6 +569,17 @@ Namespace Database
         Public Sub AddGoods(ByVal data As Goods)
             File.AddBase(data)
             GoodsList.Add(data)
+            RaiseEvent CreatedGoods(data)
+        End Sub
+
+        Public Sub DeleteGoods(ByVal data As Goods)
+            File.Command(File.GetSqlDelete(Goods.Table, "Label", data.Label), File.BasePath)
+            RaiseEvent DeletedGoods(data)
+        End Sub
+
+        Public Sub ChangeGoods(ByVal data As Goods)
+            File.Command(data.GetUpdateSqlCommand(), File.BasePath)
+            RaiseEvent ChangedGoods(data)
         End Sub
 
         ''' <summary>新增門號</summary>

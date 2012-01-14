@@ -24,10 +24,8 @@ Partial Class winStockIn
     Private Sub InitializeComponent()
         Me.Label1 = New System.Windows.Forms.Label
         Me.txtLabel = New System.Windows.Forms.TextBox
-        Me.cbGoods = New System.Windows.Forms.ComboBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
-        Me.cbSupplier = New System.Windows.Forms.ComboBox
         Me.txtDate = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.txtIMEI = New System.Windows.Forms.TextBox
@@ -41,8 +39,10 @@ Partial Class winStockIn
         Me.txtNumber = New System.Windows.Forms.TextBox
         Me.Label9 = New System.Windows.Forms.Label
         Me.btOK = New System.Windows.Forms.Button
-        Me.btAddSupplier = New System.Windows.Forms.Button
-        Me.btAddGoods = New System.Windows.Forms.Button
+        Me.btSelectSupplier = New System.Windows.Forms.Button
+        Me.btSelectGoods = New System.Windows.Forms.Button
+        Me.btResetGoods = New System.Windows.Forms.Button
+        Me.btResetSupplier = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Label1
@@ -61,19 +61,10 @@ Partial Class winStockIn
         Me.txtLabel.Size = New System.Drawing.Size(127, 22)
         Me.txtLabel.TabIndex = 14
         '
-        'cbGoods
-        '
-        Me.cbGoods.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbGoods.FormattingEnabled = True
-        Me.cbGoods.Location = New System.Drawing.Point(284, 68)
-        Me.cbGoods.Name = "cbGoods"
-        Me.cbGoods.Size = New System.Drawing.Size(127, 20)
-        Me.cbGoods.TabIndex = 16
-        '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(237, 71)
+        Me.Label2.Location = New System.Drawing.Point(28, 66)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(29, 12)
         Me.Label2.TabIndex = 15
@@ -82,24 +73,15 @@ Partial Class winStockIn
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(237, 32)
+        Me.Label3.Location = New System.Drawing.Point(28, 98)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(41, 12)
         Me.Label3.TabIndex = 15
         Me.Label3.Text = "供應商"
         '
-        'cbSupplier
-        '
-        Me.cbSupplier.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbSupplier.FormattingEnabled = True
-        Me.cbSupplier.Location = New System.Drawing.Point(284, 29)
-        Me.cbSupplier.Name = "cbSupplier"
-        Me.cbSupplier.Size = New System.Drawing.Size(127, 20)
-        Me.cbSupplier.TabIndex = 16
-        '
         'txtDate
         '
-        Me.txtDate.Location = New System.Drawing.Point(75, 68)
+        Me.txtDate.Location = New System.Drawing.Point(284, 29)
         Me.txtDate.Name = "txtDate"
         Me.txtDate.Size = New System.Drawing.Size(127, 22)
         Me.txtDate.TabIndex = 14
@@ -107,7 +89,7 @@ Partial Class winStockIn
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(16, 71)
+        Me.Label4.Location = New System.Drawing.Point(225, 32)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(53, 12)
         Me.Label4.TabIndex = 15
@@ -115,7 +97,7 @@ Partial Class winStockIn
         '
         'txtIMEI
         '
-        Me.txtIMEI.Location = New System.Drawing.Point(75, 108)
+        Me.txtIMEI.Location = New System.Drawing.Point(77, 128)
         Me.txtIMEI.Name = "txtIMEI"
         Me.txtIMEI.Size = New System.Drawing.Size(127, 22)
         Me.txtIMEI.TabIndex = 14
@@ -123,7 +105,7 @@ Partial Class winStockIn
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(28, 111)
+        Me.Label5.Location = New System.Drawing.Point(30, 131)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(30, 12)
         Me.Label5.TabIndex = 15
@@ -132,7 +114,7 @@ Partial Class winStockIn
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(29, 201)
+        Me.Label6.Location = New System.Drawing.Point(31, 213)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(29, 12)
         Me.Label6.TabIndex = 18
@@ -140,7 +122,7 @@ Partial Class winStockIn
         '
         'txtNote
         '
-        Me.txtNote.Location = New System.Drawing.Point(30, 225)
+        Me.txtNote.Location = New System.Drawing.Point(32, 237)
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(394, 77)
@@ -148,7 +130,7 @@ Partial Class winStockIn
         '
         'txtCost
         '
-        Me.txtCost.Location = New System.Drawing.Point(75, 148)
+        Me.txtCost.Location = New System.Drawing.Point(77, 168)
         Me.txtCost.Name = "txtCost"
         Me.txtCost.Size = New System.Drawing.Size(127, 22)
         Me.txtCost.TabIndex = 14
@@ -156,7 +138,7 @@ Partial Class winStockIn
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(28, 151)
+        Me.Label7.Location = New System.Drawing.Point(30, 171)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(41, 12)
         Me.Label7.TabIndex = 15
@@ -164,7 +146,7 @@ Partial Class winStockIn
         '
         'txtPrice
         '
-        Me.txtPrice.Location = New System.Drawing.Point(284, 145)
+        Me.txtPrice.Location = New System.Drawing.Point(286, 165)
         Me.txtPrice.Name = "txtPrice"
         Me.txtPrice.Size = New System.Drawing.Size(127, 22)
         Me.txtPrice.TabIndex = 14
@@ -172,7 +154,7 @@ Partial Class winStockIn
         'Label8
         '
         Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(237, 148)
+        Me.Label8.Location = New System.Drawing.Point(239, 168)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(29, 12)
         Me.Label8.TabIndex = 15
@@ -180,7 +162,7 @@ Partial Class winStockIn
         '
         'txtNumber
         '
-        Me.txtNumber.Location = New System.Drawing.Point(284, 108)
+        Me.txtNumber.Location = New System.Drawing.Point(286, 128)
         Me.txtNumber.Name = "txtNumber"
         Me.txtNumber.Size = New System.Drawing.Size(127, 22)
         Me.txtNumber.TabIndex = 14
@@ -188,52 +170,70 @@ Partial Class winStockIn
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(237, 111)
+        Me.Label9.Location = New System.Drawing.Point(239, 131)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(29, 12)
         Me.Label9.TabIndex = 15
         Me.Label9.Text = "數量"
         '
-        'btAdd
+        'btOK
         '
-        Me.btOK.Location = New System.Drawing.Point(349, 325)
-        Me.btOK.Name = "btAdd"
+        Me.btOK.Location = New System.Drawing.Point(351, 337)
+        Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
         Me.btOK.TabIndex = 19
         Me.btOK.Text = "新增"
         Me.btOK.UseVisualStyleBackColor = True
         '
-        'btAddSupplier
+        'btSelectSupplier
         '
-        Me.btAddSupplier.Location = New System.Drawing.Point(430, 27)
-        Me.btAddSupplier.Name = "btAddSupplier"
-        Me.btAddSupplier.Size = New System.Drawing.Size(53, 23)
-        Me.btAddSupplier.TabIndex = 20
-        Me.btAddSupplier.Text = "新增"
-        Me.btAddSupplier.UseVisualStyleBackColor = True
+        Me.btSelectSupplier.Location = New System.Drawing.Point(77, 93)
+        Me.btSelectSupplier.Name = "btSelectSupplier"
+        Me.btSelectSupplier.Size = New System.Drawing.Size(284, 23)
+        Me.btSelectSupplier.TabIndex = 20
+        Me.btSelectSupplier.Text = "新增"
+        Me.btSelectSupplier.UseVisualStyleBackColor = True
         '
-        'btAddGoods
+        'btSelectGoods
         '
-        Me.btAddGoods.Location = New System.Drawing.Point(430, 66)
-        Me.btAddGoods.Name = "btAddGoods"
-        Me.btAddGoods.Size = New System.Drawing.Size(53, 23)
-        Me.btAddGoods.TabIndex = 20
-        Me.btAddGoods.Text = "新增"
-        Me.btAddGoods.UseVisualStyleBackColor = True
+        Me.btSelectGoods.Location = New System.Drawing.Point(75, 61)
+        Me.btSelectGoods.Name = "btSelectGoods"
+        Me.btSelectGoods.Size = New System.Drawing.Size(286, 23)
+        Me.btSelectGoods.TabIndex = 20
+        Me.btSelectGoods.Text = "新增"
+        Me.btSelectGoods.UseVisualStyleBackColor = True
+        '
+        'btResetGoods
+        '
+        Me.btResetGoods.Location = New System.Drawing.Point(367, 61)
+        Me.btResetGoods.Name = "btResetGoods"
+        Me.btResetGoods.Size = New System.Drawing.Size(46, 23)
+        Me.btResetGoods.TabIndex = 21
+        Me.btResetGoods.Text = "清除"
+        Me.btResetGoods.UseVisualStyleBackColor = True
+        '
+        'btResetSupplier
+        '
+        Me.btResetSupplier.Location = New System.Drawing.Point(367, 93)
+        Me.btResetSupplier.Name = "btResetSupplier"
+        Me.btResetSupplier.Size = New System.Drawing.Size(46, 23)
+        Me.btResetSupplier.TabIndex = 21
+        Me.btResetSupplier.Text = "清除"
+        Me.btResetSupplier.UseVisualStyleBackColor = True
         '
         'winStockIn
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(499, 360)
-        Me.Controls.Add(Me.btAddGoods)
-        Me.Controls.Add(Me.btAddSupplier)
+        Me.ClientSize = New System.Drawing.Size(440, 373)
+        Me.Controls.Add(Me.btResetSupplier)
+        Me.Controls.Add(Me.btResetGoods)
+        Me.Controls.Add(Me.btSelectGoods)
+        Me.Controls.Add(Me.btSelectSupplier)
         Me.Controls.Add(Me.btOK)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.txtNote)
-        Me.Controls.Add(Me.cbSupplier)
         Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.cbGoods)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.Label8)
@@ -257,10 +257,8 @@ Partial Class winStockIn
     End Sub
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents txtLabel As System.Windows.Forms.TextBox
-    Friend WithEvents cbGoods As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents cbSupplier As System.Windows.Forms.ComboBox
     Friend WithEvents txtDate As System.Windows.Forms.TextBox
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents txtIMEI As System.Windows.Forms.TextBox
@@ -274,6 +272,8 @@ Partial Class winStockIn
     Friend WithEvents txtNumber As System.Windows.Forms.TextBox
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents btOK As System.Windows.Forms.Button
-    Friend WithEvents btAddSupplier As System.Windows.Forms.Button
-    Friend WithEvents btAddGoods As System.Windows.Forms.Button
+    Friend WithEvents btSelectSupplier As System.Windows.Forms.Button
+    Friend WithEvents btSelectGoods As System.Windows.Forms.Button
+    Friend WithEvents btResetGoods As System.Windows.Forms.Button
+    Friend WithEvents btResetSupplier As System.Windows.Forms.Button
 End Class

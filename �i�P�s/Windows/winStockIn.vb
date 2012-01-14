@@ -8,34 +8,28 @@ Public Class winStockIn
     End Enum
     Dim Work As Mode
 
+    Private SelectedGoods As Database.Goods = Database.Goods.Null()
+    Private SelectedSupplier As Database.Supplier = Database.Supplier.Null()
+
 
     Private Sub winStockIn_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btOK.Text = IIf(Work = Mode.Create, "入庫", "修改")
         txtLabel.Enabled = Work = Mode.Create
-    End Sub
 
-    Public Sub Config()
-        cbGoods.Items.Clear()
-        cbGoods.Items.AddRange(Array.ConvertAll(Goodsies, Function(G As Goods) G.Name))
-        If cbGoods.Items.Count > 0 Then cbGoods.SelectedIndex = cbGoods.Items.Count - 1
-
-        cbSupplier.Items.Clear()
-        cbSupplier.Items.AddRange(Array.ConvertAll(Supplies, Function(S As Supplier) S.Name))
-        If cbSupplier.Items.Count > 0 Then cbSupplier.SelectedIndex = cbSupplier.Items.Count - 1
-
+        btSelectGoods.Text = SelectedGoods.ToString()
     End Sub
 
 
     Public Sub Create()
         Dim data As Stock = GetNewStock()
-        Config()
+
         UpdateText(data)
         Work = Mode.Create
         MyBase.ShowDialog()
     End Sub
 
     Public Sub Open(ByVal stock As Stock)
-        Config()
+
         UpdateText(stock)
         Work = Mode.Open
         MyBase.ShowDialog()
@@ -49,8 +43,12 @@ Public Class winStockIn
         txtDate.Text = Data.Date
         txtNote.Text = Data.Note
         txtNumber.Text = Data.Number
-        cbGoods.Text = Array.Find(Goodsies, Function(G As Goods) G.Label = Data.GoodsLabel).Name
-        cbSupplier.Text = Array.Find(Supplies, Function(S As Supplier) S.Label = Data.SupplierLabel).Name
+        SelectedGoods = DB.GetGoods(Data.GoodsLabel)
+        btSelectGoods.Text = SelectedGoods.ToString()
+        SelectedSupplier = DB.GetSupplier(Data.SupplierLabel)
+        btSelectSupplier.Text = SelectedSupplier.ToString()
+        'cbGoods.Text = Array.Find(Goodsies, Function(G As Goods) G.Label = Data.GoodsLabel).Name
+        'cbSupplier.Text = Array.Find(Supplies, Function(S As Supplier) S.Label = Data.SupplierLabel).Name
     End Sub
 
     Public Function GetData() As Stock
@@ -62,17 +60,19 @@ Public Class winStockIn
         Data.Note = txtNote.Text
         Data.Date = txtDate.Text
         Data.Number = Val(txtNumber.Text)
-        If cbGoods.SelectedIndex >= 0 Then
-            Data.GoodsLabel = Goodsies(cbGoods.SelectedIndex).Label
-        Else
-            Data.GoodsLabel = ""
-        End If
+        Data.GoodsLabel = SelectedGoods.Label
+        Data.SupplierLabel = SelectedSupplier.Label
+        'If cbGoods.SelectedIndex >= 0 Then
+        '    Data.GoodsLabel = Goodsies(cbGoods.SelectedIndex).Label
+        'Else
+        '    Data.GoodsLabel = ""
+        'End If
 
-        If cbSupplier.SelectedIndex >= 0 Then Data.SupplierLabel = Supplies(cbSupplier.SelectedIndex).Label
+        'If cbSupplier.SelectedIndex >= 0 Then Data.SupplierLabel = Supplies(cbSupplier.SelectedIndex).Label
         Return Data
     End Function
 
-    Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOK.Click
+    Private Sub btOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOK.Click
         Dim newStock As Stock = GetData()
         If newStock.GoodsLabel = "" Then
             MsgBox("尚未指定商品")
@@ -89,21 +89,32 @@ Public Class winStockIn
         Me.Close()
     End Sub
 
-    Private Sub btAddSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddSupplier.Click
-        winPeople.AddSupplier(GetNewSupplier)
-        InitialProgram()
-        Config()
+    Private Sub btAddSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSelectSupplier.Click
+        Dim sel As Supplier = winSupplierList.SelectDialog()
+        If Not sel.IsNull() Then
+            SelectedSupplier = sel
+            btSelectSupplier.Text = SelectedSupplier.ToString()
+        End If
     End Sub
 
-    Private Sub btAddGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddGoods.Click
-        'winGoods.Add(GetNewGoods)
-        'InitialProgram()
-
-        winGoodsList.Show()
-        Config()
-
+    Private Sub btAddGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSelectGoods.Click
+        Dim sel As Goods = winGoodsList.SelectDialog()
+        If Not sel.IsNull() Then
+            SelectedGoods = sel
+            btSelectGoods.Text = SelectedGoods.ToString()
+        End If
     End Sub
 
 
 
+    Private Sub btResetGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetGoods.Click
+        SelectedGoods = Database.Goods.Null()
+        btSelectGoods.Text = SelectedGoods.ToString()
+    End Sub
+
+
+    Private Sub btResetSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetSupplier.Click
+        SelectedSupplier = Database.Supplier.Null()
+        btSelectSupplier.Text = SelectedSupplier.ToString()
+    End Sub
 End Class

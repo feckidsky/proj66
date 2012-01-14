@@ -1,9 +1,25 @@
 ﻿Imports 進銷存.Database.StructureBase
 
 Public Class winGoods
+    Enum Mode
+        Create = 0
+        Open = 1
+    End Enum
 
+    Dim Work As Mode
 
-    Public Sub Add(ByVal Data As Goods)
+    Private Sub winGoods_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        btAdd.Text = IIf(Work = Mode.Create, "新增", "修改")
+    End Sub
+
+    Public Sub Open(ByVal Data As Goods)
+        Work = Mode.Open
+        UpdateText(Data)
+        MyBase.ShowDialog()
+    End Sub
+
+    Public Sub Create(ByVal Data As Goods)
+        Work = Mode.Create
         UpdateText(Data)
         MyBase.ShowDialog()
     End Sub
@@ -27,11 +43,18 @@ Public Class winGoods
     End Function
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
-        DB.AddGoods(GetData())
-        UpdateText(GetNewGoods)
+
+        If Work = Mode.Create Then
+            DB.AddGoods(GetData())
+        Else
+            DB.ChangeGoods(GetData())
+        End If
+
+        Me.Close()
+        'UpdateText(GetNewGoods)
+
+
     End Sub
 
-    Private Sub winGoods_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    End Sub
 End Class

@@ -71,9 +71,7 @@ Public Class winMain
     End Sub
 
 
-    Private Sub 銷貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨ToolStripMenuItem.Click
-        winSales.Create()
-    End Sub
+
 
     Private Sub dgSales_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgSales.CellMouseDoubleClick
 
@@ -109,8 +107,7 @@ Public Class winMain
         UpdateSalesList()
     End Sub
 
-
-    Private Sub 銷貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨AToolStripMenuItem.Click
+    Private Sub 銷貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨AToolStripMenuItem.Click, 銷貨ToolStripMenuItem.Click
         winSales.Create()
     End Sub
 
@@ -132,5 +129,13 @@ Public Class winMain
         Dim sales As New Sales
         sales.Label = dgSales.SelectedRows(0).Cells(0).Value
         DB.DeleteSales(sales)
+    End Sub
+
+    Private Sub 商品項目GToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 商品項目GToolStripMenuItem.Click
+        winGoodsList.Show()
+    End Sub
+
+    Private Sub 供應商ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 供應商ToolStripMenuItem.Click
+        winSupplierList.Show()
     End Sub
 End Class
