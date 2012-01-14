@@ -70,6 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lib\Database.vb" />
+    <Compile Include="Windows\winGoodsList.Designer.vb">
+      <DependentUpon>winGoodsList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winGoodsList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\winMain.Designer.vb">
       <DependentUpon>winMain.vb</DependentUpon>
     </Compile>
@@ -118,10 +124,10 @@
     <Compile Include="Windows\winSales.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winStock.Designer.vb">
-      <DependentUpon>winStock.vb</DependentUpon>
+    <Compile Include="Windows\winStockList.Designer.vb">
+      <DependentUpon>winStockList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winStock.vb">
+    <Compile Include="Windows\winStockList.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\winStockIn.Designer.vb">
@@ -130,10 +136,20 @@
     <Compile Include="Windows\winStockIn.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\winStockInLog.Designer.vb">
+      <DependentUpon>winStockInLog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winStockInLog.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Windows\winGoods.resx">
       <DependentUpon>winGoods.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winGoodsList.resx">
+      <DependentUpon>winGoodsList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winMain.resx">
@@ -158,8 +174,12 @@
       <DependentUpon>winSales.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winStock.resx">
-      <DependentUpon>winStock.vb</DependentUpon>
+    <EmbeddedResource Include="Windows\winStockInLog.resx">
+      <DependentUpon>winStockInLog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winStockList.resx">
+      <DependentUpon>winStockList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winStockIn.resx">

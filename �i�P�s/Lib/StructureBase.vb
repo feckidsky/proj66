@@ -27,6 +27,7 @@ Namespace Database
             End Sub
             Default Public ReadOnly Property Item(ByVal Label As String)
                 Get
+                    If System.DBNull.Equals(Row.Item(Label), System.DBNull.Value) Then Return ""
                     Return RTrim(Row.Item(Label))
                 End Get
             End Property
@@ -262,8 +263,6 @@ Namespace Database
             Dim Price As Single
             ''' <summary>數量</summary>
             Dim Number As Integer
-            ''' <summary>狀態(入庫/出貨)</summary>
-            Dim Statu As String
             ''' <summary>備註</summary>
             Dim Note As String
 
@@ -277,30 +276,47 @@ Namespace Database
                 Columns.Add(New Column("Cost", DBTypeSingle))
                 Columns.Add(New Column("Price", DBTypeSingle))
                 Columns.Add(New Column("Number", DBTypeInteger))
-                Columns.Add(New Column("Statu", DBTypeNote))
                 Columns.Add(New Column("Note", DBTypeNote))
                 Return Columns.ToArray
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date], IMEI, Cost, Price, Number, Statu, Note}
+                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date].ToString("yyyy/MM/dd HH:mm:ss"), IMEI, Cost, Price, Number, Note}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Stock
                 Dim R As New MyDataRow(Row)
                 Dim data As Stock
                 data.Label = R("Label")
-                data.GoodsLabel = R("Name")
-                data.SupplierLabel = R("Commission")
+                data.GoodsLabel = R("GoodsLabel")
+                data.SupplierLabel = R("SupplierLabel")
                 data.Date = R("Date")
                 data.IMEI = R("IMEI")
                 data.Cost = R("Cost")
                 data.Price = R("Price")
                 data.Number = R("Number")
-                data.Statu = R("Statu")
                 data.Note = R("Note")
                 Return data
             End Function
+
+            Public Function GetUpdateSqlCommand()
+                Dim SQLCommand As String = "UPDATE " & Table & " SET "
+                Dim label() As String = New String() {"GoodsLabel", "SupplierLabel", "Date", "IMEI", "Cost", "Price", "Number", "Note"}
+                Dim value() As String = New String() {"'" & GoodsLabel & "'", "'" & SupplierLabel & "'", [Date].ToString("#yyyy/MM/dd HH:mm:ss#"), "'" & IMEI & "'", Cost, Price, Number, "'" & Note & "'"}
+
+                SQLCommand &= GetColumnChange(label, value) & " WHERE Label='" & Me.Label & "';"
+                Return SQLCommand
+            End Function
+
+            Private Function GetColumnChange(ByVal Label() As String, ByVal value() As String) As String
+                Dim lst As New List(Of String)
+
+                For i As Integer = 0 To Label.Length - 1
+                    lst.Add("[" & Label(i) & "]=" & value(i))
+                Next i
+                Return Join(lst.ToArray, ",")
+            End Function
+
         End Structure
 #End Region
 

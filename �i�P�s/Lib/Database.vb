@@ -17,6 +17,13 @@ Namespace Database
         Dim GoodsList As New List(Of Goods)
         Dim MobileList As New List(Of Mobile)
 
+        Event CreatedStock(ByVal stock As Stock)
+        Event ChangedStock(ByVal stock As Stock)
+        Event DeletedStock(ByVal stock As Stock)
+
+        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
+        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
+        Event DeletedSales(ByVal sales As Sales)
 
         Public Sub New()
             File.Dir = My.Application.Info.DirectoryPath & "\data"
@@ -24,18 +31,137 @@ Namespace Database
             File.SalesPath = File.Dir & "\sales.mdb"
         End Sub
 
+        Public Function GetGoodsList() As Data.DataTable
+            Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & ";"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '更新庫存內容
+        Public Sub ChangeStock(ByVal newStock As Stock)
+            Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
+            File.Command(SQLCommand, File.BasePath)
+            RaiseEvent ChangedStock(newStock)
+        End Sub
+
+        '刪除一筆庫存
+        Public Sub DeleteStock(ByVal dStock As Stock)
+            Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
+            File.Command(SQLCommand, File.BasePath)
+            RaiseEvent DeletedStock(dStock)
+        End Sub
+
+        '讀取庫存資料
+        Public Function GetStock(ByVal Label As String) As Stock
+            Dim SQLCommand As String = "SELECT * FROM " & Stock.Table & " WHERE Label='" & Label & "';"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+
+            Dim data As New Stock
+            If DT.Rows.Count > 0 Then data = Stock.GetFrom(DT.Rows(0))
+            Return data
+        End Function
+
+
+
         ''' <summary>取得庫存清單</summary>
         Public Function GetStockList() As Data.DataTable
-            Dim SQLCommand As String = "SELECT a.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
+            'Dims SQLCommand As String = "SELECT stock.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
+            Dim SqlCommand As String = "SELECT stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Price AS 售價, stock.Note AS 備註 " & _
+            " FROM (stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
+            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
+
+
             Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
             Return DT
         End Function
 
 
-        Public Function GetSalesList() As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM Sales, SalesGoods;"
+        ''' <summary>取得進貨記錄</summary>
+        Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
+            " WHERE (((Stock.[date]) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+
+        '讀取銷貨單
+        Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
+            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.Date AS 時間, Customer.Name AS 銷售人員, Personnel.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
+            " FROM ((sales LEFT JOIN (SELECT SalesLabel, sum(SellingPrice*Number) AS 金額 FROM SalesGoods GROUP BY SalesLabel)  AS tmp ON sales.label = tmp.SalesLabel) LEFT JOIN Customer ON sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON sales.PersonnelLabel = Personnel.Label " & _
+            " WHERE (((sales.[date]) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
+
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '取得銷貨單資訊
+        Public Function GetSales(ByVal Label As String) As Sales
+            Dim SQLCommand As String = "SELECT * FROM " & Sales.Table & " WHERE label='" & Label & "';"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+
+            Dim s As New Sales
+            If DT Is Nothing OrElse DT.Rows.Count <= 0 Then Return s
+            Return Sales.GetFrom(DT.Rows(0))
 
         End Function
+
+        '取得銷貨單的商品清單-根據銷貨單號
+        Public Function GetGoodsListBySalesLabel(ByVal Label As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
+            " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
+            " WHERE (((SalesGoods.SalesLabel)=""" & Label & """));"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '取得包含該商品的銷貨單
+        Public Function GetGoodsListByStockLabel(ByVal Label As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
+            " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
+            " WHERE (((SalesGoods.StockLabel)=""" & Label & """));"
+            Dim DT As Data.DataTable = File.Read("table", File.BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '新增銷貨單
+        Public Sub CreateSales(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
+            CreateSalesWithoutEvent(newSales, Goods)
+            RaiseEvent CreatedSales(newSales, Goods)
+
+        End Sub
+
+        '刪除銷貨單
+        Public Sub DeleteSales(ByVal dSales As Sales)
+            DeleteSalesWithoutEvent(dSales)
+            RaiseEvent DeletedSales(dSales)
+        End Sub
+
+        '修改銷貨單
+        Public Sub ChangeSales(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
+            DeleteSalesWithoutEvent(newSales)
+            CreateSalesWithoutEvent(newSales, Goods)
+            RaiseEvent ChangedSales(newSales, Goods)
+        End Sub
+
+        Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
+            Database.Access.File.AddBase(newSales)
+
+            For Each g As SalesGoods In Goods
+                Database.Access.File.AddBase(g)
+            Next
+        End Sub
+
+        Private Sub DeleteSalesWithoutEvent(ByVal dSales As Sales)
+            Dim SqlCommand As String = "DELETE FROM sales WHERE label='" & dSales.Label & "';"
+            File.Command(SqlCommand, File.BasePath)
+
+            SqlCommand = "DELETE FROM salesgoods WHERE saleslabel='" & dSales.Label & "';"
+            File.Command(SqlCommand, File.BasePath)
+        End Sub
+
+
 
         Public Class File
 
@@ -61,19 +187,19 @@ Namespace Database
 
             End Function
 
-            ''' <summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
-            ''' <param name="FilePath">檔案路徑</param>
-            Public Shared Function ConnectSales(ByVal FilePath As String) As OleDb.OleDbConnection
-                Dim Dir As String = Left(FilePath, FilePath.LastIndexOf("\"))
+            '''' <summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
+            '''' <param name="FilePath">檔案路徑</param>
+            'Public Shared Function ConnectSales(ByVal FilePath As String) As OleDb.OleDbConnection
+            '    Dim Dir As String = Left(FilePath, FilePath.LastIndexOf("\"))
 
-                If Not IO.Directory.Exists(Dir) Then IO.Directory.CreateDirectory(Dir)
+            '    If Not IO.Directory.Exists(Dir) Then IO.Directory.CreateDirectory(Dir)
 
-                If Not IO.File.Exists(FilePath) Then
-                    Return CreateFileSales(FilePath)
-                Else
-                    Return Open(FilePath)
-                End If
-            End Function
+            '    If Not IO.File.Exists(FilePath) Then
+            '        Return CreateFileSales(FilePath)
+            '    Else
+            '        Return Open(FilePath)
+            '    End If
+            'End Function
 
             ''' <summary>連接資料庫，回傳所連接的資料庫元件</summary>
             ''' <param name="FilePath">檔案路徑</param>
@@ -178,22 +304,22 @@ Namespace Database
             ''' <summary>對資料庫下達SQL指令</summary>
             ''' <param name="SqlCommand">SQL字串</param>
             ''' <param name="File">檔按路徑</param>
-            Private Shared Function CommandBase(ByVal SqlCommand As String, ByVal File As String) As Long
+            Public Shared Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
                 Dim DBControl As OleDb.OleDbConnection = ConnectBase(File)
                 Dim Count As Long = Command(SqlCommand, DBControl)
                 Close(DBControl)
                 Return Count
             End Function
 
-            ''' <summary>對資料庫下達SQL指令</summary>
-            ''' <param name="SqlCommand">SQL字串</param>
-            ''' <param name="File">檔按路徑</param>
-            Private Shared Function CommandSales(ByVal SqlCommand As String, ByVal File As String) As Long
-                Dim DBControl As OleDb.OleDbConnection = ConnectSales(File)
-                Dim Count As Long = Command(SqlCommand, DBControl)
-                Close(DBControl)
-                Return Count
-            End Function
+            '''' <summary>對資料庫下達SQL指令</summary>
+            '''' <param name="SqlCommand">SQL字串</param>
+            '''' <param name="File">檔按路徑</param>
+            'Private Shared Function CommandSales(ByVal SqlCommand As String, ByVal File As String) As Long
+            '    Dim DBControl As OleDb.OleDbConnection = ConnectSales(File)
+            '    Dim Count As Long = Command(SqlCommand, DBControl)
+            '    Close(DBControl)
+            '    Return Count
+            'End Function
 
 #End Region
 
@@ -217,9 +343,10 @@ Namespace Database
                 Dim i As Integer
                 For i = 1 To totFile
                     TmpFile = FileList(i - 1)
-                    Dim tmpDB As OleDb.OleDbConnection = New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
+
+                    Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
                     Try
-                        tmpDB.Open()
+                        'tmpDB.Open()
                         For j As Integer = 0 To SQLCommand.Length - 1
                             DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
                             DA.Fill(DS, Table)
@@ -263,12 +390,12 @@ Namespace Database
 
 
             Public Shared Sub AddBase(ByVal data As Object)
-                CommandBase(GetSqlInsert(data), BasePath)
+                Command(GetSqlInsert(data), BasePath)
             End Sub
 
-            Public Shared Sub AddSales(ByVal data As Object)
-                CommandSales(data, SalesPath)
-            End Sub
+            'Public Shared Sub AddSales(ByVal data As Object)
+            '    CommandSales(data, SalesPath)
+            'End Sub
 
 
             Delegate Function Conv(Of T)(ByVal d As Data.DataRow) As T
@@ -377,17 +504,18 @@ Namespace Database
         ''' <summary>新增庫存</summary>
         Public Sub AddStock(ByVal data As Stock)
             File.AddBase(data)
+            RaiseEvent CreatedStock(data)
         End Sub
 
-        ''' <summary>新增銷貨單</summary>
-        Public Sub AddSales(ByVal data As Sales)
-            File.AddSales(data)
-        End Sub
+        '''' <summary>新增銷貨單</summary>
+        'Public Sub AddSales(ByVal data As Sales)
+        '    File.AddSales(data)
+        'End Sub
 
-        ''' <summary>新增訂單</summary>
-        Public Sub AddOrder(ByVal data As Order)
-            File.AddSales(data)
-        End Sub
+        '''' <summary>新增訂單</summary>
+        'Public Sub AddOrder(ByVal data As Order)
+        '    File.AddSales(data)
+        'End Sub
 
         Public Function ReadSupplier() As Supplier()
             Return File.ReadSupplier()

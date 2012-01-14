@@ -2,6 +2,8 @@
 
 Public Class winMobile
 
+
+
     Public Sub Add(ByVal Data As Mobile)
         UpdateText(Data)
         MyBase.ShowDialog()
@@ -27,10 +29,8 @@ Public Class winMobile
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
         DB.AddMobile(GetData())
-        UpdateText(NewMobile)
+        UpdateText(GetNewMobile)
     End Sub
 
-    Private Sub winMobile_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    End Sub
 End Class

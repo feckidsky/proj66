@@ -72,13 +72,13 @@ Public Class winPeople
         Select Case Mode
             Case Kind.Customer
                 DB.AddCustomer(myData.Customer)
-                UpdateText(NewCustomer)
+                UpdateText(GetNewCustomer)
             Case Kind.Personnel
                 DB.AddPersonnel(myData.Personnel)
-                UpdateText(NewPersonnel)
+                UpdateText(GetNewPersonnel)
             Case Kind.Supplier
                 DB.AddSupplier(myData.Supplier)
-                UpdateText(NewSupplier)
+                UpdateText(GetNewSupplier)
         End Select
 
     End Sub

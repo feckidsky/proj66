@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class winStock
+Partial Class winStockList
     Inherits System.Windows.Forms.Form
 
     'Form 覆寫 Dispose 以清除元件清單。
@@ -25,12 +25,15 @@ Partial Class winStock
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.更新ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.進貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'DataGridView1
         '
+        Me.DataGridView1.AllowUserToAddRows = False
+        Me.DataGridView1.AllowUserToDeleteRows = False
         Me.DataGridView1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -38,6 +41,7 @@ Partial Class winStock
         Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridView1.Location = New System.Drawing.Point(12, 30)
         Me.DataGridView1.Name = "DataGridView1"
+        Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.RowTemplate.Height = 24
         Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.DataGridView1.Size = New System.Drawing.Size(645, 327)
@@ -45,7 +49,7 @@ Partial Class winStock
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem, Me.進貨ToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(669, 24)
@@ -57,8 +61,15 @@ Partial Class winStock
         Me.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem"
         Me.更新ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
         Me.更新ToolStripMenuItem.Text = "更新"
+        Me.更新ToolStripMenuItem.Visible = False
         '
-        'winStock
+        '進貨ToolStripMenuItem
+        '
+        Me.進貨ToolStripMenuItem.Name = "進貨ToolStripMenuItem"
+        Me.進貨ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+        Me.進貨ToolStripMenuItem.Text = "進貨"
+        '
+        'winStockList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -66,7 +77,7 @@ Partial Class winStock
         Me.Controls.Add(Me.DataGridView1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Name = "winStock"
+        Me.Name = "winStockList"
         Me.Text = "庫存清單"
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip1.ResumeLayout(False)
@@ -78,4 +89,5 @@ Partial Class winStock
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents 更新ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 進貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

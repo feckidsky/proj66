@@ -25,54 +25,56 @@ Public Module Program
         'DB.File.CreateTable(SalesGoods.Table, SalesGoods.ToColumns, d)
     End Sub
 
-    Public Function NewSupplier() As Supplier
+    Public Function GetNewSupplier() As Supplier
         Dim data As Supplier = Nothing
         data.Label = "SU" & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
-    Public Function NewPersonnel() As Personnel
+    Public Function GetNewPersonnel() As Personnel
         Dim data As Personnel = Nothing
         data.Label = "P" & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
-    Public Function NewCustomer() As Customer
+    Public Function GetNewCustomer() As Customer
         Dim data As Customer = Nothing
         data.Label = "C" & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
-    Public Function NewGoods() As Goods
+    Public Function GetNewGoods() As Goods
         Dim data As Goods = Nothing
         data.Label = "G" & Now.ToString("yyMMddHHmmss")
+
         Return data
     End Function
 
-    Public Function NewMobile() As Mobile
+    Public Function GetNewMobile() As Mobile
         Dim data As Mobile = Nothing
         data.Label = "M" & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
-    Public Function NewStock() As Stock
+    Public Function GetNewStock() As Stock
         Dim data As Stock = Nothing
         data.Label = "ST" & Now.ToString("yyMMddHHmmss")
-        data.Date = Today
+        data.Date = Now
+        data.Number = 1
         Return data
     End Function
 
-    Public Function NewSales() As Sales
+    Public Function GetNewSales() As Sales
         Dim data As Sales = Nothing
         data.Label = "SA" & Now.ToString("yyMMddHHmmss")
-        data.Date = Today
+        data.Date = Now
         Return data
     End Function
 
-    Public Function NewOrder() As Order
+    Public Function GetNewOrder() As Order
         Dim data As Order = Nothing
         data.Label = "O" & Now.ToString("yyMMddHHmmss")
-        data.Date = Today
+        data.Date = Now
         Return data
     End Function
 End Module

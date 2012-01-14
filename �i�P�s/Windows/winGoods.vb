@@ -28,7 +28,7 @@ Public Class winGoods
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
         DB.AddGoods(GetData())
-        UpdateText(NewGoods)
+        UpdateText(GetNewGoods)
     End Sub
 
     Private Sub winGoods_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load

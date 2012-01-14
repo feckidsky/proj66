@@ -8,10 +8,9 @@
 <members>
 <member name="M:進銷存.Database.Access.GetStockList">
 	<summary>取得庫存清單</summary>
+</member><member name="M:進銷存.Database.Access.GetStockLog(System.DateTime,System.DateTime)">
+	<summary>取得進貨記錄</summary>
 </member><member name="M:進銷存.Database.Access.File.ConnectBase(System.String)">
-	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
-	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.ConnectSales(System.String)">
 	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
 	<param name="FilePath">檔案路徑</param>
 </member><member name="M:進銷存.Database.Access.File.Open(System.String)">
@@ -46,11 +45,7 @@
 	<summary>對資料庫下達SQL指令</summary>
 	<param name="newCMD">SQL字串</param>
 	<param name="DBControl">資料庫名稱</param>
-</member><member name="M:進銷存.Database.Access.File.CommandBase(System.String,System.String)">
-	<summary>對資料庫下達SQL指令</summary>
-	<param name="SqlCommand">SQL字串</param>
-	<param name="File">檔按路徑</param>
-</member><member name="M:進銷存.Database.Access.File.CommandSales(System.String,System.String)">
+</member><member name="M:進銷存.Database.Access.File.Command(System.String,System.String)">
 	<summary>對資料庫下達SQL指令</summary>
 	<param name="SqlCommand">SQL字串</param>
 	<param name="File">檔按路徑</param>
@@ -66,10 +61,6 @@
 	<summary>新增門號</summary>
 </member><member name="M:進銷存.Database.Access.AddStock(進銷存.Database.StructureBase.Stock)">
 	<summary>新增庫存</summary>
-</member><member name="M:進銷存.Database.Access.AddSales(進銷存.Database.StructureBase.Sales)">
-	<summary>新增銷貨單</summary>
-</member><member name="M:進銷存.Database.Access.AddOrder(進銷存.Database.StructureBase.Order)">
-	<summary>新增訂單</summary>
 </member><member name="F:進銷存.Database.StructureBase.Supplier.Label">
 	<summary>供應商識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Supplier.Name">
@@ -152,8 +143,6 @@
 	<summary>定價</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Number">
 	<summary>數量</summary>
-</member><member name="F:進銷存.Database.StructureBase.Stock.Statu">
-	<summary>狀態(入庫/出貨)</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Note">
 	<summary>備註</summary>
 </member><member name="T:進銷存.Database.StructureBase.Stock">
