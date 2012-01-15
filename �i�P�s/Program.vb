@@ -32,8 +32,9 @@ Public Module Program
 
         LogOut(False)
 
-        Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
-        LogIn(admin.ID, admin.Password, False)
+        LogIn("kidsky1", "3883", False)
+        'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
+        'LogIn(admin.ID, admin.Password, False)
     End Sub
 
     Public Function CheckAuthority(ByVal level As Integer, Optional ByVal WithAdmin As Boolean = False) As Boolean
@@ -113,7 +114,7 @@ Public Module Program
     Public Function GetNewSales() As Sales
         Dim data As Sales = Nothing
         data.Label = "SA" & Now.ToString("yyMMddHHmmss")
-        data.Date = Now
+        data.OrderDate = Now
         Return data
     End Function
 

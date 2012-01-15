@@ -155,8 +155,6 @@
 	<summary>庫存</summary>
 </member><member name="T:進銷存.Database.StructureBase.TypeOfPayment">
 	<summary>付款方式</summary>
-</member><member name="T:進銷存.Database.StructureBase.TypeOfGoods">
-	<summary>商品種類：商品/門號</summary>
 </member><member name="F:進銷存.Database.StructureBase.SalesGoods.SalesLabel">
 	<summary>單號識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.SalesGoods.StockLabel">
@@ -167,7 +165,7 @@
 	<summary>數量</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.Label">
 	<summary>單號識別碼</summary>
-</member><member name="F:進銷存.Database.StructureBase.Sales.Date">
+</member><member name="F:進銷存.Database.StructureBase.Sales.SalesDate">
 	<summary>銷貨日期</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.CustomerLabel">
 	<summary>客戶識別碼</summary>

@@ -2,12 +2,19 @@
 
 Public Class winSales
 
+    Enum Form
+        Order = 0
+        Sales = 1
+    End Enum
+
     Enum Mode
         Create = 0
         Edit = 1
     End Enum
 
     Dim Work As Mode
+
+    Dim FormKind As Form
 
     Dim Customer As Database.Customer = Database.Customer.Null()
     Dim Personnel As Database.Personnel = Database.Personnel.Null()
@@ -19,13 +26,21 @@ Public Class winSales
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         cbPayMode.Items.AddRange(TypeOfPaymentsDescribe)
-        cbPayMode.SelectedIndex = TypeOfPayment.Unpaid
+        cbPayMode.SelectedIndex = TypeOfPayment.Commission
     End Sub
 
 
     Private Sub winSales_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        btCheck.Text = IIf(Work = Mode.Create, "新增", "更新")
+        btOrder.Text = IIf(Work = Mode.Create, "新增", "更新")
         txtLabel.Enabled = Work = Mode.Create
+
+        FormKind = IIf(txtSalesDate.Text = "", Form.Order, Form.Sales)
+        Me.Text = IIf(FormKind = Form.Order, "訂單", "銷貨單")
+
+        btOrder.Text = IIf(Work = Mode.Create, "新增訂單", "修改訂單")
+        btOrder.Enabled = FormKind = Form.Order
+
+        btSales.Text = IIf(Work = Mode.Create Or FormKind = Form.Order, "銷貨", "修改銷貨單")
     End Sub
 
     Public Overloads Sub Create()
@@ -35,7 +50,7 @@ Public Class winSales
         txtPersonnel.Text = Personnel.Name
         Dim sales As Sales = GetNewSales()
         txtLabel.Text = sales.Label
-        txtDate.Text = sales.Date.ToString("yyyy/MM/dd HH:mm:ss")
+        txtOrderDate.Text = sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
         Work = Mode.Create
         MyBase.Show()
     End Sub
@@ -50,8 +65,10 @@ Public Class winSales
     Public Sub Open(ByVal Sales As Sales)
 
         txtLabel.Text = Sales.Label
-        txtDate.Text = Sales.Date.ToString("yyyy/MM/dd HH:mm:ss")
+        txtOrderDate.Text = Sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
+        txtSalesDate.Text = IIf(Sales.SalesDate = New Date(2001, 1, 1, 0, 0, 0), "", Sales.SalesDate.ToString("yyyy/MM/dd HH:mm:ss"))
         txtNote.Text = Sales.Note
+        txtDeposit.Text = Sales.Deposit
         cbPayMode.SelectedIndex = Sales.TypeOfPayment
 
         Personnel = DB.GetPersonnelByLabel(Sales.PersonnelLabel)
@@ -116,7 +133,9 @@ Public Class winSales
         Dim newSales As Sales
         With newSales
             .Label = txtLabel.Text
-            .Date = Date.ParseExact(txtDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing)
+            .OrderDate = Date.ParseExact(txtOrderDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing)
+            Date.TryParseExact(txtSalesDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing, Globalization.DateTimeStyles.None, .SalesDate)
+            .Deposit = txtDeposit.Text
             .Note = txtNote.Text
             .CustomerLabel = Customer.Label
             .PersonnelLabel = Personnel.Label
@@ -145,18 +164,42 @@ Public Class winSales
     End Function
 
 
-    Private Sub btCheck_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btCheck.Click
-        If Work = Mode.Create Then
-            '新增銷貨單
-            DB.CreateSales(GetFormSales(), GetFormGoodsList())
-        Else
-            '更新銷貨單
-            DB.ChangeSales(GetFormSales(), GetFormGoodsList())
+    Private Sub btCheck_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder.Click
+        Dim sales As Sales = GetFormSales()
+
+        If sales.TypeOfPayment <> TypeOfPayment.Commission Then
+            MsgBox("訂單的付款方式必須是訂金", MsgBoxStyle.Exclamation)
+            Exit Sub
         End If
 
-
+        If Work = Mode.Create Then
+            '新增銷貨單
+            DB.CreateSales(sales, GetFormGoodsList())
+        Else
+            '更新銷貨單
+            DB.ChangeSales(sales, GetFormGoodsList())
+        End If
         Me.Close()
+    End Sub
 
+
+    Private Sub btSales_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSales.Click
+        Dim sales As Sales = GetFormSales()
+        If sales.TypeOfPayment = TypeOfPayment.Commission Then
+            MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        If txtSalesDate.Text = "" Then txtSalesDate.Text = Now.ToString("yyyy/MM/dd HH:mm:ss")
+        sales = GetFormSales()
+
+
+        If Work = Mode.Create Then
+            DB.CreateSales(sales, GetFormGoodsList)
+        Else
+            DB.ChangeSales(sales, GetFormGoodsList())
+        End If
+        Me.Close()
     End Sub
 
     Private Sub txtPersonnel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtPersonnel.Click
@@ -203,4 +246,6 @@ Public Class winSales
         Customer = Database.Customer.Null()
         txtCustomer.Text = Customer.Name
     End Sub
+
+
 End Class

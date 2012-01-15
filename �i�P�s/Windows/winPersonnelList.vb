@@ -97,6 +97,7 @@
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
 
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
+        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         If dgList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub

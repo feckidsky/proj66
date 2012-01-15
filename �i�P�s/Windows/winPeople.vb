@@ -53,6 +53,7 @@ Public Class winPeople
 
     Public Sub OpenPersonnel(ByVal data As Personnel)
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
+        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Open
         DataMode = StructKind.Personnel
         ShowDialog(data)
@@ -67,6 +68,7 @@ Public Class winPeople
 
     Public Sub CreateCustomer(ByVal Data As Customer)
         If Not CheckAuthority(2) Then Exit Sub
+
         work = Mode.Create
         DataMode = StructKind.Customer
         ShowDialog(Data)
@@ -74,6 +76,7 @@ Public Class winPeople
 
     Public Sub CreatePersonnel(ByVal Data As Personnel)
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
+        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Create
         DataMode = StructKind.Personnel
         ShowDialog(Data)

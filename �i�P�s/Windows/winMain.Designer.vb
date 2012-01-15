@@ -67,11 +67,14 @@ Partial Class winMain
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.關閉QToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.縮到工具列TToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.cbForm = New System.Windows.Forms.ComboBox
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.cmsSystem.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -93,30 +96,30 @@ Partial Class winMain
         '登入IToolStripMenuItem
         '
         Me.登入IToolStripMenuItem.Name = "登入IToolStripMenuItem"
-        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
         Me.登入IToolStripMenuItem.Text = "登入(&I)"
         '
         '登出OToolStripMenuItem
         '
         Me.登出OToolStripMenuItem.Name = "登出OToolStripMenuItem"
-        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
         Me.登出OToolStripMenuItem.Text = "登出(&O)"
         '
         '修改密碼PToolStripMenuItem
         '
         Me.修改密碼PToolStripMenuItem.Name = "修改密碼PToolStripMenuItem"
-        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
         Me.修改密碼PToolStripMenuItem.Text = "修改密碼(&P)"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(136, 6)
         '
         '關閉CToolStripMenuItem
         '
         Me.關閉CToolStripMenuItem.Name = "關閉CToolStripMenuItem"
-        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
         Me.關閉CToolStripMenuItem.Text = "關閉(&Q)"
         '
         '庫存ToolStripMenuItem
@@ -148,7 +151,7 @@ Partial Class winMain
         '
         Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
         Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
-        Me.銷貨ToolStripMenuItem.Text = "銷貨(&O)"
+        Me.銷貨ToolStripMenuItem.Text = "訂單(&O)"
         '
         '其他資訊ToolStripMenuItem
         '
@@ -191,12 +194,12 @@ Partial Class winMain
         Me.dgSales.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgSales.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSalesLabel, Me.cTime, Me.cPersonnel, Me.Customer, Me.cDposit, Me.cPrice})
         Me.dgSales.ContextMenuStrip = Me.cmsEdit
-        Me.dgSales.Location = New System.Drawing.Point(12, 85)
+        Me.dgSales.Location = New System.Drawing.Point(12, 79)
         Me.dgSales.Name = "dgSales"
         Me.dgSales.ReadOnly = True
         Me.dgSales.RowTemplate.Height = 24
         Me.dgSales.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgSales.Size = New System.Drawing.Size(771, 465)
+        Me.dgSales.Size = New System.Drawing.Size(771, 471)
         Me.dgSales.TabIndex = 1
         '
         'cSalesLabel
@@ -275,9 +278,9 @@ Partial Class winMain
         Me.GroupBox1.Controls.Add(Me.rToday)
         Me.GroupBox1.Controls.Add(Me.rUserTime)
         Me.GroupBox1.Controls.Add(Me.r30Day)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 27)
+        Me.GroupBox1.Location = New System.Drawing.Point(222, 27)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(771, 46)
+        Me.GroupBox1.Size = New System.Drawing.Size(561, 46)
         Me.GroupBox1.TabIndex = 3
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "篩選時間"
@@ -285,7 +288,7 @@ Partial Class winMain
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(440, 22)
+        Me.Label1.Location = New System.Drawing.Point(386, 22)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(11, 12)
         Me.Label1.TabIndex = 2
@@ -293,14 +296,14 @@ Partial Class winMain
         '
         'dtpEnd
         '
-        Me.dtpEnd.Location = New System.Drawing.Point(464, 15)
+        Me.dtpEnd.Location = New System.Drawing.Point(410, 15)
         Me.dtpEnd.Name = "dtpEnd"
         Me.dtpEnd.Size = New System.Drawing.Size(139, 22)
         Me.dtpEnd.TabIndex = 1
         '
         'dtpStart
         '
-        Me.dtpStart.Location = New System.Drawing.Point(287, 15)
+        Me.dtpStart.Location = New System.Drawing.Point(233, 15)
         Me.dtpStart.Name = "dtpStart"
         Me.dtpStart.Size = New System.Drawing.Size(139, 22)
         Me.dtpStart.TabIndex = 1
@@ -318,7 +321,7 @@ Partial Class winMain
         'rUserTime
         '
         Me.rUserTime.AutoSize = True
-        Me.rUserTime.Location = New System.Drawing.Point(210, 20)
+        Me.rUserTime.Location = New System.Drawing.Point(156, 20)
         Me.rUserTime.Name = "rUserTime"
         Me.rUserTime.Size = New System.Drawing.Size(71, 16)
         Me.rUserTime.TabIndex = 0
@@ -329,7 +332,7 @@ Partial Class winMain
         '
         Me.r30Day.AutoSize = True
         Me.r30Day.Checked = True
-        Me.r30Day.Location = New System.Drawing.Point(101, 21)
+        Me.r30Day.Location = New System.Drawing.Point(76, 21)
         Me.r30Day.Name = "r30Day"
         Me.r30Day.Size = New System.Drawing.Size(71, 16)
         Me.r30Day.TabIndex = 0
@@ -388,11 +391,32 @@ Partial Class winMain
         Me.縮到工具列TToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.縮到工具列TToolStripMenuItem.Text = "縮到工具列"
         '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.cbForm)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 27)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(204, 45)
+        Me.GroupBox2.TabIndex = 4
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "種類"
+        '
+        'cbForm
+        '
+        Me.cbForm.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbForm.FormattingEnabled = True
+        Me.cbForm.Items.AddRange(New Object() {"訂單", "銷貨單", "訂單與銷貨單"})
+        Me.cbForm.Location = New System.Drawing.Point(44, 15)
+        Me.cbForm.Name = "cbForm"
+        Me.cbForm.Size = New System.Drawing.Size(121, 20)
+        Me.cbForm.TabIndex = 0
+        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(795, 562)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.dgSales)
         Me.Controls.Add(Me.MenuStrip1)
@@ -407,6 +431,7 @@ Partial Class winMain
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.cmsSystem.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -454,4 +479,6 @@ Partial Class winMain
     Friend WithEvents 縮到工具列TToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 客戶CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents cbForm As System.Windows.Forms.ComboBox
 End Class

@@ -5,6 +5,7 @@ Public Class winMain
 
 
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        cbForm.SelectedIndex = 2
         UpdateSalesList()
         Me.Text = SystemTitle & " - " & CurrentUser.Name
     End Sub
@@ -22,7 +23,25 @@ Public Class winMain
 
     End Sub
 
+    Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
+        ShowKind()
+    End Sub
 
+    Public Sub ShowKind()
+
+
+        For i As Integer = 0 To dgSales.Rows.Count - 1
+            If cbForm.SelectedIndex = 2 Then
+
+                dgSales.Rows(i).Visible = True
+            ElseIf cbForm.SelectedIndex = 0 Then
+                dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value = "訂金"
+            Else
+                dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value <> "訂金"
+            End If
+        Next
+
+    End Sub
 
     Public Sub UpdateSalesList()
 
@@ -51,11 +70,15 @@ Public Class winMain
 
         For i As Integer = 0 To dt.Rows.Count - 1
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
-            dgSales.Rows.Add(arr)
+            Dim idx As Integer = dgSales.Rows.Add(arr)
+            dgSales.Rows.Item(i).Cells("銷貨時間").Value = IIf(dgSales.Rows(i).Cells("銷貨時間").Value = New Date(2001, 1, 1, 0, 0, 0), "", dgSales.Rows(i).Cells("銷貨時間").Value)
 
+            dgSales.Rows(idx).DefaultCellStyle.BackColor = IIf(dgSales.Rows(i).Cells("付款方式").Value = 2, Color.LightBlue, Color.LightGreen)
             dgSales.Rows.Item(i).Cells("付款方式").Value = TypeOfPaymentsDescribe(dgSales.Rows(i).Cells("付款方式").Value)
 
+
         Next
+        ShowKind()
     End Sub
 
     Public Sub OpenSales()
@@ -199,4 +222,6 @@ Public Class winMain
     Private Sub 修改密碼PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改密碼PToolStripMenuItem.Click
         winChangePassword.ShowDialog()
     End Sub
+
+
 End Class

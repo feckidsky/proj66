@@ -463,20 +463,20 @@ Namespace Database
 
         ''' <summary>付款方式</summary>
         Enum TypeOfPayment
-            Unpaid = 0
-            Cash = 1
-            Card = 2
-            Commission = 3
+
+            Cash = 0
+            Card = 1
+            Commission = 2
         End Enum
 
-        Public TypeOfPaymentsDescribe As String() = New String() {"未付", "現金", "刷卡", "訂金"}
+        Public TypeOfPaymentsDescribe As String() = New String() {"現金", "刷卡", "訂金"}
 
 
-        ''' <summary>商品種類：商品/門號</summary>
-        Enum TypeOfGoods
-            Goods = 0
-            MobileNumber = 1
-        End Enum
+        '''' <summary>商品種類：商品/門號</summary>
+        'Enum TypeOfGoods
+        '    Goods = 0
+        '    MobileNumber = 1
+        'End Enum
 
         Structure SalesGoods
             Shared Table As String = "SalesGoods"
@@ -519,8 +519,10 @@ Namespace Database
             Shared Table As String = "Sales"
             ''' <summary>單號識別碼</summary>
             Dim Label As String
+
+            Dim OrderDate As Date
             ''' <summary>銷貨日期</summary>
-            Dim [Date] As Date
+            Dim SalesDate As Date
             ''' <summary>客戶識別碼</summary>
             Dim CustomerLabel As String
             ''' <summary>員工識別碼</summary>
@@ -535,7 +537,8 @@ Namespace Database
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
-                Columns.Add(New Column("Date", DBTypeDate))
+                Columns.Add(New Column("OrderDate", DBTypeDate))
+                Columns.Add(New Column("SalesDate", DBTypeDate))
                 Columns.Add(New Column("CustomerLabel", DBTypeLabel))
                 Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
                 Columns.Add(New Column("Deposit", DBTypeSingle))
@@ -545,7 +548,7 @@ Namespace Database
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, [Date], CustomerLabel, PersonnelLabel, Deposit, CType(TypeOfPayment, Int16), Note}
+                Return New Object() {Label, OrderDate, SalesDate, CustomerLabel, PersonnelLabel, Deposit, CType(TypeOfPayment, Int16), Note}
             End Function
 
             'Private Function GetTypeOfPaymentNumber() As Integer
@@ -557,7 +560,8 @@ Namespace Database
                 Dim R As New MyDataRow(Row)
                 Dim data As Sales
                 data.Label = R("Label")
-                data.Date = R("Date")
+                data.OrderDate = R("OrderDate")
+                Date.TryParse(R("SalesDate"), data.SalesDate)
                 data.CustomerLabel = R("CustomerLabel")
                 data.PersonnelLabel = R("PersonnelLabel")
                 data.Deposit = R("Deposit")
