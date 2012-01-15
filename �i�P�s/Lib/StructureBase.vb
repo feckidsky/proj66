@@ -16,6 +16,10 @@ Namespace Database
 
         Dim TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
 
+        Public Function DBTypeString(ByVal Count As Integer) As String
+            Return "char(" & Count & ")"
+        End Function
+
         Private Function Bracket(ByVal Text As String) As String
             Return "'" & Text & """"
         End Function
@@ -90,7 +94,7 @@ Namespace Database
             Public Function GetUpdateSqlCommand() As String
                 Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note"}
                 Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, Note}
-                Return File.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
             Public Overrides Function ToString() As String
@@ -138,6 +142,27 @@ Namespace Database
                 data.Note = R("Note")
                 Return data
             End Function
+
+            Public Shared Function Null() As Customer
+                Dim d As New Customer
+                d.Label = ""
+                Return d
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note"}
+                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, Note}
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+            End Function
+
+            Public Overrides Function ToString() As String
+                If IsNull() Then Return ""
+                Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
+            End Function
         End Structure
 
         ''' <summary>員工</summary>
@@ -155,6 +180,13 @@ Namespace Database
             Dim Addr As String
             ''' <summary>備註</summary>
             Dim Note As String
+            ''' <summary>帳號</summary>
+            Dim ID As String
+            ''' <summary>密碼</summary>
+            Dim Password As String
+            ''' <summary>權限</summary>
+            Dim Authority As Integer
+
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
@@ -162,11 +194,15 @@ Namespace Database
                 Columns.Add(New Column("Tel1", DBTypeTel))
                 Columns.Add(New Column("Tel2", DBTypeTel))
                 Columns.Add(New Column("Addr", DBTypeAddr))
+                Columns.Add(New Column("ID", DBTypeString(16)))
+                Columns.Add(New Column("Password", DBTypeString(8)))
+                Columns.Add(New Column("Authority", DBTypeInteger))
                 Columns.Add(New Column("Note", DBTypeNote))
                 Return Columns.ToArray
             End Function
+
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, ID, Password, Authority, Note}
             End Function
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Personnel
                 Dim R As New MyDataRow(Row)
@@ -176,9 +212,66 @@ Namespace Database
                 data.Tel1 = R("Tel1")
                 data.Tel2 = R("Tel2")
                 data.Addr = R("Addr")
+                data.ID = R("ID")
+                data.Password = R("Password")
+                data.Authority = R("Authority")
                 data.Note = R("Note")
                 Return data
             End Function
+
+            Public Shared Function Null() As Personnel
+                Dim d As New Personnel
+                d.Label = ""
+                Return d
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
+            Public Function IsGuest() As Boolean
+                Return Label = "Guest"
+            End Function
+
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "ID", "Password", "Authority", "Note"}
+                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, ID, Password, Authority, Note}
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+            End Function
+
+            Public Overrides Function ToString() As String
+                If IsNull() Then Return ""
+                Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
+            End Function
+
+            Shared ReadOnly Property Guest() As Personnel
+                Get
+                    Dim d As New Personnel
+                    d.Label = "Guest"
+                    d.Authority = 0
+                    d.ID = "Guest"
+                    d.Name = "未登入"
+                    Return d
+                End Get
+
+            End Property
+
+            Shared ReadOnly Property Administrator() As Personnel
+                Get
+                    Dim per As New Personnel
+                    per.Label = "Administrator"
+                    per.ID = "Administrator"
+                    per.Password = "1234"
+                    per.Name = "系統管理者"
+                    per.Authority = 100
+                    Return per
+                End Get
+            End Property
+
+            Public Function IsAdministrator() As Boolean
+                Return Label = "Administrator"
+            End Function
+
         End Structure
 #End Region
 
@@ -224,7 +317,7 @@ Namespace Database
             Public Function GetUpdateSqlCommand() As String
                 Dim Column As String() = New String() {"Name", "Kind", "Brand", "Note"}
                 Dim Value As String() = New String() {Name, Kind, Brand, Note}
-                Return File.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
             Public Function IsNull() As Boolean
@@ -241,7 +334,7 @@ Namespace Database
                 If IsNull() Then Return ""
                 Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
             End Function
-End Structure
+        End Structure
 #End Region
 #Region "門號"
         ''' <summary>門號</summary>
@@ -283,7 +376,6 @@ End Structure
             End Function
         End Structure
 #End Region
-
 #Region "庫存"
         ''' <summary>庫存</summary>
         Structure Stock

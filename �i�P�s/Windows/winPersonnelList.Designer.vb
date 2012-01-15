@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class winGoodsList
+Partial Class winPersonnelList
     Inherits System.Windows.Forms.Form
 
     'Form 覆寫 Dispose 以清除元件清單。
@@ -23,35 +23,35 @@ Partial Class winGoodsList
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Me.dgGoodsList = New System.Windows.Forms.DataGridView
+        Me.dgList = New System.Windows.Forms.DataGridView
         Me.cmsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.新增CToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.修改CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.刪除DToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.新增AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        CType(Me.dgGoodsList, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
-        'dgGoodsList
+        'dgList
         '
-        Me.dgGoodsList.AllowUserToAddRows = False
-        Me.dgGoodsList.AllowUserToDeleteRows = False
-        Me.dgGoodsList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.dgList.AllowUserToAddRows = False
+        Me.dgList.AllowUserToDeleteRows = False
+        Me.dgList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgGoodsList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
-        Me.dgGoodsList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgGoodsList.ContextMenuStrip = Me.cmsEdit
-        Me.dgGoodsList.Location = New System.Drawing.Point(12, 30)
-        Me.dgGoodsList.Name = "dgGoodsList"
-        Me.dgGoodsList.ReadOnly = True
-        Me.dgGoodsList.RowTemplate.Height = 24
-        Me.dgGoodsList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgGoodsList.Size = New System.Drawing.Size(577, 350)
-        Me.dgGoodsList.TabIndex = 0
+        Me.dgList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgList.ContextMenuStrip = Me.cmsEdit
+        Me.dgList.Location = New System.Drawing.Point(12, 30)
+        Me.dgList.Name = "dgList"
+        Me.dgList.ReadOnly = True
+        Me.dgList.RowTemplate.Height = 24
+        Me.dgList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgList.Size = New System.Drawing.Size(577, 350)
+        Me.dgList.TabIndex = 0
         '
         'cmsEdit
         '
@@ -92,17 +92,17 @@ Partial Class winGoodsList
         Me.新增AToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
         Me.新增AToolStripMenuItem.Text = "新增(&A)"
         '
-        'winGoodsList
+        'winPersonnelList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(601, 392)
-        Me.Controls.Add(Me.dgGoodsList)
+        Me.Controls.Add(Me.dgList)
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Name = "winGoodsList"
-        Me.Text = "商品項目清單"
-        CType(Me.dgGoodsList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.Name = "winPersonnelList"
+        Me.Text = "員工資料"
+        CType(Me.dgList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.cmsEdit.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
@@ -110,7 +110,7 @@ Partial Class winGoodsList
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents dgGoodsList As System.Windows.Forms.DataGridView
+    Friend WithEvents dgList As System.Windows.Forms.DataGridView
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents 新增AToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cmsEdit As System.Windows.Forms.ContextMenuStrip

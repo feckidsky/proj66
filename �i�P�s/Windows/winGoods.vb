@@ -13,12 +13,14 @@ Public Class winGoods
     End Sub
 
     Public Sub Open(ByVal Data As Goods)
+        If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Open
         UpdateText(Data)
         MyBase.ShowDialog()
     End Sub
 
     Public Sub Create(ByVal Data As Goods)
+        If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Create
         UpdateText(Data)
         MyBase.ShowDialog()

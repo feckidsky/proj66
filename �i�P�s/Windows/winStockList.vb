@@ -7,6 +7,13 @@
         UpdateStockList()
     End Sub
 
+    Public Overloads Sub Show()
+        If Not CheckAuthority(1) Then
+            Exit Sub
+        End If
+        MyBase.Show()
+    End Sub
+
     Public Sub UpdateStockList()
         Dim DT As Data.DataTable = DB.GetStockList()
         DataGridView1.DataSource = DT

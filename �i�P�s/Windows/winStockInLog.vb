@@ -11,6 +11,11 @@
         UpdateStockInLog()
     End Sub
 
+    Public Overloads Sub Show()
+        If Not CheckAuthority(1) Then Exit Sub
+        MyBase.Show()
+    End Sub
+
     Public Sub UpdateStockInLog()
 
         Dim StartTime As Date
@@ -29,10 +34,6 @@
 
         dgStockLog.DataSource = DB.GetStockLog(StartTime, EndTime)
 
-    End Sub
-
-    Private Sub 進貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨ToolStripMenuItem.Click
-        winStockIn.Create()
     End Sub
 
 
@@ -62,7 +63,8 @@
 
 
     '快捷功能表
-    Private Sub 進貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨AToolStripMenuItem.Click
+    Private Sub 進貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨AToolStripMenuItem.Click, 進貨ToolStripMenuItem.Click
+
         winStockIn.Create()
     End Sub
 
@@ -80,7 +82,7 @@
     End Sub
 
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
-
+        If Not CheckAuthority(2) Then Exit Sub
         If dgStockLog.SelectedRows.Count = 0 Then
             MsgBox("您必須選取一個項目")
             Exit Sub
@@ -89,7 +91,7 @@
         Dim stock As New Database.Stock
         stock.Label = dgStockLog.SelectedRows(0).Cells(0).Value
 
-        If DB.GetGoodsListByStockLabel(stock.Label).Rows.Count > 0 Then
+        If DB.GetSalesListByStockLabel(stock.Label).Rows.Count > 0 Then
             MsgBox("無法刪除，該商品已經有銷貨記錄!")
             Exit Sub
         End If

@@ -14,9 +14,25 @@
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OptionExplicit>On</OptionExplicit>
-    <OptionCompare>Binary</OptionCompare>
+    <OptionCompare>Text</OptionCompare>
     <OptionStrict>Off</OptionStrict>
     <OptionInfer>On</OptionInfer>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationIcon>0017.ico</ApplicationIcon>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,10 +86,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lib\Database.vb" />
+    <Compile Include="Windows\winAccount.Designer.vb">
+      <DependentUpon>winAccount.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winAccount.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\winGoodsList.Designer.vb">
       <DependentUpon>winGoodsList.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\winGoodsList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\winLogIn.Designer.vb">
+      <DependentUpon>winLogIn.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winLogIn.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\winMain.Designer.vb">
@@ -148,14 +176,40 @@
     <Compile Include="Windows\winSupplierList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\winPersonnelList.Designer.vb">
+      <DependentUpon>winPersonnelList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winPersonnelList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\winCustomerList.Designer.vb">
+      <DependentUpon>winCustomerList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winCustomerList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\winChangePassword.Designer.vb">
+      <DependentUpon>winChangePassword.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winChangePassword.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Windows\winAccount.resx">
+      <DependentUpon>winAccount.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\winGoods.resx">
       <DependentUpon>winGoods.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winGoodsList.resx">
       <DependentUpon>winGoodsList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winLogIn.resx">
+      <DependentUpon>winLogIn.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winMain.resx">
@@ -196,6 +250,18 @@
       <DependentUpon>winSupplierList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winPersonnelList.resx">
+      <DependentUpon>winPersonnelList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winCustomerList.resx">
+      <DependentUpon>winCustomerList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winChangePassword.resx">
+      <DependentUpon>winChangePassword.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="My Project\Application.myapp">
@@ -209,7 +275,30 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="0017.ico" />
     <Content Include="Interop.ADOX.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

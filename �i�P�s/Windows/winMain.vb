@@ -3,21 +3,23 @@
 Public Class winMain
     WithEvents access As Database.Access = Program.DB
 
+
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-
-        'dgSales.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
-
+        UpdateSalesList()
+        Me.Text = SystemTitle & " - " & CurrentUser.Name
     End Sub
 
     Public Sub New()
-        InitialProgram()
+
         ' 此為 Windows Form 設計工具所需的呼叫。
         InitializeComponent()
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
+        AddHandler Program.Account_Logout, AddressOf Account_Login
+        AddHandler Program.Account_LogIn, AddressOf Account_Login
 
-        UpdateSalesList()
+        InitialProgram()
+
     End Sub
 
 
@@ -137,5 +139,64 @@ Public Class winMain
 
     Private Sub 供應商ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 供應商ToolStripMenuItem.Click
         winSupplierList.Show()
+    End Sub
+
+    Private Sub 員工PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 員工PToolStripMenuItem.Click
+        winPersonnelList.Show()
+    End Sub
+
+    Private Sub 客戶CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 客戶CToolStripMenuItem.Click
+        winCustomerList.Show()
+    End Sub
+
+
+    Private RealClose As Boolean = False
+    Private Sub 關閉CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 關閉CToolStripMenuItem.Click, 關閉QToolStripMenuItem.Click
+        RealClose = True
+        Me.Close()
+    End Sub
+
+    Private Sub NotifyIcon1_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles NotifyIcon1.MouseDoubleClick
+        Me.Visible = True
+    End Sub
+
+    Private Sub winMain_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        If e.CloseReason = CloseReason.UserClosing And Not RealClose Then
+            Me.Visible = False
+            e.Cancel = True
+        End If
+
+    End Sub
+
+
+    Private Sub 開啟OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 開啟OToolStripMenuItem.Click
+        Me.Visible = True
+    End Sub
+
+
+    Private Sub 縮到工具列TToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 縮到工具列TToolStripMenuItem.Click
+        Me.Visible = False
+    End Sub
+
+    Private Sub 登出OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登出OToolStripMenuItem.Click, 登出OToolStripMenuItem1.Click
+        LogOut()
+
+
+    End Sub
+
+
+    Private Sub 登入IToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登入IToolStripMenuItem.Click, 登入IToolStripMenuItem1.Click
+        winLogIn.ShowDialog()
+    End Sub
+
+
+    Private Sub Account_Login(ByVal per As Database.Personnel, ByVal message As String)
+        Me.Text = SystemTitle & " - " & per.Name
+        MsgBox(message, MsgBoxStyle.Information, "帳號")
+    End Sub
+
+
+    Private Sub 修改密碼PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改密碼PToolStripMenuItem.Click
+        winChangePassword.ShowDialog()
     End Sub
 End Class

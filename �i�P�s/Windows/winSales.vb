@@ -9,6 +9,8 @@ Public Class winSales
 
     Dim Work As Mode
 
+    Dim Customer As Database.Customer = Database.Customer.Null()
+    Dim Personnel As Database.Personnel = Database.Personnel.Null()
 
     Public Sub New()
 
@@ -23,11 +25,14 @@ Public Class winSales
 
     Private Sub winSales_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btCheck.Text = IIf(Work = Mode.Create, "新增", "更新")
-
+        txtLabel.Enabled = Work = Mode.Create
     End Sub
 
     Public Overloads Sub Create()
+        If Not CheckAuthority(2) Then Exit Sub
 
+        Personnel = CurrentUser
+        txtPersonnel.Text = Personnel.Name
         Dim sales As Sales = GetNewSales()
         txtLabel.Text = sales.Label
         txtDate.Text = sales.Date.ToString("yyyy/MM/dd HH:mm:ss")
@@ -48,6 +53,12 @@ Public Class winSales
         txtDate.Text = Sales.Date.ToString("yyyy/MM/dd HH:mm:ss")
         txtNote.Text = Sales.Note
         cbPayMode.SelectedIndex = Sales.TypeOfPayment
+
+        Personnel = DB.GetPersonnelByLabel(Sales.PersonnelLabel)
+        Customer = DB.GetCustomerByLabel(Sales.CustomerLabel)
+
+        txtPersonnel.Text = Personnel.Name
+        txtCustomer.Text = Customer.Name
 
         Dim dt As Data.DataTable = DB.GetGoodsListBySalesLabel(Sales.Label)
 
@@ -107,8 +118,8 @@ Public Class winSales
             .Label = txtLabel.Text
             .Date = Date.ParseExact(txtDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing)
             .Note = txtNote.Text
-            .CustomerLabel = ""
-            .PersonnelLabel = ""
+            .CustomerLabel = Customer.Label
+            .PersonnelLabel = Personnel.Label
             .TypeOfPayment = cbPayMode.SelectedIndex
         End With
         Return newSales
@@ -148,6 +159,48 @@ Public Class winSales
 
     End Sub
 
+    Private Sub txtPersonnel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtPersonnel.Click
+
+        If Not Personnel.IsNull() AndAlso winLogIn.ShowDialog("此銷售人員的帳號密碼", Personnel.ID).State <> LoginState.Success Then
+            Exit Sub
+        End If
+
+        If winLogIn.ShowDialog("請登入欲修改的銷售帳號").State = LoginState.Success Then
+            Personnel = CurrentUser
+            txtPersonnel.Text = Personnel.Name
+        End If
+
+        'Dim per As Database.Personnel = winPersonnelList.SelectDialog()
+        'If Not per.IsNull() Then
+        '    Personnel = per
+        '    txtPersonnel.Text = per.Name
+        'End If
+
+    End Sub
+
+    Private Sub txtCustomer_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtCustomer.Click
+        Dim cur As Database.Customer = winCustomerList.SelectDialog()
+        If Not cur.IsNull() Then
+            Customer = cur
+            txtCustomer.Text = cur.Name
+        End If
+    End Sub
 
 
+    Private Sub btResetPersonnel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetPersonnel.Click
+
+        If winLogIn.ShowDialog("請重新登入銷售帳號", Personnel.ID).State = LoginState.Success Then
+            Personnel = CurrentUser
+            txtPersonnel.Text = Personnel.Name
+            Personnel = Database.Personnel.Null()
+            txtPersonnel.Text = Personnel.Name
+        End If
+
+
+    End Sub
+
+    Private Sub btResetCustomer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetCustomer.Click
+        Customer = Database.Customer.Null()
+        txtCustomer.Text = Customer.Name
+    End Sub
 End Class

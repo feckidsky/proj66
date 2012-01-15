@@ -10,30 +10,30 @@
 	<summary>取得庫存清單</summary>
 </member><member name="M:進銷存.Database.Access.GetStockLog(System.DateTime,System.DateTime)">
 	<summary>取得進貨記錄</summary>
-</member><member name="M:進銷存.Database.Access.File.ConnectBase(System.String)">
+</member><member name="M:進銷存.Database.Access.ConnectBase(System.String)">
 	<summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
 	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.Open(System.String)">
+</member><member name="M:進銷存.Database.Access.Open(System.String)">
 	<summary>連接資料庫，回傳所連接的資料庫元件</summary>
 	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.CreateFileBase(System.String)">
+</member><member name="M:進銷存.Database.Access.CreateFileBase(System.String)">
 	<summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
 	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.CreateFileSales(System.String)">
+</member><member name="M:進銷存.Database.Access.CreateFileSales(System.String)">
 	<summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
 	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.CreateAccessFile(System.Object)">
+</member><member name="M:進銷存.Database.Access.CreateAccessFile(System.Object)">
 	<summary>
  新增Access檔案
  </summary>
 	<param name="FilePath">檔案路徑</param>
-</member><member name="M:進銷存.Database.Access.File.CreateTable(System.String,進銷存.Database.Column[],System.Data.OleDb.OleDbConnection)">
+</member><member name="M:進銷存.Database.Access.CreateTable(System.String,進銷存.Database.Column[],System.Data.OleDb.OleDbConnection)">
 	<summary>
  新增Alarm資料表
  </summary>
 	<param name="Table">資料表名稱</param>
 	<param name="DBControl">資料庫元件</param>
-</member><member name="M:進銷存.Database.Access.File.CreateIndex(System.String,System.String,System.String,System.Data.OleDb.OleDbConnection)">
+</member><member name="M:進銷存.Database.Access.CreateIndex(System.String,System.String,System.String,System.Data.OleDb.OleDbConnection)">
 	<summary>
  加入索引
  </summary>
@@ -41,11 +41,11 @@
 	<param name="IndexName">索引名稱</param>
 	<param name="IndexClumnList">欲加入索引之欄位</param>
 	<param name="DBControl">資料庫元件</param>
-</member><member name="M:進銷存.Database.Access.File.Command(System.String,System.Data.OleDb.OleDbConnection)">
+</member><member name="M:進銷存.Database.Access.Command(System.String,System.Data.OleDb.OleDbConnection)">
 	<summary>對資料庫下達SQL指令</summary>
 	<param name="newCMD">SQL字串</param>
 	<param name="DBControl">資料庫名稱</param>
-</member><member name="M:進銷存.Database.Access.File.Command(System.String,System.String)">
+</member><member name="M:進銷存.Database.Access.Command(System.String,System.String)">
 	<summary>對資料庫下達SQL指令</summary>
 	<param name="SqlCommand">SQL字串</param>
 	<param name="File">檔按路徑</param>
@@ -101,6 +101,12 @@
 	<summary>地址</summary>
 </member><member name="F:進銷存.Database.StructureBase.Personnel.Note">
 	<summary>備註</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.ID">
+	<summary>帳號</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Password">
+	<summary>密碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Personnel.Authority">
+	<summary>權限</summary>
 </member><member name="T:進銷存.Database.StructureBase.Personnel">
 	<summary>員工</summary>
 </member><member name="F:進銷存.Database.StructureBase.Goods.Label">

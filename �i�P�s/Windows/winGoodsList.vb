@@ -14,6 +14,7 @@
     End Sub
 
     Public Overloads Sub Show()
+        If Not CheckAuthority(1) Then Exit Sub
         work = Mode.Normal
         MyBase.Show()
     End Sub
@@ -80,6 +81,8 @@
 
 
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
+        If Not CheckAuthority(2) Then Exit Sub
+
         If dgGoodsList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub

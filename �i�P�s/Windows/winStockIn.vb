@@ -21,6 +21,7 @@ Public Class winStockIn
 
 
     Public Sub Create()
+        If Not CheckAuthority(2) Then Exit Sub
         Dim data As Stock = GetNewStock()
 
         UpdateText(data)
@@ -29,7 +30,7 @@ Public Class winStockIn
     End Sub
 
     Public Sub Open(ByVal stock As Stock)
-
+        If Not CheckAuthority(2) Then Exit Sub
         UpdateText(stock)
         Work = Mode.Open
         MyBase.ShowDialog()

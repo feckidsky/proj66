@@ -23,12 +23,24 @@ Partial Class winMain
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
-        Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.登出OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.修改密碼PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
+        Me.關閉CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.其他資訊ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.供應商ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.客戶CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
+        Me.員工PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -47,35 +59,72 @@ Partial Class winMain
         Me.rToday = New System.Windows.Forms.RadioButton
         Me.rUserTime = New System.Windows.Forms.RadioButton
         Me.r30Day = New System.Windows.Forms.RadioButton
-        Me.其他資訊ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.供應商ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.NotifyIcon1 = New System.Windows.Forms.NotifyIcon(Me.components)
+        Me.cmsSystem = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.登入IToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.登出OToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.開啟OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        Me.關閉QToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.縮到工具列TToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.cmsSystem.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.銷貨ToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.其他資訊ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.其他資訊ToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(795, 24)
         Me.MenuStrip1.TabIndex = 0
         Me.MenuStrip1.Text = "MenuStrip1"
         '
-        '銷貨ToolStripMenuItem
+        '系統SToolStripMenuItem
         '
-        Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
-        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
-        Me.銷貨ToolStripMenuItem.Text = "銷貨"
+        Me.系統SToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem, Me.登出OToolStripMenuItem, Me.修改密碼PToolStripMenuItem, Me.ToolStripSeparator2, Me.關閉CToolStripMenuItem})
+        Me.系統SToolStripMenuItem.Name = "系統SToolStripMenuItem"
+        Me.系統SToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
+        Me.系統SToolStripMenuItem.Text = "系統(&S)"
+        '
+        '登入IToolStripMenuItem
+        '
+        Me.登入IToolStripMenuItem.Name = "登入IToolStripMenuItem"
+        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登入IToolStripMenuItem.Text = "登入(&I)"
+        '
+        '登出OToolStripMenuItem
+        '
+        Me.登出OToolStripMenuItem.Name = "登出OToolStripMenuItem"
+        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登出OToolStripMenuItem.Text = "登出(&O)"
+        '
+        '修改密碼PToolStripMenuItem
+        '
+        Me.修改密碼PToolStripMenuItem.Name = "修改密碼PToolStripMenuItem"
+        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.修改密碼PToolStripMenuItem.Text = "修改密碼(&P)"
+        '
+        'ToolStripSeparator2
+        '
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(149, 6)
+        '
+        '關閉CToolStripMenuItem
+        '
+        Me.關閉CToolStripMenuItem.Name = "關閉CToolStripMenuItem"
+        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.關閉CToolStripMenuItem.Text = "關閉(&Q)"
         '
         '庫存ToolStripMenuItem
         '
         Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
         Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
-        Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
-        Me.庫存ToolStripMenuItem.Text = "庫存"
+        Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
+        Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
         '
         '進貨記錄ToolStripMenuItem1
         '
@@ -94,6 +143,42 @@ Partial Class winMain
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
         Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
+        '
+        '銷貨ToolStripMenuItem
+        '
+        Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
+        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
+        Me.銷貨ToolStripMenuItem.Text = "銷貨(&O)"
+        '
+        '其他資訊ToolStripMenuItem
+        '
+        Me.其他資訊ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.供應商ToolStripMenuItem, Me.客戶CToolStripMenuItem, Me.ToolStripSeparator3, Me.員工PToolStripMenuItem})
+        Me.其他資訊ToolStripMenuItem.Name = "其他資訊ToolStripMenuItem"
+        Me.其他資訊ToolStripMenuItem.Size = New System.Drawing.Size(83, 20)
+        Me.其他資訊ToolStripMenuItem.Text = "其他資訊(&E)"
+        '
+        '供應商ToolStripMenuItem
+        '
+        Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
+        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.供應商ToolStripMenuItem.Text = "供應商(&S)"
+        '
+        '客戶CToolStripMenuItem
+        '
+        Me.客戶CToolStripMenuItem.Name = "客戶CToolStripMenuItem"
+        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.客戶CToolStripMenuItem.Text = "客戶(&C)"
+        '
+        'ToolStripSeparator3
+        '
+        Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(124, 6)
+        '
+        '員工PToolStripMenuItem
+        '
+        Me.員工PToolStripMenuItem.Name = "員工PToolStripMenuItem"
+        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.員工PToolStripMenuItem.Text = "員工(&P)"
         '
         'dgSales
         '
@@ -252,18 +337,56 @@ Partial Class winMain
         Me.r30Day.Text = "30天以內"
         Me.r30Day.UseVisualStyleBackColor = True
         '
-        '其他資訊ToolStripMenuItem
+        'NotifyIcon1
         '
-        Me.其他資訊ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.供應商ToolStripMenuItem})
-        Me.其他資訊ToolStripMenuItem.Name = "其他資訊ToolStripMenuItem"
-        Me.其他資訊ToolStripMenuItem.Size = New System.Drawing.Size(68, 20)
-        Me.其他資訊ToolStripMenuItem.Text = "其他資訊"
+        Me.NotifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info
+        Me.NotifyIcon1.BalloonTipText = "文字"
+        Me.NotifyIcon1.BalloonTipTitle = "標題"
+        Me.NotifyIcon1.ContextMenuStrip = Me.cmsSystem
+        Me.NotifyIcon1.Icon = CType(resources.GetObject("NotifyIcon1.Icon"), System.Drawing.Icon)
+        Me.NotifyIcon1.Text = "進銷存系統"
+        Me.NotifyIcon1.Visible = True
         '
-        '供應商ToolStripMenuItem
+        'cmsSystem
         '
-        Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
-        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.供應商ToolStripMenuItem.Text = "供應商"
+        Me.cmsSystem.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem1, Me.登出OToolStripMenuItem1, Me.開啟OToolStripMenuItem, Me.ToolStripSeparator1, Me.關閉QToolStripMenuItem, Me.縮到工具列TToolStripMenuItem})
+        Me.cmsSystem.Name = "cmsSystem"
+        Me.cmsSystem.Size = New System.Drawing.Size(137, 120)
+        '
+        '登入IToolStripMenuItem1
+        '
+        Me.登入IToolStripMenuItem1.Name = "登入IToolStripMenuItem1"
+        Me.登入IToolStripMenuItem1.Size = New System.Drawing.Size(136, 22)
+        Me.登入IToolStripMenuItem1.Text = "登入"
+        '
+        '登出OToolStripMenuItem1
+        '
+        Me.登出OToolStripMenuItem1.Name = "登出OToolStripMenuItem1"
+        Me.登出OToolStripMenuItem1.Size = New System.Drawing.Size(136, 22)
+        Me.登出OToolStripMenuItem1.Text = "登出"
+        '
+        '開啟OToolStripMenuItem
+        '
+        Me.開啟OToolStripMenuItem.Name = "開啟OToolStripMenuItem"
+        Me.開啟OToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.開啟OToolStripMenuItem.Text = "開啟"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(133, 6)
+        '
+        '關閉QToolStripMenuItem
+        '
+        Me.關閉QToolStripMenuItem.Name = "關閉QToolStripMenuItem"
+        Me.關閉QToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.關閉QToolStripMenuItem.Text = "關閉"
+        '
+        '縮到工具列TToolStripMenuItem
+        '
+        Me.縮到工具列TToolStripMenuItem.Name = "縮到工具列TToolStripMenuItem"
+        Me.縮到工具列TToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.縮到工具列TToolStripMenuItem.Text = "縮到工具列"
         '
         'winMain
         '
@@ -273,15 +396,17 @@ Partial Class winMain
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.dgSales)
         Me.Controls.Add(Me.MenuStrip1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "winMain"
-        Me.Text = "銷貨記錄"
+        Me.Text = "進銷存管理系統"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).EndInit()
         Me.cmsEdit.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.cmsSystem.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -312,4 +437,21 @@ Partial Class winMain
     Friend WithEvents 商品項目GToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 其他資訊ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 供應商ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 員工PToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 系統SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 登入IToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 登出OToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 修改密碼PToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents 關閉CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents NotifyIcon1 As System.Windows.Forms.NotifyIcon
+    Friend WithEvents cmsSystem As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents 登入IToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 登出OToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 關閉QToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 開啟OToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents 縮到工具列TToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 客戶CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
 End Class

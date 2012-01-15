@@ -247,7 +247,7 @@ Partial Class winStockIn
         Me.Controls.Add(Me.txtIMEI)
         Me.Controls.Add(Me.txtDate)
         Me.Controls.Add(Me.txtLabel)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.MaximizeBox = False
         Me.Name = "winStockIn"
         Me.Text = "進貨"

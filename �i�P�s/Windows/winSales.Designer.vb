@@ -47,6 +47,12 @@ Partial Class winSales
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
         Me.txtDeposit = New System.Windows.Forms.TextBox
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.txtCustomer = New System.Windows.Forms.TextBox
+        Me.txtPersonnel = New System.Windows.Forms.TextBox
+        Me.btResetPersonnel = New System.Windows.Forms.Button
+        Me.btResetCustomer = New System.Windows.Forms.Button
         CType(Me.dgList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
@@ -54,7 +60,7 @@ Partial Class winSales
         'btAddGood
         '
         Me.btAddGood.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btAddGood.Location = New System.Drawing.Point(407, 363)
+        Me.btAddGood.Location = New System.Drawing.Point(407, 310)
         Me.btAddGood.Name = "btAddGood"
         Me.btAddGood.Size = New System.Drawing.Size(75, 23)
         Me.btAddGood.TabIndex = 39
@@ -84,7 +90,7 @@ Partial Class winSales
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(221, 30)
+        Me.Label4.Location = New System.Drawing.Point(47, 71)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(29, 12)
         Me.Label4.TabIndex = 30
@@ -102,14 +108,14 @@ Partial Class winSales
         'txtDate
         '
         Me.txtDate.Enabled = False
-        Me.txtDate.Location = New System.Drawing.Point(256, 24)
+        Me.txtDate.Location = New System.Drawing.Point(97, 65)
         Me.txtDate.Name = "txtDate"
         Me.txtDate.Size = New System.Drawing.Size(127, 22)
         Me.txtDate.TabIndex = 25
         '
         'txtLabel
         '
-        Me.txtLabel.Location = New System.Drawing.Point(80, 24)
+        Me.txtLabel.Location = New System.Drawing.Point(97, 24)
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.Size = New System.Drawing.Size(127, 22)
         Me.txtLabel.TabIndex = 24
@@ -126,7 +132,7 @@ Partial Class winSales
         Me.dgList.Location = New System.Drawing.Point(17, 26)
         Me.dgList.Name = "dgList"
         Me.dgList.RowTemplate.Height = 24
-        Me.dgList.Size = New System.Drawing.Size(546, 331)
+        Me.dgList.Size = New System.Drawing.Size(546, 278)
         Me.dgList.TabIndex = 42
         '
         'cLabel
@@ -190,7 +196,7 @@ Partial Class winSales
         'btDelete
         '
         Me.btDelete.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btDelete.Location = New System.Drawing.Point(488, 363)
+        Me.btDelete.Location = New System.Drawing.Point(488, 310)
         Me.btDelete.Name = "btDelete"
         Me.btDelete.Size = New System.Drawing.Size(75, 23)
         Me.btDelete.TabIndex = 39
@@ -205,9 +211,9 @@ Partial Class winSales
         Me.GroupBox1.Controls.Add(Me.dgList)
         Me.GroupBox1.Controls.Add(Me.btDelete)
         Me.GroupBox1.Controls.Add(Me.btAddGood)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 55)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 98)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(578, 395)
+        Me.GroupBox1.Size = New System.Drawing.Size(578, 342)
         Me.GroupBox1.TabIndex = 43
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "商品清單"
@@ -280,11 +286,69 @@ Partial Class winSales
         Me.txtDeposit.Size = New System.Drawing.Size(100, 22)
         Me.txtDeposit.TabIndex = 48
         '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(280, 27)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(53, 12)
+        Me.Label7.TabIndex = 29
+        Me.Label7.Text = "銷售人員"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(304, 68)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(29, 12)
+        Me.Label8.TabIndex = 29
+        Me.Label8.Text = "客戶"
+        '
+        'txtCustomer
+        '
+        Me.txtCustomer.BackColor = System.Drawing.SystemColors.Window
+        Me.txtCustomer.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.txtCustomer.Location = New System.Drawing.Point(350, 65)
+        Me.txtCustomer.Name = "txtCustomer"
+        Me.txtCustomer.ReadOnly = True
+        Me.txtCustomer.Size = New System.Drawing.Size(127, 22)
+        Me.txtCustomer.TabIndex = 24
+        '
+        'txtPersonnel
+        '
+        Me.txtPersonnel.BackColor = System.Drawing.SystemColors.Window
+        Me.txtPersonnel.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.txtPersonnel.Location = New System.Drawing.Point(350, 24)
+        Me.txtPersonnel.Name = "txtPersonnel"
+        Me.txtPersonnel.ReadOnly = True
+        Me.txtPersonnel.Size = New System.Drawing.Size(127, 22)
+        Me.txtPersonnel.TabIndex = 24
+        '
+        'btResetPersonnel
+        '
+        Me.btResetPersonnel.Location = New System.Drawing.Point(483, 24)
+        Me.btResetPersonnel.Name = "btResetPersonnel"
+        Me.btResetPersonnel.Size = New System.Drawing.Size(38, 22)
+        Me.btResetPersonnel.TabIndex = 49
+        Me.btResetPersonnel.Text = "清除"
+        Me.btResetPersonnel.UseVisualStyleBackColor = True
+        '
+        'btResetCustomer
+        '
+        Me.btResetCustomer.Location = New System.Drawing.Point(483, 63)
+        Me.btResetCustomer.Name = "btResetCustomer"
+        Me.btResetCustomer.Size = New System.Drawing.Size(38, 22)
+        Me.btResetCustomer.TabIndex = 49
+        Me.btResetCustomer.Text = "清除"
+        Me.btResetCustomer.UseVisualStyleBackColor = True
+        '
         'winSales
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(622, 595)
+        Me.Controls.Add(Me.btResetCustomer)
+        Me.Controls.Add(Me.btResetPersonnel)
         Me.Controls.Add(Me.txtDeposit)
         Me.Controls.Add(Me.cbPayMode)
         Me.Controls.Add(Me.btCheck)
@@ -296,8 +360,12 @@ Partial Class winSales
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.txtNote)
         Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.Label8)
+        Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.txtDate)
+        Me.Controls.Add(Me.txtCustomer)
+        Me.Controls.Add(Me.txtPersonnel)
         Me.Controls.Add(Me.txtLabel)
         Me.Name = "winSales"
         Me.Text = "銷貨單"
@@ -332,4 +400,10 @@ Partial Class winSales
     Friend WithEvents cSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents txtDeposit As System.Windows.Forms.TextBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents txtCustomer As System.Windows.Forms.TextBox
+    Friend WithEvents txtPersonnel As System.Windows.Forms.TextBox
+    Friend WithEvents btResetPersonnel As System.Windows.Forms.Button
+    Friend WithEvents btResetCustomer As System.Windows.Forms.Button
 End Class
