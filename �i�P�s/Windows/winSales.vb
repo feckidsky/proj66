@@ -135,7 +135,7 @@ Public Class winSales
             .Label = txtLabel.Text
             .OrderDate = Date.ParseExact(txtOrderDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing)
             Date.TryParseExact(txtSalesDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing, Globalization.DateTimeStyles.None, .SalesDate)
-            .Deposit = txtDeposit.Text
+            .Deposit = Val(txtDeposit.Text)
             .Note = txtNote.Text
             .CustomerLabel = Customer.Label
             .PersonnelLabel = Personnel.Label

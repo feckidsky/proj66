@@ -1,2 +1,6 @@
+
+
 /進銷存/obj
 *.suo
+/通訊行進銷存/Debug
+/通訊行進銷存/Release
