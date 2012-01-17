@@ -248,4 +248,7 @@ Public Class winSales
     End Sub
 
 
+    Private Sub cbPayMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbPayMode.SelectedIndexChanged
+        Me.BackColor = IIf(cbPayMode.SelectedIndex = 2, ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+    End Sub
 End Class

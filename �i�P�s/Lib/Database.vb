@@ -190,9 +190,12 @@
 
         '讀取銷貨單
         Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
-            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.OrderDate AS 訂單時間, sales.SalesDate as 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
-            " FROM ((sales LEFT JOIN (SELECT SalesLabel, sum(SellingPrice*Number) AS 金額 FROM SalesGoods GROUP BY SalesLabel)  AS tmp ON sales.label = tmp.SalesLabel) LEFT JOIN Customer ON sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON sales.PersonnelLabel = Personnel.Label " & _
-            " WHERE (((sales.Orderdate) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
+            Dim condition As String = " WHERE (((sales.Orderdate) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)) "
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number]) AS 利潤, Sales.Note AS 備註 " & _
+" FROM ((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label " & _
+            condition & _
+" GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note; "
+
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT

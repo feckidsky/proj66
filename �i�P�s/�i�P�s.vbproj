@@ -116,6 +116,12 @@
     <Compile Include="Windows\winMobile.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\winOptional.Designer.vb">
+      <DependentUpon>winOptional.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winOptional.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\winPeople.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -218,6 +224,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winMobile.resx">
       <DependentUpon>winMobile.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winOptional.resx">
+      <DependentUpon>winOptional.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winPeople.resx">

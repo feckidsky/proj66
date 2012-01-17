@@ -72,13 +72,16 @@ Public Class winMain
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
             Dim idx As Integer = dgSales.Rows.Add(arr)
             dgSales.Rows.Item(i).Cells("銷貨時間").Value = IIf(dgSales.Rows(i).Cells("銷貨時間").Value = New Date(2001, 1, 1, 0, 0, 0), "", dgSales.Rows(i).Cells("銷貨時間").Value)
-
-            dgSales.Rows(idx).DefaultCellStyle.BackColor = IIf(dgSales.Rows(i).Cells("付款方式").Value = 2, Color.LightBlue, Color.LightGreen)
             dgSales.Rows.Item(i).Cells("付款方式").Value = TypeOfPaymentsDescribe(dgSales.Rows(i).Cells("付款方式").Value)
-
-
         Next
+        UpdateListColor()
         ShowKind()
+    End Sub
+
+    Public Sub UpdateListColor()
+        For i As Integer = 0 To dgSales.Rows.Count - 1
+            dgSales.Rows(i).DefaultCellStyle.BackColor = IIf(dgSales.Rows(i).Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+        Next
     End Sub
 
     Public Sub OpenSales()
@@ -224,4 +227,12 @@ Public Class winMain
     End Sub
 
 
+    Private Sub 其他資訊ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 其他資訊ToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub 選項OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 選項OToolStripMenuItem.Click
+        winOptional.ShowDialog()
+        UpdateListColor()
+    End Sub
 End Class

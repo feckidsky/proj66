@@ -69,6 +69,7 @@ Partial Class winMain
         Me.縮到工具列TToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.cbForm = New System.Windows.Forms.ComboBox
+        Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
@@ -79,7 +80,7 @@ Partial Class winMain
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.其他資訊ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.選項OToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(795, 24)
@@ -163,24 +164,24 @@ Partial Class winMain
         '供應商ToolStripMenuItem
         '
         Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
-        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.供應商ToolStripMenuItem.Text = "供應商(&S)"
         '
         '客戶CToolStripMenuItem
         '
         Me.客戶CToolStripMenuItem.Name = "客戶CToolStripMenuItem"
-        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.客戶CToolStripMenuItem.Text = "客戶(&C)"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(124, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(149, 6)
         '
         '員工PToolStripMenuItem
         '
         Me.員工PToolStripMenuItem.Name = "員工PToolStripMenuItem"
-        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
+        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.員工PToolStripMenuItem.Text = "員工(&P)"
         '
         'dgSales
@@ -411,6 +412,12 @@ Partial Class winMain
         Me.cbForm.Size = New System.Drawing.Size(121, 20)
         Me.cbForm.TabIndex = 0
         '
+        '選項OToolStripMenuItem
+        '
+        Me.選項OToolStripMenuItem.Name = "選項OToolStripMenuItem"
+        Me.選項OToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
+        Me.選項OToolStripMenuItem.Text = "選項(&O)"
+        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -481,4 +488,5 @@ Partial Class winMain
     Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents cbForm As System.Windows.Forms.ComboBox
+    Friend WithEvents 選項OToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

@@ -18,23 +18,53 @@ Public Module Program
         Success = 2
     End Enum
 
+    Structure SystemOptional
+        Dim OrderBackcolor As Integer
+        Dim SalesBackColor As Integer
+
+
+
+        Shared ReadOnly Property DefaultConfig()
+            Get
+                Dim def As SystemOptional
+                def.OrderBackcolor = Color.LightPink.ToArgb
+                def.SalesBackColor = Color.LightGreen.ToArgb
+                Return def
+            End Get
+        End Property
+
+    End Structure
+
+    Public Config As SystemOptional
+    Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
+
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
 
     Event Account_Logout(ByVal personnel As Database.Personnel, ByVal Message As String)
     Event Account_LogIn(ByVal personnel As Database.Personnel, ByVal Message As String)
     Public SystemTitle As String = "進銷存管理系統"
-   
+
     Public Sub InitialProgram()
         'Dim d As OleDb.OleDbConnection = DB.File.ConnectBase(DB.File.BasePath)
         'DB.File.CreateTable(Sales.Table, Sales.ToColumns, d)
         'DB.File.CreateTable(SalesGoods.Table, SalesGoods.ToColumns, d)
         'DB.AddBase(Personnel.Administrator)
 
+        ConfigLoad()
+
         LogOut(False)
 
         LogIn("kidsky1", "3883", False)
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
         'LogIn(admin.ID, admin.Password, False)
+    End Sub
+
+    Public Sub ConfigLoad()
+        Config = Code.Load(Of SystemOptional)(ConfigPath, SystemOptional.DefaultConfig)
+    End Sub
+
+    Public Sub ConfigSave()
+        Code.Save(Config, ConfigPath)
     End Sub
 
     Public Function CheckAuthority(ByVal level As Integer, Optional ByVal WithAdmin As Boolean = False) As Boolean
@@ -124,4 +154,119 @@ Public Module Program
         data.Date = Now
         Return data
     End Function
+
+    Public Function ToColor(ByVal argb As Integer) As Color
+        Return Color.FromArgb(argb)
+    End Function
+
+
+#Region "Code - 序列化 / 壓縮"
+    Public Class Code
+        Public Shared Function Zip(ByVal Text As String, Optional ByVal ZipCount As Int16 = 1) As String
+            If Text = "" Then Return ""
+            If ZipCount > 0 Then
+                Dim Data As Byte() = System.Text.Encoding.UTF8.GetBytes(Text)
+                Return Convert.ToBase64String(Zip(Data, ZipCount))
+            Else
+                Return Text
+            End If
+        End Function
+
+        Public Shared Function Unzip(ByVal Text As String, Optional ByVal ZipCount As Int16 = 1) As String
+            If Text = "" Then Return ""
+            If ZipCount > 0 Then
+                Dim Data As Byte() = Convert.FromBase64String(Text)
+                Return System.Text.Encoding.UTF8.GetString(Unzip(Data, ZipCount))
+            Else
+                Return Text
+            End If
+        End Function
+
+
+        Public Shared Function Zip(ByVal Data() As Byte, Optional ByVal Count As Int16 = 1) As Byte()
+            If Count = 0 Then Return Data
+            Dim ms As IO.MemoryStream = New IO.MemoryStream()
+            Dim compressedzipStream As IO.Compression.GZipStream = New IO.Compression.GZipStream(ms, IO.Compression.CompressionMode.Compress, True)
+            compressedzipStream.Write(Data, 0, Data.Length)
+            compressedzipStream.Close()
+            compressedzipStream.Dispose()
+            Return Zip(ms.ToArray, Count - 1)
+            ms.Dispose()
+        End Function
+
+        Public Shared Function Unzip(ByVal Data() As Byte, Optional ByVal Count As Int16 = 1) As Byte()
+            If Count = 0 Then Return Data
+            Dim ms As IO.MemoryStream = New IO.MemoryStream(Data)
+            Dim compressedzipStream As IO.Compression.GZipStream = New IO.Compression.GZipStream(ms, IO.Compression.CompressionMode.Decompress, True)
+
+            Dim buff(4095) As Byte
+            Dim read As Long = compressedzipStream.Read(buff, 0, buff.Length)
+            Dim output As New IO.MemoryStream()
+            output.Write(buff, 0, read)
+            Do While (read > 0)
+                read = compressedzipStream.Read(buff, 0, buff.Length)
+                output.Write(buff, 0, read)
+            Loop
+
+            ms.Dispose()
+            compressedzipStream.Close()
+            compressedzipStream.Dispose()
+            Return Unzip(output.ToArray, Count - 1)
+            output.Dispose()
+        End Function
+
+        Public Shared Function SerializeWithZIP(ByVal obj As Object) As String
+            Return Zip(Serialize(obj))
+        End Function
+
+        Public Shared Function DeserializeWithUnzip(Of T)(ByVal ZipText As String, ByVal Type As Type) As T
+            Return Deserialize(Of T)(Unzip(ZipText))
+        End Function
+
+        Public Shared Function DeserializeWithUnzip(Of T)(ByVal ZipText As String) As T
+            Return Deserialize(Of T)(Unzip(ZipText))
+        End Function
+
+        Public Shared Function Serialize(ByVal Obj As Object) As String
+            Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(Obj.GetType)
+            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+            Dim writer As IO.StringWriter = New IO.StringWriter(sb)
+            ser.Serialize(writer, Obj)
+            Return sb.ToString()
+            writer.Dispose()
+        End Function
+
+        Public Shared Function Deserialize(Of T)(ByVal Text As String) As T
+            ''將取得的內容進行反序列化
+            Dim mySerializer As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(GetType(T)) 'GetType(SerializeData))
+            Dim reader As New IO.StringReader(Text)
+            Return mySerializer.Deserialize(reader)
+            reader.Dispose()
+        End Function
+
+        Public Enum ZipMode
+            Normal = 0
+            ZIP = 1
+        End Enum
+
+        Public Shared Sub Save(Of T)(ByVal Data As T, ByVal FilePath As String, Optional ByVal Mode As ZipMode = ZipMode.Normal)
+            Dim Dir As String = IO.Path.GetDirectoryName(FilePath)
+            If Not IO.Directory.Exists(Dir) Then IO.Directory.CreateDirectory(Dir)
+            Dim Text As String = Code.Serialize(Data)
+            If Mode = ZipMode.ZIP Then Text = Code.Zip(Text)
+            My.Computer.FileSystem.WriteAllText(FilePath, Text, False, System.Text.Encoding.Unicode)
+        End Sub
+
+        Public Shared Function Load(Of T)(ByVal FilePath As String, ByVal DefaultData As T, Optional ByVal Mode As ZipMode = ZipMode.Normal) As T
+            If IO.File.Exists(FilePath) Then
+                Dim Text As String = My.Computer.FileSystem.ReadAllText(FilePath, System.Text.Encoding.Unicode)
+                If Mode = ZipMode.ZIP Then Text = Code.Unzip(Text)
+                Return Code.Deserialize(Of T)(Text)
+            Else
+                Return DefaultData
+            End If
+        End Function
+
+    End Class
+#End Region
 End Module
