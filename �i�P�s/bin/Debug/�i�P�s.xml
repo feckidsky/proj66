@@ -123,6 +123,8 @@
 	<summary>商品</summary>
 </member><member name="F:進銷存.Database.StructureBase.Mobile.Label">
 	<summary>門號識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Mobile.Enable">
+	<summary>有效</summary>
 </member><member name="F:進銷存.Database.StructureBase.Mobile.Name">
 	<summary>名稱</summary>
 </member><member name="F:進銷存.Database.StructureBase.Mobile.Commission">

@@ -13,6 +13,7 @@ Namespace Database
         Dim DBTypeDate As String = "date"
         Dim DBTypeSingle As String = "single"
         Dim DBTypeInteger As String = "int"
+        Dim DBTypeBoolean As String = "bit"
 
         Dim TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
 
@@ -342,6 +343,8 @@ Namespace Database
             Shared Table As String = "Mobile"
             ''' <summary>門號識別碼</summary>
             Dim Label As String
+            ''' <summary>有效</summary>
+            Dim Enable As Boolean
             ''' <summary>名稱</summary>
             Dim Name As String
             ''' <summary>佣金</summary>
@@ -354,6 +357,7 @@ Namespace Database
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
+                Columns.Add(New Column("Enable", DBTypeBoolean))
                 Columns.Add(New Column("Name", DBTypeName))
                 Columns.Add(New Column("Commission", DBTypeSingle))
                 Columns.Add(New Column("Discount", DBTypeSingle))
@@ -361,19 +365,22 @@ Namespace Database
                 Return Columns.ToArray
             End Function
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Commission, Discount, Note}
+                Return New Object() {Label, Enable, Name, Commission, Discount, Note}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Mobile
                 Dim R As New MyDataRow(Row)
                 Dim data As Mobile
                 data.Label = R("Label")
+                data.Enable = R("Enable")
                 data.Name = R("Name")
                 data.Commission = R("Commission")
                 data.Discount = R("Discount")
                 data.Note = R("Note")
                 Return data
             End Function
+
+  
         End Structure
 #End Region
 #Region "庫存"
@@ -471,13 +478,6 @@ Namespace Database
 
         Public TypeOfPaymentsDescribe As String() = New String() {"現金", "刷卡", "訂金"}
 
-
-        '''' <summary>商品種類：商品/門號</summary>
-        'Enum TypeOfGoods
-        '    Goods = 0
-        '    MobileNumber = 1
-        'End Enum
-
         Structure SalesGoods
             Shared Table As String = "SalesGoods"
             ''' <summary>單號識別碼</summary>
@@ -512,6 +512,64 @@ Namespace Database
                 Return data
             End Function
 
+        End Structure
+
+
+        Structure SalesMobile
+            Shared Table As String = "SalesMobile"
+            Dim SalesLabel As String
+            Dim Discount As Single
+            Dim Phone As String
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("SalesLabel", DBTypeLabel))
+                Columns.Add(New Column("Discount", DBTypeSingle))
+                Columns.Add(New Column("Phone", DBTypeTel))
+                Return Columns.ToArray()
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {SalesLabel, Discount, Phone}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesMobile
+                Dim R As New MyDataRow(Row)
+                Dim data As SalesMobile
+                data.SalesLabel = R("SalesLabel")
+                data.Discount = R("Discount")
+                data.Phone = R("Phone")
+                Return data
+            End Function
+
+
+        End Structure
+
+        Structure OrderGoods
+            Shared Table As String = "OrderGoods"
+            Dim SalesLabel As String
+            Dim GoodsLabel As String
+            Dim Number As Integer
+
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("SalesLabel", DBTypeLabel))
+                Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+                Columns.Add(New Column("Number", DBTypeInteger))
+                Return Columns.ToArray()
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {SalesLabel, GoodsLabel, Number}
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As OrderGoods
+                Dim R As New MyDataRow(Row)
+                Dim data As OrderGoods
+                data.SalesLabel = R("SalesLabel")
+                data.GoodsLabel = R("GoodsLabel")
+                data.Number = R("Number")
+                Return data
+            End Function
         End Structure
 
         ''' <summary>銷貨</summary>

@@ -45,10 +45,9 @@ Public Module Program
     Public SystemTitle As String = "進銷存管理系統"
 
     Public Sub InitialProgram()
-        'Dim d As OleDb.OleDbConnection = DB.File.ConnectBase(DB.File.BasePath)
-        'DB.File.CreateTable(Sales.Table, Sales.ToColumns, d)
-        'DB.File.CreateTable(SalesGoods.Table, SalesGoods.ToColumns, d)
-        'DB.AddBase(Personnel.Administrator)
+
+
+        'UpdateDatabase()
 
         ConfigLoad()
 
@@ -57,6 +56,14 @@ Public Module Program
         LogIn("kidsky1", "3883", False)
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
         'LogIn(admin.ID, admin.Password, False)
+    End Sub
+
+    Public Sub UpdateDatabase()
+        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(Database.Access.BasePath)
+        Database.Access.DeleteTable(Mobile.Table, d)
+        Database.Access.CreateTable(Mobile.Table, Mobile.ToColumns, d)
+        Database.Access.CreateTable(SalesMobile.Table, SalesMobile.ToColumns, d)
+        Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
     End Sub
 
     Public Sub ConfigLoad()

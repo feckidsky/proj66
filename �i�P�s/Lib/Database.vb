@@ -11,11 +11,6 @@
 
     Public Class Access
 
-        'Dim SupplierList As New List(Of Supplier)
-        'Dim PersonnelList As New List(Of Personnel)
-        'Dim GoodsList As New List(Of Goods)
-        'Dim MobileList As New List(Of Mobile)
-
         Event CreatedStock(ByVal stock As Stock)
         Event ChangedStock(ByVal stock As Stock)
         Event DeletedStock(ByVal stock As Stock)
@@ -350,6 +345,8 @@
             CreateTable(Stock.Table, Stock.ToColumns, DBControl)
             CreateTable(Sales.Table, Sales.ToColumns, DBControl)
             CreateTable(SalesGoods.Table, SalesGoods.ToColumns, DBControl)
+            CreateTable(SalesMobile.Table, SalesMobile.ToColumns, DBControl)
+            CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             AddBase(Personnel.Administrator)
             Return DBControl
         End Function
@@ -391,6 +388,9 @@
             Return ResMsg
         End Function
 
+        Public Shared Function DeleteTable(ByVal Table As String, ByVal DBControl As OleDb.OleDbConnection) As String
+            Return Command("DROP TABLE [" & Table & "];", DBControl)
+        End Function
         ''' <summary>
         ''' 加入索引
         ''' </summary>
@@ -548,63 +548,6 @@
             Next
             Return lstData.ToArray
         End Function
-
-        'Public Shared Function ReadSupplier() As Supplier()
-        '    Return Read(Of Supplier)(Supplier.Table, AddressOf Supplier.GetFrom)
-        'End Function
-
-        'Public Shared Function ReadPersonnel() As Personnel()
-        '    Return Read(Of Personnel)(Personnel.Table, AddressOf Personnel.GetFrom)
-        'End Function
-
-        'Public Shared Function ReadGoods() As Goods()
-        '    Return Read(Of Goods)(Goods.Table, AddressOf Goods.GetFrom)
-        'End Function
-
-        'Public Shared Function ReadMobile() As Mobile()
-        '    Return Read(Of Mobile)(Mobile.Table, AddressOf Mobile.GetFrom)
-        'End Function
-#Region "hide"
-        '''' <summary>新增供應商</summary>
-        'Public Shared Sub AddSupplier(ByVal data As Supplier)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增客戶</summary>
-        'Public Shared Sub AddCustomer(ByVal data As Customer)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增員工</summary>
-        'Public Shared Sub AddPersonnel(ByVal data As Personnel)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增商品</summary>
-        'Public Shared Sub AddGoods(ByVal data As Goods)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增門號</summary>
-        'Public Shared Sub AddMobile(ByVal data As Mobile)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增庫存</summary>
-        'Public Shared Sub AddStock(ByVal data As Stock)
-        '    CommandBase(GetSqlInsert(data), BasePath)
-        'End Sub
-
-        '''' <summary>新增銷貨單</summary>
-        'Public Shared Sub AddSales(ByVal data As Sales)
-        '    CommandSales(GetSqlInsert(data), SalesPath)
-        'End Sub
-
-        '''' <summary>新增訂單</summary>
-        'Public Shared Sub AddOrder(ByVal data As Order)
-        '    CommandSales(GetSqlInsert(data), SalesPath)
-        'End Sub
-#End Region
 
         'End Class
 
