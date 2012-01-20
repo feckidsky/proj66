@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class winGoodsList
+Partial Class winContractList
     Inherits System.Windows.Forms.Form
 
     'Form 覆寫 Dispose 以清除元件清單。
@@ -92,7 +92,7 @@ Partial Class winGoodsList
         Me.新增AToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
         Me.新增AToolStripMenuItem.Text = "新增(&A)"
         '
-        'winGoodsList
+        'winContractList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -100,8 +100,8 @@ Partial Class winGoodsList
         Me.Controls.Add(Me.dgGoodsList)
         Me.Controls.Add(Me.MenuStrip1)
         Me.MainMenuStrip = Me.MenuStrip1
-        Me.Name = "winGoodsList"
-        Me.Text = "商品項目清單"
+        Me.Name = "winContractList"
+        Me.Text = "合約"
         CType(Me.dgGoodsList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.cmsEdit.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)

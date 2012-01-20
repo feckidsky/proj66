@@ -60,9 +60,9 @@ Public Module Program
 
     Public Sub UpdateDatabase()
         Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(Database.Access.BasePath)
-        Database.Access.DeleteTable(Mobile.Table, d)
-        Database.Access.CreateTable(Mobile.Table, Mobile.ToColumns, d)
-        Database.Access.CreateTable(SalesMobile.Table, SalesMobile.ToColumns, d)
+        Database.Access.DeleteTable("Mobile", d)
+        Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
+        Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
     End Sub
 
@@ -134,8 +134,8 @@ Public Module Program
         Return data
     End Function
 
-    Public Function GetNewMobile() As Mobile
-        Dim data As Mobile = Nothing
+    Public Function GetNewMobile() As Contract
+        Dim data As Contract = Nothing
         data.Label = "M" & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
@@ -159,6 +159,13 @@ Public Module Program
         Dim data As Order = Nothing
         data.Label = "O" & Now.ToString("yyMMddHHmmss")
         data.Date = Now
+        Return data
+    End Function
+
+    Public Function GetNewContract() As Contract
+        Dim data As New Contract
+        data.Label = "C" & Now.ToString("yyMMddHHmmss")
+        data.Enable = True
         Return data
     End Function
 

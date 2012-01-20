@@ -57,7 +57,7 @@
 	<summary>新增員工</summary>
 </member><member name="M:進銷存.Database.Access.AddGoods(進銷存.Database.StructureBase.Goods)">
 	<summary>新增商品</summary>
-</member><member name="M:進銷存.Database.Access.AddMobile(進銷存.Database.StructureBase.Mobile)">
+</member><member name="M:進銷存.Database.Access.AddContract(進銷存.Database.StructureBase.Contract)">
 	<summary>新增門號</summary>
 </member><member name="M:進銷存.Database.Access.AddStock(進銷存.Database.StructureBase.Stock)">
 	<summary>新增庫存</summary>
@@ -121,20 +121,22 @@
 	<summary>備註</summary>
 </member><member name="T:進銷存.Database.StructureBase.Goods">
 	<summary>商品</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Label">
-	<summary>門號識別碼</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Enable">
+</member><member name="F:進銷存.Database.StructureBase.Contract.Label">
+	<summary>合約識別碼</summary>
+</member><member name="F:進銷存.Database.StructureBase.Contract.Enable">
 	<summary>有效</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Name">
+</member><member name="F:進銷存.Database.StructureBase.Contract.Name">
 	<summary>名稱</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Commission">
+</member><member name="F:進銷存.Database.StructureBase.Contract.Commission">
 	<summary>佣金</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Discount">
+</member><member name="F:進銷存.Database.StructureBase.Contract.Discount">
 	<summary>折扣</summary>
-</member><member name="F:進銷存.Database.StructureBase.Mobile.Note">
+</member><member name="F:進銷存.Database.StructureBase.Contract.Prepay">
+	<summary>預付額</summary>
+</member><member name="F:進銷存.Database.StructureBase.Contract.Note">
 	<summary>備註</summary>
-</member><member name="T:進銷存.Database.StructureBase.Mobile">
-	<summary>門號</summary>
+</member><member name="T:進銷存.Database.StructureBase.Contract">
+	<summary>合約、綁約</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Label">
 	<summary>庫存識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.GoodsLabel">

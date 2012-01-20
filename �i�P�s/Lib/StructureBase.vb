@@ -338,10 +338,10 @@ Namespace Database
         End Structure
 #End Region
 #Region "門號"
-        ''' <summary>門號</summary>
-        Structure Mobile
-            Shared Table As String = "Mobile"
-            ''' <summary>門號識別碼</summary>
+        ''' <summary>合約、綁約</summary>
+        Structure Contract
+            Shared Table As String = "Contract"
+            ''' <summary>合約識別碼</summary>
             Dim Label As String
             ''' <summary>有效</summary>
             Dim Enable As Boolean
@@ -351,6 +351,8 @@ Namespace Database
             Dim Commission As Single
             ''' <summary>折扣</summary>
             Dim Discount As Single
+            ''' <summary>預付額</summary>
+            Dim Prepay As Single
             ''' <summary>備註</summary>
             Dim Note As String
 
@@ -361,26 +363,47 @@ Namespace Database
                 Columns.Add(New Column("Name", DBTypeName))
                 Columns.Add(New Column("Commission", DBTypeSingle))
                 Columns.Add(New Column("Discount", DBTypeSingle))
+                Columns.Add(New Column("Prepay", DBTypeSingle))
                 Columns.Add(New Column("Note", DBTypeNote))
                 Return Columns.ToArray
             End Function
             Function ToObjects() As Object()
-                Return New Object() {Label, Enable, Name, Commission, Discount, Note}
+                Return New Object() {Label, Enable, Name, Commission, Discount, Prepay, Note}
             End Function
 
-            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Mobile
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Contract
                 Dim R As New MyDataRow(Row)
-                Dim data As Mobile
+                Dim data As Contract
                 data.Label = R("Label")
                 data.Enable = R("Enable")
                 data.Name = R("Name")
                 data.Commission = R("Commission")
                 data.Discount = R("Discount")
+                data.Discount = R("Prepay")
                 data.Note = R("Note")
                 Return data
             End Function
 
-  
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Enable", "Name", "Commission", "Discount", "Prepay", "Note"}
+                Dim Value As String() = New String() {Enable, Name, Commission, Discount, Prepay, Note}
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
+            Public Shared Function Null() As Contract
+                Dim g As New Contract
+                g.Label = ""
+                Return g
+            End Function
+
+            Public Overrides Function ToString() As String
+                If IsNull() Then Return ""
+                Return Join(Array.ConvertAll(ToObjects(), Function(o As Object) o.ToString), ",")
+            End Function
         End Structure
 #End Region
 #Region "庫存"
@@ -444,7 +467,6 @@ Namespace Database
                 Dim SQLCommand As String = "UPDATE " & Table & " SET "
                 Dim label() As String = New String() {"GoodsLabel", "SupplierLabel", "Date", "IMEI", "Cost", "Price", "Number", "Note"}
                 Dim value() As String = New String() {"'" & GoodsLabel & "'", "'" & SupplierLabel & "'", [Date].ToString("#yyyy/MM/dd HH:mm:ss#"), "'" & IMEI & "'", Cost, Price, Number, "'" & Note & "'"}
-
                 SQLCommand &= GetSqlColumnChangePart(label, value) & " WHERE Label='" & Me.Label & "';"
                 Return SQLCommand
             End Function
@@ -454,6 +476,7 @@ Namespace Database
                 SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]='" & ConditionText & "';"
                 Return SQLCommand
             End Function
+
 
             Private Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As String) As String
                 Dim lst As New List(Of String)
@@ -515,27 +538,30 @@ Namespace Database
         End Structure
 
 
-        Structure SalesMobile
-            Shared Table As String = "SalesMobile"
+        Structure SalesContract
+            Shared Table As String = "SalesContract"
             Dim SalesLabel As String
+            Dim ContractLabel As String
             Dim Discount As Single
             Dim Phone As String
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("SalesLabel", DBTypeLabel))
+                Columns.Add(New Column("ContractLabel", DBTypeLabel))
                 Columns.Add(New Column("Discount", DBTypeSingle))
                 Columns.Add(New Column("Phone", DBTypeTel))
                 Return Columns.ToArray()
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {SalesLabel, Discount, Phone}
+                Return New Object() {SalesLabel, ContractLabel, Discount, Phone}
             End Function
 
-            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesMobile
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesContract
                 Dim R As New MyDataRow(Row)
-                Dim data As SalesMobile
+                Dim data As SalesContract
                 data.SalesLabel = R("SalesLabel")
+                data.ContractLabel = R("ContractLabel")
                 data.Discount = R("Discount")
                 data.Phone = R("Phone")
                 Return data

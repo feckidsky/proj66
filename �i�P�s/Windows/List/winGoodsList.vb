@@ -1,4 +1,5 @@
-﻿Public Class winGoodsList
+﻿
+Public Class winGoodsList
 
     Enum Mode
         Normal = 0
@@ -32,7 +33,7 @@
 
 
     Private Sub UpdateList()
-        dgGoodsList.DataSource = DB.GetGoodsList()
+        dgItemList.DataSource = DB.GetGoodsList()
 
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "品名")
@@ -43,7 +44,7 @@
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
-        dgGoodsList.Columns(Label).HeaderText = Text
+        dgItemList.Columns(Label).HeaderText = Text
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
@@ -56,7 +57,7 @@
 
     Private Sub EditGoods()
 
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        If dgItemList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
@@ -66,9 +67,9 @@
     End Sub
 
     Public Function GetSelectedGoods() As Database.Goods
-        Dim dt As DataTable = dgGoodsList.DataSource
+        Dim dt As DataTable = dgItemList.DataSource
 
-        Dim label As String = dgGoodsList.SelectedRows(0).Cells(0).Value
+        Dim label As String = dgItemList.SelectedRows(0).Cells(0).Value
 
         For Each r As Data.DataRow In dt.Rows
             If r.Item(0) = label Then
@@ -83,7 +84,7 @@
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
 
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        If dgItemList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
@@ -104,7 +105,7 @@
         DB.DeleteGoods(SelectedGoods)
     End Sub
 
-    Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
+    Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgItemList.CellMouseDoubleClick
         If work = Mode.Normal Then
             EditGoods()
         Else

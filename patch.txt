@@ -1,3 +1,7 @@
+20121220
+1.將Mobile資料表更名為Contract，並新增欄位資訊。
+2.新增合約清單與編輯(新增/修改/刪除)。
+
 20120118
 1.新增資料表 SalesMobile/OrderGoods。
 2.資料表Mobile新增Enable欄位。

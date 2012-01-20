@@ -235,4 +235,8 @@ Public Class winMain
         winOptional.ShowDialog()
         UpdateListColor()
     End Sub
+
+    Private Sub 合約CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 合約CToolStripMenuItem.Click
+        winContractList.ShowDialog()
+    End Sub
 End Class

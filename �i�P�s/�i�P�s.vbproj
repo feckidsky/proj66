@@ -86,22 +86,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lib\Database.vb" />
-    <Compile Include="Windows\winAccount.Designer.vb">
+    <Compile Include="Windows\EditForm\winContract.Designer.vb">
+      <DependentUpon>winContract.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EditForm\winContract.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\List\winContractList.Designer.vb">
+      <DependentUpon>winContractList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\List\winContractList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\UserAccount\winAccount.Designer.vb">
       <DependentUpon>winAccount.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winAccount.vb">
+    <Compile Include="Windows\UserAccount\winAccount.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winGoodsList.Designer.vb">
+    <Compile Include="Windows\List\winGoodsList.Designer.vb">
       <DependentUpon>winGoodsList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winGoodsList.vb">
+    <Compile Include="Windows\List\winGoodsList.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winLogIn.Designer.vb">
+    <Compile Include="Windows\UserAccount\winLogIn.Designer.vb">
       <DependentUpon>winLogIn.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winLogIn.vb">
+    <Compile Include="Windows\UserAccount\winLogIn.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\winMain.Designer.vb">
@@ -110,22 +122,16 @@
     <Compile Include="Windows\winMain.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winMobile.Designer.vb">
-      <DependentUpon>winMobile.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\winMobile.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\winOptional.Designer.vb">
       <DependentUpon>winOptional.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\winOptional.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winPeople.vb">
+    <Compile Include="Windows\EditForm\winPeople.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winPeople.Designer.vb">
+    <Compile Include="Windows\EditForm\winPeople.Designer.vb">
       <DependentUpon>winPeople.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
@@ -146,75 +152,83 @@
     </Compile>
     <Compile Include="Program.vb" />
     <Compile Include="Lib\StructureBase.vb" />
-    <Compile Include="Windows\winGoods.Designer.vb">
+    <Compile Include="Windows\EditForm\winGoods.Designer.vb">
       <DependentUpon>winGoods.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winGoods.vb">
+    <Compile Include="Windows\EditForm\winGoods.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winSales.Designer.vb">
+    <Compile Include="Windows\EditForm\winSales.Designer.vb">
       <DependentUpon>winSales.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winSales.vb">
+    <Compile Include="Windows\EditForm\winSales.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winStockList.Designer.vb">
+    <Compile Include="Windows\List\winStockList.Designer.vb">
       <DependentUpon>winStockList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winStockList.vb">
+    <Compile Include="Windows\List\winStockList.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winStockIn.Designer.vb">
+    <Compile Include="Windows\EditForm\winStockIn.Designer.vb">
       <DependentUpon>winStockIn.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winStockIn.vb">
+    <Compile Include="Windows\EditForm\winStockIn.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winStockInLog.Designer.vb">
+    <Compile Include="Windows\List\winStockInLog.Designer.vb">
       <DependentUpon>winStockInLog.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winStockInLog.vb">
+    <Compile Include="Windows\List\winStockInLog.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winSupplierList.Designer.vb">
+    <Compile Include="Windows\List\winSupplierList.Designer.vb">
       <DependentUpon>winSupplierList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winSupplierList.vb">
+    <Compile Include="Windows\List\winSupplierList.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winPersonnelList.Designer.vb">
+    <Compile Include="Windows\List\winPersonnelList.Designer.vb">
       <DependentUpon>winPersonnelList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winPersonnelList.vb">
+    <Compile Include="Windows\List\winPersonnelList.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winCustomerList.Designer.vb">
+    <Compile Include="Windows\List\winCustomerList.Designer.vb">
       <DependentUpon>winCustomerList.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winCustomerList.vb">
+    <Compile Include="Windows\List\winCustomerList.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\winChangePassword.Designer.vb">
+    <Compile Include="Windows\UserAccount\winChangePassword.Designer.vb">
       <DependentUpon>winChangePassword.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\winChangePassword.vb">
+    <Compile Include="Windows\UserAccount\winChangePassword.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Windows\winAccount.resx">
+    <EmbeddedResource Include="Windows\EditForm\winContract.resx">
+      <DependentUpon>winContract.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\List\winContractList.resx">
+      <DependentUpon>winContractList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\UserAccount\winAccount.resx">
       <DependentUpon>winAccount.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winGoods.resx">
+    <EmbeddedResource Include="Windows\EditForm\winGoods.resx">
       <DependentUpon>winGoods.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winGoodsList.resx">
+    <EmbeddedResource Include="Windows\List\winGoodsList.resx">
       <DependentUpon>winGoodsList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winLogIn.resx">
+    <EmbeddedResource Include="Windows\UserAccount\winLogIn.resx">
       <DependentUpon>winLogIn.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -222,15 +236,11 @@
       <DependentUpon>winMain.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winMobile.resx">
-      <DependentUpon>winMobile.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\winOptional.resx">
       <DependentUpon>winOptional.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winPeople.resx">
+    <EmbeddedResource Include="Windows\EditForm\winPeople.resx">
       <DependentUpon>winPeople.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -240,35 +250,35 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winSales.resx">
+    <EmbeddedResource Include="Windows\EditForm\winSales.resx">
       <DependentUpon>winSales.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winStockInLog.resx">
+    <EmbeddedResource Include="Windows\List\winStockInLog.resx">
       <DependentUpon>winStockInLog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winStockList.resx">
+    <EmbeddedResource Include="Windows\List\winStockList.resx">
       <DependentUpon>winStockList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winStockIn.resx">
+    <EmbeddedResource Include="Windows\EditForm\winStockIn.resx">
       <DependentUpon>winStockIn.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winSupplierList.resx">
+    <EmbeddedResource Include="Windows\List\winSupplierList.resx">
       <DependentUpon>winSupplierList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winPersonnelList.resx">
+    <EmbeddedResource Include="Windows\List\winPersonnelList.resx">
       <DependentUpon>winPersonnelList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winCustomerList.resx">
+    <EmbeddedResource Include="Windows\List\winCustomerList.resx">
       <DependentUpon>winCustomerList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\winChangePassword.resx">
+    <EmbeddedResource Include="Windows\UserAccount\winChangePassword.resx">
       <DependentUpon>winChangePassword.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

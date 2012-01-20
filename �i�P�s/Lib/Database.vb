@@ -11,6 +11,10 @@
 
     Public Class Access
 
+        Event CreatedContract(ByVal con As Contract)
+        Event ChangedContract(ByVal con As Contract)
+        Event DeletedContract(ByVal con As Contract)
+
         Event CreatedStock(ByVal stock As Stock)
         Event ChangedStock(ByVal stock As Stock)
         Event DeletedStock(ByVal stock As Stock)
@@ -77,6 +81,18 @@
             If dt.Rows.Count = 0 Then Return Supplier.Null()
             Return Supplier.GetFrom(dt.Rows(0))
 
+        End Function
+
+        Public Function GetContractList() As Data.DataTable
+            Dim SQLCommand As String = "SELECT * FROM " & Contract.Table & ";"
+            Return Read("table", BasePath, SQLCommand)
+        End Function
+
+        Public Function GetSalesListByContractLabel(ByVal Label As String) As Data.DataTable
+            Dim SqlCommand As String = "SELECT Contract.Label, Contract.Name, Contract.Discount, Contract.Prepay, Contract.Note " & _
+            " FROM (Sales INNER JOIN SalesContract ON Sales.Label = SalesContract.SalesLabel) LEFT JOIN Contract ON SalesContract.ContractLabel = Contract.Label " & _
+            " WHERE Contract.Label='" & Label & "'"
+            Return Read("table", BasePath, SqlCommand)
         End Function
 
         Public Function GetPersonnelList() As Data.DataTable
@@ -341,11 +357,11 @@
             CreateTable(Customer.Table, Customer.ToColumns, DBControl)
             CreateTable(Personnel.Table, Personnel.ToColumns, DBControl)
             CreateTable(Goods.Table, Goods.ToColumns, DBControl)
-            CreateTable(Mobile.Table, Mobile.ToColumns, DBControl)
+            CreateTable(Contract.Table, Contract.ToColumns, DBControl)
             CreateTable(Stock.Table, Stock.ToColumns, DBControl)
             CreateTable(Sales.Table, Sales.ToColumns, DBControl)
             CreateTable(SalesGoods.Table, SalesGoods.ToColumns, DBControl)
-            CreateTable(SalesMobile.Table, SalesMobile.ToColumns, DBControl)
+            CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             AddBase(Personnel.Administrator)
             Return DBControl
@@ -618,10 +634,21 @@
         End Sub
 
         ''' <summary>新增門號</summary>
-        Public Sub AddMobile(ByVal data As Mobile)
+        Public Sub AddContract(ByVal data As Contract)
             AddBase(data)
-            'MobileList.Add(data)
+            RaiseEvent CreatedContract(data)
         End Sub
+
+        Public Sub ChangeContract(ByVal data As Contract)
+            Command(data.getupdatesqlcommand(), BasePath)
+            RaiseEvent ChangedContract(data)
+        End Sub
+
+        Public Sub DeleteContract(ByVal data As Contract)
+            Command(GetSqlDelete(Contract.Table, "Label", data.Label), BasePath)
+        End Sub
+
+
 
         ''' <summary>新增庫存</summary>
         Public Sub AddStock(ByVal data As Stock)
