@@ -42,6 +42,7 @@ Partial Class winMain
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
         Me.員工PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -70,7 +71,6 @@ Partial Class winMain
         Me.縮到工具列TToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.cbForm = New System.Windows.Forms.ComboBox
-        Me.合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
@@ -81,7 +81,7 @@ Partial Class winMain
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.選項OToolStripMenuItem, Me.合約CToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.合約CToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.選項OToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(795, 24)
@@ -134,19 +134,19 @@ Partial Class winMain
         '進貨記錄ToolStripMenuItem1
         '
         Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(141, 22)
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
         Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
         '
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
         '
         '商品項目GToolStripMenuItem
         '
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
         '
         '銷貨ToolStripMenuItem
@@ -160,7 +160,7 @@ Partial Class winMain
         Me.其他資訊ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.供應商ToolStripMenuItem, Me.客戶CToolStripMenuItem, Me.ToolStripSeparator3, Me.員工PToolStripMenuItem})
         Me.其他資訊ToolStripMenuItem.Name = "其他資訊ToolStripMenuItem"
         Me.其他資訊ToolStripMenuItem.Size = New System.Drawing.Size(83, 20)
-        Me.其他資訊ToolStripMenuItem.Text = "其他資訊(&E)"
+        Me.其他資訊ToolStripMenuItem.Text = "基本資料(&B)"
         '
         '供應商ToolStripMenuItem
         '
@@ -190,6 +190,12 @@ Partial Class winMain
         Me.選項OToolStripMenuItem.Name = "選項OToolStripMenuItem"
         Me.選項OToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
         Me.選項OToolStripMenuItem.Text = "選項(&O)"
+        '
+        '合約CToolStripMenuItem
+        '
+        Me.合約CToolStripMenuItem.Name = "合約CToolStripMenuItem"
+        Me.合約CToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
+        Me.合約CToolStripMenuItem.Text = "合約(&C)"
         '
         'dgSales
         '
@@ -418,12 +424,6 @@ Partial Class winMain
         Me.cbForm.Name = "cbForm"
         Me.cbForm.Size = New System.Drawing.Size(121, 20)
         Me.cbForm.TabIndex = 0
-        '
-        '合約CToolStripMenuItem
-        '
-        Me.合約CToolStripMenuItem.Name = "合約CToolStripMenuItem"
-        Me.合約CToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
-        Me.合約CToolStripMenuItem.Text = "合約(&C)"
         '
         'winMain
         '

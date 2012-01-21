@@ -11,6 +11,8 @@
 
     Public Class Access
 
+
+
         Event CreatedContract(ByVal con As Contract)
         Event ChangedContract(ByVal con As Contract)
         Event DeletedContract(ByVal con As Contract)
@@ -35,15 +37,24 @@
         Event ChangedPersonnel(ByVal per As Personnel)
         Event DeletedPersonnel(ByVal per As Personnel)
 
-        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
-        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods)
+        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods)
+        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods)
         Event DeletedSales(ByVal sales As Sales)
+
+        Event CreatedHistoryPrice(ByVal hp As HistoryPrice)
+        Event ChangedHistoryPrice(ByVal hp As HistoryPrice)
+        Event DeletedHistoryPrice(ByVal hp As HistoryPrice)
 
         Public Sub New()
             Dir = My.Application.Info.DirectoryPath & "\data"
             BasePath = Dir & "\base.mdb"
             SalesPath = Dir & "\sales.mdb"
         End Sub
+
+        Public Function GetHistoryPrice(ByVal Label As String) As Data.DataTable
+            Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
+            Return Read("table", BasePath, SqlCommand)
+        End Function
 
         Public Function GetGoodsList() As Data.DataTable
             Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & ";"
@@ -55,6 +66,14 @@
             Dim dt As DataTable = Read("table", BasePath, SQLCommand)
             If dt.Rows.Count = 0 Then Return Goods.Null()
             Return Goods.GetFrom(dt.Rows(0))
+        End Function
+
+        Public Function GetGoodsWithPrice(ByVal Label As String) As Data.DataTable
+            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price " & _
+            " FROM (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label " & _
+            " WHERE(Goods.Label = '" & Label & "') " & _
+            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price; "
+            Return Read("table", BasePath, SqlCommand)
         End Function
 
         Public Function GetCustomerList() As Data.DataTable
@@ -223,9 +242,20 @@
 
         End Function
 
+        Public Function GetOrderListBySalesLabel(ByVal label) As Data.DataTable
+            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price, OrderGoods.Price, OrderGoods.Number " & _
+            " FROM OrderGoods LEFT JOIN ((SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price " & _
+            " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 " & _
+            " FROM HistoryPrice " & _
+            " GROUP BY HistoryPrice.GoodsLabel )  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1 = HistoryPrice.Time) AND (tmp.GoodsLabel = HistoryPrice.GoodsLabel) )  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON OrderGoods.GoodsLabel = Goods.Label " & _
+            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price, OrderGoods.Price, OrderGoods.Number;"
+
+            Return Read("table", BasePath, SqlCommand)
+        End Function
+
         '取得銷貨單的商品清單-根據銷貨單號
         Public Function GetGoodsListBySalesLabel(ByVal Label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
+            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
             " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
             " WHERE (((SalesGoods.SalesLabel)=""" & Label & """));"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -251,9 +281,9 @@
 
 
         '新增銷貨單
-        Public Sub CreateSales(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
-            CreateSalesWithoutEvent(newSales, Goods)
-            RaiseEvent CreatedSales(newSales, Goods)
+        Public Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
+            CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods)
+            RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods)
 
         End Sub
 
@@ -264,17 +294,21 @@
         End Sub
 
         '修改銷貨單
-        Public Sub ChangeSales(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
+        Public Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
             DeleteSalesWithoutEvent(newSales)
-            CreateSalesWithoutEvent(newSales, Goods)
-            RaiseEvent ChangedSales(newSales, Goods)
+            CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods)
+            RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods)
         End Sub
 
-        Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal Goods() As SalesGoods)
+        Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
             Database.Access.AddBase(newSales)
 
-            For Each g As SalesGoods In Goods
+            For Each g As SalesGoods In SalesGoods
                 Database.Access.AddBase(g)
+            Next
+
+            For Each o As OrderGoods In OrderGoods
+                Database.Access.AddBase(o)
             Next
         End Sub
 
@@ -284,7 +318,12 @@
 
             SqlCommand = "DELETE FROM salesgoods WHERE saleslabel='" & dSales.Label & "';"
             Command(SqlCommand, BasePath)
+
+            SqlCommand = "DELETE FROM OrderGoods WHERE SalesLabel='" & dSales.Label & "';"
+            Command(SqlCommand, BasePath)
         End Sub
+
+
 
 
 
@@ -363,6 +402,7 @@
             CreateTable(SalesGoods.Table, SalesGoods.ToColumns, DBControl)
             CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
+            CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), DBControl)
             AddBase(Personnel.Administrator)
             Return DBControl
         End Function
@@ -513,9 +553,27 @@
             Return "DELETE FROM " & Table & " WHERE [" & ColumnName & "]='" & Text & "';"
         End Function
 
-        Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn As String, ByVal ConditionText As String) As String
+        Shared Function GetConitionSql(ByVal ColumnNames() As String, ByVal Conitions() As Object) As String
+            Dim lstConition As New List(Of String)
+            For i As Integer = 0 To ColumnNames.Length - 1
+                lstConition.Add("[" & ColumnNames(i) & "]=" & GetSqlValue(Conitions(i)))
+            Next
+            Return Join(lstConition.ToArray, " AND ")
+        End Function
+
+        Shared Function GetSqlDelete(ByVal Table As String, ByVal ColumnNames() As String, ByVal Conitions() As Object) As String
+            Return "DELETE FROM " & Table & " WHERE " & GetConitionSql(ColumnNames, Conitions) & ";"
+        End Function
+
+        Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn() As String, ByVal Condition() As Object) As String
             Dim SQLCommand As String = "UPDATE " & Table & " SET "
-            SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]='" & ConditionText & "';"
+            SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE " & GetConitionSql(ConditionColumn, Condition) & ";"
+            Return SQLCommand
+        End Function
+
+        Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn As String, ByVal Condition As Object) As String
+            Dim SQLCommand As String = "UPDATE " & Table & " SET "
+            SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]=" & GetSqlValue(Condition) & ";"
             Return SQLCommand
         End Function
 
@@ -640,7 +698,7 @@
         End Sub
 
         Public Sub ChangeContract(ByVal data As Contract)
-            Command(data.getupdatesqlcommand(), BasePath)
+            Command(data.GetUpdateSqlCommand(), BasePath)
             RaiseEvent ChangedContract(data)
         End Sub
 
@@ -649,6 +707,20 @@
         End Sub
 
 
+        Public Sub AddHistoryPrice(ByVal data As HistoryPrice)
+            AddBase(data)
+            RaiseEvent CreatedHistoryPrice(data)
+        End Sub
+
+        Public Sub ChangeHistoryPrice(ByVal data As HistoryPrice)
+            Command(data.GetUpdateSqlCommand(), BasePath)
+            RaiseEvent ChangedHistoryPrice(data)
+        End Sub
+
+        Public Sub DeleteHistoryPrice(ByVal data As HistoryPrice)
+            Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
+            RaiseEvent DeletedHistoryPrice(data)
+        End Sub
 
         ''' <summary>新增庫存</summary>
         Public Sub AddStock(ByVal data As Stock)
@@ -684,7 +756,60 @@
 
 
 
+        Public Shared Function RepairAccess(ByVal FilePath As String) As Boolean
+            Dim strFile As String = FilePath
+            Try
+                ' Jet Access (MDB) 連線字串; Jet ( Joint Engine Technology ) 
+                Dim strCn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}"
 
+                ' 或"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5"
+
+                ' Path.GetTempFileName 方法: 在磁碟上建立具命之零位元組的唯一暫存檔案，
+                '   然後傳回該檔案的完整路徑。
+                Dim strTmpFile As String = IO.Path.GetTempFileName.Replace(".tmp", ".mdb") ' 把tmp 副檔名改成mdb
+
+
+
+                ' 建立物件陣列存放引數(參數) , 來源, 目的
+                Dim objPara As Object() = New Object() {String.Format(strCn, strFile), String.Format(strCn, strTmpFile)}
+
+
+                ' Activator 成員: 包含本機或遠端建立物件型別的方法，或者取得對現有遠端物件的參考。
+                ' Activator.CreateInstance 方法(Type)  : 使用最符合指定參數的建構函式，建立指定型別的執行個體。
+                Dim objJRO As Object = Activator.CreateInstance(System.Type.GetTypeFromProgID("JRO.JetEngine"))
+
+                ' Type.GetTypeFromProgID 方法: 取得與指定的程式識別項(ProgID) 關聯的型別；
+                '   如果在載入Type 時發生錯誤，則傳回null。
+                ' JRO.JetEngine 為Microsoft Jet and Replication Objects X.X library  
+
+
+                ' Type.InvokeMember 方法
+                ' Type.InvokeMember (String, BindingFlags, Binder, Object, Object[]) 
+                objJRO.GetType.InvokeMember("CompactDatabase", Reflection.BindingFlags.InvokeMethod, Nothing, objJRO, objPara)
+
+
+
+                ' 使用指定的繫結條件約束並符合指定的引數清單，來叫用指定的成員。
+                ' BindingFlags 列舉型別,InvokeMethod 指定要叫用方法。
+
+
+                IO.File.Delete(strFile) ' File.Delete 方法: 刪除Compact 前之mdb 檔
+                IO.File.Move(strTmpFile, strFile) ' File.Move 方法: 將Compact 過的mdb 檔改成(回)正確檔名
+
+
+
+                ' Marshal.ReleaseComObject 方法釋放JRO COM 物件
+
+                Runtime.InteropServices.Marshal.ReleaseComObject(objJRO)
+
+                objJRO = Nothing
+                Return True
+            Catch
+                'MsgBox(Err.Description)
+                Return False
+            End Try
+
+        End Function
     End Class
 
 

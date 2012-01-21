@@ -164,7 +164,7 @@
 </member><member name="F:進銷存.Database.StructureBase.SalesGoods.StockLabel">
 	<summary>庫存識別碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.SalesGoods.SellingPrice">
-	<summary>單價</summary>
+	<summary>賣價</summary>
 </member><member name="F:進銷存.Database.StructureBase.SalesGoods.Number">
 	<summary>數量</summary>
 </member><member name="F:進銷存.Database.StructureBase.Sales.Label">

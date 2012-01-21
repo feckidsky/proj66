@@ -11,7 +11,7 @@ Public Class winGoodsList
     WithEvents access As Database.Access = Program.DB
 
     Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        UpdateList()
+        UpdateGoodsList()
     End Sub
 
     Public Overloads Sub Show()
@@ -31,20 +31,28 @@ Public Class winGoodsList
         End If
     End Function
 
+    Private GoodsLoading As Boolean = False
+    Private Sub UpdateGoodsList()
 
-    Private Sub UpdateList()
-        dgItemList.DataSource = DB.GetGoodsList()
-
+        GoodsLoading = True
+        dgGoodsList.DataSource = DB.GetGoodsList()
+        GoodsLoading = False
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "品名")
         UpdateTitle("Kind", "種類")
         UpdateTitle("Brand", "廠牌")
         UpdateTitle("Note", "備註")
 
+
+        If dgGoodsList.Rows.Count > 0 Then
+            dgGoodsList.Rows(0).Selected = True
+            UpdateHistory()
+        End If
+        dgGoodsList.Rows(0).Selected = True
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
-        dgItemList.Columns(Label).HeaderText = Text
+        dgGoodsList.Columns(Label).HeaderText = Text
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
@@ -57,7 +65,7 @@ Public Class winGoodsList
 
     Private Sub EditGoods()
 
-        If dgItemList.SelectedRows.Count <= 0 Then
+        If dgGoodsList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
@@ -67,9 +75,14 @@ Public Class winGoodsList
     End Sub
 
     Public Function GetSelectedGoods() As Database.Goods
-        Dim dt As DataTable = dgItemList.DataSource
+        If dgGoodsList.SelectedRows.Count = 0 Then
+            MsgBox("請先選取一個商品項目", MsgBoxStyle.Information)
+            Return Database.Goods.Null()
+        End If
 
-        Dim label As String = dgItemList.SelectedRows(0).Cells(0).Value
+        Dim dt As DataTable = dgGoodsList.DataSource
+
+        Dim label As String = dgGoodsList.SelectedRows(0).Cells(0).Value
 
         For Each r As Data.DataRow In dt.Rows
             If r.Item(0) = label Then
@@ -84,7 +97,7 @@ Public Class winGoodsList
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
 
-        If dgItemList.SelectedRows.Count <= 0 Then
+        If dgGoodsList.SelectedRows.Count <= 0 Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
@@ -105,7 +118,7 @@ Public Class winGoodsList
         DB.DeleteGoods(SelectedGoods)
     End Sub
 
-    Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgItemList.CellMouseDoubleClick
+    Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
         If work = Mode.Normal Then
             EditGoods()
         Else
@@ -115,9 +128,93 @@ Public Class winGoodsList
 
     End Sub
 
+    Private Sub access_ChangedHistoryPrice(ByVal hp As Database.StructureBase.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
+        UpdateHistory()
+    End Sub
+
     Private Sub access_ChangedGoods(ByVal goods As Database.StructureBase.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
-        UpdateList()
+        UpdateGoodsList()
     End Sub
 
 
+    Private Sub dgItemList_SelectionChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgGoodsList.SelectionChanged
+        UpdateHistory()
+    End Sub
+
+    Private Sub UpdateHistory()
+        If GoodsLoading Then Exit Sub
+        Dim goods As Database.Goods = GetSelectedGoods()
+        gbHistory.Text = "歷史售價 - " & goods.Name
+        Dim dt As Data.DataTable = DB.GetHistoryPrice(goods.Label)
+        dgHistory.DataSource = dt
+        dgHistory.Columns(0).Visible = False
+
+
+        dgHistory.Columns("Time").HeaderText = "時間"
+        dgHistory.Columns("Cost").HeaderText = "進貨價"
+        dgHistory.Columns("Price").HeaderText = "建議售價"
+    End Sub
+
+
+    Private Sub 新增歷史售價HToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增歷史售價HToolStripMenuItem.Click, tsAddHistoryPrice.Click
+        AddHistoryPrice()
+    End Sub
+
+
+    Private Sub AddHistoryPrice()
+        If Not CheckAuthority(2) Then Exit Sub
+        Dim goods As Database.Goods = GetSelectedGoods()
+        winHistoryPrice.Create(goods.Label, goods.Name)
+    End Sub
+
+    Private Function GetSelectedHistoryPrice() As Database.HistoryPrice
+        If dgHistory.SelectedRows.Count = 0 Then
+            Return Database.HistoryPrice.Null()
+        End If
+
+        Dim data As Database.HistoryPrice
+
+        Dim selectedRow = dgHistory.SelectedRows(0)
+        data.GoodsLabel = selectedRow.Cells("GoodsLabel").Value
+        data.Time = selectedRow.Cells("Time").Value
+        data.Price = selectedRow.Cells("Price").Value
+        data.Cost = selectedRow.Cells("Cost").Value
+        Return data
+
+    End Function
+
+    Private Sub tsEditHistoryPrice_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsEditHistoryPrice.Click
+        EditHIstoryPrice()
+    End Sub
+
+    Private Sub EditHistoryPrice()
+        If Not CheckAuthority(2) Then Exit Sub
+        Dim selectedHisPrice As Database.HistoryPrice = GetSelectedHistoryPrice()
+        If selectedHisPrice.IsNull Then
+            MsgBox("您至少必須選擇一個項目", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+        winHistoryPrice.Open(selectedHisPrice, GetSelectedGoods().Name)
+    End Sub
+
+
+    Private Sub tsDeleteHistoryPrice_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tsDeleteHistoryPrice.Click
+        If Not CheckAuthority(2) Then Exit Sub
+        Dim selectedHisPrice As Database.HistoryPrice = GetSelectedHistoryPrice()
+        If selectedHisPrice.IsNull Then
+            MsgBox("您至少必須選擇一個項目", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        If MsgBox("這麼做將會刪除該此歷史售價，您確定要這麼做？", MsgBoxStyle.OkCancel + MsgBoxStyle.Question) = MsgBoxResult.Cancel Then
+            Exit Sub
+        End If
+
+        DB.DeleteHistoryPrice(GetSelectedHistoryPrice())
+    End Sub
+
+
+    Private Sub dgHistory_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles dgHistory.MouseDoubleClick
+        EditHistoryPrice()
+    End Sub
 End Class

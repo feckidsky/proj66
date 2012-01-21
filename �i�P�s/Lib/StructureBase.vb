@@ -337,6 +337,55 @@ Namespace Database
             End Function
         End Structure
 #End Region
+
+#Region "歷史售價"
+        Structure HistoryPrice
+            Shared Table As String = "HistoryPrice"
+            Dim GoodsLabel As String
+            Dim Time As Date
+            Dim Cost As String
+            Dim Price As String
+            Shared Function ToColumns() As Column()
+                Dim Columns As New List(Of Column)
+                Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+                Columns.Add(New Column("Time", DBTypeDate))
+                Columns.Add(New Column("Cost", DBTypeSingle))
+                Columns.Add(New Column("Price", DBTypeSingle))
+                Return Columns.ToArray
+            End Function
+
+            Function ToObjects() As Object()
+                Return New Object() {GoodsLabel, Time, Cost, Price}
+            End Function
+
+            Public Shared Function Null() As HistoryPrice
+                Dim data As New HistoryPrice
+                data.GoodsLabel = ""
+                Return data
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return GoodsLabel = ""
+            End Function
+
+            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As HistoryPrice
+                Dim R As New MyDataRow(Row)
+                Dim data As HistoryPrice
+                data.GoodsLabel = R("GoodsLabel")
+                data.Time = R("Time")
+                data.Cost = R("Cost")
+                data.Price = R("Price")
+                Return data
+            End Function
+
+            Public Function GetUpdateSqlCommand() As String
+                Dim Column As String() = New String() {"Cost", "Price"}
+                Dim Value As String() = New String() {Cost, Price}
+                Return Access.GetUpdateSqlCommand(Table, Column, Value, New String() {"GoodsLabel", "Time"}, New Object() {GoodsLabel, Time})
+            End Function
+        End Structure
+#End Region
+
 #Region "門號"
         ''' <summary>合約、綁約</summary>
         Structure Contract
@@ -507,7 +556,7 @@ Namespace Database
             Dim SalesLabel As String
             ''' <summary>庫存識別碼</summary>
             Dim StockLabel As String
-            ''' <summary>單價</summary>
+            ''' <summary>賣價</summary>
             Dim SellingPrice As Single
             ''' <summary>數量</summary>
             Dim Number As Integer
@@ -574,18 +623,22 @@ Namespace Database
             Shared Table As String = "OrderGoods"
             Dim SalesLabel As String
             Dim GoodsLabel As String
+            Dim PurchaseLabel As String
+            Dim Price As Single
             Dim Number As Integer
 
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("SalesLabel", DBTypeLabel))
                 Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+                Columns.Add(New Column("PurchaseLabel", DBTypeLabel))
+                Columns.Add(New Column("Price", DBTypeSingle))
                 Columns.Add(New Column("Number", DBTypeInteger))
                 Return Columns.ToArray()
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {SalesLabel, GoodsLabel, Number}
+                Return New Object() {SalesLabel, GoodsLabel, PurchaseLabel, Price, Number}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As OrderGoods
@@ -593,6 +646,8 @@ Namespace Database
                 Dim data As OrderGoods
                 data.SalesLabel = R("SalesLabel")
                 data.GoodsLabel = R("GoodsLabel")
+                data.PurchaseLabel = R("PurchaseLabel")
+                data.Price = R("Price")
                 data.Number = R("Number")
                 Return data
             End Function

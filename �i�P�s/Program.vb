@@ -48,7 +48,7 @@ Public Module Program
 
 
         'UpdateDatabase()
-
+        'Database.Access.RepairAccess(Database.Access.BasePath)
         ConfigLoad()
 
         LogOut(False)
@@ -64,6 +64,7 @@ Public Module Program
         Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
         Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
+        Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
     End Sub
 
     Public Sub ConfigLoad()

@@ -22,24 +22,12 @@ Partial Class winSales
     '請不要使用程式碼編輯器進行修改。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.btAddGood = New System.Windows.Forms.Button
         Me.Label6 = New System.Windows.Forms.Label
         Me.txtNote = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
         Me.txtOrderDate = New System.Windows.Forms.TextBox
         Me.txtLabel = New System.Windows.Forms.TextBox
-        Me.dgList = New System.Windows.Forms.DataGridView
-        Me.cLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cKind = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cName = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.btDelete = New System.Windows.Forms.Button
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.lbTotal = New System.Windows.Forms.Label
         Me.btOrder = New System.Windows.Forms.Button
@@ -57,26 +45,45 @@ Partial Class winSales
         Me.Label9 = New System.Windows.Forms.Label
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.btSales = New System.Windows.Forms.Button
-        CType(Me.dgList, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.tpOrder = New System.Windows.Forms.TabPage
+        Me.btDeleteOrderItem = New System.Windows.Forms.Button
+        Me.btAddOrderItem = New System.Windows.Forms.Button
+        Me.dgOrderList = New System.Windows.Forms.DataGridView
+        Me.cOLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOKind = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOName = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cONumber = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cOSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.tpSales = New System.Windows.Forms.TabPage
+        Me.dgSalesList = New System.Windows.Forms.DataGridView
+        Me.btDeleteSalesItem = New System.Windows.Forms.Button
+        Me.btAddSalesItem = New System.Windows.Forms.Button
+        Me.cSGoods = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSKind = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSName = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.GroupBox2.SuspendLayout()
+        Me.TabControl1.SuspendLayout()
+        Me.tpOrder.SuspendLayout()
+        CType(Me.dgOrderList, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tpSales.SuspendLayout()
+        CType(Me.dgSalesList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'btAddGood
-        '
-        Me.btAddGood.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btAddGood.Location = New System.Drawing.Point(407, 311)
-        Me.btAddGood.Name = "btAddGood"
-        Me.btAddGood.Size = New System.Drawing.Size(75, 23)
-        Me.btAddGood.TabIndex = 39
-        Me.btAddGood.Text = "新增"
-        Me.btAddGood.UseVisualStyleBackColor = True
         '
         'Label6
         '
         Me.Label6.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(19, 475)
+        Me.Label6.Location = New System.Drawing.Point(19, 499)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(29, 12)
         Me.Label6.TabIndex = 38
@@ -86,10 +93,10 @@ Partial Class winSales
         '
         Me.txtNote.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNote.Location = New System.Drawing.Point(21, 490)
+        Me.txtNote.Location = New System.Drawing.Point(21, 514)
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
-        Me.txtNote.Size = New System.Drawing.Size(358, 93)
+        Me.txtNote.Size = New System.Drawing.Size(414, 93)
         Me.txtNote.TabIndex = 37
         '
         'Label4
@@ -125,109 +132,11 @@ Partial Class winSales
         Me.txtLabel.Size = New System.Drawing.Size(127, 22)
         Me.txtLabel.TabIndex = 24
         '
-        'dgList
-        '
-        Me.dgList.AllowUserToAddRows = False
-        Me.dgList.AllowUserToDeleteRows = False
-        Me.dgList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dgList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cLabel, Me.cKind, Me.cBrand, Me.cName, Me.cPrice, Me.cSPrice, Me.cNumber, Me.cSubTotal})
-        Me.dgList.Location = New System.Drawing.Point(17, 26)
-        Me.dgList.Name = "dgList"
-        Me.dgList.RowTemplate.Height = 24
-        Me.dgList.Size = New System.Drawing.Size(546, 279)
-        Me.dgList.TabIndex = 42
-        '
-        'cLabel
-        '
-        Me.cLabel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cLabel.HeaderText = "商品編號"
-        Me.cLabel.Name = "cLabel"
-        Me.cLabel.ReadOnly = True
-        Me.cLabel.Width = 78
-        '
-        'cKind
-        '
-        Me.cKind.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cKind.HeaderText = "種類"
-        Me.cKind.Name = "cKind"
-        Me.cKind.Width = 54
-        '
-        'cBrand
-        '
-        Me.cBrand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cBrand.HeaderText = "廠牌"
-        Me.cBrand.Name = "cBrand"
-        Me.cBrand.Width = 54
-        '
-        'cName
-        '
-        Me.cName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cName.HeaderText = "品名"
-        Me.cName.Name = "cName"
-        Me.cName.Width = 54
-        '
-        'cPrice
-        '
-        Me.cPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cPrice.HeaderText = "定價"
-        Me.cPrice.Name = "cPrice"
-        Me.cPrice.Width = 54
-        '
-        'cSPrice
-        '
-        Me.cSPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSPrice.HeaderText = "賣價"
-        Me.cSPrice.Name = "cSPrice"
-        Me.cSPrice.Width = 54
-        '
-        'cNumber
-        '
-        Me.cNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cNumber.HeaderText = "數量"
-        Me.cNumber.Name = "cNumber"
-        Me.cNumber.Width = 54
-        '
-        'cSubTotal
-        '
-        Me.cSubTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSubTotal.HeaderText = "小計"
-        Me.cSubTotal.Name = "cSubTotal"
-        Me.cSubTotal.ReadOnly = True
-        Me.cSubTotal.Width = 54
-        '
-        'btDelete
-        '
-        Me.btDelete.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btDelete.Location = New System.Drawing.Point(488, 311)
-        Me.btDelete.Name = "btDelete"
-        Me.btDelete.Size = New System.Drawing.Size(75, 23)
-        Me.btDelete.TabIndex = 39
-        Me.btDelete.Text = "刪除"
-        Me.btDelete.UseVisualStyleBackColor = True
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.dgList)
-        Me.GroupBox1.Controls.Add(Me.btDelete)
-        Me.GroupBox1.Controls.Add(Me.btAddGood)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 129)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(578, 343)
-        Me.GroupBox1.TabIndex = 43
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "商品清單"
-        '
         'Label2
         '
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(413, 483)
+        Me.Label2.Location = New System.Drawing.Point(469, 507)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(29, 12)
         Me.Label2.TabIndex = 44
@@ -237,7 +146,7 @@ Partial Class winSales
         '
         Me.lbTotal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lbTotal.AutoSize = True
-        Me.lbTotal.Location = New System.Drawing.Point(470, 483)
+        Me.lbTotal.Location = New System.Drawing.Point(526, 507)
         Me.lbTotal.Name = "lbTotal"
         Me.lbTotal.Size = New System.Drawing.Size(11, 12)
         Me.lbTotal.TabIndex = 45
@@ -246,7 +155,7 @@ Partial Class winSales
         'btOrder
         '
         Me.btOrder.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btOrder.Location = New System.Drawing.Point(428, 564)
+        Me.btOrder.Location = New System.Drawing.Point(484, 588)
         Me.btOrder.Name = "btOrder"
         Me.btOrder.Size = New System.Drawing.Size(75, 35)
         Me.btOrder.TabIndex = 46
@@ -258,7 +167,7 @@ Partial Class winSales
         Me.cbPayMode.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cbPayMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbPayMode.FormattingEnabled = True
-        Me.cbPayMode.Location = New System.Drawing.Point(472, 531)
+        Me.cbPayMode.Location = New System.Drawing.Point(528, 555)
         Me.cbPayMode.Name = "cbPayMode"
         Me.cbPayMode.Size = New System.Drawing.Size(100, 20)
         Me.cbPayMode.TabIndex = 47
@@ -267,7 +176,7 @@ Partial Class winSales
         '
         Me.Label3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(413, 534)
+        Me.Label3.Location = New System.Drawing.Point(469, 558)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(53, 12)
         Me.Label3.TabIndex = 44
@@ -277,7 +186,7 @@ Partial Class winSales
         '
         Me.Label5.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(413, 506)
+        Me.Label5.Location = New System.Drawing.Point(469, 530)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(29, 12)
         Me.Label5.TabIndex = 44
@@ -286,7 +195,7 @@ Partial Class winSales
         'txtDeposit
         '
         Me.txtDeposit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDeposit.Location = New System.Drawing.Point(472, 503)
+        Me.txtDeposit.Location = New System.Drawing.Point(528, 527)
         Me.txtDeposit.Name = "txtDeposit"
         Me.txtDeposit.Size = New System.Drawing.Size(100, 22)
         Me.txtDeposit.TabIndex = 48
@@ -366,6 +275,8 @@ Partial Class winSales
         '
         'GroupBox2
         '
+        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox2.Controls.Add(Me.btResetCustomer)
         Me.GroupBox2.Controls.Add(Me.btResetPersonnel)
         Me.GroupBox2.Controls.Add(Me.Label9)
@@ -380,7 +291,7 @@ Partial Class winSales
         Me.GroupBox2.Controls.Add(Me.txtLabel)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 6)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(578, 117)
+        Me.GroupBox2.Size = New System.Drawing.Size(644, 117)
         Me.GroupBox2.TabIndex = 50
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "資訊"
@@ -388,18 +299,242 @@ Partial Class winSales
         'btSales
         '
         Me.btSales.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btSales.Location = New System.Drawing.Point(509, 564)
+        Me.btSales.Location = New System.Drawing.Point(565, 588)
         Me.btSales.Name = "btSales"
         Me.btSales.Size = New System.Drawing.Size(75, 35)
         Me.btSales.TabIndex = 46
         Me.btSales.Text = "銷貨"
         Me.btSales.UseVisualStyleBackColor = True
         '
+        'TabControl1
+        '
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Controls.Add(Me.tpOrder)
+        Me.TabControl1.Controls.Add(Me.tpSales)
+        Me.TabControl1.Location = New System.Drawing.Point(21, 129)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(649, 353)
+        Me.TabControl1.TabIndex = 51
+        '
+        'tpOrder
+        '
+        Me.tpOrder.Controls.Add(Me.btDeleteOrderItem)
+        Me.tpOrder.Controls.Add(Me.btAddOrderItem)
+        Me.tpOrder.Controls.Add(Me.dgOrderList)
+        Me.tpOrder.Location = New System.Drawing.Point(4, 22)
+        Me.tpOrder.Name = "tpOrder"
+        Me.tpOrder.Padding = New System.Windows.Forms.Padding(3)
+        Me.tpOrder.Size = New System.Drawing.Size(575, 327)
+        Me.tpOrder.TabIndex = 0
+        Me.tpOrder.Text = "訂單"
+        Me.tpOrder.UseVisualStyleBackColor = True
+        '
+        'btDeleteOrderItem
+        '
+        Me.btDeleteOrderItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btDeleteOrderItem.Location = New System.Drawing.Point(494, 294)
+        Me.btDeleteOrderItem.Name = "btDeleteOrderItem"
+        Me.btDeleteOrderItem.Size = New System.Drawing.Size(75, 23)
+        Me.btDeleteOrderItem.TabIndex = 49
+        Me.btDeleteOrderItem.Text = "刪除"
+        Me.btDeleteOrderItem.UseVisualStyleBackColor = True
+        '
+        'btAddOrderItem
+        '
+        Me.btAddOrderItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btAddOrderItem.Location = New System.Drawing.Point(413, 294)
+        Me.btAddOrderItem.Name = "btAddOrderItem"
+        Me.btAddOrderItem.Size = New System.Drawing.Size(75, 23)
+        Me.btAddOrderItem.TabIndex = 48
+        Me.btAddOrderItem.Text = "新增"
+        Me.btAddOrderItem.UseVisualStyleBackColor = True
+        '
+        'dgOrderList
+        '
+        Me.dgOrderList.AllowUserToAddRows = False
+        Me.dgOrderList.AllowUserToDeleteRows = False
+        Me.dgOrderList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgOrderList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgOrderList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgOrderList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cOLabel, Me.cOKind, Me.cOBrand, Me.cOName, Me.cOPrice, Me.cOSellingPrice, Me.cONumber, Me.cOSubTotal})
+        Me.dgOrderList.Location = New System.Drawing.Point(6, 9)
+        Me.dgOrderList.Name = "dgOrderList"
+        Me.dgOrderList.RowTemplate.Height = 24
+        Me.dgOrderList.Size = New System.Drawing.Size(563, 279)
+        Me.dgOrderList.TabIndex = 0
+        '
+        'cOLabel
+        '
+        Me.cOLabel.HeaderText = "商品編號"
+        Me.cOLabel.Name = "cOLabel"
+        Me.cOLabel.Width = 78
+        '
+        'cOKind
+        '
+        Me.cOKind.HeaderText = "種類"
+        Me.cOKind.Name = "cOKind"
+        Me.cOKind.Width = 54
+        '
+        'cOBrand
+        '
+        Me.cOBrand.HeaderText = "廠牌"
+        Me.cOBrand.Name = "cOBrand"
+        Me.cOBrand.Width = 54
+        '
+        'cOName
+        '
+        Me.cOName.HeaderText = "品名"
+        Me.cOName.Name = "cOName"
+        Me.cOName.Width = 54
+        '
+        'cOPrice
+        '
+        Me.cOPrice.HeaderText = "定價"
+        Me.cOPrice.Name = "cOPrice"
+        Me.cOPrice.Width = 54
+        '
+        'cOSellingPrice
+        '
+        Me.cOSellingPrice.HeaderText = "賣價"
+        Me.cOSellingPrice.Name = "cOSellingPrice"
+        Me.cOSellingPrice.Width = 54
+        '
+        'cONumber
+        '
+        Me.cONumber.HeaderText = "數量"
+        Me.cONumber.Name = "cONumber"
+        Me.cONumber.Width = 54
+        '
+        'cOSubTotal
+        '
+        Me.cOSubTotal.HeaderText = "小計"
+        Me.cOSubTotal.Name = "cOSubTotal"
+        Me.cOSubTotal.Width = 54
+        '
+        'tpSales
+        '
+        Me.tpSales.Controls.Add(Me.dgSalesList)
+        Me.tpSales.Controls.Add(Me.btDeleteSalesItem)
+        Me.tpSales.Controls.Add(Me.btAddSalesItem)
+        Me.tpSales.Location = New System.Drawing.Point(4, 22)
+        Me.tpSales.Name = "tpSales"
+        Me.tpSales.Padding = New System.Windows.Forms.Padding(3)
+        Me.tpSales.Size = New System.Drawing.Size(641, 327)
+        Me.tpSales.TabIndex = 1
+        Me.tpSales.Text = "銷貨單"
+        Me.tpSales.UseVisualStyleBackColor = True
+        '
+        'dgSalesList
+        '
+        Me.dgSalesList.AllowUserToAddRows = False
+        Me.dgSalesList.AllowUserToDeleteRows = False
+        Me.dgSalesList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgSalesList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgSalesList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgSalesList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSGoods, Me.cSLabel, Me.cSKind, Me.cSBrand, Me.cSName, Me.cSPrice, Me.cSSellingPrice, Me.cSNumber, Me.cSSubTotal})
+        Me.dgSalesList.Location = New System.Drawing.Point(6, 9)
+        Me.dgSalesList.Name = "dgSalesList"
+        Me.dgSalesList.RowTemplate.Height = 24
+        Me.dgSalesList.Size = New System.Drawing.Size(629, 279)
+        Me.dgSalesList.TabIndex = 48
+        '
+        'btDeleteSalesItem
+        '
+        Me.btDeleteSalesItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btDeleteSalesItem.Location = New System.Drawing.Point(560, 294)
+        Me.btDeleteSalesItem.Name = "btDeleteSalesItem"
+        Me.btDeleteSalesItem.Size = New System.Drawing.Size(75, 23)
+        Me.btDeleteSalesItem.TabIndex = 47
+        Me.btDeleteSalesItem.Text = "刪除"
+        Me.btDeleteSalesItem.UseVisualStyleBackColor = True
+        '
+        'btAddSalesItem
+        '
+        Me.btAddSalesItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btAddSalesItem.Location = New System.Drawing.Point(479, 294)
+        Me.btAddSalesItem.Name = "btAddSalesItem"
+        Me.btAddSalesItem.Size = New System.Drawing.Size(75, 23)
+        Me.btAddSalesItem.TabIndex = 46
+        Me.btAddSalesItem.Text = "新增"
+        Me.btAddSalesItem.UseVisualStyleBackColor = True
+        '
+        'cSGoods
+        '
+        Me.cSGoods.HeaderText = "商品編號"
+        Me.cSGoods.Name = "cSGoods"
+        Me.cSGoods.Width = 78
+        '
+        'cSLabel
+        '
+        Me.cSLabel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSLabel.HeaderText = "庫存編號"
+        Me.cSLabel.Name = "cSLabel"
+        Me.cSLabel.ReadOnly = True
+        Me.cSLabel.Width = 78
+        '
+        'cSKind
+        '
+        Me.cSKind.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSKind.HeaderText = "種類"
+        Me.cSKind.Name = "cSKind"
+        Me.cSKind.Width = 54
+        '
+        'cSBrand
+        '
+        Me.cSBrand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSBrand.HeaderText = "廠牌"
+        Me.cSBrand.Name = "cSBrand"
+        Me.cSBrand.Width = 54
+        '
+        'cSName
+        '
+        Me.cSName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSName.HeaderText = "品名"
+        Me.cSName.Name = "cSName"
+        Me.cSName.Width = 54
+        '
+        'cSPrice
+        '
+        Me.cSPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSPrice.HeaderText = "定價"
+        Me.cSPrice.Name = "cSPrice"
+        Me.cSPrice.Width = 54
+        '
+        'cSSellingPrice
+        '
+        Me.cSSellingPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSSellingPrice.HeaderText = "賣價"
+        Me.cSSellingPrice.Name = "cSSellingPrice"
+        Me.cSSellingPrice.Width = 54
+        '
+        'cSNumber
+        '
+        Me.cSNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSNumber.HeaderText = "數量"
+        Me.cSNumber.Name = "cSNumber"
+        Me.cSNumber.Width = 54
+        '
+        'cSSubTotal
+        '
+        Me.cSSubTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSSubTotal.HeaderText = "小計"
+        Me.cSSubTotal.Name = "cSSubTotal"
+        Me.cSSubTotal.ReadOnly = True
+        Me.cSSubTotal.Width = 54
+        '
         'winSales
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(622, 611)
+        Me.ClientSize = New System.Drawing.Size(678, 635)
+        Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.txtDeposit)
         Me.Controls.Add(Me.cbPayMode)
@@ -409,42 +544,32 @@ Partial Class winSales
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.txtNote)
         Me.Name = "winSales"
         Me.Text = "銷貨單"
-        CType(Me.dgList, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.TabControl1.ResumeLayout(False)
+        Me.tpOrder.ResumeLayout(False)
+        CType(Me.dgOrderList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tpSales.ResumeLayout(False)
+        CType(Me.dgSalesList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents btAddGood As System.Windows.Forms.Button
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents txtNote As System.Windows.Forms.TextBox
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents txtOrderDate As System.Windows.Forms.TextBox
     Friend WithEvents txtLabel As System.Windows.Forms.TextBox
-    Friend WithEvents dgList As System.Windows.Forms.DataGridView
-    Friend WithEvents btDelete As System.Windows.Forms.Button
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents lbTotal As System.Windows.Forms.Label
     Friend WithEvents btOrder As System.Windows.Forms.Button
     Friend WithEvents cbPayMode As System.Windows.Forms.ComboBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents cLabel As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cKind As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cBrand As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cName As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cPrice As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cSPrice As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cNumber As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents txtDeposit As System.Windows.Forms.TextBox
     Friend WithEvents Label7 As System.Windows.Forms.Label
@@ -457,4 +582,30 @@ Partial Class winSales
     Friend WithEvents Label9 As System.Windows.Forms.Label
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents btSales As System.Windows.Forms.Button
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents tpOrder As System.Windows.Forms.TabPage
+    Friend WithEvents tpSales As System.Windows.Forms.TabPage
+    Friend WithEvents dgSalesList As System.Windows.Forms.DataGridView
+    Friend WithEvents btDeleteSalesItem As System.Windows.Forms.Button
+    Friend WithEvents btAddSalesItem As System.Windows.Forms.Button
+    Friend WithEvents dgOrderList As System.Windows.Forms.DataGridView
+    Friend WithEvents btDeleteOrderItem As System.Windows.Forms.Button
+    Friend WithEvents btAddOrderItem As System.Windows.Forms.Button
+    Friend WithEvents cOLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOKind As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOBrand As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOName As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOSellingPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cONumber As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cOSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSGoods As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSKind As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSBrand As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSName As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSSellingPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSNumber As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cSSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class
