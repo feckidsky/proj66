@@ -86,6 +86,7 @@ Public Class winSales
 
         ReadSalesList(Sales.Label)
         ReadOrderList(Sales.Label)
+        ReadContractList(Sales.Label)
         Work = Mode.Edit
         MyBase.Show()
     End Sub
@@ -108,6 +109,14 @@ Public Class winSales
         Next
         CalOrderTotal()
 
+    End Sub
+
+    Private Sub ReadContractList(ByVal SalesLabel As String)
+        Dim dt As Data.DataTable = DB.GetContractListBySalesLabel(SalesLabel)
+
+        For Each r As Data.DataRow In dt.rows
+            dgContract.Rows.Add(r.ItemArray())
+        Next
     End Sub
 
     Private Sub btAddGood_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddSalesItem.Click
@@ -220,6 +229,22 @@ Public Class winSales
         Return lstGoods.ToArray
     End Function
 
+    Public Function GetContractList() As SalesContract()
+        Dim lst As New List(Of SalesContract)
+        Dim item As SalesContract
+
+        For Each r As DataGridViewRow In dgContract.Rows
+            With item
+                .SalesLabel = txtLabel.Text
+                .ContractLabel = r.Cells(cCLabel.Index).Value
+                .Discount = r.Cells(cCDiscount.Index).Value
+                .Phone = r.Cells(cCPhone.Index).Value
+            End With
+            lst.Add(item)
+        Next
+        Return lst.ToArray()
+    End Function
+
 
     Private Sub btOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder.Click
         Dim sales As Sales = GetSalesInfo()
@@ -231,10 +256,10 @@ Public Class winSales
 
         If Work = Mode.Create Then
             '新增銷貨單
-            DB.CreateSales(sales, GetSalseList(), GetOrderList())
+            DB.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
             '更新銷貨單
-            DB.ChangeSales(sales, GetSalseList(), GetOrderList())
+            DB.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -252,9 +277,9 @@ Public Class winSales
 
 
         If Work = Mode.Create Then
-            DB.CreateSales(sales, GetSalseList(), GetOrderList())
+            DB.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
-            DB.ChangeSales(sales, GetSalseList(), GetOrderList())
+            DB.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -354,5 +379,20 @@ Public Class winSales
         Else
             lbTotal.Text = CalSalesTotal()
         End If
+    End Sub
+
+
+    Private Sub btAddContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddContract.Click
+        Dim item As Database.Contract = winContractList.SelectDialog()
+        If item.IsNull() Then Exit Sub
+        Dim row As New DataGridViewRow
+        dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Discount, ""})
+
+    End Sub
+
+    Private Sub btDeleteContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDeleteContract.Click
+        If dgContract.SelectedCells.Count = 0 Then Exit Sub
+        Dim idx As Integer = dgContract.SelectedCells(0).RowIndex
+        dgContract.Rows.RemoveAt(idx)
     End Sub
 End Class

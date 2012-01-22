@@ -37,8 +37,8 @@
         Event ChangedPersonnel(ByVal per As Personnel)
         Event DeletedPersonnel(ByVal per As Personnel)
 
-        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods)
-        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods)
+        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
         Event DeletedSales(ByVal sales As Sales)
 
         Event CreatedHistoryPrice(ByVal hp As HistoryPrice)
@@ -262,6 +262,13 @@
             Return DT
         End Function
 
+        Public Function GetContractListBySalesLabel(ByVal SalesLabel As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT Contract.Label, Contract.Name, Contract.Prepay, SalesContract.Discount, SalesContract.Phone " & _
+            "FROM (SalesContract INNER JOIN Sales ON SalesContract.SalesLabel = Sales.Label) INNER JOIN Contract ON SalesContract.ContractLabel = Contract.Label where SalesLabel='" & SalesLabel & "';"
+            Return Read("table", BasePath, SQLCommand)
+
+        End Function
+
         '取得包含該商品的銷貨單
         Public Function GetSalesListByStockLabel(ByVal Label As String) As Data.DataTable
             Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
@@ -281,9 +288,9 @@
 
 
         '新增銷貨單
-        Public Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
-            CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods)
-            RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods)
+        Public Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods, SalesContracts)
+            RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
 
         End Sub
 
@@ -294,13 +301,13 @@
         End Sub
 
         '修改銷貨單
-        Public Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
+        Public Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             DeleteSalesWithoutEvent(newSales)
-            CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods)
-            RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods)
+            CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods, SalesContracts)
+            RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
         End Sub
 
-        Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods)
+        Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             Database.Access.AddBase(newSales)
 
             For Each g As SalesGoods In SalesGoods
@@ -309,6 +316,10 @@
 
             For Each o As OrderGoods In OrderGoods
                 Database.Access.AddBase(o)
+            Next
+
+            For Each c As SalesContract In SalesContracts
+                Database.Access.AddBase(c)
             Next
         End Sub
 
@@ -320,6 +331,9 @@
             Command(SqlCommand, BasePath)
 
             SqlCommand = "DELETE FROM OrderGoods WHERE SalesLabel='" & dSales.Label & "';"
+            Command(SqlCommand, BasePath)
+
+            SqlCommand = GetSqlDelete(SalesContract.Table, "SalesLabel", dSales.Label)
             Command(SqlCommand, BasePath)
         End Sub
 
@@ -549,8 +563,8 @@
             Return "INSERT INTO " & ColumnText & " VALUES (" & ValueText & ");"
         End Function
 
-        Shared Function GetSqlDelete(ByVal Table As String, ByVal ColumnName As String, ByVal Text As String) As String
-            Return "DELETE FROM " & Table & " WHERE [" & ColumnName & "]='" & Text & "';"
+        Shared Function GetSqlDelete(ByVal Table As String, ByVal ColumnName As String, ByVal Condition As Object) As String
+            Return "DELETE FROM " & Table & " WHERE [" & ColumnName & "]=" & GetSqlValue(Condition) & ";"
         End Function
 
         Shared Function GetConitionSql(ByVal ColumnNames() As String, ByVal Conitions() As Object) As String

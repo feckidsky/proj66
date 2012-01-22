@@ -107,11 +107,11 @@ Public Class winMain
 
     End Sub
 
-    Private Sub access_ChangedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods) Handles access.ChangedSales
+    Private Sub access_ChangedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
         UpdateSalesList()
     End Sub
 
-    Private Sub access_CreatedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods) Handles access.CreatedSales
+    Private Sub access_CreatedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
         UpdateSalesList()
     End Sub
 

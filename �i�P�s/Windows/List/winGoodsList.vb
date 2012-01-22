@@ -29,6 +29,7 @@ Public Class winGoodsList
         Else
             Return Database.Goods.Null()
         End If
+
     End Function
 
     Private GoodsLoading As Boolean = False

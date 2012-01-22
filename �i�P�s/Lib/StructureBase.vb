@@ -428,7 +428,7 @@ Namespace Database
                 data.Name = R("Name")
                 data.Commission = R("Commission")
                 data.Discount = R("Discount")
-                data.Discount = R("Prepay")
+                data.Prepay = R("Prepay")
                 data.Note = R("Note")
                 Return data
             End Function
