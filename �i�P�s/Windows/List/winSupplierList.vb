@@ -1,4 +1,5 @@
 ﻿Public Class winSupplierList
+    Dim Filter As DataGridViewFilter
 
     Enum Mode
         Normal = 0
@@ -10,6 +11,8 @@
     WithEvents access As Database.Access = Program.DB
 
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Filter = New DataGridViewFilter(dgList)
+        Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
         UpdateList()
     End Sub
 
@@ -38,12 +41,13 @@
     Private Sub UpdateList()
         dgList.DataSource = DB.GetSupplierList()
 
-        'UpdateTitle("Label", "編號")
-        'UpdateTitle("Name", "品名")
-        'UpdateTitle("Kind", "種類")
-        'UpdateTitle("Brand", "廠牌")
-        'UpdateTitle("Note", "備註")
-
+        UpdateTitle("Label", "編號")
+        UpdateTitle("Name", "名稱")
+        UpdateTitle("Tel1", "電話1")
+        UpdateTitle("Tel2", "電話2")
+        UpdateTitle("Addr", "地址")
+        UpdateTitle("Note", "備註")
+        Filter.UpdateComboBox()
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
@@ -59,16 +63,17 @@
     End Sub
 
     Private Sub EditGoods()
-
-        If dgList.SelectedRows.Count <= 0 Then
+        Dim selectedItem As Database.Supplier = GetSelectedSupplier()
+        If selectedItem.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        winPeople.OpenSupplier(GetSelectedSupplier)
+        winPeople.OpenSupplier(selectedItem)
     End Sub
 
     Public Function GetSelectedSupplier() As Database.Supplier
+        If Not Filter.HasSelectedItem Then Return Database.Supplier.Null()
         Dim dt As DataTable = dgList.DataSource
 
         Dim label As String = dgList.SelectedRows(0).Cells(0).Value
@@ -86,12 +91,14 @@
 
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
-        If dgList.SelectedRows.Count <= 0 Then
+
+        Dim SelectedSupplier As Database.Supplier = GetSelectedSupplier()
+        If SelectedSupplier.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        Dim SelectedSupplier As Database.Supplier = GetSelectedSupplier()
+
         Dim count As Integer = DB.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
         If count > 0 Then
             MsgBox("此供應商已經有進貨資料，無法刪除!")

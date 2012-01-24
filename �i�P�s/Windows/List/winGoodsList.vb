@@ -1,6 +1,6 @@
 ﻿
 Public Class winGoodsList
-
+    Dim Filter As DataGridViewFilter
     Enum Mode
         Normal = 0
         SelectItem = 1
@@ -11,6 +11,8 @@ Public Class winGoodsList
     WithEvents access As Database.Access = Program.DB
 
     Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Filter = New DataGridViewFilter(dgGoodsList)
+        Filter.AddTextFilter("編號", "品名", "種類", "廠牌", "備註")
         UpdateGoodsList()
     End Sub
 
@@ -43,7 +45,7 @@ Public Class winGoodsList
         UpdateTitle("Kind", "種類")
         UpdateTitle("Brand", "廠牌")
         UpdateTitle("Note", "備註")
-
+        Filter.UpdateComboBox()
 
         If dgGoodsList.Rows.Count > 0 Then
             dgGoodsList.Rows(0).Selected = True
@@ -65,19 +67,17 @@ Public Class winGoodsList
     End Sub
 
     Private Sub EditGoods()
-
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        Dim selected As Database.Goods = GetSelectedGoods()
+        If selected.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-
-        winGoods.Open(GetSelectedGoods())
+        winGoods.Open(selected)
     End Sub
 
     Public Function GetSelectedGoods() As Database.Goods
-        If dgGoodsList.SelectedRows.Count = 0 Then
-            MsgBox("請先選取一個商品項目", MsgBoxStyle.Information)
+        If Not Filter.HasSelectedItem Then
             Return Database.Goods.Null()
         End If
 
@@ -98,13 +98,14 @@ Public Class winGoodsList
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
 
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        Dim selected As Database.Goods = GetSelectedGoods()
+        If selected.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        Dim SelectedGoods As Database.Goods = GetSelectedGoods()
-        Dim count As Integer = DB.GetStockLogByGoodsLabel(SelectedGoods.Label).Rows.Count
+        'Dim SelectedGoods As Database.Goods = selected
+        Dim count As Integer = DB.GetStockLogByGoodsLabel(selected.Label).Rows.Count
         If count > 0 Then
             MsgBox("商品項目已經有進貨資料，無法刪除!")
             Exit Sub
@@ -116,7 +117,7 @@ Public Class winGoodsList
 
 
 
-        DB.DeleteGoods(SelectedGoods)
+        DB.DeleteGoods(selected)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick

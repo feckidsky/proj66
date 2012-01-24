@@ -536,6 +536,18 @@ Namespace Database
                 Return Join(lst.ToArray, ",")
             End Function
 
+            Shared ReadOnly Property Null() As Stock
+                Get
+                    Dim item As New Stock
+                    item.Label = ""
+                    Return item
+                End Get
+            End Property
+
+            Public Function IsNull() As Boolean
+                Return Label = ""
+            End Function
+
         End Structure
 #End Region
 

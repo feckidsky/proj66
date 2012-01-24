@@ -19,6 +19,21 @@ Public Class winSales
     Dim Customer As Database.Customer = Database.Customer.Null()
     Dim Personnel As Database.Personnel = Database.Personnel.Null()
 
+    Structure GoodsInfo
+        Dim GoodsLabel As String
+        Dim StockLabel As String
+        Dim Name As String
+        Dim Brand As String
+        Dim Kind As String
+        Dim Price As Single
+        Dim SellingPrice As Single
+        Dim Number As Integer
+
+        'Dim Goods As Goods
+        'Dim Sales As SalesGoods
+    End Structure
+
+
     Public Sub New()
 
         ' 此為 Windows Form 設計工具所需的呼叫。
@@ -89,6 +104,7 @@ Public Class winSales
         ReadContractList(Sales.Label)
         Work = Mode.Edit
         MyBase.Show()
+        CalTotalPrice()
     End Sub
 
     Private Sub ReadSalesList(ByVal SalesLabel As String)
@@ -97,7 +113,7 @@ Public Class winSales
         For Each r As Data.DataRow In dt.Rows
             dgSalesList.Rows.Add(r.ItemArray())
         Next
-        CalSalesTotal()
+        'CalSalesTotal()
     End Sub
 
 
@@ -107,7 +123,7 @@ Public Class winSales
         For Each r As Data.DataRow In dt.Rows
             dgOrderList.Rows.Add(r.ItemArray())
         Next
-        CalOrderTotal()
+        'CalOrderTotal()
 
     End Sub
 
@@ -120,7 +136,7 @@ Public Class winSales
     End Sub
 
     Private Sub btAddGood_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddSalesItem.Click
-        Dim row As DataGridViewRow = winStockList.SelectGood()
+        Dim row As DataGridViewRow = winStockList.SelectStock()
         If row Is Nothing Then Exit Sub
         For Each tmp As DataGridViewRow In dgSalesList.Rows
             If row.Cells("庫存編號").Value = tmp.Cells(cSLabel.Index).Value Then
@@ -151,7 +167,7 @@ Public Class winSales
             row.Cells(cSSubTotal.Index).Value = sub_total
             total += sub_total
         Next
-        Return total
+        Return total + GetContractTotal()
         'lbSalesTotal.Text = total
     End Function
 
@@ -164,13 +180,26 @@ Public Class winSales
             total += sub_total
         Next
 
-        Return total
+        Return total + GetContractTotal()
         'lbSalesTotal.Text = total
     End Function
 
+    Private Sub dgSalesList_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellDoubleClick
+        Dim row As DataGridViewRow = winStockList.SelectStock()
+        If row Is Nothing Then Exit Sub
+
+        With dgSalesList.Rows(e.RowIndex)
+            .Cells(cSLabel.Index).Value = row.Cells("庫存編號").Value
+            .Cells(cSKind.Index).Value = row.Cells("種類").Value
+            .Cells(cSName.Index).Value = row.Cells("品名").Value
+            .Cells(cSBrand.Index).Value = row.Cells("廠牌").Value
+            .DefaultCellStyle.BackColor = dgSalesList.DefaultCellStyle.BackColor
+        End With
+    End Sub
+
 
     Private Sub dgSales_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellEndEdit
-        If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then lbTotal.Text = CalSalesTotal()
+        If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then CalTotalPrice()
     End Sub
 
 
@@ -198,6 +227,7 @@ Public Class winSales
 
         For Each r As DataGridViewRow In dgSalesList.Rows
             If r.Cells(cSLabel.Index).Value Is Nothing Then Continue For
+            If r.Cells(cSLabel.Index).Value = "" Then Continue For
             With newGoods
                 .SalesLabel = txtLabel.Text
                 .StockLabel = r.Cells(cSLabel.Index).Value
@@ -213,20 +243,47 @@ Public Class winSales
     '取得銷貨清單
     Public Function GetOrderList() As OrderGoods()
         Dim lstGoods As New List(Of OrderGoods)
-        Dim newGoods As OrderGoods
 
         For Each r As DataGridViewRow In dgOrderList.Rows
             If r.Cells(cOLabel.Index).Value Is Nothing Then Continue For
-            With newGoods
-                .SalesLabel = txtLabel.Text
-                .GoodsLabel = r.Cells(cOLabel.Index).Value
-                .Price = r.Cells(cOSellingPrice.Index).Value
-                .Number = r.Cells(cONumber.Index).Value
-                .PurchaseLabel = ""
-            End With
-            lstGoods.Add(newGoods)
+            lstGoods.Add(OrderRow2OrderGoods(r))
         Next
         Return lstGoods.ToArray
+    End Function
+
+    Private Function OrderRow2GoodsInfo(ByVal r As DataGridViewRow) As GoodsInfo
+        Dim item As New GoodsInfo
+        item.GoodsLabel = r.Cells(cOLabel.Index).Value
+        item.Kind = r.Cells(cOKind.Index).Value
+        item.Brand = r.Cells(cOBrand.Index).Value
+        item.Name = r.Cells(cOName.Index).Value
+        item.Number = r.Cells(cONumber.Index).Value
+        item.SellingPrice = r.Cells(cOSellingPrice.Index).Value
+        item.StockLabel = ""
+        item.Price = GetSingle(r.Cells(cOPrice.Index).Value)
+        Return item
+
+    End Function
+
+    Private Function OrderRow2OrderGoods(ByVal r As DataGridViewRow) As OrderGoods
+        Dim newGoods As OrderGoods
+        With newGoods
+            .SalesLabel = txtLabel.Text
+            .GoodsLabel = r.Cells(cOLabel.Index).Value
+            .Price = r.Cells(cOSellingPrice.Index).Value
+            .Number = r.Cells(cONumber.Index).Value
+            .PurchaseLabel = ""
+        End With
+        Return newGoods
+    End Function
+
+    Private Function OrderRow2Goods(ByVal r As DataGridViewRow) As Goods
+        Dim item As New Goods
+        item.Label = r.Cells(cOLabel.Index).Value
+        item.Kind = r.Cells(cOKind.Index).Value
+        item.Brand = r.Cells(cOBrand.Index).Value
+        item.Name = r.Cells(cOName.Index).Value
+        Return item
     End Function
 
     Public Function GetContractList() As SalesContract()
@@ -266,6 +323,19 @@ Public Class winSales
 
 
     Private Sub btSales_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSales.Click
+
+        Dim lstOrder As New List(Of String)
+        For Each r As DataGridViewRow In dgSalesList.Rows
+            If r.Cells(cSLabel.Index).Value = "" Then
+                lstOrder.Add(Trim(r.Cells(cSName.Index).Value))
+            End If
+        Next
+        If lstOrder.Count > 0 Then
+            If MsgBox("以下訂單項目尚未處理，您確定要轉銷貨？" & vbCrLf & Join(lstOrder.ToArray, ",") & "。", MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
+                Exit Sub
+            End If
+        End If
+
         Dim sales As Sales = GetSalesInfo()
         If sales.TypeOfPayment = TypeOfPayment.Commission Then
             MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
@@ -352,7 +422,7 @@ Public Class winSales
         If row IsNot Nothing Then
             dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Price")), GetSingle(row("Price")), 1})
         End If
-        lbTotal.Text = CalOrderTotal()
+        CalTotalPrice()
     End Sub
 
 
@@ -362,7 +432,7 @@ Public Class winSales
     End Function
 
     Private Sub dgOrderList_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgOrderList.CellEndEdit
-        If e.ColumnIndex = cOSellingPrice.Index Or e.ColumnIndex = cONumber.Index Then lbTotal.Text = CalOrderTotal()
+        If e.ColumnIndex = cOSellingPrice.Index Or e.ColumnIndex = cONumber.Index Then CalTotalPrice()
     End Sub
 
     Private Sub btDeleteOrderItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDeleteOrderItem.Click
@@ -370,10 +440,10 @@ Public Class winSales
             Dim idx As Integer = dgOrderList.SelectedCells.Item(Me.cOLabel.Index).RowIndex
             If (idx < dgOrderList.Rows.Count) Then dgOrderList.Rows.RemoveAt(idx)
         End If
-        lbTotal.Text = CalOrderTotal()
+        CalTotalPrice()
     End Sub
 
-    Private Sub TabControl1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
+    Private Sub CalTotalPrice()
         If TabControl1.SelectedTab Is tpOrder Then
             lbTotal.Text = CalOrderTotal()
         Else
@@ -381,18 +451,63 @@ Public Class winSales
         End If
     End Sub
 
+    Private Sub TabControl1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
+        If TabControl1.SelectedTab Is Me.tpSales Then TransToSales()
+        CalTotalPrice()
+    End Sub
+
+    Private Sub TransToSales()
+        For Each row As DataGridViewRow In dgOrderList.Rows
+            If Not SalesItemExist(row.Cells(cOLabel.Index).Value) Then
+                Dim item As GoodsInfo = OrderRow2GoodsInfo(row)
+                Dim idx As Integer = dgSalesList.Rows.Add(item.GoodsLabel, "", item.Kind, item.Brand, item.Name, item.Price, item.SellingPrice, item.Number)
+                dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+            End If
+        Next
+
+
+        'CalTotalPrice()
+    End Sub
+
+    Private Function SalesItemExist(ByVal GoodsLabel As String) As Boolean
+        For Each row As DataGridViewRow In dgSalesList.Rows
+            If row.Cells(cSGoods.Index).Value = GoodsLabel Then Return True
+        Next
+        Return False
+    End Function
+
 
     Private Sub btAddContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddContract.Click
         Dim item As Database.Contract = winContractList.SelectDialog()
         If item.IsNull() Then Exit Sub
         Dim row As New DataGridViewRow
         dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Discount, ""})
-
+        CalTotalPrice()
     End Sub
 
     Private Sub btDeleteContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDeleteContract.Click
         If dgContract.SelectedCells.Count = 0 Then Exit Sub
         Dim idx As Integer = dgContract.SelectedCells(0).RowIndex
         dgContract.Rows.RemoveAt(idx)
+        CalTotalPrice()
+    End Sub
+
+
+    Private Function GetContractTotal() As Single
+        Dim subTotal As Single = 0
+        For Each row As DataGridViewRow In dgContract.Rows
+            subTotal += row.Cells(cCPrepay.Index).Value - row.Cells(cCDiscount.Index).Value
+        Next
+
+        Return subTotal
+    End Function
+
+    Private Sub dgContract_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellEndEdit
+        CalTotalPrice()
+    End Sub
+
+
+    Private Sub dgSalesList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellContentClick
+
     End Sub
 End Class

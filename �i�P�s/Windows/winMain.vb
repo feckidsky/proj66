@@ -10,6 +10,7 @@ Public Class winMain
         Me.Text = SystemTitle & " - " & CurrentUser.Name
     End Sub
 
+    Dim Filter As DataGridViewFilter
     Public Sub New()
 
         ' 此為 Windows Form 設計工具所需的呼叫。
@@ -21,6 +22,9 @@ Public Class winMain
 
         InitialProgram()
 
+        Filter = New DataGridViewFilter(dgSales)
+        Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式")
+        Filter.AddNumberFilter("訂金", "金額", "利潤")
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
@@ -76,6 +80,8 @@ Public Class winMain
         Next
         UpdateListColor()
         ShowKind()
+        If Filter IsNot Nothing Then Filter.UpdateComboBox()
+
     End Sub
 
     Public Sub UpdateListColor()

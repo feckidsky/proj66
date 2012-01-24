@@ -8,8 +8,10 @@
     Dim work As Mode
 
     WithEvents access As Database.Access = Program.DB
-
+    Dim Filter As DataGridViewFilter
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Filter = New DataGridViewFilter(dgList)
+        Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
         UpdateList()
     End Sub
 
@@ -38,12 +40,13 @@
     Private Sub UpdateList()
         dgList.DataSource = DB.GetCustomerList()
 
-        'UpdateTitle("Label", "編號")
-        'UpdateTitle("Name", "品名")
-        'UpdateTitle("Kind", "種類")
-        'UpdateTitle("Brand", "廠牌")
-        'UpdateTitle("Note", "備註")
-
+        UpdateTitle("Label", "編號")
+        UpdateTitle("Name", "名稱")
+        UpdateTitle("Tel1", "電話1")
+        UpdateTitle("Tel2", "電話2")
+        UpdateTitle("Addr", "地址")
+        UpdateTitle("Note", "備註")
+        Filter.UpdateComboBox()
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
@@ -59,16 +62,17 @@
     End Sub
 
     Private Sub EditGoods()
-
-        If dgList.SelectedRows.Count <= 0 Then
+        Dim item As Database.Customer = GetSelectedCustomer()
+        If item.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        winPeople.OpenCustomer(GetSelectedCustomer)
+        winPeople.OpenCustomer(item)
     End Sub
 
     Public Function GetSelectedCustomer() As Database.Customer
+        If Not Filter.HasSelectedItem Then Return Database.Customer.Null()
         Dim dt As DataTable = dgList.DataSource
 
         Dim label As String = dgList.SelectedRows(0).Cells(0).Value
@@ -85,13 +89,15 @@
 
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
-        If dgList.SelectedRows.Count <= 0 Then
+
+        Dim item As Database.Customer = GetSelectedCustomer()
+        If item.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        Dim SelectedSupplier As Database.Customer = GetSelectedCustomer()
-        Dim count As Integer = DB.GetSalesListByCustomer(SelectedSupplier.Label).Rows.Count
+
+        Dim count As Integer = DB.GetSalesListByCustomer(item.Label).Rows.Count
         If count > 0 Then
             MsgBox("此客戶已有銷售記錄，無法刪除!")
             Exit Sub
@@ -101,7 +107,7 @@
             Exit Sub
         End If
 
-        DB.DeleteCustomer(GetSelectedCustomer())
+        DB.DeleteCustomer(item)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgList.CellMouseDoubleClick

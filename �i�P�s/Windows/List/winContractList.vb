@@ -8,8 +8,13 @@
     Dim work As Mode
 
     WithEvents access As Database.Access = Program.DB
+    Dim Filter As DataGridViewFilter
 
     Private Sub winContactList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Filter = New DataGridViewFilter(dgGoodsList)
+        Filter.AddTextFilter("編號", "合約", "備註")
+        Filter.AddNumberFilter("預付額", "佣金", "折扣")
+        Filter.AddBoolFilter("有效")
         UpdateList()
     End Sub
 
@@ -41,7 +46,7 @@
         UpdateTitle("Discount", "折扣")
         UpdateTitle("Prepay", "預付額")
         UpdateTitle("Note", "備註")
-
+        If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
@@ -58,7 +63,7 @@
 
     Private Sub EditItem()
 
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        If GetSelectedItem().IsNull Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
@@ -68,6 +73,7 @@
     End Sub
 
     Public Function GetSelectedItem() As Database.Contract
+        If Not Filter.HasSelectedItem Then Return Database.Contract.Null()
         Dim dt As DataTable = dgGoodsList.DataSource
 
         Dim label As String = dgGoodsList.SelectedRows(0).Cells(0).Value
@@ -85,12 +91,13 @@
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
 
-        If dgGoodsList.SelectedRows.Count <= 0 Then
+        Dim selectedItem As Database.Contract = GetSelectedItem()
+        If selecteditem.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If
 
-        Dim SelectedItem As Database.Contract = GetSelectedItem()
+
         Dim count As Integer = DB.GetSalesListByContractLabel(SelectedItem.Label).Rows.Count
         If count > 0 Then
             MsgBox("商品項目已經有訂單資料，無法刪除!")

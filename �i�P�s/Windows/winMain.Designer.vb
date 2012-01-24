@@ -31,18 +31,18 @@ Partial Class winMain
         Me.修改密碼PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
         Me.關閉CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
-        Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.其他資訊ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.供應商ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.客戶CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
         Me.員工PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -124,37 +124,6 @@ Partial Class winMain
         Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
         Me.關閉CToolStripMenuItem.Text = "關閉(&Q)"
         '
-        '庫存ToolStripMenuItem
-        '
-        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
-        Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
-        Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
-        Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
-        '
-        '進貨記錄ToolStripMenuItem1
-        '
-        Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
-        '
-        '查詢庫存ToolStripMenuItem
-        '
-        Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
-        '
-        '商品項目GToolStripMenuItem
-        '
-        Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
-        '
-        '銷貨ToolStripMenuItem
-        '
-        Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
-        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
-        Me.銷貨ToolStripMenuItem.Text = "訂單(&O)"
-        '
         '其他資訊ToolStripMenuItem
         '
         Me.其他資訊ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.供應商ToolStripMenuItem, Me.客戶CToolStripMenuItem, Me.ToolStripSeparator3, Me.員工PToolStripMenuItem})
@@ -165,37 +134,68 @@ Partial Class winMain
         '供應商ToolStripMenuItem
         '
         Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
-        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.供應商ToolStripMenuItem.Text = "供應商(&S)"
         '
         '客戶CToolStripMenuItem
         '
         Me.客戶CToolStripMenuItem.Name = "客戶CToolStripMenuItem"
-        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.客戶CToolStripMenuItem.Text = "客戶(&C)"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(124, 6)
         '
         '員工PToolStripMenuItem
         '
         Me.員工PToolStripMenuItem.Name = "員工PToolStripMenuItem"
-        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.員工PToolStripMenuItem.Text = "員工(&P)"
-        '
-        '選項OToolStripMenuItem
-        '
-        Me.選項OToolStripMenuItem.Name = "選項OToolStripMenuItem"
-        Me.選項OToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
-        Me.選項OToolStripMenuItem.Text = "選項(&O)"
         '
         '合約CToolStripMenuItem
         '
         Me.合約CToolStripMenuItem.Name = "合約CToolStripMenuItem"
         Me.合約CToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
         Me.合約CToolStripMenuItem.Text = "合約(&C)"
+        '
+        '庫存ToolStripMenuItem
+        '
+        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
+        Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
+        Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
+        Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
+        '
+        '進貨記錄ToolStripMenuItem1
+        '
+        Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(141, 22)
+        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
+        '
+        '查詢庫存ToolStripMenuItem
+        '
+        Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
+        '
+        '商品項目GToolStripMenuItem
+        '
+        Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
+        '
+        '銷貨ToolStripMenuItem
+        '
+        Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
+        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
+        Me.銷貨ToolStripMenuItem.Text = "訂單(&O)"
+        '
+        '選項OToolStripMenuItem
+        '
+        Me.選項OToolStripMenuItem.Name = "選項OToolStripMenuItem"
+        Me.選項OToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
+        Me.選項OToolStripMenuItem.Text = "選項(&O)"
         '
         'dgSales
         '

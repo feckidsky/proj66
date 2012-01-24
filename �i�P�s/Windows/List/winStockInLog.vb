@@ -4,10 +4,14 @@
     Dim StartTime As Date
     Dim EndTime As Date
 
+    Dim Filter As DataGridViewFilter
+
     Private Sub winStockInLog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         dtpStart.Value = Today
         dtpEnd.Value = Today
-
+        Filter = New DataGridViewFilter(dgStockLog)
+        Filter.AddTextFilter("庫存編號", "供應商", "種類", "廠牌", "品名", "備註", "IMEI")
+        Filter.AddNumberFilter("進貨價", "定價", "數量")
         UpdateStockInLog()
     End Sub
 
@@ -33,7 +37,7 @@
 
 
         dgStockLog.DataSource = DB.GetStockLog(StartTime, EndTime)
-
+        If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
 
 
@@ -56,6 +60,7 @@
     End Sub
 
     Private Sub dgStockLog_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgStockLog.CellMouseDoubleClick
+        If e.RowIndex = -1 Then Exit Sub
         Dim label As String = dgStockLog.Rows(e.RowIndex).Cells(0).Value
         Dim stock As Database.Stock = DB.GetStock(label)
         winStockIn.Open(stock)
@@ -71,7 +76,7 @@
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
 
-        If dgStockLog.SelectedRows.Count = 0 Then
+        If Not Filter.HasSelectedItem() Then
             MsgBox("您必須選取一個項目")
             Exit Sub
         End If
@@ -83,7 +88,7 @@
 
     Private Sub 刪除DToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Click
         If Not CheckAuthority(2) Then Exit Sub
-        If dgStockLog.SelectedRows.Count = 0 Then
+        If Not Filter.HasSelectedItem() Then
             MsgBox("您必須選取一個項目")
             Exit Sub
         End If
