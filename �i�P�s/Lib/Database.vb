@@ -164,7 +164,7 @@
         ''' <summary>取得庫存清單</summary>
         Public Function GetStockList() As Data.DataTable
             'Dims SQLCommand As String = "SELECT stock.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
-            Dim SqlCommand As String = "SELECT stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Price AS 售價, stock.Note AS 備註 " & _
+            Dim SqlCommand As String = "SELECT Goods.Label as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Price AS 售價, stock.Note AS 備註 " & _
             " FROM (stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
 
@@ -218,13 +218,25 @@
         End Function
 
 
+        Enum GetSalesListType
+            Order = 0
+            Sales = 1
+            Both = 2
+        End Enum
+
         '讀取銷貨單
-        Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
-            Dim condition As String = " WHERE (((sales.Orderdate) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)) "
+        Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType) As Data.DataTable
+
+            Dim cnd As String = ""
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & TypeOfPayment.Commission
+            Dim condition1 As String = " WHERE ((sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#) " & cnd & ") "
+
+            'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
             Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number]) AS 利潤, Sales.Note AS 備註 " & _
-" FROM ((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label " & _
-            condition & _
-" GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note; "
+            " FROM ((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label " & _
+            condition1 & _
+            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note; "
 
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -248,6 +260,7 @@
             " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 " & _
             " FROM HistoryPrice " & _
             " GROUP BY HistoryPrice.GoodsLabel )  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1 = HistoryPrice.Time) AND (tmp.GoodsLabel = HistoryPrice.GoodsLabel) )  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON OrderGoods.GoodsLabel = Goods.Label " & _
+            " WHERE (OrderGoods.SalesLabel='" & label & "') " & _
             " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price, OrderGoods.Price, OrderGoods.Number;"
 
             Return Read("table", BasePath, SqlCommand)
@@ -585,17 +598,17 @@
             Return SQLCommand
         End Function
 
-        Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As String, ByVal ConditionColumn As String, ByVal Condition As Object) As String
+        Public Shared Function GetUpdateSqlCommand(ByVal Table As String, ByVal column() As String, ByVal value() As Object, ByVal ConditionColumn As String, ByVal Condition As Object) As String
             Dim SQLCommand As String = "UPDATE " & Table & " SET "
             SQLCommand &= GetSqlColumnChangePart(column, value) & " WHERE [" & ConditionColumn & "]=" & GetSqlValue(Condition) & ";"
             Return SQLCommand
         End Function
 
-        Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As String) As String
+        Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As Object) As String
             Dim lst As New List(Of String)
 
             For i As Integer = 0 To Label.Length - 1
-                lst.Add("[" & Label(i) & "]='" & value(i) & "'")
+                lst.Add("[" & Label(i) & "]=" & GetSqlValue(value(i)))
             Next i
             Return Join(lst.ToArray, ",")
         End Function
@@ -603,6 +616,8 @@
         Shared Function GetSqlValue(ByVal obj As Object) As String
             If obj Is Nothing Then
                 Return "''"
+            ElseIf obj.GetType() Is GetType(Boolean) Then
+                Return obj.ToString
             ElseIf obj Is Nothing OrElse obj.GetType() Is GetType(String) Then
                 Return "'" & obj.ToString & "'"
             ElseIf obj.GetType Is GetType(Date) Then

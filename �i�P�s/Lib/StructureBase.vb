@@ -39,6 +39,8 @@ Namespace Database
 
         End Class
 
+
+
 #Region "供應商/客戶/員工"
         ''' <summary>供應商</summary>
         Structure Supplier
@@ -435,7 +437,7 @@ Namespace Database
 
             Public Function GetUpdateSqlCommand() As String
                 Dim Column As String() = New String() {"Enable", "Name", "Commission", "Discount", "Prepay", "Note"}
-                Dim Value As String() = New String() {Enable, Name, Commission, Discount, Prepay, Note}
+                Dim Value As Object() = New Object() {Enable, Name, Commission, Discount, Prepay, Note}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 

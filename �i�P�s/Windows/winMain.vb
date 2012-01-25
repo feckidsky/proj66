@@ -28,24 +28,25 @@ Public Class winMain
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
-        ShowKind()
+        'ShowKind()
+        UpdateSalesList()
     End Sub
 
-    Public Sub ShowKind()
+    'Public Sub ShowKind()
 
 
-        For i As Integer = 0 To dgSales.Rows.Count - 1
-            If cbForm.SelectedIndex = 2 Then
+    '    For i As Integer = 0 To dgSales.Rows.Count - 1
+    '        If cbForm.SelectedIndex = 2 Then
 
-                dgSales.Rows(i).Visible = True
-            ElseIf cbForm.SelectedIndex = 0 Then
-                dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value = "訂金"
-            Else
-                dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value <> "訂金"
-            End If
-        Next
+    '            dgSales.Rows(i).Visible = True
+    '        ElseIf cbForm.SelectedIndex = 0 Then
+    '            dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value = "訂金"
+    '        Else
+    '            dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value <> "訂金"
+    '        End If
+    '    Next
 
-    End Sub
+    'End Sub
 
     Public Sub UpdateSalesList()
 
@@ -62,7 +63,7 @@ Public Class winMain
             EndTime = dtpEnd.Value.Date.AddDays(1)
         End If
 
-        Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime)
+        Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
 
 
 
@@ -79,7 +80,7 @@ Public Class winMain
             dgSales.Rows.Item(i).Cells("付款方式").Value = TypeOfPaymentsDescribe(dgSales.Rows(i).Cells("付款方式").Value)
         Next
         UpdateListColor()
-        ShowKind()
+        'ShowKind()
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
 
     End Sub

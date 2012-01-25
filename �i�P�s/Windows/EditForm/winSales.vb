@@ -146,7 +146,7 @@ Public Class winSales
         Next
 
         If row IsNot Nothing Then
-            dgSalesList.Rows.Add(New String() {row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, row.Cells("售價").Value, row.Cells("售價").Value, 1})
+            dgSalesList.Rows.Add(New String() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, row.Cells("售價").Value, row.Cells("售價").Value, 1})
         End If
         lbTotal.Text = CalSalesTotal()
     End Sub
@@ -185,7 +185,8 @@ Public Class winSales
     End Function
 
     Private Sub dgSalesList_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellDoubleClick
-        Dim row As DataGridViewRow = winStockList.SelectStock()
+        Dim GoodsLabel As String = dgSalesList.Rows(dgSalesList.SelectedCells(0).RowIndex).Cells(cSGoods.Index).Value
+        Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel)
         If row Is Nothing Then Exit Sub
 
         With dgSalesList.Rows(e.RowIndex)
@@ -478,7 +479,7 @@ Public Class winSales
 
 
     Private Sub btAddContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddContract.Click
-        Dim item As Database.Contract = winContractList.SelectDialog()
+        Dim item As Database.Contract = winContractList.SelectEffectDialog()
         If item.IsNull() Then Exit Sub
         Dim row As New DataGridViewRow
         dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Discount, ""})

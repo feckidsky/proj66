@@ -138,6 +138,8 @@ Public Class winPeople
                     DB.ChangeSupplier(myData.Supplier)
                 Case StructKind.Personnel
                     DB.ChangePersonnel(myData.Personnel)
+                Case StructKind.Customer
+                    DB.ChangeCustomer(myData.Customer)
             End Select
         End If
         Me.Close()

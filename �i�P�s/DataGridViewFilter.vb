@@ -1,9 +1,9 @@
 ﻿Public Class DataGridViewFilter
 
-    WithEvents DataGrid As DataGridView
-    Dim Conditions As New List(Of Condition)
-    Dim NumberConditions As New List(Of NumberCondition)
-    Dim BoolConditions As New List(Of BoolCondition)
+    Public WithEvents DataGrid As DataGridView
+    Dim TextFilters As New List(Of TextFilter)
+    Dim NumberFilters As New List(Of NumberFilter)
+    Dim BoolFilters As New List(Of BoolFilter)
     Dim ContextMenuStrip As ContextMenuStrip
 
     Sub New(ByVal DataGridView As DataGridView)
@@ -14,7 +14,8 @@
         DataGrid.EnableHeadersVisualStyles = False
     End Sub
 
-    Structure BoolCondition
+#Region "Filter Structure"
+    Structure BoolFilter
         Dim HeaderName As String
         Dim cms As ContextMenuStrip
         Sub New(ByVal ContextMenuStrip As ContextMenuStrip, ByVal HeaderName As String)
@@ -32,7 +33,7 @@
 
     End Structure
 
-    Structure NumberCondition
+    Structure NumberFilter
         Dim HeaderName As String
         Dim cms As ContextMenuStrip
 
@@ -59,7 +60,7 @@
         End Function
     End Structure
 
-    Structure Condition
+    Structure TextFilter
         Dim HeaderName As String
         Dim cms As ContextMenuStrip
         Sub New(ByVal cms As ContextMenuStrip, ByVal ColumnName As String)
@@ -73,8 +74,9 @@
             Return Strings.InStr(Value, Text) <> 0
         End Function
     End Structure
+#End Region
 
-
+#Region "AddFilter"
     Public Sub AddTextFilter(ByVal ParamArray ColumnNames() As String)
         For Each c As String In ColumnNames
             AddTextFilter(c)
@@ -99,7 +101,7 @@
         AddHandler cbText.TextUpdate, AddressOf Combo_BoxTextUpdate
         AddHandler cbText.SelectedIndexChanged, AddressOf Combo_SelectedIndexChanged
         AddHandler lbCancel.Click, AddressOf TextFilterCancel_Click
-        Conditions.Add(New Condition(cms, ColumnName))
+        TextFilters.Add(New TextFilter(cms, ColumnName))
     End Sub
 
     Public Sub AddBoolFilter(ByVal ParamArray ColumnNames() As String)
@@ -118,7 +120,7 @@
         cms.Text = ColumnName
         cms.BackColor = Color.LightGray
         AddHandler cbText.SelectedIndexChanged, AddressOf Combo_SelectedIndexChanged
-        BoolConditions.Add(New BoolCondition(cms, ColumnName))
+        BoolFilters.Add(New BoolFilter(cms, ColumnName))
     End Sub
 
 
@@ -154,9 +156,31 @@
         AddHandler txtMax.KeyPress, AddressOf Number_KeyPress
         AddHandler txtMin.KeyPress, AddressOf Number_KeyPress
 
-        NumberConditions.Add(New NumberCondition(cms, ColumnName))
+        NumberFilters.Add(New NumberFilter(cms, ColumnName))
+    End Sub
+#End Region
+
+    Sub SetTextFilter(ByVal ColumnText As String, ByVal Text As String)
+        Dim idx As Integer = TextFilters.FindIndex(Function(f As TextFilter) f.HeaderName = ColumnText)
+        If idx >= 0 Then
+            TextFilters(idx).cms.Items("cbText").Text = Text
+        End If
+        'Filter()
     End Sub
 
+    Sub SetBoolFilter(ByVal ColumnText As String, ByVal value As Boolean)
+        Dim idx As Integer = BoolFilters.FindIndex(Function(f As BoolFilter) f.HeaderName = ColumnText)
+        If idx >= 0 Then
+            CType(BoolFilters(idx).cms.Items("cbText"), ToolStripComboBox).SelectedIndex = IIf(value, 1, 2)
+        End If
+    End Sub
+
+    Sub CancelBoolFilter(ByVal ColumnText As String)
+        Dim idx As Integer = BoolFilters.FindIndex(Function(f As BoolFilter) f.HeaderName = ColumnText)
+        If idx >= 0 Then
+            CType(BoolFilters(idx).cms.Items("cbText"), ToolStripComboBox).SelectedIndex = 0
+        End If
+    End Sub
 
     '取消篩選
     Sub TextFilterCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs)
@@ -220,7 +244,7 @@
         Dim FilterColor As Color = Color.Red
 
         If DataGrid.Rows.Count = 0 Then Exit Sub
-        For Each c As Condition In Conditions
+        For Each c As TextFilter In TextFilters
             Dim enable As Boolean = Not (c.cms.Items("cbText").Text = "")
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
             column.DefaultCellStyle.Font = IIf(enable, FilterFont, f)
@@ -228,7 +252,7 @@
             c.cms.Items("lbCancel").Enabled = enable
         Next
 
-        For Each c As NumberCondition In NumberConditions
+        For Each c As NumberFilter In NumberFilters
             Dim enable As Boolean = c.cms.Items("txtMax").Text <> "" Or c.cms.Items("txtMin").Text <> ""
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
             column.DefaultCellStyle.Font = IIf(enable, FilterFont, f)
@@ -236,7 +260,7 @@
             c.cms.Items("lbCancel").Enabled = enable
         Next
 
-        For Each c As BoolCondition In BoolConditions
+        For Each c As BoolFilter In BoolFilters
             Dim enable As Boolean = CType(c.cms.Items("cbText"), ToolStripComboBox).SelectedIndex <> 0
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
             column.HeaderCell.Style.BackColor = IIf(enable, FilterColor, bc)
@@ -246,24 +270,27 @@
 
         DataGrid.CurrentCell = Nothing
 
-
+        ' Try
         For i As Integer = 0 To DataGrid.Rows.Count - 1
             Dim Match As Boolean = True
-            For Each c As Condition In Conditions
+            For Each c As TextFilter In TextFilters
                 Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
             Next
 
-            For Each c As NumberCondition In NumberConditions
+            For Each c As NumberFilter In NumberFilters
 
                 Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
             Next
 
-            For Each c As BoolCondition In BoolConditions
+            For Each c As BoolFilter In BoolFilters
                 Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
             Next
 
             DataGrid.Rows(i).Visible = Match
         Next
+        'Catch
+        '    MsgBox(Err.Description)
+        'End Try
     End Sub
 
     '當使用滑鼠右鍵時，將該行選起來
@@ -284,25 +311,25 @@
         Dim rec As Rectangle = DataGrid.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, False)
         Dim loc As New Point(rec.X, rec.Y + rec.Height)
         Dim HeaderText As String = DataGrid.Columns(e.ColumnIndex).HeaderText
-        For i As Integer = 0 To Conditions.Count - 1
-            If Conditions(i).HeaderName = HeaderText Then
-                Conditions(i).cms.Show(sender, loc)
+        For i As Integer = 0 To TextFilters.Count - 1
+            If TextFilters(i).HeaderName = HeaderText Then
+                TextFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If
         Next
 
 
-        For i As Integer = 0 To NumberConditions.Count - 1
-            If NumberConditions(i).HeaderName = HeaderText Then
-                NumberConditions(i).cms.Show(sender, loc)
+        For i As Integer = 0 To NumberFilters.Count - 1
+            If NumberFilters(i).HeaderName = HeaderText Then
+                NumberFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If
 
         Next
 
-        For i As Integer = 0 To BoolConditions.Count - 1
-            If BoolConditions(i).HeaderName = HeaderText Then
-                BoolConditions(i).cms.Show(sender, loc)
+        For i As Integer = 0 To BoolFilters.Count - 1
+            If BoolFilters(i).HeaderName = HeaderText Then
+                BoolFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If
         Next
@@ -315,13 +342,13 @@
     End Sub
 
     Public Sub UpdateComboBox()
-        For Each c As Condition In Conditions
+        For Each c As TextFilter In TextFilters
             CType(c.cms.Items("cbText"), ToolStripComboBox).Items.Clear()
         Next
 
 
         For Each row As DataGridViewRow In DataGrid.Rows
-            For Each c As Condition In Conditions
+            For Each c As TextFilter In TextFilters
                 Dim cb As ToolStripComboBox = c.cms.Items("cbText")
                 Dim text As String = GetCellValue(row, c.HeaderName)
                 If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)

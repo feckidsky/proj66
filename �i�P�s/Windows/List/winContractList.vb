@@ -10,13 +10,17 @@
     WithEvents access As Database.Access = Program.DB
     Dim Filter As DataGridViewFilter
 
-    Private Sub winContactList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Dim FilterEffect As Boolean = False
+
+    Private Sub winContractList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgGoodsList)
         Filter.AddTextFilter("編號", "合約", "備註")
         Filter.AddNumberFilter("預付額", "佣金", "折扣")
         Filter.AddBoolFilter("有效")
+        If FilterEffect Then Filter.SetBoolFilter("有效", True)
         UpdateList()
     End Sub
+
 
     Public Overloads Sub Show()
         If Not CheckAuthority(2) Then Exit Sub
@@ -33,6 +37,11 @@
         Else
             Return Database.Contract.Null()
         End If
+    End Function
+
+    Public Function SelectEffectDialog() As Database.Contract
+        FilterEffect = True
+        Return SelectDialog()
     End Function
 
 
@@ -128,7 +137,5 @@
     End Sub
 
 
-    Private Sub 刪除DToolStripMenuItem_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles 刪除DToolStripMenuItem.Disposed
 
-    End Sub
 End Class

@@ -39,12 +39,12 @@ Partial Class winStockList
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgItemList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgItemList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgItemList.Location = New System.Drawing.Point(8, 27)
+        Me.dgItemList.Location = New System.Drawing.Point(10, 28)
         Me.dgItemList.Name = "dgItemList"
         Me.dgItemList.ReadOnly = True
         Me.dgItemList.RowTemplate.Height = 24
         Me.dgItemList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgItemList.Size = New System.Drawing.Size(632, 333)
+        Me.dgItemList.Size = New System.Drawing.Size(620, 322)
         Me.dgItemList.TabIndex = 0
         '
         'MenuStrip1
@@ -78,7 +78,7 @@ Partial Class winStockList
         Me.Controls.Add(Me.dgItemList)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "winStockList"
-        Me.Text = "品名"
+        Me.Text = "庫存查詢"
         CType(Me.dgItemList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
