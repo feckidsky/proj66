@@ -108,7 +108,7 @@ Public Class winSales
     End Sub
 
     Private Sub ReadSalesList(ByVal SalesLabel As String)
-        Dim dt As Data.DataTable = DB.GetGoodsListBySalesLabel(SalesLabel)
+        Dim dt As Data.DataTable = DB.GetGoodsListBySalesLabelWithHistoryPrice(SalesLabel) 'DB.GetGoodsListBySalesLabel(SalesLabel)
 
         For Each r As Data.DataRow In dt.Rows
             dgSalesList.Rows.Add(r.ItemArray())

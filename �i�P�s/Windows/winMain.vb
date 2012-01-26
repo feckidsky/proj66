@@ -63,8 +63,8 @@ Public Class winMain
             EndTime = dtpEnd.Value.Date.AddDays(1)
         End If
 
-        Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
-
+        'Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
+        Dim dt As Data.DataTable = DB.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex)
 
 
         dgSales.Columns.Clear()

@@ -173,6 +173,19 @@
             Return DT
         End Function
 
+        ''' <summary>取得庫存清單</summary>
+        Public Function GetStockListWithHistoryPrice() As Data.DataTable
+
+            Dim SqlCommand As String = "SELECT stock.GoodsLabel as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, history.Price AS 售價, stock.Note AS 備註 " & _
+            " FROM ((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
+            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
+
+
+
+            Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
+            Return DT
+        End Function
+
 
         ''' <summary>取得進貨記錄</summary>
         Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
@@ -243,6 +256,25 @@
             Return DT
         End Function
 
+        '讀取銷貨單
+        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType) As Data.DataTable
+
+            Dim cnd As String = ""
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & TypeOfPayment.Commission
+            Dim condition1 As String = " WHERE ((sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#) " & cnd & ") "
+
+            'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+[Price] AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+[contractinfo].[profit] AS 利潤, Sales.Note AS 備註 " & _
+            " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+            condition1 & _
+            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
+
+
+            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
+            Return DT
+        End Function
+
         '取得銷貨單資訊
         Public Function GetSales(ByVal Label As String) As Sales
             Dim SQLCommand As String = "SELECT * FROM " & Sales.Table & " WHERE label='" & Label & "';"
@@ -271,6 +303,17 @@
             Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
             " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
             " WHERE (((SalesGoods.SalesLabel)=""" & Label & """));"
+            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '取得銷貨單的商品清單-根據銷貨單號
+        Public Function GetGoodsListBySalesLabelWithHistoryPrice(ByVal Label As String) As Data.DataTable
+            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number " & _
+            " FROM (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) LEFT JOIN ((SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.GoodsLabel=HistoryPrice.GoodsLabel) AND (tmp.Time1=HistoryPrice.Time))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON Stock.GoodsLabel = Goods.Label " & _
+            " GROUP BY Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number, SalesGoods.SalesLabel " & _
+            " HAVING (((SalesGoods.SalesLabel)='" & Label & "'));"
+
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT
         End Function

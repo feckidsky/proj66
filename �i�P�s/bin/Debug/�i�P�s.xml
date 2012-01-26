@@ -8,6 +8,8 @@
 <members>
 <member name="M:進銷存.Database.Access.GetStockList">
 	<summary>取得庫存清單</summary>
+</member><member name="M:進銷存.Database.Access.GetStockListWithHistoryPrice">
+	<summary>取得庫存清單</summary>
 </member><member name="M:進銷存.Database.Access.GetStockLog(System.DateTime,System.DateTime)">
 	<summary>取得進貨記錄</summary>
 </member><member name="M:進銷存.Database.Access.ConnectBase(System.String)">

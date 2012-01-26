@@ -28,7 +28,7 @@
     End Sub
 
     Public Sub UpdateStockList()
-        Dim DT As Data.DataTable = DB.GetStockList()
+        Dim DT As Data.DataTable = DB.GetStockListWithHistoryPrice() 'DB.GetStockList()
 
         dgItemList.DataSource = DT
         dgItemList.Columns("商品編號").Visible = False
