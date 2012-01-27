@@ -1,8 +1,7 @@
 ﻿Imports 進銷存.Database.StructureBase
 
 Public Module Program
-    Public DB As New Database.Access
-
+#Region "Structure"
     Structure LoginResult
         Dim State As LoginState
         Dim msg As String
@@ -22,8 +21,6 @@ Public Module Program
         Dim OrderBackcolor As Integer
         Dim SalesBackColor As Integer
 
-
-
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
@@ -35,8 +32,24 @@ Public Module Program
 
     End Structure
 
+    'Structure ClientInfo
+    '    Dim Name As String
+    '    Dim IP As String
+    '    Dim Port As Integer
+    '    Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
+    '        Me.Name = Name : Me.IP = IP : Me.Port = Port
+    '    End Sub
+    'End Structure
+#End Region
+
+    Public DB As New Database.Access
+    Public Server As New Database.AccessServer
+    Public Client As New Database.AccessClientMenage()
+
+
     Public Config As SystemOptional
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
+    Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
 
@@ -45,11 +58,17 @@ Public Module Program
     Public SystemTitle As String = "進銷存管理系統"
 
     Public Sub InitialProgram()
+        Server.Access = DB
+        Server.Open()
 
 
         'UpdateDatabase()
         'Database.Access.RepairAccess(Database.Access.BasePath)
         ConfigLoad()
+
+        Client.Load(ClientPath)
+
+
 
         LogOut(False)
 
@@ -59,7 +78,7 @@ Public Module Program
     End Sub
 
     Public Sub UpdateDatabase()
-        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(Database.Access.BasePath)
+        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(DB.BasePath)
         Database.Access.DeleteTable("Mobile", d)
         Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
         Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
@@ -75,6 +94,7 @@ Public Module Program
     Public Sub ConfigSave()
         Code.Save(Config, ConfigPath)
     End Sub
+
 
     Public Function CheckAuthority(ByVal level As Integer, Optional ByVal WithAdmin As Boolean = False) As Boolean
         If Not WithAdmin And CurrentUser.IsAdministrator Then

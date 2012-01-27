@@ -9,6 +9,7 @@
         End Sub
     End Structure
 
+#Region "Access"
     Public Class Access
 
         Event CreatedContract(ByVal con As Contract)
@@ -406,18 +407,18 @@
         End Sub
 
         Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
-            Database.Access.AddBase(newSales)
+            DB.AddBase(newSales)
 
             For Each g As SalesGoods In SalesGoods
-                Database.Access.AddBase(g)
+                DB.AddBase(g)
             Next
 
             For Each o As OrderGoods In OrderGoods
-                Database.Access.AddBase(o)
+                DB.AddBase(o)
             Next
 
             For Each c As SalesContract In SalesContracts
-                Database.Access.AddBase(c)
+                DB.AddBase(c)
             Next
         End Sub
 
@@ -442,8 +443,8 @@
         'Public Class File
 
         Public Shared Dir As String
-        Public Shared BasePath As String
-        Public Shared SalesPath As String
+        Public BasePath As String
+        Public SalesPath As String
         Public Shared Password As String = "36363636"
 
         Shared DBWriteLock As String = " DBWriteLock"
@@ -515,7 +516,7 @@
             CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), DBControl)
-            AddBase(Personnel.Administrator)
+            DB.AddBase(Personnel.Administrator)
             Return DBControl
         End Function
 
@@ -608,15 +609,15 @@
 
 #End Region
 
-        Public Shared Function Read(ByVal Table As String, ByVal File As String, ByVal SqlCommand As String) As Data.DataTable
+        Public Function Read(ByVal Table As String, ByVal File As String, ByVal SqlCommand As String) As Data.DataTable
             Return Read(Table, New String() {File}, New String() {SqlCommand})
         End Function
 
-        Public Shared Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SqlCommand As String) As Data.DataTable
+        Public Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SqlCommand As String) As Data.DataTable
             Return Read(Table, FileList, New String() {SqlCommand})
         End Function
 
-        Public Shared Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
+        Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
             '暫存表格
             Dim DS As DataSet = New DataSet()
             Dim DA As OleDb.OleDbDataAdapter
@@ -718,7 +719,7 @@
         End Function
 
 
-        Public Shared Sub AddBase(ByVal data As Object)
+        Public Sub AddBase(ByVal data As Object)
             Command(GetSqlInsert(data), BasePath)
         End Sub
 
@@ -729,7 +730,7 @@
 
         Delegate Function Conv(Of T)(ByVal d As Data.DataRow) As T
 
-        Public Shared Function Read(Of T)(ByVal Table As String, ByVal C As Conv(Of T)) As T()
+        Public Function Read(Of T)(ByVal Table As String, ByVal C As Conv(Of T)) As T()
             Dim DT As Data.DataTable = Read(Supplier.Table, BasePath, GetSqlSelect(Table))
 
             Dim lstData As New List(Of T)
@@ -937,6 +938,184 @@
 
         End Function
     End Class
+#End Region
 
+    Public Structure ReadArgs
+        Dim Table As String
+        Dim FileList() As String
+        Dim SqlCommand() As String
+
+    End Structure
+
+    Public Class AccessServer
+        Public WithEvents Server As New TCPTool
+        Public WithEvents Access As Access
+        Public Port As Integer = 3600
+
+        Public Sub Open()
+            Server.ServerOpen(Port)
+        End Sub
+        Public Sub Close()
+            Server.ServerClose()
+        End Sub
+
+        Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Server.ServerReceiveSplitMessage
+            Select Case Data(0)
+                Case "ReadArgs"
+                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(1))
+                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
+                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
+                    Client.Send("ReadResponse", Code.SerializeWithZIP(dt))
+            End Select
+        End Sub
+    End Class
+
+    Public Structure ClientInfo
+        Dim IP As String
+        Dim Port As Integer
+        Dim Name As String
+        Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
+            Me.Name = Name : Me.IP = IP : Me.Port = Port
+        End Sub
+    End Structure
+
+    Public Class AccessClientMenage
+
+
+
+        Public Client() As AccessClient
+
+        Public Sub Save(ByVal Path As String)
+            Dim lstInfo As New List(Of ClientInfo)
+            For Each c As AccessClient In Client
+                lstInfo.Add(New ClientInfo(c.Name, c.IP, c.Port))
+            Next
+
+            Code.Save(lstInfo.ToArray, Path)
+        End Sub
+
+        Public Sub Load(ByVal Path As String)
+            Dim lstInfo As ClientInfo() = Code.Load(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
+
+            Dim lstClient As New List(Of Database.AccessClient)
+
+            For Each c As ClientInfo In lstInfo
+                lstClient.Add(New AccessClient(c.Name, c.IP, c.Port))
+            Next
+
+            Client = lstClient.ToArray
+        End Sub
+
+        Public Sub StartConnect()
+            For i As Integer = 0 To Client.Length - 1
+                Client(i).Connect()
+            Next
+        End Sub
+
+        Public Sub EndConnect()
+            For i As Integer = 0 To Client.Length - 1
+                Client(i).Disconnect()
+            Next
+        End Sub
+
+        Public Function GetNameList() As String()
+            Return Array.ConvertAll(Client, Function(c As AccessClient) c.Name)
+        End Function
+
+        Default Public ReadOnly Property Item(ByVal Index As Integer) As AccessClient
+            Get
+                If Index < Client.Length - 1 Then Return Nothing
+                Return Client(Index)
+            End Get
+
+        End Property
+
+        Default Public ReadOnly Property Item(ByVal Name As String) As AccessClient
+            Get
+                For Each c As AccessClient In Client
+                    If c.Name = Name Then Return c
+                Next
+                Return Nothing
+            End Get
+        End Property
+
+
+    End Class
+
+    Public Class AccessClient
+        Inherits Access
+
+        Public WithEvents Client As New TCPTool.Client()
+
+        Dim ResponseDataTable As Data.DataTable = Nothing
+
+        Sub New()
+
+        End Sub
+        Sub New(ByVal Info As ClientInfo)
+            Me.Name = Info.Name : Me.IP = Info.IP : Me.Port = Info.Port
+        End Sub
+        Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
+            Me.Name = Name : Me.IP = IP : Me.Port = Port
+            'Client.Port = 3600
+        End Sub
+
+        Public Name As String = "DefaultName"
+
+        Property IP() As String
+            Get
+                Return Client.IP
+            End Get
+            Set(ByVal value As String)
+                Client.IP = value
+            End Set
+        End Property
+
+        Property Port() As Integer
+            Get
+                Return Client.Port
+            End Get
+            Set(ByVal value As Integer)
+                Client.Port = value
+            End Set
+        End Property
+
+        Public Sub Connect()
+            Client.StartConnect()
+        End Sub
+
+        Public Sub Disconnect()
+            Client.EndConnect()
+        End Sub
+
+        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
+            Dim args As ReadArgs
+            args.Table = Table
+            args.FileList = FileList
+            args.SqlCommand = SQLCommand
+
+            Send("ReadArgs", Code.SerializeWithZIP(args))
+            ResponseDataTable = Nothing
+
+            While (ResponseDataTable Is Nothing)
+                Application.DoEvents()
+            End While
+
+            Return ResponseDataTable
+        End Function
+
+        Public Sub Send(ByVal cmd As String, ByVal args As String)
+            If Not Client.Connected Then Client.Connect()
+            Client.Send(cmd, args)
+        End Sub
+
+
+        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Client.ReceiveSplitMessage
+            Select Case Data(0)
+                Case "ReadResponse"
+                    ResponseDataTable = Code.DeserializeWithUnzip(Of DataTable)(Data(1))
+            End Select
+        End Sub
+    End Class
 
 End Namespace

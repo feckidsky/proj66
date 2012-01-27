@@ -28,16 +28,27 @@ Partial Class winOptional
         Me.btOK = New System.Windows.Forms.Button
         Me.btCancel = New System.Windows.Forms.Button
         Me.ColorDialog1 = New System.Windows.Forms.ColorDialog
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.dgShop = New System.Windows.Forms.DataGridView
+        Me.cShop = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cIP = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cPort = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.btRepairMDB = New System.Windows.Forms.Button
+        Me.btMdbUpdate = New System.Windows.Forms.Button
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.dgShop, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.btSalesBackColor)
         Me.GroupBox1.Controls.Add(Me.btOrderBackColor)
-        Me.GroupBox1.Location = New System.Drawing.Point(13, 13)
+        Me.GroupBox1.Location = New System.Drawing.Point(13, 235)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(176, 95)
+        Me.GroupBox1.Size = New System.Drawing.Size(176, 88)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "訂單/銷貨單背景"
@@ -62,7 +73,7 @@ Partial Class winOptional
         '
         'btOK
         '
-        Me.btOK.Location = New System.Drawing.Point(114, 124)
+        Me.btOK.Location = New System.Drawing.Point(329, 339)
         Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
         Me.btOK.TabIndex = 1
@@ -71,18 +82,88 @@ Partial Class winOptional
         '
         'btCancel
         '
-        Me.btCancel.Location = New System.Drawing.Point(31, 124)
+        Me.btCancel.Location = New System.Drawing.Point(246, 339)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
         Me.btCancel.TabIndex = 1
         Me.btCancel.Text = "取消"
         Me.btCancel.UseVisualStyleBackColor = True
         '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.dgShop)
+        Me.GroupBox2.Location = New System.Drawing.Point(13, 12)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(420, 207)
+        Me.GroupBox2.TabIndex = 2
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "連線設定"
+        '
+        'dgShop
+        '
+        Me.dgShop.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgShop.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.dgShop.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgShop.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cShop, Me.cIP, Me.cPort})
+        Me.dgShop.Location = New System.Drawing.Point(7, 22)
+        Me.dgShop.Name = "dgShop"
+        Me.dgShop.RowTemplate.Height = 24
+        Me.dgShop.Size = New System.Drawing.Size(397, 166)
+        Me.dgShop.TabIndex = 0
+        '
+        'cShop
+        '
+        Me.cShop.HeaderText = "店名"
+        Me.cShop.Name = "cShop"
+        '
+        'cIP
+        '
+        Me.cIP.HeaderText = "IP"
+        Me.cIP.Name = "cIP"
+        '
+        'cPort
+        '
+        Me.cPort.HeaderText = "Port"
+        Me.cPort.Name = "cPort"
+        '
+        'btRepairMDB
+        '
+        Me.btRepairMDB.Location = New System.Drawing.Point(33, 21)
+        Me.btRepairMDB.Name = "btRepairMDB"
+        Me.btRepairMDB.Size = New System.Drawing.Size(113, 23)
+        Me.btRepairMDB.TabIndex = 3
+        Me.btRepairMDB.Text = "修復/壓縮資料庫"
+        Me.btRepairMDB.UseVisualStyleBackColor = True
+        '
+        'btMdbUpdate
+        '
+        Me.btMdbUpdate.Location = New System.Drawing.Point(33, 50)
+        Me.btMdbUpdate.Name = "btMdbUpdate"
+        Me.btMdbUpdate.Size = New System.Drawing.Size(113, 23)
+        Me.btMdbUpdate.TabIndex = 3
+        Me.btMdbUpdate.Text = "更新資料庫結構"
+        Me.btMdbUpdate.UseVisualStyleBackColor = True
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.btMdbUpdate)
+        Me.GroupBox3.Controls.Add(Me.btRepairMDB)
+        Me.GroupBox3.Location = New System.Drawing.Point(226, 235)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(178, 88)
+        Me.GroupBox3.TabIndex = 4
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "資料庫"
+        '
         'winOptional
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(202, 159)
+        Me.ClientSize = New System.Drawing.Size(445, 380)
+        Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.btCancel)
         Me.Controls.Add(Me.btOK)
         Me.Controls.Add(Me.GroupBox1)
@@ -90,6 +171,9 @@ Partial Class winOptional
         Me.Name = "winOptional"
         Me.Text = "選項設定"
         Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
+        CType(Me.dgShop, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox3.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -99,4 +183,12 @@ Partial Class winOptional
     Friend WithEvents btOK As System.Windows.Forms.Button
     Friend WithEvents btCancel As System.Windows.Forms.Button
     Friend WithEvents ColorDialog1 As System.Windows.Forms.ColorDialog
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents dgShop As System.Windows.Forms.DataGridView
+    Friend WithEvents cShop As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cIP As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cPort As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents btRepairMDB As System.Windows.Forms.Button
+    Friend WithEvents btMdbUpdate As System.Windows.Forms.Button
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
 End Class

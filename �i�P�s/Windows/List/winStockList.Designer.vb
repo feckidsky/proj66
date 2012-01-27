@@ -22,10 +22,13 @@ Partial Class winStockList
     '請不要使用程式碼編輯器進行修改。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Me.dgItemList = New System.Windows.Forms.DataGridView
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.更新ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.進貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.cbStock = New System.Windows.Forms.ToolStripComboBox
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         CType(Me.dgItemList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -44,36 +47,47 @@ Partial Class winStockList
         Me.dgItemList.ReadOnly = True
         Me.dgItemList.RowTemplate.Height = 24
         Me.dgItemList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgItemList.Size = New System.Drawing.Size(620, 322)
+        Me.dgItemList.Size = New System.Drawing.Size(620, 348)
         Me.dgItemList.TabIndex = 0
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem, Me.進貨ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem, Me.進貨ToolStripMenuItem, Me.cbStock})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(640, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(640, 28)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
         '更新ToolStripMenuItem
         '
         Me.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem"
-        Me.更新ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+        Me.更新ToolStripMenuItem.Size = New System.Drawing.Size(44, 24)
         Me.更新ToolStripMenuItem.Text = "更新"
         Me.更新ToolStripMenuItem.Visible = False
         '
         '進貨ToolStripMenuItem
         '
         Me.進貨ToolStripMenuItem.Name = "進貨ToolStripMenuItem"
-        Me.進貨ToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+        Me.進貨ToolStripMenuItem.Size = New System.Drawing.Size(44, 24)
         Me.進貨ToolStripMenuItem.Text = "進貨"
+        '
+        'cbStock
+        '
+        Me.cbStock.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbStock.Name = "cbStock"
+        Me.cbStock.Size = New System.Drawing.Size(121, 24)
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
+        Me.Timer1.Interval = 1000
         '
         'winStockList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(640, 361)
+        Me.ClientSize = New System.Drawing.Size(640, 387)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.dgItemList)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -90,4 +104,6 @@ Partial Class winStockList
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents 更新ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 進貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents cbStock As System.Windows.Forms.ToolStripComboBox
+    Friend WithEvents Timer1 As System.Windows.Forms.Timer
 End Class
