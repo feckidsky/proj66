@@ -24,6 +24,7 @@ Partial Class winGoodsList
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.dgGoodsList = New System.Windows.Forms.DataGridView
         Me.cmsGoodsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.新增CToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
@@ -165,6 +166,8 @@ Partial Class winGoodsList
         Me.dgHistory.Location = New System.Drawing.Point(11, 21)
         Me.dgHistory.Name = "dgHistory"
         Me.dgHistory.ReadOnly = True
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
+        Me.dgHistory.RowsDefaultCellStyle = DataGridViewCellStyle2
         Me.dgHistory.RowTemplate.Height = 24
         Me.dgHistory.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgHistory.Size = New System.Drawing.Size(308, 401)

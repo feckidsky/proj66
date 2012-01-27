@@ -85,6 +85,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationEvents.vb" />
     <Compile Include="DataGridViewFilter.vb" />
     <Compile Include="Lib\Database.vb" />
     <Compile Include="Lib\TCPTool.vb" />

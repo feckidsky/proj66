@@ -22,6 +22,8 @@ Partial Class winSales
     '請不要使用程式碼編輯器進行修改。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.Label6 = New System.Windows.Forms.Label
         Me.txtNote = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
@@ -60,6 +62,15 @@ Partial Class winSales
         Me.cOSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.tpSales = New System.Windows.Forms.TabPage
         Me.dgSalesList = New System.Windows.Forms.DataGridView
+        Me.cSGoods = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSKind = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSName = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.btDeleteSalesItem = New System.Windows.Forms.Button
         Me.btAddSalesItem = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
@@ -71,15 +82,6 @@ Partial Class winSales
         Me.cCPhone = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.btDeleteContract = New System.Windows.Forms.Button
         Me.btAddContract = New System.Windows.Forms.Button
-        Me.cSGoods = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSKind = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSName = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cSSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.GroupBox2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tpOrder.SuspendLayout()
@@ -375,6 +377,8 @@ Partial Class winSales
         Me.dgOrderList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cOLabel, Me.cOKind, Me.cOBrand, Me.cOName, Me.cOPrice, Me.cOSellingPrice, Me.cONumber, Me.cOSubTotal})
         Me.dgOrderList.Location = New System.Drawing.Point(6, 9)
         Me.dgOrderList.Name = "dgOrderList"
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White
+        Me.dgOrderList.RowsDefaultCellStyle = DataGridViewCellStyle1
         Me.dgOrderList.RowTemplate.Height = 24
         Me.dgOrderList.Size = New System.Drawing.Size(599, 198)
         Me.dgOrderList.TabIndex = 0
@@ -458,9 +462,81 @@ Partial Class winSales
         Me.dgSalesList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSGoods, Me.cSLabel, Me.cSKind, Me.cSBrand, Me.cSName, Me.cSPrice, Me.cSSellingPrice, Me.cSNumber, Me.cSSubTotal})
         Me.dgSalesList.Location = New System.Drawing.Point(6, 9)
         Me.dgSalesList.Name = "dgSalesList"
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
+        Me.dgSalesList.RowsDefaultCellStyle = DataGridViewCellStyle2
         Me.dgSalesList.RowTemplate.Height = 24
         Me.dgSalesList.Size = New System.Drawing.Size(599, 194)
         Me.dgSalesList.TabIndex = 48
+        '
+        'cSGoods
+        '
+        Me.cSGoods.HeaderText = "商品編號"
+        Me.cSGoods.Name = "cSGoods"
+        Me.cSGoods.ReadOnly = True
+        Me.cSGoods.Visible = False
+        Me.cSGoods.Width = 78
+        '
+        'cSLabel
+        '
+        Me.cSLabel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSLabel.HeaderText = "庫存編號"
+        Me.cSLabel.Name = "cSLabel"
+        Me.cSLabel.ReadOnly = True
+        Me.cSLabel.Width = 78
+        '
+        'cSKind
+        '
+        Me.cSKind.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSKind.HeaderText = "種類"
+        Me.cSKind.Name = "cSKind"
+        Me.cSKind.ReadOnly = True
+        Me.cSKind.Width = 54
+        '
+        'cSBrand
+        '
+        Me.cSBrand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSBrand.HeaderText = "廠牌"
+        Me.cSBrand.Name = "cSBrand"
+        Me.cSBrand.ReadOnly = True
+        Me.cSBrand.Width = 54
+        '
+        'cSName
+        '
+        Me.cSName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSName.HeaderText = "品名"
+        Me.cSName.Name = "cSName"
+        Me.cSName.ReadOnly = True
+        Me.cSName.Width = 54
+        '
+        'cSPrice
+        '
+        Me.cSPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSPrice.HeaderText = "定價"
+        Me.cSPrice.Name = "cSPrice"
+        Me.cSPrice.ReadOnly = True
+        Me.cSPrice.Width = 54
+        '
+        'cSSellingPrice
+        '
+        Me.cSSellingPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSSellingPrice.HeaderText = "賣價"
+        Me.cSSellingPrice.Name = "cSSellingPrice"
+        Me.cSSellingPrice.Width = 54
+        '
+        'cSNumber
+        '
+        Me.cSNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSNumber.HeaderText = "數量"
+        Me.cSNumber.Name = "cSNumber"
+        Me.cSNumber.Width = 54
+        '
+        'cSSubTotal
+        '
+        Me.cSSubTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cSSubTotal.HeaderText = "小計"
+        Me.cSSubTotal.Name = "cSSubTotal"
+        Me.cSSubTotal.ReadOnly = True
+        Me.cSSubTotal.Width = 54
         '
         'btDeleteSalesItem
         '
@@ -558,76 +634,6 @@ Partial Class winSales
         Me.btAddContract.TabIndex = 46
         Me.btAddContract.Text = "新增"
         Me.btAddContract.UseVisualStyleBackColor = True
-        '
-        'cSGoods
-        '
-        Me.cSGoods.HeaderText = "商品編號"
-        Me.cSGoods.Name = "cSGoods"
-        Me.cSGoods.ReadOnly = True
-        Me.cSGoods.Visible = False
-        Me.cSGoods.Width = 78
-        '
-        'cSLabel
-        '
-        Me.cSLabel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSLabel.HeaderText = "庫存編號"
-        Me.cSLabel.Name = "cSLabel"
-        Me.cSLabel.ReadOnly = True
-        Me.cSLabel.Width = 78
-        '
-        'cSKind
-        '
-        Me.cSKind.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSKind.HeaderText = "種類"
-        Me.cSKind.Name = "cSKind"
-        Me.cSKind.ReadOnly = True
-        Me.cSKind.Width = 54
-        '
-        'cSBrand
-        '
-        Me.cSBrand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSBrand.HeaderText = "廠牌"
-        Me.cSBrand.Name = "cSBrand"
-        Me.cSBrand.ReadOnly = True
-        Me.cSBrand.Width = 54
-        '
-        'cSName
-        '
-        Me.cSName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSName.HeaderText = "品名"
-        Me.cSName.Name = "cSName"
-        Me.cSName.ReadOnly = True
-        Me.cSName.Width = 54
-        '
-        'cSPrice
-        '
-        Me.cSPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSPrice.HeaderText = "定價"
-        Me.cSPrice.Name = "cSPrice"
-        Me.cSPrice.ReadOnly = True
-        Me.cSPrice.Width = 54
-        '
-        'cSSellingPrice
-        '
-        Me.cSSellingPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSSellingPrice.HeaderText = "賣價"
-        Me.cSSellingPrice.Name = "cSSellingPrice"
-        Me.cSSellingPrice.Width = 54
-        '
-        'cSNumber
-        '
-        Me.cSNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSNumber.HeaderText = "數量"
-        Me.cSNumber.Name = "cSNumber"
-        Me.cSNumber.Width = 54
-        '
-        'cSSubTotal
-        '
-        Me.cSSubTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
-        Me.cSSubTotal.HeaderText = "小計"
-        Me.cSSubTotal.Name = "cSSubTotal"
-        Me.cSSubTotal.ReadOnly = True
-        Me.cSSubTotal.Width = 54
         '
         'winSales
         '

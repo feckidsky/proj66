@@ -12,6 +12,7 @@
         ContextMenuStrip = DataGrid.ContextMenuStrip
         DataGrid.ContextMenuStrip = Nothing
         DataGrid.EnableHeadersVisualStyles = False
+        DataGrid.RowsDefaultCellStyle.SelectionForeColor = Color.White
     End Sub
 
 #Region "Filter Structure"
