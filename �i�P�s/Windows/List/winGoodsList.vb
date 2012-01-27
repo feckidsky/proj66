@@ -118,6 +118,7 @@ Public Class winGoodsList
 
 
         DB.DeleteGoods(selected)
+        DB.DeleteHistoryPrice(selected.Label)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
@@ -147,7 +148,7 @@ Public Class winGoodsList
         If GoodsLoading Then Exit Sub
         Dim goods As Database.Goods = GetSelectedGoods()
         gbHistory.Text = "歷史售價 - " & goods.Name
-        Dim dt As Data.DataTable = DB.GetHistoryPrice(goods.Label)
+        Dim dt As Data.DataTable = DB.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
         dgHistory.Columns(0).Visible = False
 

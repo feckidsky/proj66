@@ -123,6 +123,12 @@
     <Compile Include="Windows\UserAccount\winLogIn.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\winInformation.Designer.vb">
+      <DependentUpon>winInformation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\winInformation.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\winMain.Designer.vb">
       <DependentUpon>winMain.vb</DependentUpon>
     </Compile>
@@ -241,6 +247,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\UserAccount\winLogIn.resx">
       <DependentUpon>winLogIn.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\winInformation.resx">
+      <DependentUpon>winInformation.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\winMain.resx">

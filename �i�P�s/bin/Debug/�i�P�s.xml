@@ -151,8 +151,6 @@
 	<summary>IMEI碼</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Cost">
 	<summary>進貨價</summary>
-</member><member name="F:進銷存.Database.StructureBase.Stock.Price">
-	<summary>定價</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Number">
 	<summary>數量</summary>
 </member><member name="F:進銷存.Database.StructureBase.Stock.Note">

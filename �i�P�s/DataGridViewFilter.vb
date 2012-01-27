@@ -255,6 +255,7 @@
         For Each c As NumberFilter In NumberFilters
             Dim enable As Boolean = c.cms.Items("txtMax").Text <> "" Or c.cms.Items("txtMin").Text <> ""
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
+            If column Is Nothing Then Continue For
             column.DefaultCellStyle.Font = IIf(enable, FilterFont, f)
             column.HeaderCell.Style.BackColor = IIf(enable, FilterColor, bc)
             c.cms.Items("lbCancel").Enabled = enable
@@ -263,6 +264,7 @@
         For Each c As BoolFilter In BoolFilters
             Dim enable As Boolean = CType(c.cms.Items("cbText"), ToolStripComboBox).SelectedIndex <> 0
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
+            If column Is Nothing Then Continue For
             column.HeaderCell.Style.BackColor = IIf(enable, FilterColor, bc)
 
 

@@ -65,6 +65,7 @@ Public Module Program
         Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
+        DB.DeleteColumn(Stock.Table, "Price")
     End Sub
 
     Public Sub ConfigLoad()

@@ -43,6 +43,7 @@ Partial Class winMain
         Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.結算ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -81,7 +82,7 @@ Partial Class winMain
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.合約CToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.選項OToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.合約CToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.選項OToolStripMenuItem, Me.結算ToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(795, 24)
@@ -92,8 +93,8 @@ Partial Class winMain
         '
         Me.系統SToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem, Me.登出OToolStripMenuItem, Me.修改密碼PToolStripMenuItem, Me.ToolStripSeparator2, Me.關閉CToolStripMenuItem})
         Me.系統SToolStripMenuItem.Name = "系統SToolStripMenuItem"
-        Me.系統SToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
-        Me.系統SToolStripMenuItem.Text = "系統(&S)"
+        Me.系統SToolStripMenuItem.Size = New System.Drawing.Size(60, 20)
+        Me.系統SToolStripMenuItem.Text = "帳號(&A)"
         '
         '登入IToolStripMenuItem
         '
@@ -188,14 +189,20 @@ Partial Class winMain
         '銷貨ToolStripMenuItem
         '
         Me.銷貨ToolStripMenuItem.Name = "銷貨ToolStripMenuItem"
-        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
-        Me.銷貨ToolStripMenuItem.Text = "訂單(&O)"
+        Me.銷貨ToolStripMenuItem.Size = New System.Drawing.Size(100, 20)
+        Me.銷貨ToolStripMenuItem.Text = "訂單/銷貨單(&S)"
         '
         '選項OToolStripMenuItem
         '
         Me.選項OToolStripMenuItem.Name = "選項OToolStripMenuItem"
         Me.選項OToolStripMenuItem.Size = New System.Drawing.Size(62, 20)
         Me.選項OToolStripMenuItem.Text = "選項(&O)"
+        '
+        '結算ToolStripMenuItem
+        '
+        Me.結算ToolStripMenuItem.Name = "結算ToolStripMenuItem"
+        Me.結算ToolStripMenuItem.Size = New System.Drawing.Size(55, 20)
+        Me.結算ToolStripMenuItem.Text = "資訊(&I)"
         '
         'dgSales
         '
@@ -431,9 +438,9 @@ Partial Class winMain
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(795, 562)
         Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.dgSales)
         Me.Controls.Add(Me.MenuStrip1)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "winMain"
@@ -497,4 +504,5 @@ Partial Class winMain
     Friend WithEvents cbForm As System.Windows.Forms.ComboBox
     Friend WithEvents 選項OToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 合約CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 結算ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

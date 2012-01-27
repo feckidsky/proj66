@@ -11,8 +11,6 @@
 
     Public Class Access
 
-
-
         Event CreatedContract(ByVal con As Contract)
         Event ChangedContract(ByVal con As Contract)
         Event DeletedContract(ByVal con As Contract)
@@ -51,9 +49,18 @@
             SalesPath = Dir & "\sales.mdb"
         End Sub
 
-        Public Function GetHistoryPrice(ByVal Label As String) As Data.DataTable
+        Public Function GetHistoryPriceList(ByVal Label As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
             Return Read("table", BasePath, SqlCommand)
+        End Function
+
+        Public Function GetListHistoryPrice(ByVal Label As String) As HistoryPrice
+            Dim SqlCommand As String = "SELECT HistoryPrice.GoodsLabel, HistoryPrice.Time, HistoryPrice.Cost, HistoryPrice.Price " & _
+            " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS [Time] FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel HAVING (HistoryPrice.GoodsLabel='" & Label & "'))  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel)" & _
+            " GROUP BY HistoryPrice.GoodsLabel, HistoryPrice.Time, HistoryPrice.Cost, HistoryPrice.Price;"
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            If dt.Rows.Count = 0 Then Return HistoryPrice.Null()
+            Return HistoryPrice.GetFrom(dt.Rows(0))
         End Function
 
         Public Function GetGoodsList() As Data.DataTable
@@ -187,9 +194,11 @@
         End Function
 
 
+
+
         ''' <summary>取得進貨記錄</summary>
         Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Supplier.Name as 供應商, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Supplier.Name as 供應商, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價,  Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
             " WHERE (((Stock.[date]) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -262,10 +271,43 @@
             Dim cnd As String = ""
             If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
             If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & TypeOfPayment.Commission
-            Dim condition1 As String = " WHERE ((sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#) " & cnd & ") "
+
+            Dim OrderTime As String = "(sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
+            Dim SalesTime As String = "(sales.Salesdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
+
+
+            Dim condition1 As String
+
+            Select Case ListType
+                Case GetSalesListType.Order
+                    condition1 = " WHERE ( " & OrderTime & cnd & ") "
+                Case GetSalesListType.Sales
+                    condition1 = " WHERE ( " & SalesTime & cnd & ") "
+                Case Else
+                    condition1 = " WHERE (( " & OrderTime & " OR " & SalesTime & ")" & cnd & ") "
+            End Select
+
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+[Price] AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+[contractinfo].[profit] AS 利潤, Sales.Note AS 備註 " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit]) AS 利潤, Sales.Note AS 備註 " & _
+            " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+            condition1 & _
+            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
+
+
+            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
+            Return DT
+        End Function
+
+        '讀取訂單資訊
+        Public Function GetOrderListWithContract(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
+
+            Dim OrderTime As String = "(sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
+            Dim condition1 As String = " WHERE ( " & OrderTime & ") "
+
+
+            'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit]) AS 利潤, Sales.Note AS 備註 " & _
             " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
             condition1 & _
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
@@ -647,6 +689,11 @@
             Return SQLCommand
         End Function
 
+        Public Sub DeleteColumn(ByVal Table As String, ByVal ColumnName As String)
+            Dim SQLCommand As String = "ALTER TABLE [" & Table & "] DROP [" & ColumnName & "];"
+            Command(SQLCommand, BasePath)
+        End Sub
+
         Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As Object) As String
             Dim lst As New List(Of String)
 
@@ -791,6 +838,13 @@
 
         Public Sub DeleteHistoryPrice(ByVal data As HistoryPrice)
             Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
+            RaiseEvent DeletedHistoryPrice(data)
+        End Sub
+
+        Public Sub DeleteHistoryPrice(ByVal GoodsLabel As String)
+            Command(GetSqlDelete(HistoryPrice.Table, "GoodsLabel", GoodsLabel), BasePath)
+            Dim data As New HistoryPrice
+            data.GoodsLabel = GoodsLabel
             RaiseEvent DeletedHistoryPrice(data)
         End Sub
 

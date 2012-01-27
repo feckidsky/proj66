@@ -473,8 +473,8 @@ Namespace Database
             Dim IMEI As String
             ''' <summary>進貨價</summary>
             Dim Cost As Single
-            ''' <summary>定價</summary>
-            Dim Price As Single
+            '''' <summary>定價</summary>
+            'Dim Price As Single
             ''' <summary>數量</summary>
             Dim Number As Integer
             ''' <summary>備註</summary>
@@ -488,14 +488,14 @@ Namespace Database
                 Columns.Add(New Column("Date", DBTypeDate))
                 Columns.Add(New Column("IMEI", DBTypeIMEI))
                 Columns.Add(New Column("Cost", DBTypeSingle))
-                Columns.Add(New Column("Price", DBTypeSingle))
+                'Columns.Add(New Column("Price", DBTypeSingle))
                 Columns.Add(New Column("Number", DBTypeInteger))
                 Columns.Add(New Column("Note", DBTypeNote))
                 Return Columns.ToArray
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date].ToString("yyyy/MM/dd HH:mm:ss"), IMEI, Cost, Price, Number, Note}
+                Return New Object() {Label, GoodsLabel, SupplierLabel, [Date].ToString("yyyy/MM/dd HH:mm:ss"), IMEI, Cost, Number, Note}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Stock
@@ -507,7 +507,7 @@ Namespace Database
                 data.Date = R("Date")
                 data.IMEI = R("IMEI")
                 data.Cost = R("Cost")
-                data.Price = R("Price")
+                ' data.Price = R("Price")
                 data.Number = R("Number")
                 data.Note = R("Note")
                 Return data
@@ -516,8 +516,8 @@ Namespace Database
 
             Public Function GetUpdateSqlCommand()
                 Dim SQLCommand As String = "UPDATE " & Table & " SET "
-                Dim label() As String = New String() {"GoodsLabel", "SupplierLabel", "Date", "IMEI", "Cost", "Price", "Number", "Note"}
-                Dim value() As String = New String() {"'" & GoodsLabel & "'", "'" & SupplierLabel & "'", [Date].ToString("#yyyy/MM/dd HH:mm:ss#"), "'" & IMEI & "'", Cost, Price, Number, "'" & Note & "'"}
+                Dim label() As String = New String() {"GoodsLabel", "SupplierLabel", "Date", "IMEI", "Cost", "Number", "Note"}
+                Dim value() As String = New String() {"'" & GoodsLabel & "'", "'" & SupplierLabel & "'", [Date].ToString("#yyyy/MM/dd HH:mm:ss#"), "'" & IMEI & "'", Cost, Number, "'" & Note & "'"}
                 SQLCommand &= GetSqlColumnChangePart(label, value) & " WHERE Label='" & Me.Label & "';"
                 Return SQLCommand
             End Function

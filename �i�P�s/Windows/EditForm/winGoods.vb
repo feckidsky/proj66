@@ -10,6 +10,9 @@ Public Class winGoods
 
     Private Sub winGoods_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btAdd.Text = IIf(Work = Mode.Create, "新增", "修改")
+        txtLabel.Enabled = Work = Mode.Create
+        txtPrice.Enabled = txtLabel.Enabled
+        txtCost.Enabled = txtLabel.Enabled
     End Sub
 
     Public Sub Open(ByVal Data As Goods)
@@ -44,10 +47,20 @@ Public Class winGoods
         Return Data
     End Function
 
+    Public Function GetHistoryPrice() As HistoryPrice
+        Dim data As HistoryPrice
+        data.Cost = Val(txtCost.Text)
+        data.Price = Val(txtPrice.Text)
+        data.GoodsLabel = txtLabel.Text
+        data.Time = Now
+        Return data
+    End Function
+
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
 
         If Work = Mode.Create Then
             DB.AddGoods(GetData())
+            DB.AddHistoryPrice(GetHistoryPrice())
         Else
             DB.ChangeGoods(GetData())
         End If

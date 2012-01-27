@@ -38,9 +38,9 @@ Public Class winStockIn
 
     Public Sub UpdateText(ByVal Data As Stock)
         txtLabel.Text = Data.Label
-        txtCost.Text = Data.Cost
+        If Work = Mode.Open Then txtCost.Text = Data.Cost
         txtIMEI.Text = Data.IMEI
-        txtPrice.Text = Data.Price
+        'txtPrice.Text = Data.Price
         txtDate.Text = Data.Date
         txtNote.Text = Data.Note
         txtNumber.Text = Data.Number
@@ -48,8 +48,6 @@ Public Class winStockIn
         btSelectGoods.Text = SelectedGoods.ToString()
         SelectedSupplier = DB.GetSupplier(Data.SupplierLabel)
         btSelectSupplier.Text = SelectedSupplier.ToString()
-        'cbGoods.Text = Array.Find(Goodsies, Function(G As Goods) G.Label = Data.GoodsLabel).Name
-        'cbSupplier.Text = Array.Find(Supplies, Function(S As Supplier) S.Label = Data.SupplierLabel).Name
     End Sub
 
     Public Function GetData() As Stock
@@ -57,19 +55,13 @@ Public Class winStockIn
         Data.Label = txtLabel.Text
         Data.Cost = txtCost.Text
         Data.IMEI = txtIMEI.Text
-        Data.Price = txtPrice.Text
+        'Data.Price = txtPrice.Text
         Data.Note = txtNote.Text
         Data.Date = txtDate.Text
         Data.Number = Val(txtNumber.Text)
         Data.GoodsLabel = SelectedGoods.Label
         Data.SupplierLabel = SelectedSupplier.Label
-        'If cbGoods.SelectedIndex >= 0 Then
-        '    Data.GoodsLabel = Goodsies(cbGoods.SelectedIndex).Label
-        'Else
-        '    Data.GoodsLabel = ""
-        'End If
-
-        'If cbSupplier.SelectedIndex >= 0 Then Data.SupplierLabel = Supplies(cbSupplier.SelectedIndex).Label
+       
         Return Data
     End Function
 
@@ -86,7 +78,6 @@ Public Class winStockIn
             DB.ChangeStock(newStock)
 
         End If
-        InitialProgram()
         Me.Close()
     End Sub
 
@@ -103,6 +94,11 @@ Public Class winStockIn
         If Not sel.IsNull() Then
             SelectedGoods = sel
             btSelectGoods.Text = SelectedGoods.ToString()
+
+            Dim hp As HistoryPrice = DB.GetListHistoryPrice(sel.Label)
+            txtPrice.Text = hp.Price
+            If txtCost.Text = "" Then txtCost.Text = hp.Cost
+            'If Work = Mode.Create Then txtPrice.
         End If
     End Sub
 
@@ -117,5 +113,9 @@ Public Class winStockIn
     Private Sub btResetSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetSupplier.Click
         SelectedSupplier = Database.Supplier.Null()
         btSelectSupplier.Text = SelectedSupplier.ToString()
+    End Sub
+
+    Private Sub btUpdateCostByHistory_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUpdateCostByHistory.Click
+        txtCost.Text = DB.GetListHistoryPrice(SelectedGoods.Label).Cost
     End Sub
 End Class

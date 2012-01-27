@@ -43,6 +43,7 @@ Partial Class winStockIn
         Me.btSelectGoods = New System.Windows.Forms.Button
         Me.btResetGoods = New System.Windows.Forms.Button
         Me.btResetSupplier = New System.Windows.Forms.Button
+        Me.btUpdateCostByHistory = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Label1
@@ -146,6 +147,7 @@ Partial Class winStockIn
         '
         'txtPrice
         '
+        Me.txtPrice.Enabled = False
         Me.txtPrice.Location = New System.Drawing.Point(286, 165)
         Me.txtPrice.Name = "txtPrice"
         Me.txtPrice.Size = New System.Drawing.Size(127, 22)
@@ -221,11 +223,21 @@ Partial Class winStockIn
         Me.btResetSupplier.Text = "清除"
         Me.btResetSupplier.UseVisualStyleBackColor = True
         '
+        'btUpdateCostByHistory
+        '
+        Me.btUpdateCostByHistory.Location = New System.Drawing.Point(107, 196)
+        Me.btUpdateCostByHistory.Name = "btUpdateCostByHistory"
+        Me.btUpdateCostByHistory.Size = New System.Drawing.Size(97, 23)
+        Me.btUpdateCostByHistory.TabIndex = 22
+        Me.btUpdateCostByHistory.Text = "與商品進價同步"
+        Me.btUpdateCostByHistory.UseVisualStyleBackColor = True
+        '
         'winStockIn
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(440, 373)
+        Me.Controls.Add(Me.btUpdateCostByHistory)
         Me.Controls.Add(Me.btResetSupplier)
         Me.Controls.Add(Me.btResetGoods)
         Me.Controls.Add(Me.btSelectGoods)
@@ -276,4 +288,5 @@ Partial Class winStockIn
     Friend WithEvents btSelectGoods As System.Windows.Forms.Button
     Friend WithEvents btResetGoods As System.Windows.Forms.Button
     Friend WithEvents btResetSupplier As System.Windows.Forms.Button
+    Friend WithEvents btUpdateCostByHistory As System.Windows.Forms.Button
 End Class

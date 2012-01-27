@@ -33,12 +33,16 @@ Partial Class winGoods
         Me.txtBrand = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
+        Me.txtCost = New System.Windows.Forms.TextBox
+        Me.txtPrice = New System.Windows.Forms.TextBox
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(37, 115)
+        Me.Label6.Location = New System.Drawing.Point(29, 113)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(29, 12)
         Me.Label6.TabIndex = 10
@@ -47,7 +51,7 @@ Partial Class winGoods
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(38, 70)
+        Me.Label2.Location = New System.Drawing.Point(30, 55)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(29, 12)
         Me.Label2.TabIndex = 14
@@ -56,7 +60,7 @@ Partial Class winGoods
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(38, 29)
+        Me.Label1.Location = New System.Drawing.Point(30, 26)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(41, 12)
         Me.Label1.TabIndex = 13
@@ -64,7 +68,7 @@ Partial Class winGoods
         '
         'btAdd
         '
-        Me.btAdd.Location = New System.Drawing.Point(358, 222)
+        Me.btAdd.Location = New System.Drawing.Point(350, 220)
         Me.btAdd.Name = "btAdd"
         Me.btAdd.Size = New System.Drawing.Size(75, 23)
         Me.btAdd.TabIndex = 9
@@ -73,7 +77,7 @@ Partial Class winGoods
         '
         'txtNote
         '
-        Me.txtNote.Location = New System.Drawing.Point(39, 130)
+        Me.txtNote.Location = New System.Drawing.Point(31, 128)
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(394, 77)
@@ -81,28 +85,28 @@ Partial Class winGoods
         '
         'txtName
         '
-        Me.txtName.Location = New System.Drawing.Point(85, 67)
+        Me.txtName.Location = New System.Drawing.Point(77, 52)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(115, 22)
         Me.txtName.TabIndex = 7
         '
         'txtLabel
         '
-        Me.txtLabel.Location = New System.Drawing.Point(85, 26)
+        Me.txtLabel.Location = New System.Drawing.Point(77, 23)
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.Size = New System.Drawing.Size(115, 22)
         Me.txtLabel.TabIndex = 6
         '
         'txtKind
         '
-        Me.txtKind.Location = New System.Drawing.Point(289, 26)
+        Me.txtKind.Location = New System.Drawing.Point(281, 23)
         Me.txtKind.Name = "txtKind"
         Me.txtKind.Size = New System.Drawing.Size(115, 22)
         Me.txtKind.TabIndex = 7
         '
         'txtBrand
         '
-        Me.txtBrand.Location = New System.Drawing.Point(289, 67)
+        Me.txtBrand.Location = New System.Drawing.Point(281, 52)
         Me.txtBrand.Name = "txtBrand"
         Me.txtBrand.Size = New System.Drawing.Size(115, 22)
         Me.txtBrand.TabIndex = 7
@@ -110,7 +114,7 @@ Partial Class winGoods
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(242, 29)
+        Me.Label3.Location = New System.Drawing.Point(234, 26)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(29, 12)
         Me.Label3.TabIndex = 14
@@ -119,28 +123,65 @@ Partial Class winGoods
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(242, 70)
+        Me.Label4.Location = New System.Drawing.Point(234, 55)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(29, 12)
         Me.Label4.TabIndex = 14
         Me.Label4.Text = "廠牌"
         '
+        'txtCost
+        '
+        Me.txtCost.Location = New System.Drawing.Point(77, 82)
+        Me.txtCost.Name = "txtCost"
+        Me.txtCost.Size = New System.Drawing.Size(115, 22)
+        Me.txtCost.TabIndex = 7
+        '
+        'txtPrice
+        '
+        Me.txtPrice.Location = New System.Drawing.Point(281, 82)
+        Me.txtPrice.Name = "txtPrice"
+        Me.txtPrice.Size = New System.Drawing.Size(115, 22)
+        Me.txtPrice.TabIndex = 7
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(30, 85)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(41, 12)
+        Me.Label5.TabIndex = 14
+        Me.Label5.Text = "進貨價"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(222, 85)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(53, 12)
+        Me.Label7.TabIndex = 14
+        Me.Label7.Text = "建議售價"
+        '
         'winGoods
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(474, 257)
+        Me.ClientSize = New System.Drawing.Size(450, 256)
         Me.Controls.Add(Me.Label6)
+        Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btAdd)
         Me.Controls.Add(Me.txtNote)
+        Me.Controls.Add(Me.txtPrice)
         Me.Controls.Add(Me.txtBrand)
+        Me.Controls.Add(Me.txtCost)
         Me.Controls.Add(Me.txtKind)
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.txtLabel)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "winGoods"
         Me.Text = "商品"
         Me.ResumeLayout(False)
@@ -158,4 +199,8 @@ Partial Class winGoods
     Friend WithEvents txtBrand As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents txtCost As System.Windows.Forms.TextBox
+    Friend WithEvents txtPrice As System.Windows.Forms.TextBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Label7 As System.Windows.Forms.Label
 End Class
