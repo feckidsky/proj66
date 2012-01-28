@@ -114,15 +114,15 @@ Public Class winMain
 
     End Sub
 
-    Private Sub access_ChangedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
+    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
         UpdateSalesList()
     End Sub
 
-    Private Sub access_CreatedSales(ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
+    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
         UpdateSalesList()
     End Sub
 
-    Private Sub access_DeletedSales(ByVal sales As Database.StructureBase.Sales) Handles access.DeletedSales
+    Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales) Handles access.DeletedSales
         UpdateSalesList()
     End Sub
 

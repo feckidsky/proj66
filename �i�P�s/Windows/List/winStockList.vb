@@ -48,6 +48,9 @@
         End If
 
         dgItemList.DataSource = DT
+
+        If DT.Columns.Count = 0 Then Exit Sub
+
         dgItemList.Columns("商品編號").Visible = False
 
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
@@ -90,7 +93,7 @@
     End Sub
 
 
-    Private Sub access_CreatedStock(ByVal stock As Database.StructureBase.Stock) Handles access.CreatedStock
+    Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.StructureBase.Stock) Handles access.CreatedStock
         UpdateStockList()
     End Sub
 

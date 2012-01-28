@@ -25,12 +25,12 @@ Partial Class winChangePassword
         Me.btOK = New System.Windows.Forms.Button
         Me.btCancel = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.txtPassword = New System.Windows.Forms.MaskedTextBox
+        Me.txtNewPassword2 = New System.Windows.Forms.MaskedTextBox
+        Me.Label3 = New System.Windows.Forms.Label
         Me.txtNewPassword1 = New System.Windows.Forms.MaskedTextBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
-        Me.txtPassword = New System.Windows.Forms.MaskedTextBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.txtNewPassword2 = New System.Windows.Forms.MaskedTextBox
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -39,8 +39,8 @@ Partial Class winChangePassword
         Me.btOK.Location = New System.Drawing.Point(146, 142)
         Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
-        Me.btOK.TabIndex = 2
-        Me.btOK.Text = "登入"
+        Me.btOK.TabIndex = 4
+        Me.btOK.Text = "修改密碼"
         Me.btOK.UseVisualStyleBackColor = True
         '
         'btCancel
@@ -48,7 +48,7 @@ Partial Class winChangePassword
         Me.btCancel.Location = New System.Drawing.Point(65, 142)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btCancel.TabIndex = 3
+        Me.btCancel.TabIndex = 5
         Me.btCancel.Text = "取消"
         Me.btCancel.UseVisualStyleBackColor = True
         '
@@ -67,13 +67,38 @@ Partial Class winChangePassword
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "密碼資訊"
         '
+        'txtPassword
+        '
+        Me.txtPassword.Location = New System.Drawing.Point(77, 28)
+        Me.txtPassword.Name = "txtPassword"
+        Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
+        Me.txtPassword.Size = New System.Drawing.Size(119, 22)
+        Me.txtPassword.TabIndex = 1
+        '
+        'txtNewPassword2
+        '
+        Me.txtNewPassword2.Location = New System.Drawing.Point(77, 95)
+        Me.txtNewPassword2.Name = "txtNewPassword2"
+        Me.txtNewPassword2.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
+        Me.txtNewPassword2.Size = New System.Drawing.Size(119, 22)
+        Me.txtNewPassword2.TabIndex = 3
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(13, 98)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(53, 12)
+        Me.Label3.TabIndex = 0
+        Me.Label3.Text = "密碼確認"
+        '
         'txtNewPassword1
         '
         Me.txtNewPassword1.Location = New System.Drawing.Point(77, 62)
         Me.txtNewPassword1.Name = "txtNewPassword1"
         Me.txtNewPassword1.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtNewPassword1.Size = New System.Drawing.Size(119, 22)
-        Me.txtNewPassword1.TabIndex = 1
+        Me.txtNewPassword1.TabIndex = 2
         '
         'Label2
         '
@@ -92,31 +117,6 @@ Partial Class winChangePassword
         Me.Label1.Size = New System.Drawing.Size(41, 12)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "舊密碼"
-        '
-        'txtPassword
-        '
-        Me.txtPassword.Location = New System.Drawing.Point(77, 28)
-        Me.txtPassword.Name = "txtPassword"
-        Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(119, 22)
-        Me.txtPassword.TabIndex = 1
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(13, 98)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(53, 12)
-        Me.Label3.TabIndex = 0
-        Me.Label3.Text = "密碼確認"
-        '
-        'txtNewPassword2
-        '
-        Me.txtNewPassword2.Location = New System.Drawing.Point(77, 95)
-        Me.txtNewPassword2.Name = "txtNewPassword2"
-        Me.txtNewPassword2.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtNewPassword2.Size = New System.Drawing.Size(119, 22)
-        Me.txtNewPassword2.TabIndex = 1
         '
         'winChangePassword
         '

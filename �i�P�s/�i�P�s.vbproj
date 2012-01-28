@@ -88,6 +88,7 @@
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="DataGridViewFilter.vb" />
     <Compile Include="Lib\Database.vb" />
+    <Compile Include="Lib\NetworkDataBase.vb" />
     <Compile Include="Lib\TCPTool.vb" />
     <Compile Include="Windows\EditForm\winContract.Designer.vb">
       <DependentUpon>winContract.vb</DependentUpon>
@@ -99,6 +100,18 @@
       <DependentUpon>winHistoryPrice.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\EditForm\winHistoryPrice.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\EditForm\winSupplier.Designer.vb">
+      <DependentUpon>winSupplier.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EditForm\winSupplier.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\EditForm\winCustomer.Designer.vb">
+      <DependentUpon>winCustomer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EditForm\winCustomer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\List\winContractList.Designer.vb">
@@ -229,6 +242,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\EditForm\winHistoryPrice.resx">
       <DependentUpon>winHistoryPrice.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\EditForm\winSupplier.resx">
+      <DependentUpon>winSupplier.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\EditForm\winCustomer.resx">
+      <DependentUpon>winCustomer.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\List\winContractList.resx">

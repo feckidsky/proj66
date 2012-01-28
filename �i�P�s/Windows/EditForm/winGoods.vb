@@ -44,6 +44,7 @@ Public Class winGoods
         Data.Kind = txtKind.Text
         Data.Brand = txtBrand.Text
         Data.Note = txtNote.Text
+        Data.Modify = Now
         Return Data
     End Function
 

@@ -4,18 +4,18 @@ Namespace Database
 
     Public Module StructureBase
 
-        Dim DBTypeIMEI As String = "char(20)"
-        Dim DBTypeLabel As String = "char(20)"
-        Dim DBTypeName As String = "char(10)"
-        Dim DBTypeNote As String = "char(20)"
-        Dim DBTypeTel As String = "char(15)"
-        Dim DBTypeAddr As String = "char(30)"
-        Dim DBTypeDate As String = "date"
-        Dim DBTypeSingle As String = "single"
-        Dim DBTypeInteger As String = "int"
-        Dim DBTypeBoolean As String = "bit"
+        Public DBTypeIMEI As String = "char(20)"
+        Public DBTypeLabel As String = "char(20)"
+        Public DBTypeName As String = "char(10)"
+        Public DBTypeNote As String = "char(20)"
+        Public DBTypeTel As String = "char(15)"
+        Public DBTypeAddr As String = "char(30)"
+        Public DBTypeDate As String = "date"
+        Public DBTypeSingle As String = "single"
+        Public DBTypeInteger As String = "int"
+        Public DBTypeBoolean As String = "bit"
 
-        Dim TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
+        Public TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
 
         Public Function DBTypeString(ByVal Count As Integer) As String
             Return "char(" & Count & ")"
@@ -25,14 +25,20 @@ Namespace Database
             Return "'" & Text & """"
         End Function
 
+        Public Function GetDate(ByVal obj As Object) As Date
+            If obj Is DBNull.Value Then Return New Date(0)
+            Return CType(obj, Date)
+        End Function
+
         Class MyDataRow
             Dim Row As Data.DataRow
             Sub New(ByVal Row As Data.DataRow)
                 Me.Row = Row
             End Sub
-            Default Public ReadOnly Property Item(ByVal Label As String)
+
+            Default Public ReadOnly Property Item(ByVal Label As String) As Object
                 Get
-                    If System.DBNull.Equals(Row.Item(Label), System.DBNull.Value) Then Return ""
+                    If System.DBNull.Equals(Row.Item(Label), System.DBNull.Value) Then Return Nothing
                     Return RTrim(Row.Item(Label))
                 End Get
             End Property
@@ -57,6 +63,9 @@ Namespace Database
             Dim Addr As String
             ''' <summary>備註</summary>
             Dim Note As String
+
+            Dim Modify As Date
+
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
@@ -65,11 +74,12 @@ Namespace Database
                 Columns.Add(New Column("Tel2", DBTypeTel))
                 Columns.Add(New Column("Addr", DBTypeAddr))
                 Columns.Add(New Column("Note", DBTypeNote))
+                Columns.Add(New Column("Modify", DBTypeDate))
                 Return Columns.ToArray
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note, Modify}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Supplier
@@ -81,6 +91,7 @@ Namespace Database
                 data.Tel2 = R("Tel2")
                 data.Addr = R("Addr")
                 data.Note = R("Note")
+                data.Modify = GetDate(R("Modify"))
                 Return data
             End Function
 
@@ -95,8 +106,8 @@ Namespace Database
             End Function
 
             Public Function GetUpdateSqlCommand() As String
-                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note"}
-                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, Note}
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note", "Modify"}
+                Dim Value As Object() = New Object() {Name, Tel1, Tel2, Addr, Note, Modify}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
@@ -121,6 +132,7 @@ Namespace Database
             Dim Addr As String
             ''' <summary>備註</summary>
             Dim Note As String
+            Dim Modify As Date
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
@@ -129,10 +141,11 @@ Namespace Database
                 Columns.Add(New Column("Tel2", DBTypeTel))
                 Columns.Add(New Column("Addr", DBTypeAddr))
                 Columns.Add(New Column("Note", DBTypeNote))
+                Columns.Add(New Column("Modify", DBTypeDate))
                 Return Columns.ToArray
             End Function
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note}
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, Note, Modify}
             End Function
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Customer
                 Dim R As New MyDataRow(Row)
@@ -143,6 +156,7 @@ Namespace Database
                 data.Tel2 = R("Tel2")
                 data.Addr = R("Addr")
                 data.Note = R("Note")
+                data.Modify = GetDate(R("Modify"))
                 Return data
             End Function
 
@@ -157,8 +171,8 @@ Namespace Database
             End Function
 
             Public Function GetUpdateSqlCommand() As String
-                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note"}
-                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, Note}
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "Note", "Modify"}
+                Dim Value As Object() = New Object() {Name, Tel1, Tel2, Addr, Note, Modify}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
@@ -183,12 +197,14 @@ Namespace Database
             Dim Addr As String
             ''' <summary>備註</summary>
             Dim Note As String
+            Dim Modify As Date
             ''' <summary>帳號</summary>
             Dim ID As String
             ''' <summary>密碼</summary>
             Dim Password As String
             ''' <summary>權限</summary>
             Dim Authority As Integer
+
 
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
@@ -201,11 +217,12 @@ Namespace Database
                 Columns.Add(New Column("Password", DBTypeString(8)))
                 Columns.Add(New Column("Authority", DBTypeInteger))
                 Columns.Add(New Column("Note", DBTypeNote))
+                Columns.Add(New Column("Modify", DBTypeDate))
                 Return Columns.ToArray
             End Function
 
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Tel1, Tel2, Addr, ID, Password, Authority, Note}
+                Return New Object() {Label, Name, Tel1, Tel2, Addr, ID, Password, Authority, Note, Modify}
             End Function
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Personnel
                 Dim R As New MyDataRow(Row)
@@ -219,6 +236,7 @@ Namespace Database
                 data.Password = R("Password")
                 data.Authority = R("Authority")
                 data.Note = R("Note")
+                data.Modify = GetDate(R("Modify"))
                 Return data
             End Function
 
@@ -237,8 +255,8 @@ Namespace Database
             End Function
 
             Public Function GetUpdateSqlCommand() As String
-                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "ID", "Password", "Authority", "Note"}
-                Dim Value As String() = New String() {Name, Tel1, Tel2, Addr, ID, Password, Authority, Note}
+                Dim Column As String() = New String() {"Name", "Tel1", "Tel2", "Addr", "ID", "Password", "Authority", "Note", "Modify"}
+                Dim Value As Object() = New Object() {Name, Tel1, Tel2, Addr, ID, Password, Authority, Note, Modify}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
@@ -293,6 +311,8 @@ Namespace Database
             ''' <summary>備註</summary>
             Dim Note As String
 
+            Dim Modify As Date
+
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
                 Columns.Add(New Column("Label", DBTypeLabel))
@@ -300,10 +320,11 @@ Namespace Database
                 Columns.Add(New Column("Kind", "char(10)"))
                 Columns.Add(New Column("Brand", "char(10)"))
                 Columns.Add(New Column("Note", DBTypeNote))
+                Columns.Add(New Column("Modify", DBTypeDate))
                 Return Columns.ToArray
             End Function
             Function ToObjects() As Object()
-                Return New Object() {Label, Name, Kind, Brand, Note}
+                Return New Object() {Label, Name, Kind, Brand, Note, Modify}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Goods
@@ -314,12 +335,13 @@ Namespace Database
                 data.Kind = R("Kind")
                 data.Brand = R("Brand")
                 data.Note = R("Note")
+                data.Modify = GetDate(R("Modify"))
                 Return data
             End Function
 
             Public Function GetUpdateSqlCommand() As String
-                Dim Column As String() = New String() {"Name", "Kind", "Brand", "Note"}
-                Dim Value As String() = New String() {Name, Kind, Brand, Note}
+                Dim Column As String() = New String() {"Name", "Kind", "Brand", "Note", "Modify"}
+                Dim Value As Object() = New Object() {Name, Kind, Brand, Note, Modify}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 
@@ -374,7 +396,7 @@ Namespace Database
                 Dim R As New MyDataRow(Row)
                 Dim data As HistoryPrice
                 data.GoodsLabel = R("GoodsLabel")
-                data.Time = R("Time")
+                data.Time = GetDate(R("Time"))
                 data.Cost = R("Cost")
                 data.Price = R("Price")
                 Return data
@@ -388,7 +410,7 @@ Namespace Database
         End Structure
 #End Region
 
-#Region "門號"
+#Region "合約"
         ''' <summary>合約、綁約</summary>
         Structure Contract
             Shared Table As String = "Contract"
@@ -406,6 +428,7 @@ Namespace Database
             Dim Prepay As Single
             ''' <summary>備註</summary>
             Dim Note As String
+            Dim Modify As Date
 
             Shared Function ToColumns() As Column()
                 Dim Columns As New List(Of Column)
@@ -416,10 +439,11 @@ Namespace Database
                 Columns.Add(New Column("Discount", DBTypeSingle))
                 Columns.Add(New Column("Prepay", DBTypeSingle))
                 Columns.Add(New Column("Note", DBTypeNote))
+                Columns.Add(New Column("Modify", DBTypeDate))
                 Return Columns.ToArray
             End Function
             Function ToObjects() As Object()
-                Return New Object() {Label, Enable, Name, Commission, Discount, Prepay, Note}
+                Return New Object() {Label, Enable, Name, Commission, Discount, Prepay, Note, Modify}
             End Function
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Contract
@@ -432,12 +456,13 @@ Namespace Database
                 data.Discount = R("Discount")
                 data.Prepay = R("Prepay")
                 data.Note = R("Note")
+                data.Modify = GetDate(R("Modify"))
                 Return data
             End Function
 
             Public Function GetUpdateSqlCommand() As String
-                Dim Column As String() = New String() {"Enable", "Name", "Commission", "Discount", "Prepay", "Note"}
-                Dim Value As Object() = New Object() {Enable, Name, Commission, Discount, Prepay, Note}
+                Dim Column As String() = New String() {"Enable", "Name", "Commission", "Discount", "Prepay", "Note", "Modify"}
+                Dim Value As Object() = New Object() {Enable, Name, Commission, Discount, Prepay, Note, Modify}
                 Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
             End Function
 

@@ -45,11 +45,11 @@ Public Class winContract
         Data.Discount = Val(txtDiscount.Text)
         Data.Prepay = Val(txtPrepay.Text)
         Data.Note = txtNote.Text
+        Data.Modify = Now
         Return Data
     End Function
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
-
         If Work = Mode.Create Then
             DB.AddContract(GetData())
         Else

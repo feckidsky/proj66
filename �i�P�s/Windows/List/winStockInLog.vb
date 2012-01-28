@@ -43,7 +43,7 @@
 
 
     '進貨事件/更新進貨清單/刪除進貨資料
-    Private Sub access_CreatedStock(ByVal stock As Database.StructureBase.Stock) Handles access.CreatedStock, access.ChangedStock, access.DeletedStock
+    Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.StructureBase.Stock) Handles access.CreatedStock, access.ChangedStock, access.DeletedStock
         UpdateStockInLog()
     End Sub
 
@@ -96,7 +96,12 @@
         Dim stock As New Database.Stock
         stock.Label = dgStockLog.SelectedRows(0).Cells(0).Value
 
-        If DB.GetSalesListByStockLabel(stock.Label).Rows.Count > 0 Then
+        Dim Count As Integer = DB.GetSalesListByStockLabel(stock.Label).Rows.Count
+        For Each c As Database.AccessClient In Client.Client
+            If c.Connected Then Count += c.GetSalesListByStockLabel(stock.Label).Rows.Count
+        Next
+
+        If Count > 0 Then
             MsgBox("無法刪除，該商品已經有銷貨記錄!")
             Exit Sub
         End If

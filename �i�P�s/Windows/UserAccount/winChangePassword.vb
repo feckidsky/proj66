@@ -36,6 +36,7 @@
 
         If ErrorMsg = "" Then
             CurrentUser.Password = txtNewPassword1.Text
+            CurrentUser.Modify = Now
             DB.ChangePersonnel(CurrentUser)
             MsgBox("密碼修改成功!", MsgBoxStyle.Information)
             Me.Close()

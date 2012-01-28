@@ -107,7 +107,11 @@
         End If
 
 
-        Dim count As Integer = DB.GetSalesListByContractLabel(SelectedItem.Label).Rows.Count
+        Dim count As Integer = DB.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
+        For Each c As Database.AccessClient In Client.Client
+            If c.Connected Then count += c.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
+        Next
+
         If count > 0 Then
             MsgBox("商品項目已經有訂單資料，無法刪除!")
             Exit Sub
@@ -132,7 +136,7 @@
 
     End Sub
 
-    Private Sub access_ChangedItem(ByVal goods As Database.StructureBase.Contract) Handles access.ChangedContract, access.CreatedContract, access.DeletedContract
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal goods As Database.StructureBase.Contract) Handles access.ChangedContract, access.CreatedContract, access.DeletedContract
         UpdateList()
     End Sub
 

@@ -4,11 +4,6 @@ Imports 進銷存.Database
 
 Public Class winPeople
 
-    Public Enum StructKind
-        Supplier = 0
-        Customer = 1
-        Personnel
-    End Enum
 
     Enum Mode
         Create = 0
@@ -17,105 +12,61 @@ Public Class winPeople
 
     Dim work As Mode
 
-    Public DataMode As StructKind
-
-    <StructLayout(LayoutKind.Explicit)> _
-    Structure Data
-        <FieldOffset(0)> Dim Supplier As Supplier
-        <FieldOffset(0)> Dim Customer As Customer
-        <FieldOffset(0)> Dim Personnel As Personnel
-    End Structure
-
-    Dim myData As Data
-
+    Dim myData As Personnel
     Private Sub winPeople_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         txtLabel.Enabled = work = Mode.Create
-        btAccount.Visible = DataMode = StructKind.Personnel
+        btAccount.Visible = True
     End Sub
-    Public Overloads Sub ShowDialog(Of T)(ByVal data As T)
+
+    Public Sub Open(ByVal data As Personnel)
+        If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
+        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
+        work = Mode.Open
         UpdateText(data)
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub OpenSupplier(ByVal data As Supplier)
-        If Not CheckAuthority(2) Then Exit Sub
-        work = Mode.Open
-        DataMode = StructKind.Supplier
-        ShowDialog(data)
-    End Sub
 
-    Public Sub OpenCustomer(ByVal data As Customer)
-        If Not CheckAuthority(2) Then Exit Sub
-        work = Mode.Open
-        DataMode = StructKind.Customer
-        ShowDialog(data)
-    End Sub
-
-    Public Sub OpenPersonnel(ByVal data As Personnel)
-        If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
-        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
-        work = Mode.Open
-        DataMode = StructKind.Personnel
-        ShowDialog(data)
-    End Sub
-
-    Public Sub CreateSupplier(ByVal Data As Supplier)
-        If Not CheckAuthority(2) Then Exit Sub
-        work = Mode.Create
-        DataMode = StructKind.Supplier
-        ShowDialog(Data)
-    End Sub
-
-    Public Sub CreateCustomer(ByVal Data As Customer)
-        If Not CheckAuthority(2) Then Exit Sub
-
-        work = Mode.Create
-        DataMode = StructKind.Customer
-        ShowDialog(Data)
-    End Sub
-
-    Public Sub CreatePersonnel(ByVal Data As Personnel)
+    Public Sub Create(ByVal Data As Personnel)
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
         If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Create
-        DataMode = StructKind.Personnel
-        ShowDialog(Data)
+        UpdateText(Data)
+        MyBase.ShowDialog()
     End Sub
 
     Public Sub UpdateAccountButton()
-        btAccount.Text = IIf(myData.Personnel.ID = "", "此員工尚未設定帳號(按此設定)", myData.Personnel.ID)
+        btAccount.Text = IIf(myData.ID = "", "此員工尚未設定帳號(按此設定)", myData.ID)
     End Sub
-    Public Sub UpdateText(ByVal obj As Object)
-        Select Case DataMode
-            Case StructKind.Supplier : Me.Text = "供應商" : myData.Supplier = obj
-            Case StructKind.Customer : Me.Text = "客戶" : myData.Customer = obj
-            Case StructKind.Personnel : Me.Text = "員工"
-                myData.Personnel = obj
-                UpdateAccountButton()
-        End Select
-        txtLabel.Text = myData.Supplier.Label
-        txtName.Text = myData.Supplier.Name
-        txtAddr.Text = myData.Supplier.Addr
-        txtTel1.Text = myData.Supplier.Tel1
-        txtTel2.Text = myData.Supplier.Tel2
-        txtNote.Text = myData.Supplier.Note
+
+    Public Sub UpdateText(ByVal obj As Personnel)
+
+        Me.Text = "員工"
+        myData = obj
+        UpdateAccountButton()
+
+        txtLabel.Text = myData.Label
+        txtName.Text = myData.Name
+        txtAddr.Text = myData.Addr
+        txtTel1.Text = myData.Tel1
+        txtTel2.Text = myData.Tel2
+        txtNote.Text = myData.Note
         btAdd.Text = IIf(work = Mode.Create, "新增", "修改")
     End Sub
 
-    Public Function GetData() As Data
-        Dim data As Data = Nothing
-        data.Supplier.Label = txtLabel.Text
-        data.Supplier.Name = txtName.Text
-        data.Supplier.Addr = txtAddr.Text
-        data.Supplier.Tel1 = txtTel1.Text
-        data.Supplier.Tel2 = txtTel2.Text
-        data.Supplier.Note = txtNote.Text
+    Public Function GetData() As Personnel
+        Dim data As Personnel = Nothing
+        data.Label = txtLabel.Text
+        data.Name = txtName.Text
+        data.Addr = txtAddr.Text
+        data.Tel1 = txtTel1.Text
+        data.Tel2 = txtTel2.Text
+        data.Note = txtNote.Text
 
-        If DataMode = StructKind.Personnel Then
-            data.Personnel.ID = myData.Personnel.ID
-            data.Personnel.Password = myData.Personnel.Password
-            data.Personnel.Authority = myData.Personnel.Authority
-        End If
+        data.ID = myData.ID
+        data.Password = myData.Password
+        data.Authority = myData.Authority
+        data.Modify = Now
 
         Return data
     End Function
@@ -124,23 +75,9 @@ Public Class winPeople
         myData = GetData()
 
         If work = Mode.Create Then
-            Select Case DataMode
-                Case StructKind.Customer
-                    DB.AddCustomer(myData.Customer)
-                Case StructKind.Personnel
-                    DB.AddPersonnel(myData.Personnel)
-                Case StructKind.Supplier
-                    DB.AddSupplier(myData.Supplier)
-            End Select
+            DB.AddPersonnel(myData)
         Else
-            Select Case DataMode
-                Case StructKind.Supplier
-                    DB.ChangeSupplier(myData.Supplier)
-                Case StructKind.Personnel
-                    DB.ChangePersonnel(myData.Personnel)
-                Case StructKind.Customer
-                    DB.ChangeCustomer(myData.Customer)
-            End Select
+            DB.ChangePersonnel(myData)
         End If
         Me.Close()
     End Sub
@@ -148,7 +85,7 @@ Public Class winPeople
 
 
     Private Sub btAccount_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAccount.Click
-        winAccount.ShowDialog(myData.Personnel)
+        winAccount.ShowDialog(myData)
         UpdateAccountButton()
     End Sub
 End Class

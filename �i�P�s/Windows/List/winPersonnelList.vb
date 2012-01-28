@@ -68,7 +68,7 @@
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winPeople.CreatePersonnel(GetNewPersonnel())
+        winPeople.Create(GetNewPersonnel())
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -82,7 +82,7 @@
             Exit Sub
         End If
 
-        winPeople.OpenPersonnel(selectedItem)
+        winPeople.Open(selectedItem)
     End Sub
 
     Public Function GetSelectedItem() As Database.Personnel
@@ -115,6 +115,9 @@
 
 
         Dim count As Integer = DB.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
+        For Each c As Database.AccessClient In Client.Client
+            If c.Connected Then count += c.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
+        Next
         If count > 0 Then
             MsgBox("此員工已有銷售記錄，無法刪除!")
             Exit Sub
@@ -137,7 +140,7 @@
 
     End Sub
 
-    Private Sub access_CreatedPersonnel(ByVal per As Database.StructureBase.Personnel) Handles access.CreatedPersonnel, access.ChangedPersonnel, access.DeletedPersonnel
+    Private Sub access_CreatedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles access.CreatedPersonnel, access.ChangedPersonnel, access.DeletedPersonnel
         UpdateList()
     End Sub
 

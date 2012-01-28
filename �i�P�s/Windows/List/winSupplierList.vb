@@ -55,7 +55,7 @@
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winPeople.CreateSupplier(GetNewSupplier)
+        winSupplier.Create(GetNewSupplier)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -69,7 +69,7 @@
             Exit Sub
         End If
 
-        winPeople.OpenSupplier(selectedItem)
+        winSupplier.Open(selectedItem)
     End Sub
 
     Public Function GetSelectedSupplier() As Database.Supplier
@@ -100,6 +100,10 @@
 
 
         Dim count As Integer = DB.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
+        For Each c As Database.AccessClient In Client.Client
+            If c.Connected Then count += c.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
+        Next
+
         If count > 0 Then
             MsgBox("此供應商已經有進貨資料，無法刪除!")
             Exit Sub
@@ -122,7 +126,7 @@
 
     End Sub
 
-    Private Sub access_ChangedSupplier(ByVal sup As Database.StructureBase.Supplier) Handles access.ChangedSupplier, access.CreatedSupplier, access.DeletedSupplier
+    Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles access.ChangedSupplier, access.CreatedSupplier, access.DeletedSupplier
         UpdateList()
     End Sub
 

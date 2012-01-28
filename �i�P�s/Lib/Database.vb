@@ -12,37 +12,40 @@
 #Region "Access"
     Public Class Access
 
-        Event CreatedContract(ByVal con As Contract)
-        Event ChangedContract(ByVal con As Contract)
-        Event DeletedContract(ByVal con As Contract)
+        Private Shared Lock As String = "Lock"
 
-        Event CreatedStock(ByVal stock As Stock)
-        Event ChangedStock(ByVal stock As Stock)
-        Event DeletedStock(ByVal stock As Stock)
+        Event CreatedContract(ByVal sender As Object, ByVal con As Contract)
+        Event ChangedContract(ByVal sender As Object, ByVal con As Contract)
+        Event DeletedContract(ByVal sender As Object, ByVal con As Contract)
 
-        Event CreatedGoods(ByVal goods As Goods)
-        Event ChangedGoods(ByVal goods As Goods)
-        Event DeletedGoods(ByVal goods As Goods)
+        Event CreatedGoods(ByVal sender As Object, ByVal goods As Goods)
+        Event ChangedGoods(ByVal sender As Object, ByVal goods As Goods)
+        Event DeletedGoods(ByVal sender As Object, ByVal goods As Goods)
 
-        Event CreatedSupplier(ByVal sup As Supplier)
-        Event ChangedSupplier(ByVal sup As Supplier)
-        Event DeletedSupplier(ByVal sup As Supplier)
+        Event CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier)
+        Event ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier)
+        Event DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier)
 
-        Event CreatedCustomer(ByVal cus As Customer)
-        Event ChangedCustomer(ByVal cus As Customer)
-        Event DeletedCustomer(ByVal cus As Customer)
+        Event CreatedCustomer(ByVal sender As Object, ByVal cus As Customer)
+        Event ChangedCustomer(ByVal sender As Object, ByVal cus As Customer)
+        Event DeletedCustomer(ByVal sender As Object, ByVal cus As Customer)
 
-        Event CreatedPersonnel(ByVal per As Personnel)
-        Event ChangedPersonnel(ByVal per As Personnel)
-        Event DeletedPersonnel(ByVal per As Personnel)
+        Event CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel)
+        Event ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel)
+        Event DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel)
 
-        Event CreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
-        Event ChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
-        Event DeletedSales(ByVal sales As Sales)
+        Event CreatedStock(ByVal sender As Object, ByVal stock As Stock)
+        Event ChangedStock(ByVal sender As Object, ByVal stock As Stock)
+        Event DeletedStock(ByVal sender As Object, ByVal stock As Stock)
 
-        Event CreatedHistoryPrice(ByVal hp As HistoryPrice)
-        Event ChangedHistoryPrice(ByVal hp As HistoryPrice)
-        Event DeletedHistoryPrice(ByVal hp As HistoryPrice)
+        Event CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+        Event ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+        Event DeletedSales(ByVal sender As Object, ByVal sales As Sales)
+
+        Event CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
+        Event ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
+        Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
+        Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice)
 
         Public Sub New()
             Dir = My.Application.Info.DirectoryPath & "\data"
@@ -52,6 +55,11 @@
 
         Public Function GetHistoryPriceList(ByVal Label As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
+            Return Read("table", BasePath, SqlCommand)
+        End Function
+
+        Public Function GetHistoryPriceList() As DataTable
+            Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & ";"
             Return Read("table", BasePath, SqlCommand)
         End Function
 
@@ -110,9 +118,18 @@
 
         End Function
 
+        Event ReadedContractList(ByVal sender As Object, ByVal DataTable As DataTable)
+
+        Public Sub BeginGetContractList()
+            Dim Thread As New Threading.Thread(AddressOf GetContractList)
+            Thread.Start()
+        End Sub
+
         Public Function GetContractList() As Data.DataTable
             Dim SQLCommand As String = "SELECT * FROM " & Contract.Table & ";"
-            Return Read("table", BasePath, SQLCommand)
+            Dim dt As DataTable = Read("table", BasePath, SQLCommand)
+            RaiseEvent ReadedContractList(Me, dt)
+            Return dt
         End Function
 
         Public Function GetSalesListByContractLabel(ByVal Label As String) As Data.DataTable
@@ -147,14 +164,16 @@
         Public Sub ChangeStock(ByVal newStock As Stock)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
             Command(SQLCommand, BasePath)
-            RaiseEvent ChangedStock(newStock)
+            OnChangedStock(New Stock)
+            'RaiseEvent ChangedStock(newStock)
         End Sub
 
         '刪除一筆庫存
         Public Sub DeleteStock(ByVal dStock As Stock)
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
-            RaiseEvent DeletedStock(dStock)
+            'RaiseEvent DeletedStock(dStock)
+            OnDeletedStock(dStock)
         End Sub
 
         '讀取庫存資料
@@ -172,7 +191,7 @@
         ''' <summary>取得庫存清單</summary>
         Public Function GetStockList() As Data.DataTable
             'Dims SQLCommand As String = "SELECT stock.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
-            Dim SqlCommand As String = "SELECT Goods.Label as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Price AS 售價, stock.Note AS 備註 " & _
+            Dim SqlCommand As String = "SELECT Goods.Label as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Note AS 備註 " & _
             " FROM (stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
 
@@ -207,7 +226,7 @@
         End Function
 
         Public Function GetStockLogByGoodsLabel(ByVal label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價,  Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
             " WHERE Stock.GoodsLabel='" & label & "';"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -215,7 +234,7 @@
         End Function
 
         Public Function GetStockLogBySupplierLabel(ByVal label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價, Stock.Price as 定價, Stock.Number as 數量, Stock.Note as 備註" & _
+            Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價,  Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
             " WHERE Stock.SupplierLabel='" & label & "';"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -343,7 +362,7 @@
 
         '取得銷貨單的商品清單-根據銷貨單號
         Public Function GetGoodsListBySalesLabel(ByVal Label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
+            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, SalesGoods.SellingPrice, SalesGoods.Number" & _
             " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
             " WHERE (((SalesGoods.SalesLabel)=""" & Label & """));"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -370,7 +389,7 @@
 
         '取得包含該商品的銷貨單
         Public Function GetSalesListByStockLabel(ByVal Label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Price, SalesGoods.SellingPrice, SalesGoods.Number" & _
+            Dim SQLCommand As String = "SELECT SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name,  SalesGoods.SellingPrice, SalesGoods.Number" & _
             " FROM SalesGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON SalesGoods.StockLabel = Stock.Label" & _
             " WHERE (((SalesGoods.StockLabel)=""" & Label & """));"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -389,21 +408,23 @@
         '新增銷貨單
         Public Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods, SalesContracts)
-            RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
-
+            'RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
+            OnCreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
         End Sub
 
         '刪除銷貨單
         Public Sub DeleteSales(ByVal dSales As Sales)
             DeleteSalesWithoutEvent(dSales)
-            RaiseEvent DeletedSales(dSales)
+            'RaiseEvent DeletedSales(dSales)
+            OnDeletedSales(dSales)
         End Sub
 
         '修改銷貨單
         Public Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             DeleteSalesWithoutEvent(newSales)
             CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods, SalesContracts)
-            RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
+            'RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
+            OnChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
         End Sub
 
         Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
@@ -591,9 +612,12 @@
         ''' <param name="SqlCommand">SQL字串</param>
         ''' <param name="File">檔按路徑</param>
         Public Shared Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
-            Dim DBControl As OleDb.OleDbConnection = ConnectBase(File)
-            Dim Count As Long = Command(SqlCommand, DBControl)
-            Close(DBControl)
+            Dim Count As Long
+            SyncLock Lock
+                Dim DBControl As OleDb.OleDbConnection = ConnectBase(File)
+                Count = Command(SqlCommand, DBControl)
+                Close(DBControl)
+            End SyncLock
             Return Count
         End Function
 
@@ -618,6 +642,9 @@
         End Function
 
         Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
+
+
+
             '暫存表格
             Dim DS As DataSet = New DataSet()
             Dim DA As OleDb.OleDbDataAdapter
@@ -629,21 +656,23 @@
             Dim i As Integer
             For i = 1 To totFile
                 TmpFile = FileList(i - 1)
-
-                Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
-                Try
-                    'tmpDB.Open()
-                    For j As Integer = 0 To SQLCommand.Length - 1
-                        DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
-                        DA.Fill(DS, Table)
-                        DA.Dispose()
-                    Next
-                Catch
-                Finally
-                    tmpDB.Close()
-                    tmpDB.Dispose()
-                End Try
+                SyncLock Lock
+                    Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
+                    Try
+                        'tmpDB.Open()
+                        For j As Integer = 0 To SQLCommand.Length - 1
+                            DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
+                            DA.Fill(DS, Table)
+                            DA.Dispose()
+                        Next
+                    Catch
+                    Finally
+                        tmpDB.Close()
+                        tmpDB.Dispose()
+                    End Try
+                End SyncLock
             Next
+
 
             Return DS.Tables(Table)
         End Function
@@ -695,6 +724,11 @@
             Command(SQLCommand, BasePath)
         End Sub
 
+        Public Sub AddColumn(ByVal Table As String, ByVal ColumnName As String, ByVal Type As String)
+            Dim SqlCommand As String = "ALTER TABLE [" & Table & "] ADD [" & ColumnName & "] " & Type & ";"
+            Command(SqlCommand, BasePath)
+        End Sub
+
         Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As Object) As String
             Dim lst As New List(Of String)
 
@@ -743,116 +777,116 @@
             Return lstData.ToArray
         End Function
 
-        'End Class
 
         ''' <summary>新增供應商</summary>
-        Public Sub AddSupplier(ByVal data As Supplier)
+        Public Sub AddSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            RaiseEvent CreatedSupplier(data)
+            If trigger Then OnCreatedSupplier(data)
         End Sub
 
-        Public Sub DeleteSupplier(ByVal data As Supplier)
+        Public Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Supplier.Table, "Label", data.Label), BasePath)
-            RaiseEvent DeletedSupplier(data)
+            If trigger Then OnDeletedSupplier(data)
         End Sub
 
-        Public Sub ChangeSupplier(ByVal data As Supplier)
+        Public Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedSupplier(data)
+            If trigger Then OnChangedSupplier(data)
         End Sub
 
         ''' <summary>新增客戶</summary>
-        Public Sub AddCustomer(ByVal data As Customer)
+        Public Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            RaiseEvent CreatedCustomer(data)
+            If trigger Then OnCreatedCustomer(data)
         End Sub
 
-        Public Sub DeleteCustomer(ByVal data As Customer)
+        Public Sub DeleteCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Customer.Table, "Label", data.Label), BasePath)
-            RaiseEvent DeletedCustomer(data)
+            If trigger Then OnDeletedCustomer(data)
         End Sub
 
-        Public Sub ChangeCustomer(ByVal data As Customer)
+        Public Sub ChangeCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedCustomer(data)
+            If trigger Then OnChangedCustomer(data)
         End Sub
 
         ''' <summary>新增員工</summary>
-        Public Sub AddPersonnel(ByVal data As Personnel)
+        Public Sub AddPersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             'PersonnelList.Add(data)
-            RaiseEvent CreatedPersonnel(data)
+            If trigger Then OnCreatedPersonnel(data)
         End Sub
 
-        Public Sub DeletePersonnel(ByVal data As Personnel)
+        Public Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Personnel.Table, "Label", data.Label), BasePath)
-            RaiseEvent DeletedPersonnel(data)
+            If trigger Then OnDeletedPersonnel(data)
         End Sub
 
-        Public Sub ChangePersonnel(ByVal data As Personnel)
+        Public Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedPersonnel(data)
+            If trigger Then OnChangedPersonnel(data)
         End Sub
 
         ''' <summary>新增商品</summary>
-        Public Sub AddGoods(ByVal data As Goods)
+        Public Sub AddGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             'GoodsList.Add(data)
-            RaiseEvent CreatedGoods(data)
+            If trigger Then OnCreatedGoods(data)
         End Sub
 
-        Public Sub DeleteGoods(ByVal data As Goods)
+        Public Sub DeleteGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Goods.Table, "Label", data.Label), BasePath)
-            RaiseEvent DeletedGoods(data)
+            If trigger Then OnDeletedGoods(data)
         End Sub
 
-        Public Sub ChangeGoods(ByVal data As Goods)
+        Public Sub ChangeGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedGoods(data)
+            If trigger Then OnChangedGoods(data)
         End Sub
 
         ''' <summary>新增門號</summary>
-        Public Sub AddContract(ByVal data As Contract)
+        Public Sub AddContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            RaiseEvent CreatedContract(data)
+            If trigger Then OnCreatedContract(data)
         End Sub
 
-        Public Sub ChangeContract(ByVal data As Contract)
+        Public Sub ChangeContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedContract(data)
+            If trigger Then OnChangedContract(data)
         End Sub
 
-        Public Sub DeleteContract(ByVal data As Contract)
+        Public Sub DeleteContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Contract.Table, "Label", data.Label), BasePath)
+            If trigger Then OnDeletedContract(data)
         End Sub
 
 
-        Public Sub AddHistoryPrice(ByVal data As HistoryPrice)
+        Public Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            RaiseEvent CreatedHistoryPrice(data)
+            If trigger Then OnCreatedHistoryPrice(data)
         End Sub
 
-        Public Sub ChangeHistoryPrice(ByVal data As HistoryPrice)
+        Public Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
-            RaiseEvent ChangedHistoryPrice(data)
+            If trigger Then OnChangedHistoryPrice(data)
         End Sub
 
-        Public Sub DeleteHistoryPrice(ByVal data As HistoryPrice)
+        Public Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
-            RaiseEvent DeletedHistoryPrice(data)
+            If trigger Then OnDeletedHistoryPrice(data)
         End Sub
 
-        Public Sub DeleteHistoryPrice(ByVal GoodsLabel As String)
+        Public Sub DeleteHistoryPriceList(ByVal GoodsLabel As String, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(HistoryPrice.Table, "GoodsLabel", GoodsLabel), BasePath)
             Dim data As New HistoryPrice
             data.GoodsLabel = GoodsLabel
-            RaiseEvent DeletedHistoryPrice(data)
+            If trigger Then OnDeletedHistoryPriceList(data)
         End Sub
 
         ''' <summary>新增庫存</summary>
         Public Sub AddStock(ByVal data As Stock)
             AddBase(data)
-            RaiseEvent CreatedStock(data)
+            OnCreatedStock(data)
         End Sub
 
         '''' <summary>新增銷貨單</summary>
@@ -881,7 +915,109 @@
         '    Return ReadMobile()
         'End Function
 
+        Friend Sub OnCreatedContract(ByVal con As Contract)
+            RaiseEvent CreatedContract(Me, con)
+        End Sub
 
+        Friend Sub OnChangedContract(ByVal con As Contract)
+            RaiseEvent ChangedContract(Me, con)
+        End Sub
+        Friend Sub OnDeletedContract(ByVal con As Contract)
+            RaiseEvent DeletedContract(Me, con)
+        End Sub
+
+        Friend Sub OnCreatedGoods(ByVal goods As Goods)
+            RaiseEvent CreatedGoods(Me, goods)
+        End Sub
+        Friend Sub OnChangedGoods(ByVal goods As Goods)
+            RaiseEvent ChangedGoods(Me, goods)
+        End Sub
+        Friend Sub OnDeletedGoods(ByVal goods As Goods)
+            RaiseEvent DeletedGoods(Me, goods)
+        End Sub
+
+        Friend Sub OnCreatedSupplier(ByVal sup As Supplier)
+            RaiseEvent CreatedSupplier(Me, sup)
+        End Sub
+        Friend Sub OnChangedSupplier(ByVal sup As Supplier)
+            RaiseEvent ChangedSupplier(Me, sup)
+        End Sub
+        Friend Sub OnDeletedSupplier(ByVal sup As Supplier)
+            RaiseEvent DeletedSupplier(Me, sup)
+        End Sub
+
+        Friend Sub OnCreatedCustomer(ByVal cus As Customer)
+            RaiseEvent CreatedCustomer(Me, cus)
+        End Sub
+        Friend Sub OnChangedCustomer(ByVal cus As Customer)
+            RaiseEvent ChangedCustomer(Me, cus)
+        End Sub
+        Friend Sub OnDeletedCustomer(ByVal cus As Customer)
+            RaiseEvent DeletedCustomer(Me, cus)
+        End Sub
+
+        Friend Sub OnCreatedPersonnel(ByVal per As Personnel)
+            RaiseEvent CreatedPersonnel(Me, per)
+        End Sub
+        Friend Sub OnChangedPersonnel(ByVal per As Personnel)
+            RaiseEvent ChangedPersonnel(Me, per)
+        End Sub
+        Friend Sub OnDeletedPersonnel(ByVal per As Personnel)
+            RaiseEvent DeletedPersonnel(Me, per)
+        End Sub
+
+        Friend Sub OnCreatedStock(ByVal stock As Stock)
+            RaiseEvent CreatedStock(Me, stock)
+        End Sub
+        Friend Sub OnChangedStock(ByVal stock As Stock)
+            RaiseEvent ChangedStock(Me, stock)
+        End Sub
+        Friend Sub OnDeletedStock(ByVal stock As Stock)
+            RaiseEvent DeletedStock(Me, stock)
+        End Sub
+
+        Public Structure SalesArgs
+            Dim Sales As Sales
+            Dim GoodsList() As StructureBase.SalesGoods
+            Dim OrderList() As StructureBase.OrderGoods
+            Dim SalesContracts() As StructureBase.SalesContract
+            Sub New(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+                Me.Sales = sales
+                Me.GoodsList = GoodsList
+                Me.OrderList = OrderList
+                Me.SalesContracts = SalesContracts
+            End Sub
+
+        End Structure
+
+        Friend Sub OnCreatedSales(ByVal sales As SalesArgs)
+            OnCreatedSales(sales.Sales, sales.GoodsList, sales.OrderList, sales.SalesContracts)
+        End Sub
+        Friend Sub OnChangedSales(ByVal sales As SalesArgs)
+            OnChangedSales(sales.Sales, sales.GoodsList, sales.OrderList, sales.SalesContracts)
+        End Sub
+        Friend Sub OnCreatedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            RaiseEvent CreatedSales(Me, sales, GoodsList, OrderList, SalesContracts)
+        End Sub
+        Friend Sub OnChangedSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            RaiseEvent ChangedSales(Me, sales, GoodsList, OrderList, SalesContracts)
+        End Sub
+        Friend Sub OnDeletedSales(ByVal sales As Sales)
+            RaiseEvent DeletedSales(Me, sales)
+        End Sub
+
+        Friend Sub OnCreatedHistoryPrice(ByVal hp As HistoryPrice)
+            RaiseEvent CreatedHistoryPrice(Me, hp)
+        End Sub
+        Friend Sub OnChangedHistoryPrice(ByVal hp As HistoryPrice)
+            RaiseEvent ChangedHistoryPrice(Me, hp)
+        End Sub
+        Friend Sub OnDeletedHistoryPrice(ByVal hp As HistoryPrice)
+            RaiseEvent DeletedHistoryPrice(Me, hp)
+        End Sub
+        Friend Sub OnDeletedHistoryPriceList(ByVal hp As HistoryPrice)
+            RaiseEvent DeletedHistoryPriceList(Me, hp)
+        End Sub
 
         Public Shared Function RepairAccess(ByVal FilePath As String) As Boolean
             Dim strFile As String = FilePath
@@ -940,182 +1076,6 @@
     End Class
 #End Region
 
-    Public Structure ReadArgs
-        Dim Table As String
-        Dim FileList() As String
-        Dim SqlCommand() As String
-
-    End Structure
-
-    Public Class AccessServer
-        Public WithEvents Server As New TCPTool
-        Public WithEvents Access As Access
-        Public Port As Integer = 3600
-
-        Public Sub Open()
-            Server.ServerOpen(Port)
-        End Sub
-        Public Sub Close()
-            Server.ServerClose()
-        End Sub
-
-        Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Server.ServerReceiveSplitMessage
-            Select Case Data(0)
-                Case "ReadArgs"
-                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(1))
-                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
-                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
-                    Client.Send("ReadResponse", Code.SerializeWithZIP(dt))
-            End Select
-        End Sub
-    End Class
-
-    Public Structure ClientInfo
-        Dim IP As String
-        Dim Port As Integer
-        Dim Name As String
-        Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
-            Me.Name = Name : Me.IP = IP : Me.Port = Port
-        End Sub
-    End Structure
-
-    Public Class AccessClientMenage
-
-
-
-        Public Client() As AccessClient
-
-        Public Sub Save(ByVal Path As String)
-            Dim lstInfo As New List(Of ClientInfo)
-            For Each c As AccessClient In Client
-                lstInfo.Add(New ClientInfo(c.Name, c.IP, c.Port))
-            Next
-
-            Code.Save(lstInfo.ToArray, Path)
-        End Sub
-
-        Public Sub Load(ByVal Path As String)
-            Dim lstInfo As ClientInfo() = Code.Load(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
-
-            Dim lstClient As New List(Of Database.AccessClient)
-
-            For Each c As ClientInfo In lstInfo
-                lstClient.Add(New AccessClient(c.Name, c.IP, c.Port))
-            Next
-
-            Client = lstClient.ToArray
-        End Sub
-
-        Public Sub StartConnect()
-            For i As Integer = 0 To Client.Length - 1
-                Client(i).Connect()
-            Next
-        End Sub
-
-        Public Sub EndConnect()
-            For i As Integer = 0 To Client.Length - 1
-                Client(i).Disconnect()
-            Next
-        End Sub
-
-        Public Function GetNameList() As String()
-            Return Array.ConvertAll(Client, Function(c As AccessClient) c.Name)
-        End Function
-
-        Default Public ReadOnly Property Item(ByVal Index As Integer) As AccessClient
-            Get
-                If Index < Client.Length - 1 Then Return Nothing
-                Return Client(Index)
-            End Get
-
-        End Property
-
-        Default Public ReadOnly Property Item(ByVal Name As String) As AccessClient
-            Get
-                For Each c As AccessClient In Client
-                    If c.Name = Name Then Return c
-                Next
-                Return Nothing
-            End Get
-        End Property
-
-
-    End Class
-
-    Public Class AccessClient
-        Inherits Access
-
-        Public WithEvents Client As New TCPTool.Client()
-
-        Dim ResponseDataTable As Data.DataTable = Nothing
-
-        Sub New()
-
-        End Sub
-        Sub New(ByVal Info As ClientInfo)
-            Me.Name = Info.Name : Me.IP = Info.IP : Me.Port = Info.Port
-        End Sub
-        Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
-            Me.Name = Name : Me.IP = IP : Me.Port = Port
-            'Client.Port = 3600
-        End Sub
-
-        Public Name As String = "DefaultName"
-
-        Property IP() As String
-            Get
-                Return Client.IP
-            End Get
-            Set(ByVal value As String)
-                Client.IP = value
-            End Set
-        End Property
-
-        Property Port() As Integer
-            Get
-                Return Client.Port
-            End Get
-            Set(ByVal value As Integer)
-                Client.Port = value
-            End Set
-        End Property
-
-        Public Sub Connect()
-            Client.StartConnect()
-        End Sub
-
-        Public Sub Disconnect()
-            Client.EndConnect()
-        End Sub
-
-        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
-            Dim args As ReadArgs
-            args.Table = Table
-            args.FileList = FileList
-            args.SqlCommand = SQLCommand
-
-            Send("ReadArgs", Code.SerializeWithZIP(args))
-            ResponseDataTable = Nothing
-
-            While (ResponseDataTable Is Nothing)
-                Application.DoEvents()
-            End While
-
-            Return ResponseDataTable
-        End Function
-
-        Public Sub Send(ByVal cmd As String, ByVal args As String)
-            If Not Client.Connected Then Client.Connect()
-            Client.Send(cmd, args)
-        End Sub
-
-
-        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Client.ReceiveSplitMessage
-            Select Case Data(0)
-                Case "ReadResponse"
-                    ResponseDataTable = Code.DeserializeWithUnzip(Of DataTable)(Data(1))
-            End Select
-        End Sub
-    End Class
+   
 
 End Namespace

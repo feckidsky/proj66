@@ -51,15 +51,15 @@
 	<summary>對資料庫下達SQL指令</summary>
 	<param name="SqlCommand">SQL字串</param>
 	<param name="File">檔按路徑</param>
-</member><member name="M:進銷存.Database.Access.AddSupplier(進銷存.Database.StructureBase.Supplier)">
+</member><member name="M:進銷存.Database.Access.AddSupplier(進銷存.Database.StructureBase.Supplier,System.Boolean)">
 	<summary>新增供應商</summary>
-</member><member name="M:進銷存.Database.Access.AddCustomer(進銷存.Database.StructureBase.Customer)">
+</member><member name="M:進銷存.Database.Access.AddCustomer(進銷存.Database.StructureBase.Customer,System.Boolean)">
 	<summary>新增客戶</summary>
-</member><member name="M:進銷存.Database.Access.AddPersonnel(進銷存.Database.StructureBase.Personnel)">
+</member><member name="M:進銷存.Database.Access.AddPersonnel(進銷存.Database.StructureBase.Personnel,System.Boolean)">
 	<summary>新增員工</summary>
-</member><member name="M:進銷存.Database.Access.AddGoods(進銷存.Database.StructureBase.Goods)">
+</member><member name="M:進銷存.Database.Access.AddGoods(進銷存.Database.StructureBase.Goods,System.Boolean)">
 	<summary>新增商品</summary>
-</member><member name="M:進銷存.Database.Access.AddContract(進銷存.Database.StructureBase.Contract)">
+</member><member name="M:進銷存.Database.Access.AddContract(進銷存.Database.StructureBase.Contract,System.Boolean)">
 	<summary>新增門號</summary>
 </member><member name="M:進銷存.Database.Access.AddStock(進銷存.Database.StructureBase.Stock)">
 	<summary>新增庫存</summary>

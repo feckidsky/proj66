@@ -106,6 +106,9 @@ Public Class winGoodsList
 
         'Dim SelectedGoods As Database.Goods = selected
         Dim count As Integer = DB.GetStockLogByGoodsLabel(selected.Label).Rows.Count
+        For Each c As Database.AccessClient In Client.Client
+            If c.Connected Then count += c.GetStockLogByGoodsLabel(selected.Label).Rows.Count
+        Next
         If count > 0 Then
             MsgBox("商品項目已經有進貨資料，無法刪除!")
             Exit Sub
@@ -118,7 +121,7 @@ Public Class winGoodsList
 
 
         DB.DeleteGoods(selected)
-        DB.DeleteHistoryPrice(selected.Label)
+        DB.DeleteHistoryPriceList(selected.Label)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
@@ -131,11 +134,11 @@ Public Class winGoodsList
 
     End Sub
 
-    Private Sub access_ChangedHistoryPrice(ByVal hp As Database.StructureBase.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
+    Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
         UpdateHistory()
     End Sub
 
-    Private Sub access_ChangedGoods(ByVal goods As Database.StructureBase.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
+    Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
         UpdateGoodsList()
     End Sub
 

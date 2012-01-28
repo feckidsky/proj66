@@ -411,7 +411,7 @@ Public Class TCPTool
     End Function
 
 
-    Public Sub ServerSendAll(ByVal Msg As String)
+    Public Sub ServerSend(ByVal Msg As String)
 
         Dim lstClient() As Client = ServerClientList.ToArray
         Dim i As Long
@@ -423,7 +423,7 @@ Public Class TCPTool
         Next
     End Sub
 
-    Public Sub ServerSendAll(ByVal CMD As String, ByVal Para As String)
+    Public Sub ServerSend(ByVal CMD As String, ByVal Para As String)
 
         Dim lstClient() As Client = ServerClientList.ToArray
         Dim i As Long
@@ -723,14 +723,14 @@ Public Class TCPTool
         End Sub
 
         Public Sub BeginConnect()
-            If ConnectThread IsNot Nothing AndAlso ConnectThread.IsAlive Then Exit Sub
+            'If ConnectThread IsNot Nothing AndAlso ConnectThread.IsAlive Then Exit Sub
             ConnectThread = New Threading.Thread(AddressOf Connect)
             ConnectThread.IsBackground = True
-            Try
-                ConnectThread.Start()
-            Catch
-                OnConnectedFail()
-            End Try
+            'Try
+            ConnectThread.Start()
+            'Catch
+            '    OnConnectedFail()
+            'End Try
         End Sub
 
         Public Sub Connect()
