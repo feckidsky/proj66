@@ -53,6 +53,7 @@
     End Sub
 
     Public Sub UpdateStockList()
+        If cbStock.IsDisposed Then Exit Sub
         Dim DT As Data.DataTable
         If cbStock.SelectedIndex = 0 Then
             DT = DB.GetStockListWithHistoryPrice() 'DB.GetStockList()
@@ -131,4 +132,7 @@
     End Sub
 
 
+    Private Sub 列印PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 列印PToolStripMenuItem.Click
+        DataGridViewPrintDialog.ShowDialog("庫存清單", dgItemList)
+    End Sub
 End Class

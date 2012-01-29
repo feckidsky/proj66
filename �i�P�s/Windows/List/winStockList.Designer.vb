@@ -28,6 +28,7 @@ Partial Class winStockList
         Me.更新ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.進貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.cbStock = New System.Windows.Forms.ToolStripComboBox
+        Me.列印PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         CType(Me.dgItemList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.MenuStrip1.SuspendLayout()
@@ -52,7 +53,7 @@ Partial Class winStockList
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem, Me.進貨ToolStripMenuItem, Me.cbStock})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.更新ToolStripMenuItem, Me.進貨ToolStripMenuItem, Me.cbStock, Me.列印PToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(640, 28)
@@ -77,6 +78,12 @@ Partial Class winStockList
         Me.cbStock.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbStock.Name = "cbStock"
         Me.cbStock.Size = New System.Drawing.Size(121, 24)
+        '
+        '列印PToolStripMenuItem
+        '
+        Me.列印PToolStripMenuItem.Name = "列印PToolStripMenuItem"
+        Me.列印PToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
+        Me.列印PToolStripMenuItem.Text = "列印(&P)"
         '
         'Timer1
         '
@@ -106,4 +113,5 @@ Partial Class winStockList
     Friend WithEvents 進貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents cbStock As System.Windows.Forms.ToolStripComboBox
     Friend WithEvents Timer1 As System.Windows.Forms.Timer
+    Friend WithEvents 列印PToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

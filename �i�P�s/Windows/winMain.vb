@@ -6,7 +6,7 @@ Public Class winMain
 
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         cbForm.SelectedIndex = 2
-        UpdateSalesList()
+        'UpdateSalesList()
         Me.Text = SystemTitle & " - " & CurrentUser.Name
     End Sub
 
@@ -23,8 +23,9 @@ Public Class winMain
         InitialProgram()
 
         Filter = New DataGridViewFilter(dgSales)
-        Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式")
+        Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式", "內容")
         Filter.AddNumberFilter("訂金", "金額", "利潤")
+        dgSales.DefaultCellStyle.WrapMode = DataGridViewTriState.True
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
@@ -32,24 +33,9 @@ Public Class winMain
         UpdateSalesList()
     End Sub
 
-    'Public Sub ShowKind()
-
-
-    '    For i As Integer = 0 To dgSales.Rows.Count - 1
-    '        If cbForm.SelectedIndex = 2 Then
-
-    '            dgSales.Rows(i).Visible = True
-    '        ElseIf cbForm.SelectedIndex = 0 Then
-    '            dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value = "訂金"
-    '        Else
-    '            dgSales.Rows(i).Visible = dgSales.Rows(i).Cells("付款方式").Value <> "訂金"
-    '        End If
-    '    Next
-
-    'End Sub
 
     Public Sub UpdateSalesList()
-
+        If Not Me.Created Then Exit Sub
         Dim StartTime As Date
         Dim EndTime As Date
         If rToday.Checked Then
@@ -71,18 +57,33 @@ Public Class winMain
         For i As Integer = 0 To dt.Columns.Count - 1
             dgSales.Columns.Add(dt.Columns(i).ColumnName, dt.Columns(i).ColumnName)
         Next
-        'dgSales.DataSource = dt
+        dgSales.Columns.Add("內容", "內容")
+
+        If Not IO.File.Exists(SalesVisiblePath) Then
+            dgSales.Columns("單號").Visible = False
+            Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
+        Else
+            DataGridViewVisibleDialog.SetVisible(dgSales, Code.Load(Of String())(SalesVisiblePath, New String() {}))
+        End If
 
         For i As Integer = 0 To dt.Rows.Count - 1
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
             Dim idx As Integer = dgSales.Rows.Add(arr)
+            Dim tip As String = access.GetSalesTip(dgSales.Rows(idx).Cells("單號").Value, dgSales.Rows(idx).Cells("付款方式").Value)
+            dgSales.Rows(idx).Cells("內容").Value = tip
+            'Dim tip As String = access.GetSalesTip(dgSales.Rows(idx).Cells("單號").Value)
+            'For Each cell As DataGridViewCell In dgSales.Rows(idx).Cells
+            '    cell.ToolTipText = tip
+
+            'Next
+
+            dgSales(0, 0).ToolTipText = ""
             dgSales.Rows.Item(i).Cells("銷貨時間").Value = IIf(dgSales.Rows(i).Cells("銷貨時間").Value = New Date(2001, 1, 1, 0, 0, 0), "", dgSales.Rows(i).Cells("銷貨時間").Value)
             dgSales.Rows.Item(i).Cells("付款方式").Value = TypeOfPaymentsDescribe(dgSales.Rows(i).Cells("付款方式").Value)
         Next
         UpdateListColor()
         'ShowKind()
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
-
     End Sub
 
     Public Sub UpdateListColor()
@@ -197,6 +198,10 @@ Public Class winMain
         If e.CloseReason = CloseReason.UserClosing And Not RealClose Then
             Me.Visible = False
             e.Cancel = True
+        Else
+            'Program.FinishProgram()
+            'Environment.Exit(Environment.ExitCode)
+            'Application.Exit()
         End If
 
     End Sub
@@ -213,8 +218,6 @@ Public Class winMain
 
     Private Sub 登出OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登出OToolStripMenuItem.Click, 登出OToolStripMenuItem1.Click
         LogOut()
-
-
     End Sub
 
 
@@ -233,11 +236,6 @@ Public Class winMain
         winChangePassword.ShowDialog()
     End Sub
 
-
-    Private Sub 其他資訊ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 其他資訊ToolStripMenuItem.Click
-
-    End Sub
-
     Private Sub 選項OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 選項OToolStripMenuItem.Click
         winOptional.ShowDialog()
         UpdateListColor()
@@ -251,4 +249,30 @@ Public Class winMain
         winInformation.ShowDialog()
     End Sub
 
+    Private Sub 列印PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 列印PToolStripMenuItem.Click
+        DataGridViewPrintDialog.ShowDialog(cbForm.Text, dgSales)
+    End Sub
+
+    Private Sub 欄位顯示VToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 欄位顯示VToolStripMenuItem.Click
+        If DataGridViewVisibleDialog.ShowDialog(dgSales) Then Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
+
+    End Sub
+
+
+
+    Private Sub dgSales_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSales.CellContentClick
+
+    End Sub
+
+    'Private Sub dgSales_CellMouseEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSales.CellMouseEnter
+    '    Static lstIndex As Integer = -1
+    '    If lstIndex = e.RowIndex Or e.RowIndex = -1 Then Exit Sub
+    '    lstIndex = e.RowIndex
+    '    Dim tip As String = access.GetSalesTip(dgSales.Rows(e.RowIndex).Cells("單號").Value)
+    '    'For Each cell As DataGridViewCell In dgSales.Rows(idx).Cells
+    '    '    cell.ToolTipText = tip
+
+    '    'Next
+    '    ToolTip1.Show(tip, dgSales)
+    'End Sub
 End Class

@@ -51,6 +51,10 @@
         lbUserCard.Text = info.Card
     End Sub
 
+    Public Function GetSingle(ByVal obj As Object) As Single
+        If obj Is DBNull.Value Then Return 0
+        Return Val(obj)
+    End Function
 
     Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
 
@@ -58,27 +62,27 @@
 
         Dim Deposit As Single = 0
         For Each row As DataRow In dt.Rows
-            Deposit += row.Item("訂金")
+            Deposit += GetSingle(row.Item("訂金"))
         Next
 
         dt = DB.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales)
 
         Dim Cash As Single = 0
         For Each row As DataRow In dt.Select("付款方式=" & Val(Database.TypeOfPayment.Cash))
-            Cash += row.Item("金額") - row.Item("訂金")
+            Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
         Next
 
         Dim Card As Single = 0
         For Each row As DataRow In dt.Select("付款方式=" & Val(Database.TypeOfPayment.Card))
-            Card += row.Item("金額") - row.Item("訂金")
+            Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
         Next
 
 
         Dim Profit As Single = 0
         Dim SalesVolume As Single = 0
         For Each row As DataRow In dt.Rows
-            Profit += row.Item("利潤")
-            SalesVolume += row.Item("金額")
+            Profit += GetSingle(row.Item("利潤"))
+            SalesVolume += GetSingle(row.Item("金額"))
         Next
 
         Return New Info(SalesVolume, Profit, Cash + Deposit, Card)

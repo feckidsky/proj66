@@ -50,6 +50,7 @@ Public Module Program
     Public Config As SystemOptional
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
     Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
+    Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
 
@@ -80,6 +81,13 @@ Public Module Program
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
         'LogIn(admin.ID, admin.Password, False)
     End Sub
+
+    Public Sub FinishProgram()
+
+        Client.EndConnect()
+        Server.Close()
+    End Sub
+
 
     Public Sub UpdateDatabase()
         Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(DB.BasePath)

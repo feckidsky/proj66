@@ -56,10 +56,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.ADOX, Version=2.8.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.ReportViewer.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core">
@@ -86,11 +90,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="DataGridViewFilter.vb" />
+    <Compile Include="Lib\DataGridViewFilter.vb" />
     <Compile Include="Lib\Database.vb" />
     <Compile Include="Lib\ErrorLog.vb" />
     <Compile Include="Lib\NetworkDataBase.vb" />
     <Compile Include="Lib\TCPTool.vb" />
+    <Compile Include="Windows\DataGridViewPrintDialog.Designer.vb">
+      <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\DataGridViewPrintDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\EditForm\winContract.Designer.vb">
       <DependentUpon>winContract.vb</DependentUpon>
     </Compile>
@@ -235,8 +245,18 @@
     <Compile Include="Windows\UserAccount\winChangePassword.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\DataGridViewVisibleDialog.Designer.vb">
+      <DependentUpon>DataGridViewVisibleDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\DataGridViewVisibleDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Windows\DataGridViewPrintDialog.resx">
+      <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\EditForm\winContract.resx">
       <DependentUpon>winContract.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -325,6 +345,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\UserAccount\winChangePassword.resx">
       <DependentUpon>winChangePassword.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\DataGridViewVisibleDialog.resx">
+      <DependentUpon>DataGridViewVisibleDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

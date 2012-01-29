@@ -350,6 +350,7 @@ Public Class winSales
         If Work = Mode.Create Then
             DB.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
+            sales.SalesDate = Now
             DB.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
@@ -505,11 +506,6 @@ Public Class winSales
 
     Private Sub dgContract_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellEndEdit
         CalTotalPrice()
-    End Sub
-
-
-    Private Sub dgSalesList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellContentClick
-
     End Sub
 
 End Class

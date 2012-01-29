@@ -30,6 +30,10 @@ Namespace My
             SW_FORCEMINIMIZE = 11
         End Enum
 
+        Private Sub MyApplication_Shutdown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shutdown
+            FinishProgram()
+        End Sub
+
         Private Sub MyApplication_StartupNextInstance(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupNextInstanceEventArgs) Handles Me.StartupNextInstance
             'Dim proc As Process() = Process.GetProcessesByName("進銷存")
             'ShowWindow(proc(0).MainWindowHandle.ToInt32(), CommandShow.SW_SHOWNORMAL)

@@ -381,6 +381,29 @@
             Return DT
         End Function
 
+        Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.TypeOfPayment) As String
+            Dim lst As New List(Of String)
+            Dim dt As DataTable = GetContractListBySalesLabel(Label)
+
+            For Each r As DataRow In dt.Rows
+                lst.Add(r("Name"))
+            Next
+
+            If style = TypeOfPayment.Commission Then
+                dt = GetOrderListBySalesLabel(Label)
+            Else
+                dt = GetGoodsListBySalesLabel(Label)
+            End If
+
+            For Each r As DataRow In dt.Rows
+                lst.Add(r("Name") & " x " & r("Number"))
+            Next
+
+            If lst.Count = 0 Then Return ""
+            Return Join(lst.ToArray, vbCrLf)
+
+        End Function
+
         '取得銷貨單的商品清單-根據銷貨單號
         Public Function GetGoodsListBySalesLabelWithHistoryPrice(ByVal Label As String) As Data.DataTable
             Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number " & _
