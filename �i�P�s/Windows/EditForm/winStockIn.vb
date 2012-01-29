@@ -38,7 +38,8 @@ Public Class winStockIn
 
     Public Sub UpdateText(ByVal Data As Stock)
         txtLabel.Text = Data.Label
-        If Work = Mode.Open Then txtCost.Text = Data.Cost
+        'If Work = Mode.Open Then txtCost.Text = Data.Cost
+        txtCost.Text = IIf(Work = Mode.Open, Data.Cost, "")
         txtIMEI.Text = Data.IMEI
         'txtPrice.Text = Data.Price
         txtDate.Text = Data.Date
@@ -98,7 +99,9 @@ Public Class winStockIn
             Dim hp As HistoryPrice = DB.GetListHistoryPrice(sel.Label)
             txtPrice.Text = hp.Price
             If txtCost.Text = "" Then txtCost.Text = hp.Cost
-            'If Work = Mode.Create Then txtPrice.
+
+
+
         End If
     End Sub
 

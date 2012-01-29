@@ -6,7 +6,7 @@ Namespace Database
 
         Public DBTypeIMEI As String = "char(20)"
         Public DBTypeLabel As String = "char(20)"
-        Public DBTypeName As String = "char(10)"
+        Public DBTypeName As String = "char(20)"
         Public DBTypeNote As String = "char(20)"
         Public DBTypeTel As String = "char(15)"
         Public DBTypeAddr As String = "char(30)"

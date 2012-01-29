@@ -88,6 +88,7 @@
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="DataGridViewFilter.vb" />
     <Compile Include="Lib\Database.vb" />
+    <Compile Include="Lib\ErrorLog.vb" />
     <Compile Include="Lib\NetworkDataBase.vb" />
     <Compile Include="Lib\TCPTool.vb" />
     <Compile Include="Windows\EditForm\winContract.Designer.vb">

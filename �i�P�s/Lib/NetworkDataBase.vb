@@ -327,7 +327,7 @@
                 Case "DeletedHistoryPriceList" : OnDeletedHistoryPriceList(Repair(Of HistoryPrice)(args))
                 Case "CreatedSales" : OnCreatedSales(Repair(Of SalesArgs)(args))
                 Case "ChangedSales" : OnChangedSales(Repair(Of SalesArgs)(args))
-                Case "DeleteSales" : OnDeletedSales(Repair(Of Sales)(args))
+                Case "DeletedSales" : OnDeletedSales(Repair(Of Sales)(args))
 
                 Case Else
                     MsgBox("不明指令:" & vbCrLf & Data(0))

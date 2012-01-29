@@ -58,6 +58,7 @@ Public Module Program
     Public SystemTitle As String = "進銷存管理系統"
 
     Public Sub InitialProgram()
+        ErrorLog.Enable()
         Server.Access = DB
         Server.Open()
 
@@ -73,7 +74,7 @@ Public Module Program
 
         LogOut(False)
         Try
-            LogIn("kidsky1", "3883", False)
+            LogIn("kidsky", "3883", False)
         Catch
         End Try
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")

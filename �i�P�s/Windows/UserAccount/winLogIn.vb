@@ -8,7 +8,7 @@
         Me.Text = Title
         txtID.Text = ID
         txtPassword.Text = ""
-
+        result.State = LoginState.PasswordError
         MyBase.ShowDialog()
         Return result
     End Function

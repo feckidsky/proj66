@@ -93,7 +93,8 @@
         End Function
 
         Public Function GetCustomerList() As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM " & Customer.Table & ";"
+            Dim name() As String = Array.ConvertAll(Change(Customer.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Customer.Table & ";"
             Return Read("table", BasePath, SQLCommand)
         End Function
 
@@ -105,8 +106,18 @@
             Return Customer.GetFrom(dt.Rows(0))
         End Function
 
+        Public Function Change(ByVal columns() As Column, ByVal Name1 As String, ByVal Name2 As String) As Column()
+            Dim c1 As Integer = Array.FindIndex(columns, Function(c As Column) c.Name = Name1)
+            Dim c2 As Integer = Array.FindIndex(columns, Function(c As Column) c.Name = Name2)
+            Dim tmp As Column = columns(c1)
+            columns(c1) = columns(c2)
+            columns(c2) = tmp
+            Return columns
+        End Function
+
         Public Function GetSupplierList() As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM " & Supplier.Table & ";"
+            Dim name() As String = Array.ConvertAll(Change(Supplier.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Supplier.Table & ";"
             Return Read("table", BasePath, SQLCommand)
         End Function
 
@@ -140,7 +151,8 @@
         End Function
 
         Public Function GetPersonnelList() As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM " & Personnel.Table & ";"
+            Dim name() As String = Array.ConvertAll(Change(Personnel.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Personnel.Table & ";"
             Return Read("table", BasePath, SQLCommand)
         End Function
 

@@ -18,6 +18,17 @@
     End Sub
 
     Private Sub winStockList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
+
+        Config()
+
+
+    End Sub
+
+    Private Sub cbStock_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.SelectedIndexChanged
+        UpdateStockList()
+    End Sub
+
+    Private Sub Config()
         Filter.SetTextFilter("商品編號", GoodsFilterText)
         cbStock.Items.Clear()
         cbStock.Items.Add("本機庫存")
@@ -27,16 +38,18 @@
         UpdateTitleText()
     End Sub
 
-    Private Sub cbStock_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.SelectedIndexChanged
-        UpdateStockList()
-    End Sub
-
-
     Public Overloads Sub Show()
         If Not CheckAuthority(1) Then
             Exit Sub
         End If
+
         MyBase.Show()
+        GoodsFilterText = ""
+        Config()
+        'Filter.SetTextFilter("商品編號", "")
+        'cbStock.SelectedIndex = 0 'UpdateStockList()
+        'Filter.Filter()
+
     End Sub
 
     Public Sub UpdateStockList()
@@ -51,7 +64,7 @@
 
         If DT.Columns.Count = 0 Then Exit Sub
 
-        dgItemList.Columns("商品編號").Visible = False
+        'dgItemList.Columns("商品編號").Visible = False
 
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
@@ -65,6 +78,7 @@
     Public Function SelectStock() As DataGridViewRow
         SelectMode = True
         SelectedRow = Nothing
+        GoodsFilterText = ""
         MyBase.ShowDialog()
         If cbStock.SelectedIndex > 0 Then
             MsgBox("您無法選擇不在本店的庫存", MsgBoxStyle.Exclamation)
@@ -89,7 +103,8 @@
         If e.RowIndex = -1 Then Exit Sub
         If dgItemList.SelectedCells(0).RowIndex >= dgItemList.Rows.Count Then Exit Sub
         SelectedRow = dgItemList.Rows(e.RowIndex)
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Close()
+        'Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
 
@@ -114,5 +129,6 @@
         End If
         Me.Text = "庫存查詢-" & cbStock.Text & connectState
     End Sub
+
 
 End Class

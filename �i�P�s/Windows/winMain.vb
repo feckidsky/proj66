@@ -250,4 +250,5 @@ Public Class winMain
     Private Sub 結算ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 結算ToolStripMenuItem.Click
         winInformation.ShowDialog()
     End Sub
+
 End Class

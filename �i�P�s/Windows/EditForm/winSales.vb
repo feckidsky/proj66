@@ -357,20 +357,20 @@ Public Class winSales
 
     Private Sub txtPersonnel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtPersonnel.Click
 
-        If Not Personnel.IsNull() AndAlso winLogIn.ShowDialog("此銷售人員的帳號密碼", Personnel.ID).State <> LoginState.Success Then
-            Exit Sub
-        End If
-
-        If winLogIn.ShowDialog("請登入欲修改的銷售帳號").State = LoginState.Success Then
-            Personnel = CurrentUser
-            txtPersonnel.Text = Personnel.Name
-        End If
-
-        'Dim per As Database.Personnel = winPersonnelList.SelectDialog()
-        'If Not per.IsNull() Then
-        '    Personnel = per
-        '    txtPersonnel.Text = per.Name
+        'If Not Personnel.IsNull() AndAlso winLogIn.ShowDialog("此銷售人員的帳號密碼", Personnel.ID).State <> LoginState.Success Then
+        '    Exit Sub
         'End If
+
+        'If winLogIn.ShowDialog("請登入欲修改的銷售帳號").State = LoginState.Success Then
+        '    Personnel = CurrentUser
+        '    txtPersonnel.Text = Personnel.Name
+        'End If
+
+        Dim per As Database.Personnel = winPersonnelList.SelectDialog()
+        If Not per.IsNull() Then
+            Personnel = per
+            txtPersonnel.Text = per.Name
+        End If
 
     End Sub
 
@@ -511,4 +511,5 @@ Public Class winSales
     Private Sub dgSalesList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellContentClick
 
     End Sub
+
 End Class
