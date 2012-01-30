@@ -44,7 +44,9 @@
 
     Private Sub btSetting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSetting.Click
         PrintDialog1.PrinterSettings = PrintDocument1.PrinterSettings
-        If PrintDialog1.ShowDialog() = Windows.Forms.DialogResult.OK Then PrintDocument1.PrinterSettings = PrintDialog1.PrinterSettings
+        PrintDialog1.Document = PrintDocument1
+        Dim result As DialogResult = PrintDialog1.ShowDialog()
+        If result = Windows.Forms.DialogResult.OK Then PrintDocument1.PrinterSettings = PrintDialog1.PrinterSettings
     End Sub
 
     Private Sub btPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPrint.Click

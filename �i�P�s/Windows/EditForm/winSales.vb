@@ -148,7 +148,7 @@ Public Class winSales
         If row IsNot Nothing Then
             dgSalesList.Rows.Add(New String() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, row.Cells("售價").Value, row.Cells("售價").Value, 1})
         End If
-        lbTotal.Text = CalSalesTotal()
+        CalTotalPrice()
     End Sub
 
     Private Sub btDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDeleteSalesItem.Click
@@ -156,7 +156,7 @@ Public Class winSales
             Dim idx As Integer = dgSalesList.SelectedCells.Item(0).RowIndex
             If (idx < dgSalesList.Rows.Count) Then dgSalesList.Rows.RemoveAt(idx)
         End If
-        lbTotal.Text = CalSalesTotal()
+        CalTotalPrice()
     End Sub
 
     Private Function CalSalesTotal() As Single
@@ -167,7 +167,8 @@ Public Class winSales
             row.Cells(cSSubTotal.Index).Value = sub_total
             total += sub_total
         Next
-        Return total + GetContractTotal()
+
+        Return total '+ GetContractTotal()
         'lbSalesTotal.Text = total
     End Function
 
@@ -180,7 +181,7 @@ Public Class winSales
             total += sub_total
         Next
 
-        Return total + GetContractTotal()
+        Return total '+ GetContractTotal()
         'lbSalesTotal.Text = total
     End Function
 
@@ -446,11 +447,32 @@ Public Class winSales
     End Sub
 
     Private Sub CalTotalPrice()
+        Dim GoodsTotal As Single
         If TabControl1.SelectedTab Is tpOrder Then
-            lbTotal.Text = CalOrderTotal()
+            GoodsTotal = CalOrderTotal()
         Else
-            lbTotal.Text = CalSalesTotal()
+            GoodsTotal = CalSalesTotal()
         End If
+        Dim contractTotal As ContractTotal = GetContractTotal()
+
+        Dim msg As String = ""
+        If GoodsTotal > 0 Then msg &= GoodsTotal & "(商品)"
+        If contractTotal.Prepay > 0 Then msg &= " + " & contractTotal.Prepay & "(預付額)"
+        If contractTotal.Discount > 0 Then msg &= " - " & contractTotal.Discount & "(折扣)"
+
+        Dim Deposit As Single = 0
+
+        Try
+            Deposit = Val(txtDeposit.Text)
+        Catch ex As Exception
+        End Try
+
+
+        'If Deposit > 0 Then msg &= " - " & txtDeposit.Text & "(訂金)"
+        Dim total As Single = GoodsTotal + contractTotal.Prepay - contractTotal.Discount
+        lbTotal.Text = "金額:  " & msg & " = " & total
+        lbRealTotal.Text = "應付金額:  " & total & " - " & Deposit & "(訂金) = " & (total - Deposit)
+
     End Sub
 
     Private Sub TabControl1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
@@ -495,17 +517,31 @@ Public Class winSales
     End Sub
 
 
-    Private Function GetContractTotal() As Single
+    Structure ContractTotal
+        Dim Prepay As Single
+        Dim Discount As Single
+    End Structure
+
+    Private Function GetContractTotal() As ContractTotal
         Dim subTotal As Single = 0
+        Dim result As ContractTotal
+        result.Discount = 0
+        result.Prepay = 0
+
         For Each row As DataGridViewRow In dgContract.Rows
+            result.Prepay += row.Cells(cCPrepay.Index).Value
+            result.Discount += row.Cells(cCDiscount.Index).Value
             subTotal += row.Cells(cCPrepay.Index).Value - row.Cells(cCDiscount.Index).Value
         Next
 
-        Return subTotal
+        Return result
     End Function
 
     Private Sub dgContract_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellEndEdit
         CalTotalPrice()
     End Sub
 
+    Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged
+        CalTotalPrice()
+    End Sub
 End Class
