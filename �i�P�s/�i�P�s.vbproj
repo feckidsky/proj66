@@ -90,15 +90,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Lib\Database\AccessServer.vb" />
     <Compile Include="Lib\DataGridViewFilter.vb" />
-    <Compile Include="Lib\Database.vb" />
+    <Compile Include="Lib\Database\Database.vb" />
     <Compile Include="Lib\ErrorLog.vb" />
-    <Compile Include="Lib\NetworkDataBase.vb" />
+    <Compile Include="Lib\Database\AccessClient.vb" />
     <Compile Include="Lib\TCPTool.vb" />
-    <Compile Include="Windows\DataGridViewPrintDialog.Designer.vb">
+    <Compile Include="Windows\Dialog\DataGridViewPrintDialog.Designer.vb">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\DataGridViewPrintDialog.vb">
+    <Compile Include="Windows\Dialog\DataGridViewPrintDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\EditForm\winContract.Designer.vb">
@@ -190,7 +191,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Program.vb" />
-    <Compile Include="Lib\StructureBase.vb" />
+    <Compile Include="Lib\Database\StructureBase.vb" />
     <Compile Include="Windows\EditForm\winGoods.Designer.vb">
       <DependentUpon>winGoods.vb</DependentUpon>
     </Compile>
@@ -245,15 +246,15 @@
     <Compile Include="Windows\UserAccount\winChangePassword.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\DataGridViewVisibleDialog.Designer.vb">
+    <Compile Include="Windows\Dialog\DataGridViewVisibleDialog.Designer.vb">
       <DependentUpon>DataGridViewVisibleDialog.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\DataGridViewVisibleDialog.vb">
+    <Compile Include="Windows\Dialog\DataGridViewVisibleDialog.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Windows\DataGridViewPrintDialog.resx">
+    <EmbeddedResource Include="Windows\Dialog\DataGridViewPrintDialog.resx">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -347,7 +348,7 @@
       <DependentUpon>winChangePassword.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\DataGridViewVisibleDialog.resx">
+    <EmbeddedResource Include="Windows\Dialog\DataGridViewVisibleDialog.resx">
       <DependentUpon>DataGridViewVisibleDialog.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

@@ -788,6 +788,8 @@ Public Class TCPTool
             Return Send(CMD & "," & Para)
         End Function
 
+
+
         Public Function Send(ByVal Msg As String) As Boolean ', Optional ByVal SendLevel As Level = Level.Low) As Boolean
             Dim SendLevel As Level = Level.Low
             Dim newMsg As String = "[/" & Msg & "/]"

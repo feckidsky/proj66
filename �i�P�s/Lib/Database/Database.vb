@@ -646,7 +646,7 @@
         ''' <summary>對資料庫下達SQL指令</summary>
         ''' <param name="SqlCommand">SQL字串</param>
         ''' <param name="File">檔按路徑</param>
-        Public Shared Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
+        Public Overridable Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
             Dim Count As Long
             SyncLock Lock
                 Dim DBControl As OleDb.OleDbConnection = ConnectBase(File)
