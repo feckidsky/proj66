@@ -9,6 +9,20 @@
         End Sub
     End Structure
 
+    Public Structure SalesArgs
+        Dim Sales As Sales
+        Dim GoodsList() As StructureBase.SalesGoods
+        Dim OrderList() As StructureBase.OrderGoods
+        Dim SalesContracts() As StructureBase.SalesContract
+        Sub New(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            Me.Sales = sales
+            Me.GoodsList = GoodsList
+            Me.OrderList = OrderList
+            Me.SalesContracts = SalesContracts
+        End Sub
+
+    End Structure
+
 #Region "Access"
     Public Class Access
 
@@ -173,7 +187,7 @@
         End Function
 
         '更新庫存內容
-        Public Sub ChangeStock(ByVal newStock As Stock)
+        Public Overridable Sub ChangeStock(ByVal newStock As Stock)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
             Command(SQLCommand, BasePath)
             OnChangedStock(New Stock)
@@ -181,7 +195,7 @@
         End Sub
 
         '刪除一筆庫存
-        Public Sub DeleteStock(ByVal dStock As Stock)
+        Public Overridable Sub DeleteStock(ByVal dStock As Stock)
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
             'RaiseEvent DeletedStock(dStock)
@@ -440,22 +454,31 @@
         'End Function
 
 
+
+        Public Sub CreateSales(ByVal args As SalesArgs)
+            CreateSales(args.Sales, args.GoodsList, args.OrderList, args.SalesContracts)
+        End Sub
+
+        Public Sub ChangeSales(ByVal args As SalesArgs)
+            ChangeSales(args.Sales, args.GoodsList, args.OrderList, args.SalesContracts)
+        End Sub
+
         '新增銷貨單
-        Public Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
+        Public Overridable Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods, SalesContracts)
             'RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
             OnCreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
         End Sub
 
         '刪除銷貨單
-        Public Sub DeleteSales(ByVal dSales As Sales)
+        Public Overridable Sub DeleteSales(ByVal dSales As Sales)
             DeleteSalesWithoutEvent(dSales)
             'RaiseEvent DeletedSales(dSales)
             OnDeletedSales(dSales)
         End Sub
 
         '修改銷貨單
-        Public Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
+        Public Overridable Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
             DeleteSalesWithoutEvent(newSales)
             CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods, SalesContracts)
             'RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
@@ -814,104 +837,104 @@
 
 
         ''' <summary>新增供應商</summary>
-        Public Sub AddSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             If trigger Then OnCreatedSupplier(data)
         End Sub
 
-        Public Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Supplier.Table, "Label", data.Label), BasePath)
             If trigger Then OnDeletedSupplier(data)
         End Sub
 
-        Public Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedSupplier(data)
         End Sub
 
         ''' <summary>新增客戶</summary>
-        Public Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             If trigger Then OnCreatedCustomer(data)
         End Sub
 
-        Public Sub DeleteCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Customer.Table, "Label", data.Label), BasePath)
             If trigger Then OnDeletedCustomer(data)
         End Sub
 
-        Public Sub ChangeCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedCustomer(data)
         End Sub
 
         ''' <summary>新增員工</summary>
-        Public Sub AddPersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddPersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             'PersonnelList.Add(data)
             If trigger Then OnCreatedPersonnel(data)
         End Sub
 
-        Public Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Personnel.Table, "Label", data.Label), BasePath)
             If trigger Then OnDeletedPersonnel(data)
         End Sub
 
-        Public Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedPersonnel(data)
         End Sub
 
         ''' <summary>新增商品</summary>
-        Public Sub AddGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             'GoodsList.Add(data)
             If trigger Then OnCreatedGoods(data)
         End Sub
 
-        Public Sub DeleteGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Goods.Table, "Label", data.Label), BasePath)
             If trigger Then OnDeletedGoods(data)
         End Sub
 
-        Public Sub ChangeGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedGoods(data)
         End Sub
 
         ''' <summary>新增門號</summary>
-        Public Sub AddContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             If trigger Then OnCreatedContract(data)
         End Sub
 
-        Public Sub ChangeContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedContract(data)
         End Sub
 
-        Public Sub DeleteContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Contract.Table, "Label", data.Label), BasePath)
             If trigger Then OnDeletedContract(data)
         End Sub
 
 
-        Public Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             AddBase(data)
             If trigger Then OnCreatedHistoryPrice(data)
         End Sub
 
-        Public Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedHistoryPrice(data)
         End Sub
 
-        Public Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
             If trigger Then OnDeletedHistoryPrice(data)
         End Sub
 
-        Public Sub DeleteHistoryPriceList(ByVal GoodsLabel As String, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteHistoryPriceList(ByVal GoodsLabel As String, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(HistoryPrice.Table, "GoodsLabel", GoodsLabel), BasePath)
             Dim data As New HistoryPrice
             data.GoodsLabel = GoodsLabel
@@ -919,7 +942,7 @@
         End Sub
 
         ''' <summary>新增庫存</summary>
-        Public Sub AddStock(ByVal data As Stock)
+        Public Overridable Sub AddStock(ByVal data As Stock)
             AddBase(data)
             OnCreatedStock(data)
         End Sub
@@ -1011,19 +1034,7 @@
             RaiseEvent DeletedStock(Me, stock)
         End Sub
 
-        Public Structure SalesArgs
-            Dim Sales As Sales
-            Dim GoodsList() As StructureBase.SalesGoods
-            Dim OrderList() As StructureBase.OrderGoods
-            Dim SalesContracts() As StructureBase.SalesContract
-            Sub New(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
-                Me.Sales = sales
-                Me.GoodsList = GoodsList
-                Me.OrderList = OrderList
-                Me.SalesContracts = SalesContracts
-            End Sub
 
-        End Structure
 
         Friend Sub OnCreatedSales(ByVal sales As SalesArgs)
             OnCreatedSales(sales.Sales, sales.GoodsList, sales.OrderList, sales.SalesContracts)

@@ -17,15 +17,21 @@ Public Module Program
         Success = 2
     End Enum
 
+    Enum Connect
+        Client = 0
+        Server = 1
+    End Enum
+
     Structure SystemOptional
         Dim OrderBackcolor As Integer
         Dim SalesBackColor As Integer
-
+        Dim Mode As Connect
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
                 def.OrderBackcolor = Color.LightPink.ToArgb
                 def.SalesBackColor = Color.LightGreen.ToArgb
+                def.Mode = Connect.Client
                 Return def
             End Get
         End Property
@@ -483,81 +489,79 @@ Public Module Program
     End Function
 
     Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.ChangedContract
-        DB.ChangeContract(con, False)
+        If Config.Mode = Connect.Server Then DB.ChangeContract(con, False)
     End Sub
 
     Private Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.ChangedCustomer
-        DB.ChangeCustomer(cus, False)
+        If Config.Mode = Connect.Server Then DB.ChangeCustomer(cus, False)
     End Sub
 
     Private Sub ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.ChangedGoods
-        DB.ChangeGoods(goods, False)
+        If Config.Mode = Connect.Server Then DB.ChangeGoods(goods, False)
     End Sub
 
     Private Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.ChangedHistoryPrice
-        DB.ChangeHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then DB.ChangeHistoryPrice(hp, False)
     End Sub
 
     Private Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.ChangedPersonnel
-        DB.ChangePersonnel(per, False)
+        If Config.Mode = Connect.Server Then DB.ChangePersonnel(per, False)
     End Sub
 
 
     Private Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.ChangedSupplier
-        DB.ChangeSupplier(sup, False)
+        If Config.Mode = Connect.Server Then DB.ChangeSupplier(sup, False)
     End Sub
 
-
-
     Private Sub CreatedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.CreatedContract
-        DB.AddContract(con, False)
+        If Config.Mode = Connect.Server Then DB.AddContract(con, False)
     End Sub
 
     Private Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.CreatedCustomer
-        DB.AddCustomer(cus, False)
+        If Config.Mode = Connect.Server Then DB.AddCustomer(cus, False)
     End Sub
 
     Private Sub CreatedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.CreatedGoods
-        DB.AddGoods(goods, False)
+        If Config.Mode = Connect.Server Then DB.AddGoods(goods, False)
     End Sub
 
     Private Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.CreatedHistoryPrice
-        DB.AddHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then DB.AddHistoryPrice(hp, False)
     End Sub
 
     Private Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.CreatedPersonnel
-        DB.AddPersonnel(per, False)
+        If Config.Mode = Connect.Server Then DB.AddPersonnel(per, False)
     End Sub
 
     Private Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.CreatedSupplier
-        DB.AddSupplier(sup, False)
+        If Config.Mode = Connect.Server Then DB.AddSupplier(sup, False)
     End Sub
 
     Private Sub DeletedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.DeletedContract
-        DB.DeleteContract(con, False)
+        If Config.Mode = Connect.Server Then DB.DeleteContract(con, False)
     End Sub
 
     Private Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.DeletedCustomer
-        DB.DeleteCustomer(cus, False)
+        If Config.Mode = Connect.Server Then DB.DeleteCustomer(cus, False)
     End Sub
 
     Private Sub DeletedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.DeletedGoods
-        DB.DeleteGoods(goods, False)
+        If Config.Mode = Connect.Server Then DB.DeleteGoods(goods, False)
     End Sub
 
     Private Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPrice
-        DB.DeleteHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then DB.DeleteHistoryPrice(hp, False)
     End Sub
 
     Private Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPriceList
-        DB.DeleteHistoryPriceList(hp.GoodsLabel, False)
+        If Config.Mode = Connect.Server Then DB.DeleteHistoryPriceList(hp.GoodsLabel, False)
     End Sub
 
     Private Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.DeletedPersonnel
-        DB.DeletePersonnel(per, False)
+        If Config.Mode = Connect.Server Then DB.DeletePersonnel(per, False)
     End Sub
 
     Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.DeletedSupplier
-        DB.DeleteSupplier(sup, False)
+        If Config.Mode = Connect.Server Then DB.DeleteSupplier(sup, False)
     End Sub
 End Module

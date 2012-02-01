@@ -145,7 +145,7 @@
             args.FileList = FileList
             args.SqlCommand = SQLCommand
 
-            Send("ReadArgs", Code.SerializeWithZIP(args))
+            Send("ReadArgs", args)
             ResponseDataTable = Nothing
 
             While (ResponseDataTable Is Nothing)
@@ -155,9 +155,9 @@
             Return ResponseDataTable
         End Function
 
-        Public Sub Send(ByVal cmd As String, ByVal args As String)
+        Public Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             'If Not Client.Connected Then Client.Connect()
-            Client.Send(cmd, args)
+            Client.Send(cmd, Code.SerializeWithZIP(args))
         End Sub
 
 
@@ -168,6 +168,8 @@
         Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
             RaiseEvent ConnectSuccess(Me)
         End Sub
+
+
 
         Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Client.ReceiveSplitMessage
 
@@ -209,6 +211,89 @@
                     MsgBox("不明指令:" & vbCrLf & Data(0))
             End Select
         End Sub
+
+        Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+            Send("CreatePersonnel", pen)
+        End Sub
+
+        Overrides Sub DeletePersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+            Send("DeletePersonnel", pen)
+        End Sub
+        Overrides Sub ChangePersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+            Send("ChangePersonnel", pen)
+        End Sub
+
+        Overrides Sub AddSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+            Send("CreateSupplier", data)
+        End Sub
+        Overrides Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteSupplier", data)
+        End Sub
+        Overrides Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+            Send("ChangeSupplier", data)
+        End Sub
+
+        Overrides Sub AddCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+            Send("CreateCustomer", data)
+        End Sub
+        Overrides Sub DeleteCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteCustomer", data)
+        End Sub
+
+        Overrides Sub ChangeCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+            Send("ChangeCustomer", data)
+        End Sub
+        Overrides Sub AddContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+            Send("CreateContract", data)
+        End Sub
+        Overrides Sub DeleteContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteConract", data)
+        End Sub
+        Overrides Sub ChangeContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+            Send("ChangeContract", data)
+        End Sub
+        Overrides Sub AddGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+            Send("CreateGoods", data)
+        End Sub
+        Overrides Sub DeleteGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteGoods", data)
+        End Sub
+        Overrides Sub ChangeGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+            Send("ChangeGoods", data)
+        End Sub
+        Overrides Sub AddStock(ByVal data As Stock)
+            Send("CreateStock", data)
+        End Sub
+        Overrides Sub DeleteStock(ByVal data As Stock)
+            Send("DeleteStock", data)
+        End Sub
+        Overrides Sub ChangeStock(ByVal data As Stock)
+            Send("ChangeStock", data)
+        End Sub
+        Overrides Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+            Send("CreateHistoryPrice", data)
+        End Sub
+        Overrides Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteHistoryPrice", data)
+        End Sub
+        Overrides Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+            Send("ChangeHistoryPrice", data)
+        End Sub
+        Overrides Sub DeleteHistoryPriceList(ByVal Label As String, Optional ByVal Trigger As Boolean = True)
+            Send("DeleteHistoryPriceList", Label)
+        End Sub
+
+        Overrides Sub CreateSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            Send("CreateSales", New SalesArgs(sales, GoodsList, OrderList, SalesContracts))
+        End Sub
+        Overrides Sub ChangeSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            Send("ChangeSales", New SalesArgs(sales, GoodsList, OrderList, SalesContracts))
+        End Sub
+
+        Overrides Sub DeleteSales(ByVal sales As Sales)
+            Send("DeleteSales", sales)
+        End Sub
+
     End Class
 
 

@@ -18,15 +18,31 @@
                     Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
                     Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
                     Client.Send("ReadResponse", Code.SerializeWithZIP(dt))
-                Case "CreatePersonnel"
-                Case "DeletePersonnel"
-                Case "UpdatePersonnel"
-                Case "CreateSupplier"
-                Case "DeleteSupplier"
-                Case "UpdateSupplier"
-                Case "CreateCustomer"
-                Case "DeleteCustomer"
-                Case "UpdateCustomer"
+                Case "CreatePersonnel" : Access.AddPersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
+                Case "DeletePersonnel" : Access.DeletePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
+                Case "ChangePersonnel" : Access.ChangePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
+                Case "CreateSupplier" : Access.AddSupplier(Code.DeserializeWithUnzip(Of Supplier)(Data(1)))
+                Case "DeleteSupplier" : Access.DeleteSupplier(Code.DeserializeWithUnzip(Of Supplier)(Data(1)))
+                Case "ChangeSupplier" : Access.ChangeSupplier(Code.DeserializeWithUnzip(Of Supplier)(Data(1)))
+                Case "CreateCustomer" : Access.AddCustomer(Code.DeserializeWithUnzip(Of Customer)(Data(1)))
+                Case "DeleteCustomer" : Access.DeleteCustomer(Code.DeserializeWithUnzip(Of Customer)(Data(1)))
+                Case "ChangeCustomer" : Access.ChangeCustomer(Code.DeserializeWithUnzip(Of Customer)(Data(1)))
+                Case "CreateContract" : Access.AddContract(Code.DeserializeWithUnzip(Of Contract)(Data(1)))
+                Case "DeleteContract" : Access.DeleteContract(Code.DeserializeWithUnzip(Of Contract)(Data(1)))
+                Case "ChangeContract" : Access.ChangeContract(Code.DeserializeWithUnzip(Of Contract)(Data(1)))
+                Case "CreateGoods" : Access.AddGoods(Code.DeserializeWithUnzip(Of Goods)(Data(1)))
+                Case "DeleteGoods" : Access.DeleteGoods(Code.DeserializeWithUnzip(Of Goods)(Data(1)))
+                Case "ChangeGoods" : Access.ChangeGoods(Code.DeserializeWithUnzip(Of Goods)(Data(1)))
+                Case "CreateStock" : Access.AddStock(Code.DeserializeWithUnzip(Of Stock)(Data(1)))
+                Case "DeleteStock" : Access.DeleteStock(Code.DeserializeWithUnzip(Of Stock)(Data(1)))
+                Case "ChangeStock" : Access.ChangeStock(Code.DeserializeWithUnzip(Of Stock)(Data(1)))
+                Case "CreateHistoryPrice" : Access.AddHistoryPrice(Code.DeserializeWithUnzip(Of HistoryPrice)(Data(1)))
+                Case "DeleteHistoryPrice" : Access.DeleteHistoryPrice(Code.DeserializeWithUnzip(Of HistoryPrice)(Data(1)))
+                Case "ChangeHistoryPrice" : Access.ChangeHistoryPrice(Code.DeserializeWithUnzip(Of HistoryPrice)(Data(1)))
+                Case "DeleteHistoryPriceList" : Access.DeleteHistoryPriceList(Code.DeserializeWithUnzip(Of String)(Data(1)))
+                Case "CreateSales" : Access.CreateSales(Code.DeserializeWithUnzip(Of SalesArgs)(Data(1)))
+                Case "ChangeSales" : Access.ChangeSales(Code.DeserializeWithUnzip(Of SalesArgs)(Data(1)))
+                Case "DeleteSales" : Access.DeleteSales(Code.DeserializeWithUnzip(Of Sales)(Data(1)))
 
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
@@ -56,7 +72,7 @@
         End Sub
 
         Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As StructureBase.Sales, ByVal GoodsList() As StructureBase.SalesGoods, ByVal OrderList() As StructureBase.OrderGoods, ByVal SalesContracts() As StructureBase.SalesContract) Handles Access.ChangedSales
-            Server.ServerSend("ChangedSales", Code.SerializeWithZIP(New Access.SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+            Server.ServerSend("ChangedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
         End Sub
 
         Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As StructureBase.Stock) Handles Access.ChangedStock
@@ -87,7 +103,7 @@
         End Sub
 
         Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As StructureBase.Sales, ByVal GoodsList() As StructureBase.SalesGoods, ByVal OrderList() As StructureBase.OrderGoods, ByVal SalesContracts() As StructureBase.SalesContract) Handles Access.CreatedSales
-            Server.ServerSend("CreatedSales", Code.SerializeWithZIP(New Access.SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+            Server.ServerSend("CreatedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
         End Sub
 
         Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As StructureBase.Stock) Handles Access.CreatedStock
