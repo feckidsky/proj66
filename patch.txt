@@ -1,3 +1,11 @@
+20120205-1
+1.新增ServerName與ServerPort設定，可指定伺服名稱(店名)與通訊埠。
+2.Access元件改為繼承自TcpTool.Client。
+3.自AccessClent中刪除Client元件，由Access繼承的Client來代替。
+4.主畫面現在可以選擇資料來源，可以是本機資料庫(Server模式)或連線到Server。
+5.庫存查詢頁中的資料來源預設為主畫面的資料來源。
+6修改編輯訂單/銷貨單中的庫存商品的非本機庫存判斷條件。
+
 20120205
 1.將系統執行分為兩種模式(Server/Client)。
 2.將各頁面與資料庫資料來源自本機改為Client，使各頁可與各Server直接查詢資料，以達成遠端查詢的功能。

@@ -5,8 +5,10 @@
 
         btOrderBackColor.BackColor = ToColor(Config.OrderBackcolor)
         btSalesBackColor.BackColor = ToColor(Config.SalesBackColor)
-        UpdateShopList()
 
+        txtServerName.Text = Config.ServerName
+        txtPort.Text = Config.ServerPort
+        UpdateShopList()
 
     End Sub
 
@@ -45,24 +47,48 @@
 
         Config.OrderBackcolor = btOrderBackColor.BackColor.ToArgb
         Config.SalesBackColor = btSalesBackColor.BackColor.ToArgb
+
+        Config.ServerName = txtServerName.Text
+        If Config.Mode = Connect.Server Then Server.ChangeName(Config.ServerName)
+
+        Dim newPort As Integer
+        If Not Integer.TryParse(txtPort.Text, newPort) Then
+            MsgBox("通訊埠設定錯誤!")
+            Exit Sub
+        End If
+
+        If Config.ServerPort <> newPort Then
+            Config.ServerPort = newPort
+            Server.Port = Config.ServerPort
+            Server.Close()
+            Server.Open()
+        End If
+
         Config.Mode = cbMode.SelectedIndex
         ConfigSave()
 
+
         Client.EndConnect()
-        Dim lstClient As New List(Of Database.AccessClient)
+        Dim lstClient As New List(Of Database.Access)
         If Config.Mode = Connect.Server Then lstClient.Add(myDatabase)
         lstClient.AddRange(GetShopList())
         Client.Client = lstClient.ToArray()
         Client.StartConnect()
         Client.Save(ClientPath)
 
-        If ModeChanged Then
-            If MsgBox("您已經改變工作模式，必須重新啟動才能正式生效，您現在要重新啟動？", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "重新啟動") = MsgBoxResult.Yes Then
 
-                FinishProgram()
-                Application.Restart()
-            End If
+        If ModeChanged Then
+            'If MsgBox("您已經改變工作模式，必須重新啟動才能正式生效，您現在要重新啟動？", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "重新啟動") = MsgBoxResult.Yes Then
+            '    FinishProgram()
+            '    Application.Restart()
+            'End If
+            MsgBox("您已經改變工作模式，現在的模式是[" & cbMode.Text & "]。")
+
+            FinishProgram()
+            InitialProgram()
         End If
+
+
         Me.Close()
     End Sub
 
@@ -82,5 +108,10 @@
         Else
             MsgBox("Client無此功能")
         End If
+    End Sub
+
+    Private Sub cbMode_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbMode.SelectedIndexChanged
+        txtServerName.Enabled = cbMode.SelectedIndex = 1
+        txtPort.Enabled = cbMode.SelectedIndex = 1
     End Sub
 End Class

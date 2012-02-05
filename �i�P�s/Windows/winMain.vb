@@ -5,9 +5,19 @@ Public Class winMain
 
 
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        cbForm.SelectedIndex = 2
-        'UpdateSalesList()
-        Me.Text = SystemTitle & " - " & CurrentUser.Name
+        UpdateTitle()
+        UpdateSalesList()
+
+    End Sub
+
+    Dim UpdateTitleHandler As New Action(AddressOf UpdateTitle)
+    Private Sub UpdateTitle()
+        If Me.InvokeRequired Then
+            Me.Invoke(UpdateTitleHandler)
+            Exit Sub
+        End If
+        Dim connectState As String = IIf(access.GetType Is GetType(Database.AccessClient) And Not access.Connected, "斷線", "已連線")
+        Me.Text = SystemTitle & " - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
     End Sub
 
     Dim Filter As DataGridViewFilter
@@ -15,16 +25,16 @@ Public Class winMain
 
         InitialProgram()
 
-        If Config.Mode = Connect.Server Then
-            access = Program.myDatabase
-            'access = Client.Client(0)
-        Else
-            If Client.Client.Count = 0 Then
-                access = New Database.AccessClient()
-            Else
-                access = Client.Client(0)
-            End If
-        End If
+        'If Config.Mode = Connect.Server Then
+        '    access = Program.myDatabase
+        '    'access = Client.Client(0)
+        'Else
+        '    If Client.Client.Count = 0 Then
+        '        access = New Database.AccessClient()
+        '    Else
+        '        access = Client.Client(0)
+        '    End If
+        'End If
 
         ' 此為 Windows Form 設計工具所需的呼叫。
         InitializeComponent()
@@ -40,13 +50,24 @@ Public Class winMain
         Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式", "內容")
         Filter.AddNumberFilter("訂金", "金額", "利潤")
         dgSales.DefaultCellStyle.WrapMode = DataGridViewTriState.True
+
+        cbClient.Items.Clear()
+        cbClient.Items.AddRange(Client.GetNameList())
+        If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
+        cbForm.SelectedIndex = 2
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
-        'ShowKind()
         FormIndex = cbForm.SelectedIndex
-        UpdateSalesList()
+        If Me.Created Then UpdateSalesList()
     End Sub
+
+    Private Sub cbClient_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.SelectedIndexChanged
+        access = Client(cbClient.Text)
+        If Me.Created Then UpdateSalesList()
+        UpdateTitle()
+    End Sub
+
 
     Dim StartTime As Date
     Dim EndTime As Date
@@ -54,6 +75,7 @@ Public Class winMain
 
     Public Sub UpdateSalesList()
         If Not Me.Created Or access Is Nothing Then Exit Sub
+        If access.GetType Is GetType(Database.AccessClient) AndAlso Not access.Connected Then dgSales.Rows.Clear()
 
         If rToday.Checked Then
             StartTime = Today.Date
@@ -143,11 +165,11 @@ Public Class winMain
     End Sub
 
     Private Sub rToday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged
-        UpdateSalesList()
+        If Me.Created Then UpdateSalesList()
     End Sub
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
-        UpdateSalesList()
+        If Me.Created Then UpdateSalesList()
     End Sub
 
     Private Sub 銷貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨AToolStripMenuItem.Click, 銷貨ToolStripMenuItem.Click
@@ -340,6 +362,21 @@ Public Class winMain
 
     End Sub
 
+    Private Sub access_ConnectedFail(ByVal Client As TCPTool.Client) Handles access.ConnectedFail
+        UpdateTitle()
+    End Sub
+
+    Dim UpdateSalesListHandler As New Action(AddressOf UpdateSalesList)
+    Private Sub access_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles access.ConnectedSuccess
+        If Me.InvokeRequired Then
+            Me.Invoke(UpdateTitleHandler)
+            Me.Invoke(UpdateSalesListHandler)
+            Exit Sub
+        End If
+        UpdateTitleHandler()
+        UpdateSalesListHandler()
+    End Sub
+
     Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
@@ -361,6 +398,8 @@ Public Class winMain
             DeleteRowHandler.Invoke(sales)
         End If
     End Sub
+
+
 
 
 End Class

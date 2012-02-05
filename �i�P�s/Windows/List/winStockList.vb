@@ -25,6 +25,7 @@
     End Sub
 
     Private Sub cbStock_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.SelectedIndexChanged
+        access = Client(cbStock.Text)
         UpdateStockList()
     End Sub
 
@@ -34,8 +35,9 @@
         'cbStock.Items.Add("本機庫存")
         cbStock.Items.AddRange(Client.GetNameList())
 
-        cbStock.SelectedIndex = 0
+        cbStock.Text = access.Name ' = 0
         UpdateTitleText()
+        UpdateStockList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -54,14 +56,14 @@
     End Sub
 
     Public Sub UpdateStockList()
-        If cbStock.IsDisposed Then Exit Sub
-        Dim DT As Data.DataTable
-        If cbStock.SelectedIndex = 0 Then
+        If Not Me.Created Then Exit Sub
+        Dim DT As Data.DataTable = access.GetStockListWithHistoryPrice()
+        'If cbStock.SelectedIndex = 0 Then
 
-            DT = Program.myDatabase.GetStockListWithHistoryPrice() 'DB.GetStockList()
-        Else
-            DT = Client(cbStock.Text).GetStockListWithHistoryPrice
-        End If
+        '    DT = Program.myDatabase.GetStockListWithHistoryPrice() 'DB.GetStockList()
+        'Else
+        '    DT = access.GetStockListWithHistoryPrice
+        'End If
 
         dgItemList.DataSource = DT
 
@@ -84,7 +86,8 @@
         SelectedRow = Nothing
         GoodsFilterText = ""
         MyBase.ShowDialog()
-        If cbStock.SelectedIndex > 0 Then
+
+        If db.Name <> cbStock.Text Then
             MsgBox("您無法選擇不在本店的庫存", MsgBoxStyle.Exclamation)
             SelectedRow = Nothing
         End If
@@ -97,7 +100,7 @@
         SelectedRow = Nothing
         GoodsFilterText = GoodsLabel
         MyBase.ShowDialog()
-        If cbStock.SelectedIndex > 0 Then
+        If SelectedRow IsNot Nothing And DB.Name <> cbStock.Text Then
             MsgBox("您無法選擇不在本店的庫存", MsgBoxStyle.Exclamation)
             SelectedRow = Nothing
         End If
@@ -128,9 +131,9 @@
 
     Private Sub UpdateTitleText()
         Dim connectState As String = ""
-        If Client(cbStock.Text).GetType Is GetType(Database.AccessClient) Then
-            Dim c As Database.AccessClient = Client(cbStock.Text)
-            connectState = IIf(c.Client.Connected, "-已連線", "-斷線")
+        If access.GetType Is GetType(Database.AccessClient) Then
+            Dim c As Database.AccessClient = access
+            connectState = IIf(c.Connected, "-已連線", "-斷線")
         End If
         Me.Text = "庫存查詢-" & cbStock.Text & connectState
     End Sub

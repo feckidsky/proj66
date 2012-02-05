@@ -25,6 +25,7 @@
 
 #Region "Access"
     Public Class Access
+        Inherits TCPTool.Client
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
 
@@ -408,6 +409,7 @@
         Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.TypeOfPayment) As String
             Dim lst As New List(Of String)
             Dim dt As DataTable = GetContractListBySalesLabel(Label)
+            If dt Is Nothing Then Return ""
 
             For Each r As DataRow In dt.Rows
                 lst.Add(r("Name"))
@@ -584,7 +586,7 @@
             Return DBControl
         End Function
 
-        Public Shared Sub Close(ByVal DBControl As OleDb.OleDbConnection)
+        Public Overloads Shared Sub Close(ByVal DBControl As OleDb.OleDbConnection)
             Try : DBControl.Close() : Catch : End Try
             Try : DBControl.Dispose() : Catch : End Try
         End Sub

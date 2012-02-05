@@ -27,6 +27,7 @@ Public Module Program
         Dim SalesBackColor As Integer
         Dim Mode As Connect
         Dim ServerName As String
+        Dim ServerPort As Integer
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
@@ -34,6 +35,7 @@ Public Module Program
                 def.SalesBackColor = Color.LightGreen.ToArgb
                 def.Mode = Connect.Client
                 def.ServerName = My.Computer.Name
+                def.ServerPort = 3600
                 Return def
             End Get
         End Property
@@ -66,6 +68,8 @@ Public Module Program
 
         If Config.Mode = Connect.Server Then
             Server.Access = myDatabase
+            Server.Port = Config.ServerPort
+            Server.Name = Config.ServerName
             Server.Open()
         End If
 
@@ -355,7 +359,8 @@ Public Module Program
             AddHandler .DeletedGoods, AddressOf DeletedGoods
             AddHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
             AddHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
-            AddHandler .ConnectSuccess, AddressOf ConnectSuccess
+            AddHandler .ConnectedSuccess, AddressOf ConnectSuccess
+            AddHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
         End With
         'Next
     End Sub
@@ -385,14 +390,15 @@ Public Module Program
             RemoveHandler .DeletedGoods, AddressOf DeletedGoods
             RemoveHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
             RemoveHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
-            RemoveHandler .ConnectSuccess, AddressOf ConnectSuccess
+            RemoveHandler .ConnectedSuccess, AddressOf ConnectSuccess
+            RemoveHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
         End With
         'Next
     End Sub
 
     Dim UpdateDataLock As String = "UpdateDataLock"
 
-    Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectSuccess
+    Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
         If Config.Mode = Connect.Client Then Exit Sub
         SyncLock UpdateDataLock
             Try
@@ -564,5 +570,9 @@ Public Module Program
 
     Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.DeletedSupplier
         If Config.Mode = Connect.Server Then myDatabase.DeleteSupplier(sup, False)
+    End Sub
+
+    Private Sub ccc_ReceiveServerName(ByVal sender As Object, ByVal Name As String) Handles ccc.ReceiveServerName
+        Client.Save(ClientPath)
     End Sub
 End Module

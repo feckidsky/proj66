@@ -4,12 +4,25 @@
         Public WithEvents Access As Access
         Public Port As Integer = 3600
 
+        Public Name As String
+
         Public Sub Open()
             Server.ServerOpen(Port)
         End Sub
+
         Public Sub Close()
             Server.ServerClose()
         End Sub
+
+        Public Sub ChangeName(ByVal newName As String)
+            Name = newName
+            Server.ServerSend("ServerName", Code.SerializeWithZIP(Name))
+        End Sub
+
+        Private Sub Server_ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As TCPTool.Client) Handles Server.ReceiveConnected
+            Client.Send("ServerName", Code.SerializeWithZIP(Name))
+        End Sub
+
 
         Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Server.ServerReceiveSplitMessage
             Select Case Data(0)

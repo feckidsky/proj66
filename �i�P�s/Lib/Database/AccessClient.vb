@@ -14,14 +14,18 @@
         Event BeforeDisconnect(ByVal sender As Object, ByVal client As AccessClient)
         Event BeforeConnect(ByVal sender As Object, ByVal Client As AccessClient)
 
-
+        Dim SaveLock As String = "SaveLock"
         Public Sub Save(ByVal Path As String)
-            Dim lstInfo As New List(Of ClientInfo)
-            For Each c As AccessClient In Client
-                If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(c.Name, c.IP, c.Port))
-            Next
+            SyncLock SaveLock
+                Dim lstInfo As New List(Of ClientInfo)
+                For Each c As Access In Client
+                    If c.GetType IsNot GetType(AccessClient) Then Continue For
+                    Dim cc As AccessClient = c
+                    If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(cc.Name, cc.IP, cc.Port))
+                Next
 
-            Code.Save(lstInfo.ToArray, Path)
+                Code.Save(lstInfo.ToArray, Path)
+            End SyncLock
         End Sub
 
         Public Shared Function Load(ByVal Path As String) As AccessClient()
@@ -41,7 +45,7 @@
             For i As Integer = 0 To Client.Length - 1
                 If Client(i).GetType Is GetType(AccessClient) Then
                     RaiseEvent BeforeConnect(Me, Client(i))
-                    CType(Client(i), AccessClient).Connect()
+                    CType(Client(i), AccessClient).StartConnect()
                 End If
 
             Next
@@ -85,9 +89,11 @@
     Public Class AccessClient
         Inherits Access
 
-        Event ConnectSuccess(ByVal sender As Object)
 
-        Public WithEvents Client As New TCPTool.Client()
+        'Event ConnectSuccess(ByVal sender As Object)
+        Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
+
+        'Public WithEvents Client As New TCPTool.Client()
 
         Dim ResponseDataTable As Data.DataTable = Nothing
 
@@ -106,32 +112,32 @@
         End Sub
 
 
-        ReadOnly Property Connected() As Boolean
-            Get
-                Return Client.Connected
-            End Get
-        End Property
-        Property IP() As String
-            Get
-                Return Client.IP
-            End Get
-            Set(ByVal value As String)
-                Client.IP = value
-            End Set
-        End Property
+        'ReadOnly Property Connected() As Boolean
+        '    Get
+        '        Return Client.Connected
+        '    End Get
+        'End Property
+        'Property IP() As String
+        '    Get
+        '        Return Client.IP
+        '    End Get
+        '    Set(ByVal value As String)
+        '        Client.IP = value
+        '    End Set
+        'End Property
 
-        Property Port() As Integer
-            Get
-                Return Client.Port
-            End Get
-            Set(ByVal value As Integer)
-                Client.Port = value
-            End Set
-        End Property
+        'Property Port() As Integer
+        '    Get
+        '        Return Client.Port
+        '    End Get
+        '    Set(ByVal value As Integer)
+        '        Client.Port = value
+        '    End Set
+        'End Property
 
-        Public Sub Connect()
-            Client.StartConnect()
-        End Sub
+        'Public Sub startConnect()
+        '    Client.StartConnect()
+        'End Sub
 
         Public Sub Disconnect()
             Client.EndConnect()
@@ -148,7 +154,7 @@
         Dim Waiter As New Threading.AutoResetEvent(True)
 
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
-            If Not Client.Connected Then
+            If Not Connected() Then
                 MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return New DataTable
             End If
@@ -175,9 +181,9 @@
             Return ResponseDataTable
         End Function
 
-        Public Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
+        Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             'If Not Client.Connected Then Client.Connect()
-            Client.Send(cmd, Code.SerializeWithZIP(args))
+            MyBase.Send(cmd, Code.SerializeWithZIP(args))
         End Sub
 
 
@@ -185,19 +191,25 @@
             Return Code.DeserializeWithUnzip(Of T)(s)
         End Function
 
-        Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
-            RaiseEvent ConnectSuccess(Me)
-        End Sub
+        'Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
+        '    RaiseEvent ConnectSuccess(Me)
+        'End Sub
 
 
 
-        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Client.ReceiveSplitMessage
+        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ReceiveSplitMessage
 
 
             Dim args As String = ""
             If Data.Length > 1 Then args = Data(1)
 
             Select Case Data(0)
+                Case "ServerName"
+                    Dim newName As String = Repair(Of String)(args)
+                    If Name <> newName Then
+                        Name = newName
+                        RaiseEvent ReceiveServerName(Me, Name)
+                    End If
                 Case "ReadResponse"
                     ResponseDataTable = Repair(Of DataTable)(args)
                     Waiter.Set()
