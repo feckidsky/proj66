@@ -8,6 +8,8 @@ Public Class winStockIn
     End Enum
     Dim Work As Mode
 
+    Dim access As Database.Access
+
     Private SelectedGoods As Database.Goods = Database.Goods.Null()
     Private SelectedSupplier As Database.Supplier = Database.Supplier.Null()
 
@@ -20,19 +22,22 @@ Public Class winStockIn
     End Sub
 
 
-    Public Sub Create()
+    Public Sub Create(ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         Dim data As Stock = GetNewStock()
-
-        UpdateText(data)
         Work = Mode.Create
+        UpdateText(data)
+
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub Open(ByVal stock As Stock)
+    Public Sub Open(ByVal stock As Stock, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
-        UpdateText(stock)
         Work = Mode.Open
+        UpdateText(stock)
+
         MyBase.ShowDialog()
     End Sub
 
@@ -45,9 +50,9 @@ Public Class winStockIn
         txtDate.Text = Data.Date
         txtNote.Text = Data.Note
         txtNumber.Text = Data.Number
-        SelectedGoods = DB.GetGoods(Data.GoodsLabel)
+        SelectedGoods = access.GetGoods(Data.GoodsLabel)
         btSelectGoods.Text = SelectedGoods.ToString()
-        SelectedSupplier = DB.GetSupplier(Data.SupplierLabel)
+        SelectedSupplier = access.GetSupplier(Data.SupplierLabel)
         btSelectSupplier.Text = SelectedSupplier.ToString()
     End Sub
 
@@ -74,16 +79,16 @@ Public Class winStockIn
         End If
 
         If Work = Mode.Create Then
-            DB.AddStock(newStock)
+            access.AddStock(newStock)
         Else
-            DB.ChangeStock(newStock)
+            access.ChangeStock(newStock)
 
         End If
         Me.Close()
     End Sub
 
     Private Sub btAddSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSelectSupplier.Click
-        Dim sel As Supplier = winSupplierList.SelectDialog()
+        Dim sel As Supplier = winSupplierList.SelectDialog(access)
         If Not sel.IsNull() Then
             SelectedSupplier = sel
             btSelectSupplier.Text = SelectedSupplier.ToString()
@@ -91,12 +96,12 @@ Public Class winStockIn
     End Sub
 
     Private Sub btAddGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSelectGoods.Click
-        Dim sel As Goods = winGoodsList.SelectDialog()
+        Dim sel As Goods = winGoodsList.SelectDialog(access)
         If Not sel.IsNull() Then
             SelectedGoods = sel
             btSelectGoods.Text = SelectedGoods.ToString()
 
-            Dim hp As HistoryPrice = DB.GetListHistoryPrice(sel.Label)
+            Dim hp As HistoryPrice = access.GetListHistoryPrice(sel.Label)
             txtPrice.Text = hp.Price
             If txtCost.Text = "" Then txtCost.Text = hp.Cost
 
@@ -119,6 +124,6 @@ Public Class winStockIn
     End Sub
 
     Private Sub btUpdateCostByHistory_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUpdateCostByHistory.Click
-        txtCost.Text = DB.GetListHistoryPrice(SelectedGoods.Label).Cost
+        txtCost.Text = access.GetListHistoryPrice(SelectedGoods.Label).Cost
     End Sub
 End Class

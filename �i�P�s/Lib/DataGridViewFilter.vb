@@ -236,8 +236,8 @@
         Return Nothing
     End Function
 
-    '執行篩選動作
-    Public Sub Filter()
+    '更新篩選功能表的外觀
+    Private Sub UpdateToolStripState()
         Dim f As Font = DataGrid.DefaultCellStyle.Font
         Dim FilterFont As New Font(f.FontFamily, f.Size, FontStyle.Bold + FontStyle.Italic, f.Unit)
 
@@ -267,33 +267,55 @@
             Dim column As DataGridViewColumn = GetColumn(c.HeaderName)
             If column Is Nothing Then Continue For
             column.HeaderCell.Style.BackColor = IIf(enable, FilterColor, bc)
-
-
         Next
+    End Sub
+
+    '執行篩選動作
+    Public Sub Filter()
+        UpdateToolStripState()
 
         DataGrid.CurrentCell = Nothing
 
         ' Try
         For i As Integer = 0 To DataGrid.Rows.Count - 1
-            Dim Match As Boolean = True
-            For Each c As TextFilter In TextFilters
-                Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            Next
+            FilterRow(DataGrid.Rows(i))
+            'Dim Match As Boolean = True
+            'For Each c As TextFilter In TextFilters
+            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
+            'Next
 
-            For Each c As NumberFilter In NumberFilters
+            'For Each c As NumberFilter In NumberFilters
 
-                Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            Next
+            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
+            'Next
 
-            For Each c As BoolFilter In BoolFilters
-                Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            Next
+            'For Each c As BoolFilter In BoolFilters
+            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
+            'Next
 
-            DataGrid.Rows(i).Visible = Match
+            'DataGrid.Rows(i).Visible = Match
         Next
         'Catch
         '    MsgBox(Err.Description)
         'End Try
+    End Sub
+
+    Public Sub FilterRow(ByVal row As DataGridViewRow)
+        Dim Match As Boolean = True
+        For Each c As TextFilter In TextFilters
+            Match = Match And c.Match(GetCellValue(row, c.HeaderName))
+        Next
+
+        For Each c As NumberFilter In NumberFilters
+
+            Match = Match And c.Match(GetCellValue(row, c.HeaderName))
+        Next
+
+        For Each c As BoolFilter In BoolFilters
+            Match = Match And c.Match(GetCellValue(row, c.HeaderName))
+        Next
+
+        row.Visible = Match
     End Sub
 
     '當使用滑鼠右鍵時，將該行選起來
@@ -344,18 +366,31 @@
         If e.Button = MouseButtons.Right And ContextMenuStrip IsNot Nothing Then ContextMenuStrip.Show(sender, e.X, e.Y)
     End Sub
 
-    Public Sub UpdateComboBox()
+    Public Sub AddComboBoxItem(ByVal row As DataGridViewRow)
+        For Each c As TextFilter In TextFilters
+            Dim cb As ToolStripComboBox = c.cms.Items("cbText")
+            Dim text As String = GetCellValue(row, c.HeaderName)
+            If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)
+        Next
+    End Sub
+
+    Public Sub ClearComboBoxItem()
         For Each c As TextFilter In TextFilters
             CType(c.cms.Items("cbText"), ToolStripComboBox).Items.Clear()
         Next
+    End Sub
+
+    Public Sub UpdateComboBox()
+        ClearComboBoxItem()
 
 
         For Each row As DataGridViewRow In DataGrid.Rows
-            For Each c As TextFilter In TextFilters
-                Dim cb As ToolStripComboBox = c.cms.Items("cbText")
-                Dim text As String = GetCellValue(row, c.HeaderName)
-                If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)
-            Next
+            AddComboBoxItem(row)
+            'For Each c As TextFilter In TextFilters
+            '    Dim cb As ToolStripComboBox = c.cms.Items("cbText")
+            '    Dim text As String = GetCellValue(row, c.HeaderName)
+            '    If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)
+            'Next
         Next
         Filter()
     End Sub

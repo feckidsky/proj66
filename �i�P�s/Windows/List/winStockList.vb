@@ -1,5 +1,5 @@
 ﻿Public Class winStockList
-    WithEvents access As Database.Access = Program.DB
+    WithEvents access As Database.Access '= Program.DB
 
     Dim SelectMode As Boolean = False
     Dim Filter As DataGridViewFilter
@@ -31,14 +31,15 @@
     Private Sub Config()
         Filter.SetTextFilter("商品編號", GoodsFilterText)
         cbStock.Items.Clear()
-        cbStock.Items.Add("本機庫存")
+        'cbStock.Items.Add("本機庫存")
         cbStock.Items.AddRange(Client.GetNameList())
 
         cbStock.SelectedIndex = 0
         UpdateTitleText()
     End Sub
 
-    Public Overloads Sub Show()
+    Public Overloads Sub Show(ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(1) Then
             Exit Sub
         End If
@@ -56,7 +57,8 @@
         If cbStock.IsDisposed Then Exit Sub
         Dim DT As Data.DataTable
         If cbStock.SelectedIndex = 0 Then
-            DT = DB.GetStockListWithHistoryPrice() 'DB.GetStockList()
+
+            DT = Program.myDatabase.GetStockListWithHistoryPrice() 'DB.GetStockList()
         Else
             DT = Client(cbStock.Text).GetStockListWithHistoryPrice
         End If
@@ -76,7 +78,8 @@
     End Sub
 
     Public SelectedRow As DataGridViewRow = Nothing
-    Public Function SelectStock() As DataGridViewRow
+    Public Function SelectStock(ByVal db As Database.Access) As DataGridViewRow
+        access = db
         SelectMode = True
         SelectedRow = Nothing
         GoodsFilterText = ""
@@ -88,7 +91,8 @@
         Return SelectedRow 'DataGridView1.SelectedRows.Item(0)
     End Function
 
-    Public Function SelectStock(ByVal GoodsLabel As String) As DataGridViewRow
+    Public Function SelectStock(ByVal GoodsLabel As String, ByVal DB As Database.Access) As DataGridViewRow
+        access = DB
         SelectMode = True
         SelectedRow = Nothing
         GoodsFilterText = GoodsLabel
@@ -114,7 +118,7 @@
     End Sub
 
     Private Sub 進貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨ToolStripMenuItem.Click
-        winStockIn.Create()
+        winStockIn.Create(access)
     End Sub
 
 
@@ -124,9 +128,9 @@
 
     Private Sub UpdateTitleText()
         Dim connectState As String = ""
-        If Client(cbStock.Text) IsNot Nothing Then
-            connectState = IIf(Client(cbStock.Text).Client.Connected, "-已連線", "-斷線")
-
+        If Client(cbStock.Text).GetType Is GetType(Database.AccessClient) Then
+            Dim c As Database.AccessClient = Client(cbStock.Text)
+            connectState = IIf(c.Client.Connected, "-已連線", "-斷線")
         End If
         Me.Text = "庫存查詢-" & cbStock.Text & connectState
     End Sub
@@ -134,5 +138,9 @@
 
     Private Sub 列印PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 列印PToolStripMenuItem.Click
         DataGridViewPrintDialog.ShowDialog("庫存清單", dgItemList)
+    End Sub
+
+    Private Sub cbStock_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.TextChanged
+
     End Sub
 End Class

@@ -12,20 +12,23 @@ Public Class winCustomer
 
     Dim work As Mode
 
+    Dim access As Database.Access
 
     Private Sub winPeople_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         txtLabel.Enabled = work = Mode.Create
         btAccount.Visible = False
     End Sub
 
-    Public Sub Open(ByVal data As Customer)
+    Public Sub Open(ByVal data As Customer, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Open
         UpdateText(data)
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub Create(ByVal Data As Customer)
+    Public Sub Create(ByVal Data As Customer, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Create
         UpdateText(Data)
@@ -69,9 +72,9 @@ Public Class winCustomer
         Dim myData As Customer = GetData()
 
         If work = Mode.Create Then
-            DB.AddCustomer(myData)
+            Access.AddCustomer(myData)
         Else
-            DB.ChangeCustomer(myData)
+            Access.ChangeCustomer(myData)
         End If
         Me.Close()
     End Sub

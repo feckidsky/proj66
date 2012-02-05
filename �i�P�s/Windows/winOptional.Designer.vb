@@ -36,6 +36,8 @@ Partial Class winOptional
         Me.btRepairMDB = New System.Windows.Forms.Button
         Me.btMdbUpdate = New System.Windows.Forms.Button
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.cbMode = New System.Windows.Forms.ComboBox
+        Me.Label1 = New System.Windows.Forms.Label
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.dgShop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -46,7 +48,7 @@ Partial Class winOptional
         '
         Me.GroupBox1.Controls.Add(Me.btSalesBackColor)
         Me.GroupBox1.Controls.Add(Me.btOrderBackColor)
-        Me.GroupBox1.Location = New System.Drawing.Point(13, 235)
+        Me.GroupBox1.Location = New System.Drawing.Point(13, 270)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(176, 88)
         Me.GroupBox1.TabIndex = 0
@@ -73,7 +75,7 @@ Partial Class winOptional
         '
         'btOK
         '
-        Me.btOK.Location = New System.Drawing.Point(329, 339)
+        Me.btOK.Location = New System.Drawing.Point(329, 374)
         Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
         Me.btOK.TabIndex = 1
@@ -82,7 +84,7 @@ Partial Class winOptional
         '
         'btCancel
         '
-        Me.btCancel.Location = New System.Drawing.Point(246, 339)
+        Me.btCancel.Location = New System.Drawing.Point(246, 374)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
         Me.btCancel.TabIndex = 1
@@ -92,9 +94,9 @@ Partial Class winOptional
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.dgShop)
-        Me.GroupBox2.Location = New System.Drawing.Point(13, 12)
+        Me.GroupBox2.Location = New System.Drawing.Point(13, 50)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(420, 207)
+        Me.GroupBox2.Size = New System.Drawing.Size(420, 204)
         Me.GroupBox2.TabIndex = 2
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "連線設定"
@@ -107,10 +109,10 @@ Partial Class winOptional
         Me.dgShop.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
         Me.dgShop.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgShop.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cShop, Me.cIP, Me.cPort})
-        Me.dgShop.Location = New System.Drawing.Point(7, 22)
+        Me.dgShop.Location = New System.Drawing.Point(17, 21)
         Me.dgShop.Name = "dgShop"
         Me.dgShop.RowTemplate.Height = 24
-        Me.dgShop.Size = New System.Drawing.Size(397, 166)
+        Me.dgShop.Size = New System.Drawing.Size(385, 164)
         Me.dgShop.TabIndex = 0
         '
         'cShop
@@ -150,19 +152,40 @@ Partial Class winOptional
         '
         Me.GroupBox3.Controls.Add(Me.btMdbUpdate)
         Me.GroupBox3.Controls.Add(Me.btRepairMDB)
-        Me.GroupBox3.Location = New System.Drawing.Point(226, 235)
+        Me.GroupBox3.Location = New System.Drawing.Point(226, 270)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(178, 88)
         Me.GroupBox3.TabIndex = 4
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "資料庫"
         '
+        'cbMode
+        '
+        Me.cbMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbMode.FormattingEnabled = True
+        Me.cbMode.Items.AddRange(New Object() {"連線端", "伺服器"})
+        Me.cbMode.Location = New System.Drawing.Point(89, 12)
+        Me.cbMode.Name = "cbMode"
+        Me.cbMode.Size = New System.Drawing.Size(100, 20)
+        Me.cbMode.TabIndex = 5
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(30, 15)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(53, 12)
+        Me.Label1.TabIndex = 6
+        Me.Label1.Text = "工作模式"
+        '
         'winOptional
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(445, 380)
+        Me.ClientSize = New System.Drawing.Size(445, 414)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.cbMode)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.btCancel)
         Me.Controls.Add(Me.btOK)
@@ -175,6 +198,7 @@ Partial Class winOptional
         CType(Me.dgShop, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox3.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
@@ -191,4 +215,6 @@ Partial Class winOptional
     Friend WithEvents btRepairMDB As System.Windows.Forms.Button
     Friend WithEvents btMdbUpdate As System.Windows.Forms.Button
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents cbMode As System.Windows.Forms.ComboBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
 End Class

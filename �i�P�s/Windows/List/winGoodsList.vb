@@ -8,7 +8,7 @@ Public Class winGoodsList
 
     Dim work As Mode
 
-    WithEvents access As Database.Access = Program.DB
+    WithEvents access As Database.Access '= Program.DB
 
     Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgGoodsList)
@@ -16,14 +16,17 @@ Public Class winGoodsList
         UpdateGoodsList()
     End Sub
 
-    Public Overloads Sub Show()
+    Public Overloads Sub Show(ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(1) Then Exit Sub
         work = Mode.Normal
         MyBase.Show()
     End Sub
 
 
-    Public Function SelectDialog() As Database.Goods
+    Public Function SelectDialog(ByVal DB As Database.Access) As Database.Goods
+        access = DB
+
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         work = Mode.SelectItem
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -38,7 +41,7 @@ Public Class winGoodsList
     Private Sub UpdateGoodsList()
 
         GoodsLoading = True
-        dgGoodsList.DataSource = DB.GetGoodsList()
+        dgGoodsList.DataSource = access.GetGoodsList()
         GoodsLoading = False
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "品名")
@@ -59,7 +62,7 @@ Public Class winGoodsList
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winGoods.Create(GetNewGoods())
+        winGoods.Create(GetNewGoods(), access)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -73,7 +76,7 @@ Public Class winGoodsList
             Exit Sub
         End If
 
-        winGoods.Open(selected)
+        winGoods.Open(selected, access)
     End Sub
 
     Public Function GetSelectedGoods() As Database.Goods
@@ -105,7 +108,7 @@ Public Class winGoodsList
         End If
 
         'Dim SelectedGoods As Database.Goods = selected
-        Dim count As Integer = DB.GetStockLogByGoodsLabel(selected.Label).Rows.Count
+        Dim count As Integer = access.GetStockLogByGoodsLabel(selected.Label).Rows.Count
         For Each c As Database.AccessClient In Client.Client
             If c.Connected Then count += c.GetStockLogByGoodsLabel(selected.Label).Rows.Count
         Next
@@ -120,8 +123,8 @@ Public Class winGoodsList
 
 
 
-        DB.DeleteGoods(selected)
-        DB.DeleteHistoryPriceList(selected.Label)
+        access.DeleteGoods(selected)
+        access.DeleteHistoryPriceList(selected.Label)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
@@ -134,24 +137,31 @@ Public Class winGoodsList
 
     End Sub
 
+
+    Dim invHistoryPrice As New ItemUpdate(AddressOf UpdateHistory)
     Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
-        UpdateHistory()
+        Me.Invoke(invHistoryPrice)
+        'UpdateHistory()
     End Sub
 
+
+    Delegate Sub ItemUpdate()
+    Dim invGoods As New ItemUpdate(AddressOf UpdateGoodsList)
     Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
-        UpdateGoodsList()
+        Me.Invoke(invGoods)
+        'UpdateGoodsList()
     End Sub
 
 
     Private Sub dgItemList_SelectionChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgGoodsList.SelectionChanged
-        UpdateHistory()
+        If Me.IsHandleCreated Then UpdateHistory()
     End Sub
 
     Private Sub UpdateHistory()
         If GoodsLoading Then Exit Sub
         Dim goods As Database.Goods = GetSelectedGoods()
         gbHistory.Text = "歷史售價 - " & goods.Name
-        Dim dt As Data.DataTable = DB.GetHistoryPriceList(goods.Label)
+        Dim dt As Data.DataTable = access.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
         dgHistory.Columns(0).Visible = False
 
@@ -170,7 +180,7 @@ Public Class winGoodsList
     Private Sub AddHistoryPrice()
         If Not CheckAuthority(2) Then Exit Sub
         Dim goods As Database.Goods = GetSelectedGoods()
-        winHistoryPrice.Create(goods.Label, goods.Name)
+        winHistoryPrice.Create(goods.Label, goods.Name, access)
     End Sub
 
     Private Function GetSelectedHistoryPrice() As Database.HistoryPrice
@@ -200,7 +210,7 @@ Public Class winGoodsList
             MsgBox("您至少必須選擇一個項目", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
-        winHistoryPrice.Open(selectedHisPrice, GetSelectedGoods().Name)
+        winHistoryPrice.Open(selectedHisPrice, GetSelectedGoods().Name, access)
     End Sub
 
 
@@ -216,7 +226,7 @@ Public Class winGoodsList
             Exit Sub
         End If
 
-        DB.DeleteHistoryPrice(GetSelectedHistoryPrice())
+        access.DeleteHistoryPrice(GetSelectedHistoryPrice())
     End Sub
 
 

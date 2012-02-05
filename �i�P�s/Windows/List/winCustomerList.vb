@@ -7,7 +7,7 @@
 
     Dim work As Mode
 
-    WithEvents access As Database.Access = Program.DB
+    WithEvents access As Database.Access '= Program.DB
     Dim Filter As DataGridViewFilter
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgList)
@@ -15,11 +15,12 @@
         UpdateList()
     End Sub
 
-    Public Overloads Sub Show()
-        ShowDialog()
+    Public Overloads Sub Show(ByVal db As Database.Access)
+        ShowDialog(db)
     End Sub
 
-    Public Overloads Sub ShowDialog()
+    Public Overloads Sub ShowDialog(ByVal DB As Database.Access)
+        Me.access = DB
         If Not CheckAuthority(1) Then Exit Sub
         work = Mode.Normal
         MyBase.ShowDialog()
@@ -36,9 +37,10 @@
         End If
     End Function
 
-
+    Dim dt As DataTable
     Private Sub UpdateList()
-        dgList.DataSource = DB.GetCustomerList()
+        dt = access.GetCustomerList()
+        dgList.DataSource = dt
 
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "名稱")
@@ -54,7 +56,7 @@
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winCustomer.Create(GetNewCustomer())
+        winCustomer.Create(GetNewCustomer(), access)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -68,7 +70,7 @@
             Exit Sub
         End If
 
-        winCustomer.Open(item)
+        winCustomer.Open(item, access)
     End Sub
 
     Public Function GetSelectedCustomer() As Database.Customer
@@ -97,7 +99,7 @@
         End If
 
 
-        Dim count As Integer = DB.GetSalesListByCustomer(item.Label).Rows.Count
+        Dim count As Integer = access.GetSalesListByCustomer(item.Label).Rows.Count
 
         For Each c As Database.AccessClient In Client.Client
             If c.Connected Then count += c.GetSalesListByCustomer(item.Label).Rows.Count
@@ -111,7 +113,7 @@
             Exit Sub
         End If
 
-        DB.DeleteCustomer(item)
+        access.DeleteCustomer(item)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgList.CellMouseDoubleClick
@@ -123,11 +125,54 @@
 
 
     End Sub
+    'Delegate Sub ItemUpdate()
+    'Dim inv As New ItemUpdate(AddressOf UpdateList)
+    'Private Sub access_CreatedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles access.CreatedCustomer, access.ChangedCustomer, access.DeletedCustomer
+    '    Me.Invoke(inv)
+    'End Sub
 
-    Private Sub access_CreatedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles access.CreatedCustomer, access.ChangedCustomer, access.DeletedCustomer
-        UpdateList()
+
+    Delegate Sub DelegateItem(ByVal sender As Object, ByVal sup As Database.Customer)
+    Dim invCreate As New DelegateItem(AddressOf access_CreatedItem)
+    Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
+    Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
+
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.CreatedCustomer
+        If Me.InvokeRequired Then
+            Me.Invoke(invCreate, sender, item)
+            Exit Sub
+        End If
+        With item
+            dt.Rows.Add(.Label, .Name, .Tel1, .Tel2, .Note, .Addr, .Modify)
+        End With
+    End Sub
+
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.ChangedCustomer
+        If Me.InvokeRequired Then
+            Me.Invoke(invChange, sender, item)
+            Exit Sub
+        End If
+
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = item.Label Then item.UpdateRow(r) 'r.ItemArray = sup.ToObjects()
+        Next
     End Sub
 
 
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.DeletedCustomer
+        If Me.InvokeRequired Then
+            Me.Invoke(invDelete, sender, item)
+            Exit Sub
+        End If
 
+        Dim delRow As New List(Of DataRow)
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = item.Label Then delRow.Add(r)
+        Next
+
+        For Each r As DataRow In delRow
+            dt.Rows.Remove(r)
+        Next
+
+    End Sub
 End Class

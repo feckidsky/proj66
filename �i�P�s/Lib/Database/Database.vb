@@ -25,7 +25,7 @@
 
 #Region "Access"
     Public Class Access
-
+        Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
 
         Event CreatedContract(ByVal sender As Object, ByVal con As Contract)
@@ -61,11 +61,18 @@
         Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
         Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice)
 
-        Public Sub New()
+        Public Sub New(ByVal Name As String)
+            Me.Name = Name
             Dir = My.Application.Info.DirectoryPath & "\data"
             BasePath = Dir & "\base.mdb"
             SalesPath = Dir & "\sales.mdb"
         End Sub
+
+        'Public Sub New()
+        '    Dir = My.Application.Info.DirectoryPath & "\data"
+        '    BasePath = Dir & "\base.mdb"
+        '    SalesPath = Dir & "\sales.mdb"
+        'End Sub
 
         Public Function GetHistoryPriceList(ByVal Label As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
@@ -190,7 +197,7 @@
         Public Overridable Sub ChangeStock(ByVal newStock As Stock)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
             Command(SQLCommand, BasePath)
-            OnChangedStock(New Stock)
+            OnChangedStock(newStock)
             'RaiseEvent ChangedStock(newStock)
         End Sub
 
@@ -240,13 +247,14 @@
         End Function
 
 
-
-
         ''' <summary>取得進貨記錄</summary>
-        Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
+        Public Function GetStockLog(ByVal StartTime As Date, ByVal EndTime As Date, Optional ByVal StockLabel As String = "") As Data.DataTable
+            Dim StockCondition As String = ""
+            If StockLabel <> "" Then StockCondition = " AND Stock.Label='" & StockLabel & "'"
+
             Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Supplier.Name as 供應商, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價,  Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
-            " WHERE (((Stock.[date]) Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#));"
+            " WHERE ((Stock.[date] Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)" & StockCondition & ");"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT
         End Function
@@ -268,7 +276,7 @@
         End Function
 
         Public Function GetSalesListByCustomer(ByVal Customer As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.Date AS 時間, Customer.Name AS 銷售人員, Personnel.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
+            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.SalesDate AS 時間, Customer.Name AS 銷售人員, Personnel.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
             " FROM ((sales LEFT JOIN (SELECT SalesLabel, sum(SellingPrice*Number) AS 金額 FROM SalesGoods GROUP BY SalesLabel)  AS tmp ON sales.label = tmp.SalesLabel) LEFT JOIN Customer ON sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON sales.PersonnelLabel = Personnel.Label " & _
             " WHERE (sales.CustomerLabel='" & Customer & "');"
 
@@ -277,7 +285,7 @@
         End Function
 
         Public Function GetSalesListByPersonnel(ByVal Personnel As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.Date AS 時間, Customer.Name AS 銷售人員, Personnel.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
+            Dim SQLCommand As String = "SELECT sales.label AS 單號, sales.SalesDate AS 時間, Customer.Name AS 銷售人員, Personnel.Name AS 客戶, sales.TypeOfPayment AS 付款方式, sales.Deposit AS 訂金, tmp.金額, sales.note AS 備註" & _
             " FROM ((sales LEFT JOIN (SELECT SalesLabel, sum(SellingPrice*Number) AS 金額 FROM SalesGoods GROUP BY SalesLabel)  AS tmp ON sales.label = tmp.SalesLabel) LEFT JOIN Customer ON sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON sales.PersonnelLabel = Personnel.Label " & _
             " WHERE (sales.PersonnelLabel='" & Personnel & "');"
 
@@ -312,7 +320,7 @@
         End Function
 
         '讀取銷貨單
-        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType) As Data.DataTable
+        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "") As Data.DataTable
 
             Dim cnd As String = ""
             If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
@@ -321,16 +329,18 @@
             Dim OrderTime As String = "(sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
             Dim SalesTime As String = "(sales.Salesdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
 
+            Dim LabelCnd As String = ""
+            If SalesLabel <> "" Then LabelCnd = "AND Sales.Label='" & SalesLabel & "' "
 
             Dim condition1 As String
 
             Select Case ListType
                 Case GetSalesListType.Order
-                    condition1 = " WHERE ( " & OrderTime & cnd & ") "
+                    condition1 = " WHERE ( " & OrderTime & cnd & LabelCnd & ") "
                 Case GetSalesListType.Sales
-                    condition1 = " WHERE ( " & SalesTime & cnd & ") "
+                    condition1 = " WHERE ( " & SalesTime & cnd & LabelCnd & ") "
                 Case Else
-                    condition1 = " WHERE (( " & OrderTime & " OR " & SalesTime & ")" & cnd & ") "
+                    condition1 = " WHERE (( " & OrderTime & " OR " & SalesTime & ")" & cnd & LabelCnd & ") "
             End Select
 
 
@@ -486,18 +496,18 @@
         End Sub
 
         Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
-            DB.AddBase(newSales)
+            myDatabase.AddBase(newSales)
 
             For Each g As SalesGoods In SalesGoods
-                DB.AddBase(g)
+                myDatabase.AddBase(g)
             Next
 
             For Each o As OrderGoods In OrderGoods
-                DB.AddBase(o)
+                myDatabase.AddBase(o)
             Next
 
             For Each c As SalesContract In SalesContracts
-                DB.AddBase(c)
+                myDatabase.AddBase(c)
             Next
         End Sub
 
@@ -595,7 +605,7 @@
             CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), DBControl)
-            DB.AddBase(Personnel.Administrator)
+            myDatabase.AddBase(Personnel.Administrator)
             Return DBControl
         End Function
 
@@ -607,7 +617,7 @@
             CreateAccessFile(FilePath)
             Dim DBControl As OleDb.OleDbConnection = Open(FilePath)
             CreateTable(Sales.Table, Sales.ToColumns, DBControl)
-            CreateTable(Order.Table, Order.ToColumns, DBControl)
+            'CreateTable(Order.Table, Order.ToColumns, DBControl)
             Return DBControl
         End Function
         ''' <summary>

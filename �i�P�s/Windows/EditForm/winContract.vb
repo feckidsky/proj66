@@ -1,6 +1,8 @@
 ﻿Imports 進銷存.Database.StructureBase
 
 Public Class winContract
+
+    Dim access As Database.Access
     Enum Mode
         Create = 0
         Open = 1
@@ -12,14 +14,16 @@ Public Class winContract
         btAdd.Text = IIf(Work = Mode.Create, "新增", "修改")
     End Sub
 
-    Public Sub Open(ByVal Data As Contract)
+    Public Sub Open(ByVal Data As Contract, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Open
         UpdateText(Data)
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub Create(ByVal Data As Contract)
+    Public Sub Create(ByVal Data As Contract, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Create
         UpdateText(Data)
@@ -51,9 +55,9 @@ Public Class winContract
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
         If Work = Mode.Create Then
-            DB.AddContract(GetData())
+            access.AddContract(GetData())
         Else
-            DB.ChangeContract(GetData())
+            access.ChangeContract(GetData())
         End If
 
         Me.Close()

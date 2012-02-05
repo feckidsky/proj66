@@ -1,7 +1,10 @@
 ﻿Public Class winAccount
     Dim personnel As Database.Personnel
 
-    Public Overloads Sub ShowDialog(ByRef per As Database.Personnel)
+    Dim access As Database.Access
+
+    Public Overloads Sub ShowDialog(ByRef per As Database.Personnel, ByVal DB As Database.Access)
+        access = DB
         personnel = per
         txtID.Text = per.ID
         txtPassword1.Text = per.Password
@@ -26,7 +29,7 @@
 
         Dim cnv As Integer
 
-        If personnel.ID <> txtID.Text AndAlso Not DB.GetPersonnelByID(txtID.Text).IsNull() Then
+        If personnel.ID <> txtID.Text AndAlso Not access.GetPersonnelByID(txtID.Text).IsNull() Then
             ErrorMsg = "此帳號已經被使用，請使用其他名稱"
         ElseIf txtPassword1.Text <> txtPassword2.Text Then
             ErrorMsg = "密碼確認錯誤!"

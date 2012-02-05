@@ -9,22 +9,22 @@
 
     Public Class AccessClientMenage
 
-        Public Client() As AccessClient
+        Public Client() As Access
 
-        Event BeforeDisconnect(ByVal sender As Object)
-        Event BeforeConnect(ByVal sender As Object)
+        Event BeforeDisconnect(ByVal sender As Object, ByVal client As AccessClient)
+        Event BeforeConnect(ByVal sender As Object, ByVal Client As AccessClient)
 
 
         Public Sub Save(ByVal Path As String)
             Dim lstInfo As New List(Of ClientInfo)
             For Each c As AccessClient In Client
-                lstInfo.Add(New ClientInfo(c.Name, c.IP, c.Port))
+                If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(c.Name, c.IP, c.Port))
             Next
 
             Code.Save(lstInfo.ToArray, Path)
         End Sub
 
-        Public Sub Load(ByVal Path As String)
+        Public Shared Function Load(ByVal Path As String) As AccessClient()
             Dim lstInfo As ClientInfo() = Code.Load(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
 
             Dim lstClient As New List(Of Database.AccessClient)
@@ -33,28 +33,35 @@
                 lstClient.Add(New AccessClient(c.Name, c.IP, c.Port))
             Next
 
-            Client = lstClient.ToArray
-        End Sub
+            Return lstClient.ToArray
+        End Function
 
         Public Sub StartConnect()
-            RaiseEvent BeforeConnect(Me)
+
             For i As Integer = 0 To Client.Length - 1
-                Client(i).Connect()
+                If Client(i).GetType Is GetType(AccessClient) Then
+                    RaiseEvent BeforeConnect(Me, Client(i))
+                    CType(Client(i), AccessClient).Connect()
+                End If
+
             Next
         End Sub
 
         Public Sub EndConnect()
-            RaiseEvent BeforeDisconnect(Me)
+
             For i As Integer = 0 To Client.Length - 1
-                Client(i).Disconnect()
+                If Client(i).GetType Is GetType(AccessClient) Then
+                    RaiseEvent BeforeDisconnect(Me, Client(i))
+                    If Client(i).GetType Is GetType(AccessClient) Then CType(Client(i), AccessClient).Disconnect()
+                End If
             Next
         End Sub
 
         Public Function GetNameList() As String()
-            Return Array.ConvertAll(Client, Function(c As AccessClient) c.Name)
+            Return Array.ConvertAll(Client, Function(c As Access) c.Name)
         End Function
 
-        Default Public ReadOnly Property Item(ByVal Index As Integer) As AccessClient
+        Default Public ReadOnly Property Item(ByVal Index As Integer) As Access
             Get
                 If Index < Client.Length - 1 Then Return Nothing
                 Return Client(Index)
@@ -62,9 +69,9 @@
 
         End Property
 
-        Default Public ReadOnly Property Item(ByVal Name As String) As AccessClient
+        Default Public ReadOnly Property Item(ByVal Name As String) As Access
             Get
-                For Each c As AccessClient In Client
+                For Each c As Access In Client
                     If c.Name = Name Then Return c
                 Next
                 Return Nothing
@@ -85,18 +92,20 @@
         Dim ResponseDataTable As Data.DataTable = Nothing
 
         Sub New()
-
+            MyBase.New("遠端資料庫")
         End Sub
 
         Sub New(ByVal Info As ClientInfo)
+            MyClass.New()
             Me.Name = Info.Name : Me.IP = Info.IP : Me.Port = Info.Port
         End Sub
         Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
+            MyClass.New()
             Me.Name = Name : Me.IP = IP : Me.Port = Port
             'Client.Port = 3600
         End Sub
 
-        Public Name As String = "DefaultName"
+
         ReadOnly Property Connected() As Boolean
             Get
                 Return Client.Connected
@@ -134,24 +143,35 @@
             Return Count
         End Function
 
+        Dim ReadLock As String = "ReadLck"
+
+        Dim Waiter As New Threading.AutoResetEvent(True)
+
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
             If Not Client.Connected Then
                 MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return New DataTable
             End If
 
-            Dim args As ReadArgs
-            args.Table = Table
-            args.FileList = FileList
-            args.SqlCommand = SQLCommand
+            SyncLock ReadLock
+                Dim args As ReadArgs
+                args.Table = Table
+                args.FileList = FileList
+                args.SqlCommand = SQLCommand
+                ResponseDataTable = Nothing
 
-            Send("ReadArgs", args)
-            ResponseDataTable = Nothing
+                Waiter.Reset()
+                Send("ReadArgs", args)
 
-            While (ResponseDataTable Is Nothing)
-                Application.DoEvents()
-            End While
+                If Not Waiter.WaitOne(10000, False) Then
+                    ResponseDataTable = New DataTable
+                    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
+                End If
 
+                'While (ResponseDataTable Is Nothing)
+                '    Application.DoEvents()
+                'End While
+            End SyncLock
             Return ResponseDataTable
         End Function
 
@@ -180,7 +200,7 @@
             Select Case Data(0)
                 Case "ReadResponse"
                     ResponseDataTable = Repair(Of DataTable)(args)
-
+                    Waiter.Set()
                 Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args))
                 Case "DeletedContract" : OnDeletedContract(Repair(Of Contract)(args))
                 Case "ChangedContract" : OnChangedContract(Repair(Of Contract)(args))

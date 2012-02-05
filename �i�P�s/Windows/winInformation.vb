@@ -1,5 +1,7 @@
 ﻿Public Class winInformation
 
+    Dim access As Database.Access
+
     Structure Info
         Dim Sales As Single
         Dim Profit As Single
@@ -9,6 +11,12 @@
             Me.Sales = Sales : Me.Profit = Profit : Me.Cash = Cash : Me.Card = Card
         End Sub
     End Structure
+
+    Public Overloads Sub ShowDialog(ByVal DB As Database.Access)
+        access = DB
+        MyBase.ShowDialog()
+    End Sub
+
 
     Private Sub winInformation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -58,14 +66,14 @@
 
     Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
 
-        Dim dt As DataTable = DB.GetOrderListWithContract(St, Ed)
+        Dim dt As DataTable = access.GetOrderListWithContract(St, Ed)
 
         Dim Deposit As Single = 0
         For Each row As DataRow In dt.Rows
             Deposit += GetSingle(row.Item("訂金"))
         Next
 
-        dt = DB.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales)
+        dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales)
 
         Dim Cash As Single = 0
         For Each row As DataRow In dt.Select("付款方式=" & Val(Database.TypeOfPayment.Cash))

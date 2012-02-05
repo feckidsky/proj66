@@ -8,7 +8,7 @@
 
     Dim work As Mode
 
-    WithEvents access As Database.Access = Program.DB
+    WithEvents access As Database.Access '= Program.DB
 
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgList)
@@ -16,7 +16,8 @@
         UpdateList()
     End Sub
 
-    Public Overloads Sub Show()
+    Public Overloads Sub Show(ByVal DB As Database.Access)
+        access = DB
         ShowDialog()
     End Sub
 
@@ -27,7 +28,8 @@
     End Sub
 
 
-    Public Function SelectDialog() As Database.Supplier
+    Public Function SelectDialog(ByVal db As Database.Access) As Database.Supplier
+        access = db
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         work = Mode.SelectItem
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -37,9 +39,10 @@
         End If
     End Function
 
-
+    Dim dt As DataTable
     Private Sub UpdateList()
-        dgList.DataSource = DB.GetSupplierList()
+        dt = access.GetSupplierList()
+        dgList.DataSource = dt
 
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "名稱")
@@ -55,7 +58,7 @@
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winSupplier.Create(GetNewSupplier)
+        winSupplier.Create(GetNewSupplier, access)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -69,7 +72,7 @@
             Exit Sub
         End If
 
-        winSupplier.Open(selectedItem)
+        winSupplier.Open(selectedItem, access)
     End Sub
 
     Public Function GetSelectedSupplier() As Database.Supplier
@@ -99,7 +102,7 @@
         End If
 
 
-        Dim count As Integer = DB.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
+        Dim count As Integer = access.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
         For Each c As Database.AccessClient In Client.Client
             If c.Connected Then count += c.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
         Next
@@ -113,7 +116,7 @@
             Exit Sub
         End If
 
-        DB.DeleteSupplier(SelectedSupplier)
+        access.DeleteSupplier(SelectedSupplier)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgList.CellMouseDoubleClick
@@ -126,8 +129,47 @@
 
     End Sub
 
-    Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles access.ChangedSupplier, access.CreatedSupplier, access.DeletedSupplier
-        UpdateList()
+
+    Delegate Sub DelegateItem(sender As Object ,ByVal sup As Database.Supplier)
+    Dim invCreate As New DelegateItem(AddressOf access_CreatedSupplier)
+    Dim invDelete As New DelegateItem(AddressOf access_DeletedSupplier)
+    Dim invChange As New DelegateItem(AddressOf access_ChangedSupplier)
+
+    Private Sub access_CreatedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles access.CreatedSupplier
+        If Me.InvokeRequired Then
+            Me.Invoke(invCreate, sender, sup)
+            Exit Sub
+        End If
+        dt.Rows.Add(sup.Label, sup.Name, sup.Tel1, sup.Tel2, sup.Note, sup.Addr, sup.Modify)
+    End Sub
+
+    Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles access.ChangedSupplier
+        If Me.InvokeRequired Then
+            Me.Invoke(invChange, sender, sup)
+            Exit Sub
+        End If
+
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = sup.Label Then sup.UpdateRow(r) 'r.ItemArray = sup.ToObjects()
+        Next
+    End Sub
+
+
+    Private Sub access_DeletedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles access.DeletedSupplier
+        If Me.InvokeRequired Then
+            Me.Invoke(invDelete, sender, sup)
+            Exit Sub
+        End If
+
+        Dim delRow As New List(Of DataRow)
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = sup.Label Then delRow.Add(r)
+        Next
+
+        For Each r As DataRow In delRow
+            dt.Rows.Remove(r)
+        Next
+
     End Sub
 
 

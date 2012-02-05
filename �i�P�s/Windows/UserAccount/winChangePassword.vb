@@ -2,7 +2,12 @@
 
     Dim result As LoginResult
 
-    Public Overloads Sub ShowDialog(Optional ByVal Title As String = "登入", Optional ByVal ID As String = "")
+    Dim access As Database.Access
+
+
+
+    Public Overloads Sub ShowDialog(ByVal DB As Database.Access, Optional ByVal Title As String = "登入", Optional ByVal ID As String = "")
+        access = DB
         If CurrentUser.IsGuest() Then
             MsgBox("尚未登入")
             Exit Sub
@@ -37,7 +42,7 @@
         If ErrorMsg = "" Then
             CurrentUser.Password = txtNewPassword1.Text
             CurrentUser.Modify = Now
-            DB.ChangePersonnel(CurrentUser)
+            access.ChangePersonnel(CurrentUser)
             MsgBox("密碼修改成功!", MsgBoxStyle.Information)
             Me.Close()
         Else

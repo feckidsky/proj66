@@ -8,6 +8,8 @@ Public Class winGoods
 
     Dim Work As Mode
 
+    Dim access As Database.Access
+
     Private Sub winGoods_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btAdd.Text = IIf(Work = Mode.Create, "新增", "修改")
         txtLabel.Enabled = Work = Mode.Create
@@ -15,14 +17,16 @@ Public Class winGoods
         txtCost.Enabled = txtLabel.Enabled
     End Sub
 
-    Public Sub Open(ByVal Data As Goods)
+    Public Sub Open(ByVal Data As Goods, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Open
         UpdateText(Data)
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub Create(ByVal Data As Goods)
+    Public Sub Create(ByVal Data As Goods, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         Work = Mode.Create
         UpdateText(Data)
@@ -60,10 +64,10 @@ Public Class winGoods
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
 
         If Work = Mode.Create Then
-            DB.AddGoods(GetData())
-            DB.AddHistoryPrice(GetHistoryPrice())
+            access.AddGoods(GetData())
+            access.AddHistoryPrice(GetHistoryPrice())
         Else
-            DB.ChangeGoods(GetData())
+            access.ChangeGoods(GetData())
         End If
 
         Me.Close()

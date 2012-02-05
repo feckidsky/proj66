@@ -19,6 +19,8 @@ Public Class winSales
     Dim Customer As Database.Customer = Database.Customer.Null()
     Dim Personnel As Database.Personnel = Database.Personnel.Null()
 
+    Dim access As Database.Access
+
     Structure GoodsInfo
         Dim GoodsLabel As String
         Dim StockLabel As String
@@ -63,7 +65,8 @@ Public Class winSales
         tpSales.BackColor = ToColor(Config.SalesBackColor)
     End Sub
 
-    Public Overloads Sub Create()
+    Public Overloads Sub Create(ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
 
         Personnel = CurrentUser
@@ -78,14 +81,15 @@ Public Class winSales
     End Sub
 
 
-    Public Sub Open(ByVal Label As String)
-        Dim sales As Sales = DB.GetSales(Label)
-        Open(sales)
+    Public Sub Open(ByVal Label As String, ByVal DB As Database.Access)
+        access = DB
+        Dim sales As Sales = access.GetSales(Label)
+        Open(sales, DB)
     End Sub
 
 
-    Public Sub Open(ByVal Sales As Sales)
-
+    Public Sub Open(ByVal Sales As Sales, ByVal DB As Database.Access)
+        access = DB
         txtLabel.Text = Sales.Label
         txtOrderDate.Text = Sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
         txtSalesDate.Text = IIf(Sales.SalesDate = New Date(2001, 1, 1, 0, 0, 0), "", Sales.SalesDate.ToString("yyyy/MM/dd HH:mm:ss"))
@@ -108,7 +112,7 @@ Public Class winSales
     End Sub
 
     Private Sub ReadSalesList(ByVal SalesLabel As String)
-        Dim dt As Data.DataTable = DB.GetGoodsListBySalesLabelWithHistoryPrice(SalesLabel) 'DB.GetGoodsListBySalesLabel(SalesLabel)
+        Dim dt As Data.DataTable = access.GetGoodsListBySalesLabelWithHistoryPrice(SalesLabel) 'DB.GetGoodsListBySalesLabel(SalesLabel)
 
         For Each r As Data.DataRow In dt.Rows
             dgSalesList.Rows.Add(r.ItemArray())
@@ -118,7 +122,7 @@ Public Class winSales
 
 
     Private Sub ReadOrderList(ByVal SalesLabel As String)
-        Dim dt As Data.DataTable = DB.GetOrderListBySalesLabel(SalesLabel)
+        Dim dt As Data.DataTable = access.GetOrderListBySalesLabel(SalesLabel)
 
         For Each r As Data.DataRow In dt.Rows
             dgOrderList.Rows.Add(r.ItemArray())
@@ -128,7 +132,7 @@ Public Class winSales
     End Sub
 
     Private Sub ReadContractList(ByVal SalesLabel As String)
-        Dim dt As Data.DataTable = DB.GetContractListBySalesLabel(SalesLabel)
+        Dim dt As Data.DataTable = access.GetContractListBySalesLabel(SalesLabel)
 
         For Each r As Data.DataRow In dt.rows
             dgContract.Rows.Add(r.ItemArray())
@@ -136,7 +140,7 @@ Public Class winSales
     End Sub
 
     Private Sub btAddGood_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddSalesItem.Click
-        Dim row As DataGridViewRow = winStockList.SelectStock()
+        Dim row As DataGridViewRow = winStockList.SelectStock(access)
         If row Is Nothing Then Exit Sub
         For Each tmp As DataGridViewRow In dgSalesList.Rows
             If row.Cells("庫存編號").Value = tmp.Cells(cSLabel.Index).Value Then
@@ -187,7 +191,7 @@ Public Class winSales
 
     Private Sub dgSalesList_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellDoubleClick
         Dim GoodsLabel As String = dgSalesList.Rows(dgSalesList.SelectedCells(0).RowIndex).Cells(cSGoods.Index).Value
-        Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel)
+        Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel, access)
         If row Is Nothing Then Exit Sub
 
         With dgSalesList.Rows(e.RowIndex)
@@ -315,10 +319,10 @@ Public Class winSales
 
         If Work = Mode.Create Then
             '新增銷貨單
-            DB.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
             '更新銷貨單
-            DB.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -349,10 +353,10 @@ Public Class winSales
 
 
         If Work = Mode.Create Then
-            DB.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
             sales.SalesDate = Now
-            DB.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -368,7 +372,7 @@ Public Class winSales
         '    txtPersonnel.Text = Personnel.Name
         'End If
 
-        Dim per As Database.Personnel = winPersonnelList.SelectDialog()
+        Dim per As Database.Personnel = winPersonnelList.SelectDialog(access)
         If Not per.IsNull() Then
             Personnel = per
             txtPersonnel.Text = per.Name
@@ -409,7 +413,7 @@ Public Class winSales
     End Sub
 
     Private Sub btAddOrderItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddOrderItem.Click
-        Dim newGoods As Database.Goods = winGoodsList.SelectDialog()
+        Dim newGoods As Database.Goods = winGoodsList.SelectDialog(access)
         If newGoods.IsNull() Then Exit Sub
 
 
@@ -420,7 +424,7 @@ Public Class winSales
             End If
         Next
 
-        Dim dt As Data.DataTable = DB.GetGoodsWithPrice(newGoods.Label)
+        Dim dt As Data.DataTable = access.GetGoodsWithPrice(newGoods.Label)
         Dim row As Data.DataRow = dt.Rows(0)
         If row IsNot Nothing Then
             dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Price")), GetSingle(row("Price")), 1})
@@ -502,7 +506,7 @@ Public Class winSales
 
 
     Private Sub btAddContract_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddContract.Click
-        Dim item As Database.Contract = winContractList.SelectEffectDialog()
+        Dim item As Database.Contract = winContractList.SelectEffectDialog(access)
         If item.IsNull() Then Exit Sub
         Dim row As New DataGridViewRow
         dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Discount, ""})

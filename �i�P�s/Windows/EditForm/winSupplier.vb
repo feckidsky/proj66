@@ -12,24 +12,28 @@ Public Class winSupplier
 
     Dim work As Mode
 
+    Dim access As Database.Access
+
 
     Private Sub winPeople_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         txtLabel.Enabled = work = Mode.Create
         btAccount.Visible = False
     End Sub
 
-    Public Overloads Sub ShowDialog(Of T)(ByVal data As T)
+    'Public Overloads Sub ShowDialog(Of T)(ByVal data As T)
 
-    End Sub
+    'End Sub
 
-    Public Sub Open(ByVal data As Supplier)
+    Public Sub Open(ByVal data As Supplier, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Open
         UpdateText(data)
         MyBase.ShowDialog()
     End Sub
 
-    Public Sub Create(ByVal Data As Supplier)
+    Public Sub Create(ByVal Data As Supplier, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Create
         UpdateText(Data)
@@ -73,9 +77,9 @@ Public Class winSupplier
         Dim myData As Supplier = GetData()
 
         If work = Mode.Create Then
-            DB.AddSupplier(myData)
+            Access.AddSupplier(myData)
         Else
-            DB.ChangeSupplier(myData)
+            Access.ChangeSupplier(myData)
         End If
         Me.Close()
     End Sub

@@ -13,12 +13,16 @@ Public Class winPeople
     Dim work As Mode
 
     Dim myData As Personnel
+
+    Dim access As Database.Access
+
     Private Sub winPeople_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         txtLabel.Enabled = work = Mode.Create
         btAccount.Visible = True
     End Sub
 
-    Public Sub Open(ByVal data As Personnel)
+    Public Sub Open(ByVal data As Personnel, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
         If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Open
@@ -27,7 +31,8 @@ Public Class winPeople
     End Sub
 
 
-    Public Sub Create(ByVal Data As Personnel)
+    Public Sub Create(ByVal Data As Personnel, ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
         If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Create
@@ -75,9 +80,9 @@ Public Class winPeople
         myData = GetData()
 
         If work = Mode.Create Then
-            DB.AddPersonnel(myData)
+            Access.AddPersonnel(myData)
         Else
-            DB.ChangePersonnel(myData)
+            Access.ChangePersonnel(myData)
         End If
         Me.Close()
     End Sub
@@ -85,7 +90,7 @@ Public Class winPeople
 
 
     Private Sub btAccount_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAccount.Click
-        winAccount.ShowDialog(myData)
+        winAccount.ShowDialog(myData, access)
         UpdateAccountButton()
     End Sub
 End Class

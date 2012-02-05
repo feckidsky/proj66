@@ -7,7 +7,7 @@
 
     Dim work As Mode
 
-    WithEvents access As Database.Access = Program.DB
+    WithEvents access As Database.Access '= Program.DB
     Dim Filter As DataGridViewFilter
 
     Dim FilterEffect As Boolean = False
@@ -22,14 +22,16 @@
     End Sub
 
 
-    Public Overloads Sub Show()
+    Public Overloads Sub Show(ByVal DB As Database.Access)
+        access = DB
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Normal
         MyBase.Show()
     End Sub
 
 
-    Public Function SelectDialog() As Database.Contract
+    Public Function SelectDialog(ByVal DB As Database.Access) As Database.Contract
+        access = DB
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         work = Mode.SelectItem
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -39,14 +41,15 @@
         End If
     End Function
 
-    Public Function SelectEffectDialog() As Database.Contract
+    Public Function SelectEffectDialog(ByVal DB As Database.Access) As Database.Contract
         FilterEffect = True
-        Return SelectDialog()
+        Return SelectDialog(DB)
     End Function
 
-
+    Dim dt As DataTable
     Private Sub UpdateList()
-        dgGoodsList.DataSource = DB.GetContractList()
+        dt = access.GetContractList()
+        dgGoodsList.DataSource = dt
 
         UpdateTitle("Label", "編號")
         UpdateTitle("Enable", "有效")
@@ -63,7 +66,7 @@
     End Sub
 
     Private Sub 新增AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增AToolStripMenuItem.Click, 新增CToolStripMenuItem1.Click
-        winContract.Create(GetNewContract())
+        winContract.Create(GetNewContract(), access)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -78,7 +81,7 @@
         End If
 
 
-        winContract.Open(GetSelectedItem())
+        winContract.Open(GetSelectedItem(), access)
     End Sub
 
     Public Function GetSelectedItem() As Database.Contract
@@ -107,7 +110,7 @@
         End If
 
 
-        Dim count As Integer = DB.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
+        Dim count As Integer = access.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
         For Each c As Database.AccessClient In Client.Client
             If c.Connected Then count += c.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
         Next
@@ -123,7 +126,7 @@
 
 
 
-        DB.DeleteContract(SelectedItem)
+        access.DeleteContract(selectedItem)
     End Sub
 
     Private Sub dgGoodsList_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgGoodsList.CellMouseDoubleClick
@@ -135,11 +138,52 @@
 
 
     End Sub
+    'Delegate Sub ItemUpdate()
+    'Dim inv As New ItemUpdate(AddressOf UpdateList)
+    'Private Sub access_ChangedItem(ByVal sender As Object, ByVal goods As Database.StructureBase.Contract) Handles access.ChangedContract, access.CreatedContract, access.DeletedContract
+    '    Me.Invoke(inv)
+    'End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal goods As Database.StructureBase.Contract) Handles access.ChangedContract, access.CreatedContract, access.DeletedContract
-        UpdateList()
+    Delegate Sub DelegateItem(ByVal sender As Object, ByVal sup As Database.Contract)
+    Dim invCreate As New DelegateItem(AddressOf access_CreatedItem)
+    Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
+    Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
+
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.CreatedContract
+        If Me.InvokeRequired Then
+            Me.Invoke(invCreate, sender, item)
+            Exit Sub
+        End If
+        dt.Rows.Add(item.ToObjects())
+    End Sub
+
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.ChangedContract
+        If Me.InvokeRequired Then
+            Me.Invoke(invChange, sender, item)
+            Exit Sub
+        End If
+
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = item.Label Then item.UpdateRow(r) 'r.ItemArray = sup.ToObjects()
+        Next
     End Sub
 
 
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.DeletedContract
+        If Me.InvokeRequired Then
+            Me.Invoke(invDelete, sender, item)
+            Exit Sub
+        End If
+
+        Dim delRow As New List(Of DataRow)
+        For Each r As DataRow In dt.Rows
+            If Strings.RTrim(r("Label")) = item.Label Then delRow.Add(r)
+        Next
+
+        For Each r As DataRow In delRow
+            dt.Rows.Remove(r)
+        Next
+
+    End Sub
 
 End Class

@@ -26,29 +26,24 @@ Public Module Program
         Dim OrderBackcolor As Integer
         Dim SalesBackColor As Integer
         Dim Mode As Connect
+        Dim ServerName As String
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
                 def.OrderBackcolor = Color.LightPink.ToArgb
                 def.SalesBackColor = Color.LightGreen.ToArgb
                 def.Mode = Connect.Client
+                def.ServerName = My.Computer.Name
                 Return def
             End Get
         End Property
 
     End Structure
 
-    'Structure ClientInfo
-    '    Dim Name As String
-    '    Dim IP As String
-    '    Dim Port As Integer
-    '    Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
-    '        Me.Name = Name : Me.IP = IP : Me.Port = Port
-    '    End Sub
-    'End Structure
 #End Region
 
-    Public DB As New Database.Access
+    Public myDatabase As New Database.Access("本機資料庫")
+
     Public Server As New Database.AccessServer
     Public WithEvents Client As New Database.AccessClientMenage()
 
@@ -66,24 +61,23 @@ Public Module Program
 
     Public Sub InitialProgram()
         ErrorLog.Enable()
-        Server.Access = DB
-        Server.Open()
 
-
-        'UpdateDatabase()
-        'Database.Access.RepairAccess(Database.Access.BasePath)
         ConfigLoad()
 
-        Client.Load(ClientPath)
+        If Config.Mode = Connect.Server Then
+            Server.Access = myDatabase
+            Server.Open()
+        End If
+
+
+        Dim lstClient As New List(Of Database.Access)
+        If Config.Mode = Connect.Server Then lstClient.Add(myDatabase)
+        lstClient.AddRange(Database.AccessClientMenage.Load(ClientPath))
+        Client.Client = lstClient.ToArray()
         Client.StartConnect()
 
 
-
         LogOut(False)
-        Try
-            LogIn("kidsky", "3883", False)
-        Catch
-        End Try
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
         'LogIn(admin.ID, admin.Password, False)
     End Sub
@@ -91,23 +85,27 @@ Public Module Program
     Public Sub FinishProgram()
 
         Client.EndConnect()
-        Server.Close()
+        Try
+            Server.Close()
+        Catch
+        End Try
     End Sub
 
 
     Public Sub UpdateDatabase()
-        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(DB.BasePath)
+        If Config.Mode = Connect.Client Then Exit Sub
+        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
         Database.Access.DeleteTable("Mobile", d)
         Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
         Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
-        DB.DeleteColumn(Stock.Table, "Price")
-        DB.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
-        DB.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
-        DB.AddColumn(Personnel.Table, "Modify", Database.DBTypeDate)
-        DB.AddColumn(Goods.Table, "Modify", Database.DBTypeDate)
-        DB.AddColumn(Contract.Table, "Modify", Database.DBTypeDate)
+        myDatabase.DeleteColumn(Stock.Table, "Price")
+        myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
+        myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
+        myDatabase.AddColumn(Personnel.Table, "Modify", Database.DBTypeDate)
+        myDatabase.AddColumn(Goods.Table, "Modify", Database.DBTypeDate)
+        myDatabase.AddColumn(Contract.Table, "Modify", Database.DBTypeDate)
     End Sub
 
     Public Sub ConfigLoad()
@@ -136,7 +134,9 @@ Public Module Program
     Public Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
 
         Dim result As LoginResult
-        Dim user As Personnel = DB.GetPersonnelByID(ID)
+
+        Dim user As Personnel = myDatabase.GetPersonnelByID(ID)
+
         If user.IsNull() Then
             result = New LoginResult(LoginState.IdError, "帳號不存在!")
         ElseIf user.Password <> Password Then
@@ -200,12 +200,12 @@ Public Module Program
         Return data
     End Function
 
-    Public Function GetNewOrder() As Order
-        Dim data As Order = Nothing
-        data.Label = "O" & Now.ToString("yyMMddHHmmss")
-        data.Date = Now
-        Return data
-    End Function
+    'Public Function GetNewOrder() As Order
+    '    Dim data As Order = Nothing
+    '    data.Label = "O" & Now.ToString("yyMMddHHmmss")
+    '    data.Date = Now
+    '    Return data
+    'End Function
 
     Public Function GetNewContract() As Contract
         Dim data As New Contract
@@ -330,124 +330,125 @@ Public Module Program
 #End Region
 
     WithEvents ccc As Database.AccessClient
-    Private Sub Client_BeforeConnect(ByVal sender As Object) Handles Client.BeforeConnect
-        Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
-        For i = 0 To Client.Length - 1
-            With Client(i)
-                AddHandler .CreatedContract, AddressOf CreatedContract
-                AddHandler .CreatedCustomer, AddressOf CreatedCustomer
-                AddHandler .CreatedSupplier, AddressOf CreatedSupplier
-                AddHandler .CreatedPersonnel, AddressOf CreatedPersonnel
-                AddHandler .CreatedGoods, AddressOf CreatedGoods
-                AddHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
+    Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeConnect
+        'Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
+        'For i = 0 To Client.Length - 1
+        With client
+            AddHandler .CreatedContract, AddressOf CreatedContract
+            AddHandler .CreatedCustomer, AddressOf CreatedCustomer
+            AddHandler .CreatedSupplier, AddressOf CreatedSupplier
+            AddHandler .CreatedPersonnel, AddressOf CreatedPersonnel
+            AddHandler .CreatedGoods, AddressOf CreatedGoods
+            AddHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
 
-                AddHandler .ChangedContract, AddressOf ChangedContract
-                AddHandler .ChangedCustomer, AddressOf ChangedCustomer
-                AddHandler .ChangedSupplier, AddressOf ChangedSupplier
-                AddHandler .ChangedPersonnel, AddressOf ChangedPersonnel
-                AddHandler .ChangedGoods, AddressOf ChangedGoods
-                AddHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
+            AddHandler .ChangedContract, AddressOf ChangedContract
+            AddHandler .ChangedCustomer, AddressOf ChangedCustomer
+            AddHandler .ChangedSupplier, AddressOf ChangedSupplier
+            AddHandler .ChangedPersonnel, AddressOf ChangedPersonnel
+            AddHandler .ChangedGoods, AddressOf ChangedGoods
+            AddHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
 
-                AddHandler .DeletedContract, AddressOf DeletedContract
-                AddHandler .DeletedCustomer, AddressOf DeletedCustomer
-                AddHandler .DeletedSupplier, AddressOf DeletedSupplier
-                AddHandler .DeletedPersonnel, AddressOf DeletedPersonnel
-                AddHandler .DeletedGoods, AddressOf DeletedGoods
-                AddHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
-                AddHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
-                AddHandler .ConnectSuccess, AddressOf ConnectSuccess
-            End With
-        Next
+            AddHandler .DeletedContract, AddressOf DeletedContract
+            AddHandler .DeletedCustomer, AddressOf DeletedCustomer
+            AddHandler .DeletedSupplier, AddressOf DeletedSupplier
+            AddHandler .DeletedPersonnel, AddressOf DeletedPersonnel
+            AddHandler .DeletedGoods, AddressOf DeletedGoods
+            AddHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
+            AddHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
+            AddHandler .ConnectSuccess, AddressOf ConnectSuccess
+        End With
+        'Next
     End Sub
 
-    Private Sub Client_BeforeDisconnect(ByVal sender As Object) Handles Client.BeforeDisconnect
-        Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
-        For i = 0 To Client.Length - 1
-            With Client(i)
-                RemoveHandler .CreatedContract, AddressOf CreatedContract
-                RemoveHandler .CreatedCustomer, AddressOf CreatedCustomer
-                RemoveHandler .CreatedSupplier, AddressOf CreatedSupplier
-                RemoveHandler .CreatedPersonnel, AddressOf CreatedPersonnel
-                RemoveHandler .CreatedGoods, AddressOf CreatedGoods
-                RemoveHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
+    Private Sub Client_BeforeDisconnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeDisconnect
+        'Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
+        'For i = 0 To Client.Length - 1
+        With client
+            RemoveHandler .CreatedContract, AddressOf CreatedContract
+            RemoveHandler .CreatedCustomer, AddressOf CreatedCustomer
+            RemoveHandler .CreatedSupplier, AddressOf CreatedSupplier
+            RemoveHandler .CreatedPersonnel, AddressOf CreatedPersonnel
+            RemoveHandler .CreatedGoods, AddressOf CreatedGoods
+            RemoveHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
 
-                RemoveHandler .ChangedContract, AddressOf ChangedContract
-                RemoveHandler .ChangedCustomer, AddressOf ChangedCustomer
-                RemoveHandler .ChangedSupplier, AddressOf ChangedSupplier
-                RemoveHandler .ChangedPersonnel, AddressOf ChangedPersonnel
-                RemoveHandler .ChangedGoods, AddressOf ChangedGoods
-                RemoveHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
+            RemoveHandler .ChangedContract, AddressOf ChangedContract
+            RemoveHandler .ChangedCustomer, AddressOf ChangedCustomer
+            RemoveHandler .ChangedSupplier, AddressOf ChangedSupplier
+            RemoveHandler .ChangedPersonnel, AddressOf ChangedPersonnel
+            RemoveHandler .ChangedGoods, AddressOf ChangedGoods
+            RemoveHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
 
-                RemoveHandler .DeletedContract, AddressOf DeletedContract
-                RemoveHandler .DeletedCustomer, AddressOf DeletedCustomer
-                RemoveHandler .DeletedSupplier, AddressOf DeletedSupplier
-                RemoveHandler .DeletedPersonnel, AddressOf DeletedPersonnel
-                RemoveHandler .DeletedGoods, AddressOf DeletedGoods
-                RemoveHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
-                RemoveHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
-                RemoveHandler .ConnectSuccess, AddressOf ConnectSuccess
-            End With
-        Next
+            RemoveHandler .DeletedContract, AddressOf DeletedContract
+            RemoveHandler .DeletedCustomer, AddressOf DeletedCustomer
+            RemoveHandler .DeletedSupplier, AddressOf DeletedSupplier
+            RemoveHandler .DeletedPersonnel, AddressOf DeletedPersonnel
+            RemoveHandler .DeletedGoods, AddressOf DeletedGoods
+            RemoveHandler .DeletedHistoryPrice, AddressOf DeletedHistoryPrice
+            RemoveHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
+            RemoveHandler .ConnectSuccess, AddressOf ConnectSuccess
+        End With
+        'Next
     End Sub
 
     Dim UpdateDataLock As String = "UpdateDataLock"
 
     Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectSuccess
+        If Config.Mode = Connect.Client Then Exit Sub
         SyncLock UpdateDataLock
             Try
                 Dim client As Database.AccessClient = sender
 
                 Dim sDT As DataTable = client.GetGoodsList()
-                Dim myDT As DataTable = DB.GetGoodsList()
+                Dim myDT As DataTable = myDatabase.GetGoodsList()
 
                 For Each r As DataRow In sDT.Rows
                     Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : DB.ChangeGoods(Goods.GetFrom(r), False)
-                        Case Compare.NoExist : DB.AddGoods(Goods.GetFrom(r), False)
+                        Case Compare.MoreNew : myDatabase.ChangeGoods(Goods.GetFrom(r), False)
+                        Case Compare.NoExist : myDatabase.AddGoods(Goods.GetFrom(r), False)
                     End Select
                 Next
 
                 sDT = client.GetPersonnelList
-                myDT = DB.GetPersonnelList
+                myDT = myDatabase.GetPersonnelList
                 For Each r As DataRow In sDT.Rows
                     Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : DB.ChangePersonnel(Personnel.GetFrom(r), False)
-                        Case Compare.NoExist : DB.AddPersonnel(Personnel.GetFrom(r), False)
+                        Case Compare.MoreNew : myDatabase.ChangePersonnel(Personnel.GetFrom(r), False)
+                        Case Compare.NoExist : myDatabase.AddPersonnel(Personnel.GetFrom(r), False)
                     End Select
                 Next
 
                 sDT = client.GetCustomerList
-                myDT = DB.GetCustomerList
+                myDT = myDatabase.GetCustomerList
                 For Each r As DataRow In sDT.Rows
                     Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : DB.ChangeCustomer(Customer.GetFrom(r), False)
-                        Case Compare.NoExist : DB.AddCustomer(Customer.GetFrom(r), False)
+                        Case Compare.MoreNew : myDatabase.ChangeCustomer(Customer.GetFrom(r), False)
+                        Case Compare.NoExist : myDatabase.AddCustomer(Customer.GetFrom(r), False)
                     End Select
                 Next
 
                 sDT = client.GetSupplierList
-                myDT = DB.GetSupplierList
+                myDT = myDatabase.GetSupplierList
                 For Each r As DataRow In sDT.Rows
                     Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : DB.ChangeSupplier(Supplier.GetFrom(r), False)
-                        Case Compare.NoExist : DB.AddSupplier(Supplier.GetFrom(r), False)
+                        Case Compare.MoreNew : myDatabase.ChangeSupplier(Supplier.GetFrom(r), False)
+                        Case Compare.NoExist : myDatabase.AddSupplier(Supplier.GetFrom(r), False)
                     End Select
                 Next
 
                 sDT = client.GetContractList()
-                myDT = DB.GetContractList()
+                myDT = myDatabase.GetContractList()
                 For Each r As DataRow In sDT.Rows
                     Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : DB.ChangeContract(Contract.GetFrom(r), False)
-                        Case Compare.NoExist : DB.AddContract(Contract.GetFrom(r), False)
+                        Case Compare.MoreNew : myDatabase.ChangeContract(Contract.GetFrom(r), False)
+                        Case Compare.NoExist : myDatabase.AddContract(Contract.GetFrom(r), False)
                     End Select
                 Next
 
                 sDT = client.GetHistoryPriceList()
-                myDT = DB.GetHistoryPriceList()
+                myDT = myDatabase.GetHistoryPriceList()
                 For Each r As DataRow In sDT.Rows
                     If CompareHistoryPrice(myDT, r("GoodsLabel"), GetTime(r("Time"))) = Compare.NoExist Then
-                        DB.AddHistoryPrice(HistoryPrice.GetFrom(r), False)
+                        myDatabase.AddHistoryPrice(HistoryPrice.GetFrom(r), False)
                     End If
                 Next
             Catch
@@ -489,79 +490,79 @@ Public Module Program
     End Function
 
     Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.ChangedContract
-        If Config.Mode = Connect.Server Then DB.ChangeContract(con, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangeContract(con, False)
     End Sub
 
     Private Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.ChangedCustomer
-        If Config.Mode = Connect.Server Then DB.ChangeCustomer(cus, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangeCustomer(cus, False)
     End Sub
 
     Private Sub ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.ChangedGoods
-        If Config.Mode = Connect.Server Then DB.ChangeGoods(goods, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangeGoods(goods, False)
     End Sub
 
     Private Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.ChangedHistoryPrice
-        If Config.Mode = Connect.Server Then DB.ChangeHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangeHistoryPrice(hp, False)
     End Sub
 
     Private Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.ChangedPersonnel
-        If Config.Mode = Connect.Server Then DB.ChangePersonnel(per, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangePersonnel(per, False)
     End Sub
 
 
     Private Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.ChangedSupplier
-        If Config.Mode = Connect.Server Then DB.ChangeSupplier(sup, False)
+        If Config.Mode = Connect.Server Then myDatabase.ChangeSupplier(sup, False)
     End Sub
 
     Private Sub CreatedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.CreatedContract
-        If Config.Mode = Connect.Server Then DB.AddContract(con, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddContract(con, False)
     End Sub
 
     Private Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.CreatedCustomer
-        If Config.Mode = Connect.Server Then DB.AddCustomer(cus, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddCustomer(cus, False)
     End Sub
 
     Private Sub CreatedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.CreatedGoods
-        If Config.Mode = Connect.Server Then DB.AddGoods(goods, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddGoods(goods, False)
     End Sub
 
     Private Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.CreatedHistoryPrice
-        If Config.Mode = Connect.Server Then DB.AddHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddHistoryPrice(hp, False)
     End Sub
 
     Private Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.CreatedPersonnel
-        If Config.Mode = Connect.Server Then DB.AddPersonnel(per, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddPersonnel(per, False)
     End Sub
 
     Private Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.CreatedSupplier
-        If Config.Mode = Connect.Server Then DB.AddSupplier(sup, False)
+        If Config.Mode = Connect.Server Then myDatabase.AddSupplier(sup, False)
     End Sub
 
     Private Sub DeletedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.DeletedContract
-        If Config.Mode = Connect.Server Then DB.DeleteContract(con, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteContract(con, False)
     End Sub
 
     Private Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.DeletedCustomer
-        If Config.Mode = Connect.Server Then DB.DeleteCustomer(cus, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteCustomer(cus, False)
     End Sub
 
     Private Sub DeletedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.DeletedGoods
-        If Config.Mode = Connect.Server Then DB.DeleteGoods(goods, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteGoods(goods, False)
     End Sub
 
     Private Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPrice
-        If Config.Mode = Connect.Server Then DB.DeleteHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPrice(hp, False)
     End Sub
 
     Private Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPriceList
-        If Config.Mode = Connect.Server Then DB.DeleteHistoryPriceList(hp.GoodsLabel, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPriceList(hp.GoodsLabel, False)
     End Sub
 
     Private Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.DeletedPersonnel
-        If Config.Mode = Connect.Server Then DB.DeletePersonnel(per, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeletePersonnel(per, False)
     End Sub
 
     Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.DeletedSupplier
-        If Config.Mode = Connect.Server Then DB.DeleteSupplier(sup, False)
+        If Config.Mode = Connect.Server Then myDatabase.DeleteSupplier(sup, False)
     End Sub
 End Module

@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:通訊行進銷存"
+"ProjectName" = "8:通信行進銷存"
 "LanguageId" = "3:1028"
 "CodePage" = "3:950"
 "UILanguageId" = "3:1028"
@@ -28,13 +28,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4DBBF5F932C1F2A53D425F481AE3C5CD"
+        "OwnerKey" = "8:_02F42ACF132E4EE7BB7A374AB01229F7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_02F42ACF132E4EE7BB7A374AB01229F7"
+        "OwnerKey" = "8:_4DBBF5F932C1F2A53D425F481AE3C5CD"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -92,6 +92,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -238,7 +246,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:通訊行進銷存"
+        "ProductName" = "8:通信行進銷存"
         "ProductCode" = "8:{69690497-D6E6-4D0D-81C7-9451BA8C6999}"
         "PackageCode" = "8:{1159476B-D0EA-4AB6-B9F6-706789E9421B}"
         "UpgradeCode" = "8:{14BB8540-FBAA-4192-A5E3-9A0F58C18853}"
@@ -247,12 +255,12 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:六六通訊"
+        "Manufacturer" = "8:六六通信"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:通訊行進銷存"
+        "Title" = "8:通信行進銷存"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:六六通訊"
+        "ARPCONTACT" = "8:六六通信"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"

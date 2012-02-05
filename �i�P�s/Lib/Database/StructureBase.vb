@@ -82,6 +82,14 @@ Namespace Database
                 Return New Object() {Label, Name, Tel1, Tel2, Addr, Note, Modify}
             End Function
 
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Supplier
                 Dim R As New MyDataRow(Row)
                 Dim data As Supplier
@@ -147,6 +155,15 @@ Namespace Database
             Function ToObjects() As Object()
                 Return New Object() {Label, Name, Tel1, Tel2, Addr, Note, Modify}
             End Function
+
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Customer
                 Dim R As New MyDataRow(Row)
                 Dim data As Customer
@@ -224,6 +241,15 @@ Namespace Database
             Function ToObjects() As Object()
                 Return New Object() {Label, Name, Tel1, Tel2, Addr, ID, Password, Authority, Note, Modify}
             End Function
+
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Personnel
                 Dim R As New MyDataRow(Row)
                 Dim data As Personnel
@@ -339,6 +365,14 @@ Namespace Database
                 Return data
             End Function
 
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
             Public Function GetUpdateSqlCommand() As String
                 Dim Column As String() = New String() {"Name", "Kind", "Brand", "Note", "Modify"}
                 Dim Value As Object() = New Object() {Name, Kind, Brand, Note, Modify}
@@ -381,6 +415,14 @@ Namespace Database
             Function ToObjects() As Object()
                 Return New Object() {GoodsLabel, Time, Cost, Price}
             End Function
+
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
 
             Public Shared Function Null() As HistoryPrice
                 Dim data As New HistoryPrice
@@ -460,6 +502,14 @@ Namespace Database
                 Return data
             End Function
 
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
             Public Function GetUpdateSqlCommand() As String
                 Dim Column As String() = New String() {"Enable", "Name", "Commission", "Discount", "Prepay", "Note", "Modify"}
                 Dim Value As Object() = New Object() {Enable, Name, Commission, Discount, Prepay, Note, Modify}
@@ -537,6 +587,14 @@ Namespace Database
                 data.Note = R("Note")
                 Return data
             End Function
+
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
 
 
             Public Function GetUpdateSqlCommand()
@@ -623,6 +681,14 @@ Namespace Database
                 Return data
             End Function
 
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
+
         End Structure
 
 
@@ -655,6 +721,13 @@ Namespace Database
                 Return data
             End Function
 
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
 
         End Structure
 
@@ -679,6 +752,14 @@ Namespace Database
             Function ToObjects() As Object()
                 Return New Object() {SalesLabel, GoodsLabel, PurchaseLabel, Price, Number}
             End Function
+
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As OrderGoods
                 Dim R As New MyDataRow(Row)
@@ -729,9 +810,13 @@ Namespace Database
                 Return New Object() {Label, OrderDate, SalesDate, CustomerLabel, PersonnelLabel, Deposit, CType(TypeOfPayment, Int16), Note}
             End Function
 
-            'Private Function GetTypeOfPaymentNumber() As Integer
-            '    TypeOfPayment.
-            'End Function
+            Sub UpdateRow(ByVal r As DataRow)
+                Dim columns() As Column = ToColumns()
+                Dim obj() As Object = ToObjects()
+                For i As Integer = 0 To columns.Count - 1
+                    r(columns(i).Name) = obj(i)
+                Next
+            End Sub
 
 
             Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Sales
@@ -752,57 +837,57 @@ Namespace Database
 
 
 #Region "訂單"
-        ''' <summary>訂單</summary>
-        Structure Order
-            Shared Table As String = "Order"
-            ''' <summary>訂單識別碼</summary>
-            Dim Label As String
-            ''' <summary>下訂日期</summary>
-            Dim [Date] As Date
-            ''' <summary>商品識別碼</summary>
-            Dim GoodsLabel As String
-            ''' <summary>最終售價</summary>
-            Dim SellingPrice As Single
-            ''' <summary>訂金</summary>
-            Dim Deposit As Single
-            ''' <summary>客戶識別碼</summary>
-            Dim CustomerLabel As String
-            ''' <summary>員工識別碼</summary>
-            Dim PersonnelLabel As String
-            ''' <summary>備註</summary>
-            Dim Note As String
+        '''' <summary>訂單</summary>
+        'Structure Order
+        '    Shared Table As String = "Order"
+        '    ''' <summary>訂單識別碼</summary>
+        '    Dim Label As String
+        '    ''' <summary>下訂日期</summary>
+        '    Dim [Date] As Date
+        '    ''' <summary>商品識別碼</summary>
+        '    Dim GoodsLabel As String
+        '    ''' <summary>最終售價</summary>
+        '    Dim SellingPrice As Single
+        '    ''' <summary>訂金</summary>
+        '    Dim Deposit As Single
+        '    ''' <summary>客戶識別碼</summary>
+        '    Dim CustomerLabel As String
+        '    ''' <summary>員工識別碼</summary>
+        '    Dim PersonnelLabel As String
+        '    ''' <summary>備註</summary>
+        '    Dim Note As String
 
-            Shared Function ToColumns() As Column()
-                Dim Columns As New List(Of Column)
-                Columns.Add(New Column("Label", DBTypeLabel))
-                Columns.Add(New Column("Date", DBTypeDate))
-                Columns.Add(New Column("GoodsLabel", DBTypeLabel))
-                Columns.Add(New Column("SellingPrice", DBTypeSingle))
-                Columns.Add(New Column("Deposit", DBTypeSingle))
-                Columns.Add(New Column("CustomerLabel", DBTypeLabel))
-                Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
-                Columns.Add(New Column("Note", DBTypeNote))
-                Return Columns.ToArray
-            End Function
+        '    Shared Function ToColumns() As Column()
+        '        Dim Columns As New List(Of Column)
+        '        Columns.Add(New Column("Label", DBTypeLabel))
+        '        Columns.Add(New Column("Date", DBTypeDate))
+        '        Columns.Add(New Column("GoodsLabel", DBTypeLabel))
+        '        Columns.Add(New Column("SellingPrice", DBTypeSingle))
+        '        Columns.Add(New Column("Deposit", DBTypeSingle))
+        '        Columns.Add(New Column("CustomerLabel", DBTypeLabel))
+        '        Columns.Add(New Column("PersonnelLabel", DBTypeLabel))
+        '        Columns.Add(New Column("Note", DBTypeNote))
+        '        Return Columns.ToArray
+        '    End Function
 
-            Function ToObjects() As Object()
-                Return New Object() {Label, [Date], GoodsLabel, SellingPrice, Deposit, CustomerLabel, PersonnelLabel, Note}
-            End Function
+        '    Function ToObjects() As Object()
+        '        Return New Object() {Label, [Date], GoodsLabel, SellingPrice, Deposit, CustomerLabel, PersonnelLabel, Note}
+        '    End Function
 
-            Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Order
-                Dim R As New MyDataRow(Row)
-                Dim data As Order
-                data.Label = R("Label")
-                data.Date = R("Date")
-                data.GoodsLabel = R("GoodsLabel")
-                data.SellingPrice = R("SellingPrice")
-                data.Deposit = R("Deposit")
-                data.CustomerLabel = R("CustomerLabel")
-                data.PersonnelLabel = R("PersonnelLabel")
-                data.Note = R("Note")
-                Return data
-            End Function
-        End Structure
+        '    Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Order
+        '        Dim R As New MyDataRow(Row)
+        '        Dim data As Order
+        '        data.Label = R("Label")
+        '        data.Date = R("Date")
+        '        data.GoodsLabel = R("GoodsLabel")
+        '        data.SellingPrice = R("SellingPrice")
+        '        data.Deposit = R("Deposit")
+        '        data.CustomerLabel = R("CustomerLabel")
+        '        data.PersonnelLabel = R("PersonnelLabel")
+        '        data.Note = R("Note")
+        '        Return data
+        '    End Function
+        'End Structure
 #End Region
     End Module
 End Namespace
