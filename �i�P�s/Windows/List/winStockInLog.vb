@@ -130,7 +130,7 @@
     End Sub
 
 
-    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Stock) Handles access.CreatedStock
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.CreatedStock
         Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray
 
         If Me.InvokeRequired Then
@@ -140,7 +140,7 @@
         End If
     End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Stock) Handles access.ChangedStock
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.ChangedStock
         Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray()
         If Me.InvokeRequired Then
             Me.Invoke(invChange, row)
@@ -150,7 +150,7 @@
     End Sub
 
 
-    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Stock) Handles access.DeletedStock
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.DeletedStock
         If Me.InvokeRequired Then
             Me.Invoke(invDelete, sender, item)
             Exit Sub
@@ -165,5 +165,11 @@
             dt.Rows.Remove(r)
         Next
 
+    End Sub
+
+    Private Sub dgStockLog_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgStockLog.RowsAdded
+        Dim row As DataGridViewRow = CType(sender, DataGridView).Rows(e.RowIndex)
+        Filter.FilterRow(row)
+        Filter.AddComboBoxItem(row)
     End Sub
 End Class

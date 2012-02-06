@@ -370,6 +370,7 @@
         For Each c As TextFilter In TextFilters
             Dim cb As ToolStripComboBox = c.cms.Items("cbText")
             Dim text As String = GetCellValue(row, c.HeaderName)
+            If text = Nothing Then Continue For
             If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)
         Next
     End Sub

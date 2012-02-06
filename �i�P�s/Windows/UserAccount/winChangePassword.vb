@@ -1,6 +1,6 @@
 ﻿Public Class winChangePassword
 
-    Dim result As LoginResult
+    Dim result As Database.LoginResult
 
     Dim access As Database.Access
 

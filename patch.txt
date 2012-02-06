@@ -1,3 +1,10 @@
+20120206
+1.修改登入方式，由Access類別登入。
+2.AccesServer改為繼承自TcpTool類別。
+3.所有清單根據事件所新增的資料列，在新增後直接套用篩選條件。
+4.將Datbase中的StructureBase模組範圍縮小到僅包含資料定義與部份函式，所有的資料結構現在都直接定義在Database命名空間中。
+5.新增調貨資料結構StockMove。
+
 20120205-1
 1.新增ServerName與ServerPort設定，可指定伺服名稱(店名)與通訊埠。
 2.Access元件改為繼承自TcpTool.Client。

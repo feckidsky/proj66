@@ -1,10 +1,12 @@
-﻿Public Class winLogIn
+﻿Imports 進銷存.Database
+
+Public Class winLogIn
 
     Dim result As LoginResult
-
-    Public Overloads Function ShowDialog(Optional ByVal Title As String = "登入", Optional ByVal ID As String = "") As LoginResult
+    Dim access As Access
+    Public Overloads Function ShowDialog(ByVal db As Access, Optional ByVal Title As String = "登入", Optional ByVal ID As String = "") As LoginResult
+        Me.access = db
         txtID.Enabled = ID = ""
-
         Me.Text = Title
         txtID.Text = ID
         txtPassword.Text = ""
@@ -23,7 +25,8 @@
     End Sub
 
     Private Sub btLogin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btLogin.Click
-        result = LogIn(txtID.Text, txtPassword.Text)
+        result = Client.Login(txtID.Text, txtPassword.Text)
+        If result.State = LoginState.Disconnect Then MsgBox(result.msg, MsgBoxStyle.Information, "錯誤")
         If result.State = LoginState.Success Then Me.Close()
     End Sub
 End Class

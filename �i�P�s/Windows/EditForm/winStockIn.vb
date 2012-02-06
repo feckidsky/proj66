@@ -1,4 +1,5 @@
-﻿Imports 進銷存.Database.StructureBase
+﻿Imports 進銷存.Database.DatabaseType
+Imports 進銷存.Database
 
 Public Class winStockIn
 
@@ -67,7 +68,7 @@ Public Class winStockIn
         Data.Number = Val(txtNumber.Text)
         Data.GoodsLabel = SelectedGoods.Label
         Data.SupplierLabel = SelectedSupplier.Label
-       
+
         Return Data
     End Function
 

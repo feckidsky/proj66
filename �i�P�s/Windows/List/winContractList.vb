@@ -149,7 +149,7 @@
     Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
     Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
 
-    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.CreatedContract
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.CreatedContract
         If Me.InvokeRequired Then
             Me.Invoke(invCreate, sender, item)
             Exit Sub
@@ -157,7 +157,7 @@
         dt.Rows.Add(item.ToObjects())
     End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.ChangedContract
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.ChangedContract
         If Me.InvokeRequired Then
             Me.Invoke(invChange, sender, item)
             Exit Sub
@@ -169,7 +169,7 @@
     End Sub
 
 
-    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Contract) Handles access.DeletedContract
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.DeletedContract
         If Me.InvokeRequired Then
             Me.Invoke(invDelete, sender, item)
             Exit Sub
@@ -186,4 +186,9 @@
 
     End Sub
 
+    Private Sub dgGoodsList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgGoodsList.RowsAdded
+        Dim row As DataGridViewRow = CType(sender, DataGridView).Rows(e.RowIndex)
+        Filter.FilterRow(row)
+        Filter.AddComboBoxItem(row)
+    End Sub
 End Class

@@ -24,7 +24,7 @@ Public Class winPeople
     Public Sub Open(ByVal data As Personnel, ByVal DB As Database.Access)
         access = DB
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
-        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
+        If winLogIn.ShowDialog(access, "請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Open
         UpdateText(data)
         MyBase.ShowDialog()
@@ -34,7 +34,7 @@ Public Class winPeople
     Public Sub Create(ByVal Data As Personnel, ByVal DB As Database.Access)
         access = DB
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
-        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
+        If winLogIn.ShowDialog(access, "請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
         work = Mode.Create
         UpdateText(Data)
         MyBase.ShowDialog()

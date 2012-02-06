@@ -139,7 +139,7 @@ Public Class winGoodsList
 
 
     Dim invHistoryPrice As New ItemUpdate(AddressOf UpdateHistory)
-    Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
+    Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
         Me.Invoke(invHistoryPrice)
         'UpdateHistory()
     End Sub
@@ -147,9 +147,15 @@ Public Class winGoodsList
 
     Delegate Sub ItemUpdate()
     Dim invGoods As New ItemUpdate(AddressOf UpdateGoodsList)
-    Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
+    Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
         Me.Invoke(invGoods)
         'UpdateGoodsList()
+    End Sub
+
+    Private Sub dgGoodsList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgGoodsList.RowsAdded
+        Dim row As DataGridViewRow = CType(sender, DataGridView).Rows(e.RowIndex)
+        Filter.FilterRow(row)
+        Filter.AddComboBoxItem(row)
     End Sub
 
 

@@ -1,4 +1,5 @@
-﻿Imports 進銷存.Database.StructureBase
+﻿Imports 進銷存.Database.DatabaseType
+Imports 進銷存.Database
 
 Public Class winMain
     WithEvents access As Database.Access '= Program.DB
@@ -7,7 +8,6 @@ Public Class winMain
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         UpdateTitle()
         UpdateSalesList()
-
     End Sub
 
     Dim UpdateTitleHandler As New Action(AddressOf UpdateTitle)
@@ -40,11 +40,7 @@ Public Class winMain
         InitializeComponent()
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
-        AddHandler Program.Account_Logout, AddressOf Account_Login
-        AddHandler Program.Account_LogIn, AddressOf Account_Login
 
-
-        LogIn("kidsky", "3883", False)
 
         Filter = New DataGridViewFilter(dgSales)
         Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式", "內容")
@@ -55,6 +51,8 @@ Public Class winMain
         cbClient.Items.AddRange(Client.GetNameList())
         If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
         cbForm.SelectedIndex = 2
+
+        Client.Login("kidsky", "3883", False)
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
@@ -91,13 +89,15 @@ Public Class winMain
         'Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
         Dim dt As Data.DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex)
 
+        If dgSales.Rows.Count = 0 Then
+            dgSales.Columns.Clear()
+            For i As Integer = 0 To dt.Columns.Count - 1
+                dgSales.Columns.Add(dt.Columns(i).ColumnName, dt.Columns(i).ColumnName)
+            Next
+            dgSales.Columns.Add("內容", "內容")
+        End If
 
-        dgSales.Columns.Clear()
-        For i As Integer = 0 To dt.Columns.Count - 1
-            dgSales.Columns.Add(dt.Columns(i).ColumnName, dt.Columns(i).ColumnName)
-        Next
-        dgSales.Columns.Add("內容", "內容")
-
+        dgSales.Rows.Clear()
         If Not IO.File.Exists(SalesVisiblePath) Then
             dgSales.Columns("單號").Visible = False
             Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
@@ -109,14 +109,8 @@ Public Class winMain
         For i As Integer = 0 To dt.Rows.Count - 1
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
             BeginAddRowInfo(arr)
-            'Dim idx As Integer = dgSales.Rows.Add(arr)
-            'Dim tip As String = access.GetSalesTip(dgSales.Rows(idx).Cells("單號").Value, dgSales.Rows(idx).Cells("付款方式").Value)
-            'dgSales.Rows(idx).Cells("內容").Value = tip
-            'dgSales.Rows.Item(i).Cells("銷貨時間").Value = IIf(dgSales.Rows(i).Cells("銷貨時間").Value = New Date(2001, 1, 1, 0, 0, 0), "", dgSales.Rows(i).Cells("銷貨時間").Value)
-            'dgSales.Rows.Item(i).Cells("付款方式").Value = TypeOfPaymentsDescribe(dgSales.Rows(i).Cells("付款方式").Value)
         Next
-        'UpdateListColor()
-        'If Filter IsNot Nothing Then Filter.UpdateComboBox()
+
     End Sub
 
     Public Sub UpdateListColor()
@@ -247,19 +241,19 @@ Public Class winMain
     End Sub
 
     Private Sub 登出OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登出OToolStripMenuItem.Click, 登出OToolStripMenuItem1.Click
-        LogOut()
+        access.LogOut()
     End Sub
 
 
     Private Sub 登入IToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登入IToolStripMenuItem.Click, 登入IToolStripMenuItem1.Click
-        winLogIn.ShowDialog()
+        winLogIn.ShowDialog(access)
     End Sub
 
 
-    Private Sub Account_Login(ByVal per As Database.Personnel, ByVal message As String)
-        Me.Text = SystemTitle & " - " & per.Name
-        MsgBox(message, MsgBoxStyle.Information, "帳號")
-    End Sub
+    'Private Sub Account_Login(ByVal per As Database.Personnel, ByVal message As String)
+    '    Me.Text = SystemTitle & " - " & per.Name
+    '    MsgBox(message, MsgBoxStyle.Information, "帳號")
+    'End Sub
 
 
     Private Sub 修改密碼PToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改密碼PToolStripMenuItem.Click
@@ -362,6 +356,13 @@ Public Class winMain
 
     End Sub
 
+    Private Sub access_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles access.Account_LogIn, access.Account_Logout
+
+        If result.State <> Database.LoginState.Success Then MsgBox(result.msg, MsgBoxStyle.Information)
+        If Not Me.Created Then Exit Sub
+        UpdateTitle()
+    End Sub
+
     Private Sub access_ConnectedFail(ByVal Client As TCPTool.Client) Handles access.ConnectedFail
         UpdateTitle()
     End Sub
@@ -377,20 +378,20 @@ Public Class winMain
         UpdateSalesListHandler()
     End Sub
 
-    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
+    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
     End Sub
 
 
-    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales, ByVal GoodsList() As Database.StructureBase.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
+    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)
     End Sub
 
-    Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.StructureBase.Sales) Handles access.DeletedSales
+    Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.Sales) Handles access.DeletedSales
         'UpdateSalesList()
         If Me.InvokeRequired Then
             Me.Invoke(DeleteRowHandler, sales)

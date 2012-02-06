@@ -47,8 +47,9 @@
                     RaiseEvent BeforeConnect(Me, Client(i))
                     CType(Client(i), AccessClient).StartConnect()
                 End If
-
             Next
+
+
         End Sub
 
         Public Sub EndConnect()
@@ -60,6 +61,16 @@
                 End If
             Next
         End Sub
+
+        Public Function Login(ByVal ID As String, ByVal Password As String, Optional ByVal Trigger As Boolean = True) As LoginResult
+            For Each c As Access In Client
+                If c.GetType Is GetType(Access) OrElse (c.GetType Is GetType(AccessClient) AndAlso c.Connected) Then
+                    Return c.LogIn(ID, Password, Trigger)
+                End If
+            Next
+
+            Return New LoginResult(LoginState.Disconnect, "尚未連線", Personnel.Guest)
+        End Function
 
         Public Function GetNameList() As String()
             Return Array.ConvertAll(Client, Function(c As Access) c.Name)
@@ -89,11 +100,7 @@
     Public Class AccessClient
         Inherits Access
 
-
-        'Event ConnectSuccess(ByVal sender As Object)
         Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
-
-        'Public WithEvents Client As New TCPTool.Client()
 
         Dim ResponseDataTable As Data.DataTable = Nothing
 
@@ -108,44 +115,15 @@
         Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
             MyClass.New()
             Me.Name = Name : Me.IP = IP : Me.Port = Port
-            'Client.Port = 3600
         End Sub
 
-
-        'ReadOnly Property Connected() As Boolean
-        '    Get
-        '        Return Client.Connected
-        '    End Get
-        'End Property
-        'Property IP() As String
-        '    Get
-        '        Return Client.IP
-        '    End Get
-        '    Set(ByVal value As String)
-        '        Client.IP = value
-        '    End Set
-        'End Property
-
-        'Property Port() As Integer
-        '    Get
-        '        Return Client.Port
-        '    End Get
-        '    Set(ByVal value As Integer)
-        '        Client.Port = value
-        '    End Set
-        'End Property
-
-        'Public Sub startConnect()
-        '    Client.StartConnect()
-        'End Sub
-
         Public Sub Disconnect()
-            Client.EndConnect()
+            EndConnect()
         End Sub
 
         Public Overrides Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
             Dim Count As Long
-            MsgBox("客戶端不支援直Command函數")
+            MsgBox("客戶端不支援Command函數")
             Return Count
         End Function
 
@@ -174,27 +152,17 @@
                     MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
                 End If
 
-                'While (ResponseDataTable Is Nothing)
-                '    Application.DoEvents()
-                'End While
             End SyncLock
             Return ResponseDataTable
         End Function
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
-            'If Not Client.Connected Then Client.Connect()
             MyBase.Send(cmd, Code.SerializeWithZIP(args))
         End Sub
-
 
         Private Function Repair(Of T)(ByVal s As String) As T
             Return Code.DeserializeWithUnzip(Of T)(s)
         End Function
-
-        'Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
-        '    RaiseEvent ConnectSuccess(Me)
-        'End Sub
-
 
 
         Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ReceiveSplitMessage
@@ -279,7 +247,7 @@
             Send("CreateContract", data)
         End Sub
         Overrides Sub DeleteContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
-            Send("DeleteConract", data)
+            Send("DeleteContract", data)
         End Sub
         Overrides Sub ChangeContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
             Send("ChangeContract", data)

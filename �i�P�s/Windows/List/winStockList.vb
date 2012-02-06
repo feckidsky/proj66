@@ -116,7 +116,7 @@
     End Sub
 
 
-    Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.StructureBase.Stock) Handles access.CreatedStock
+    Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.CreatedStock
         UpdateStockList()
     End Sub
 

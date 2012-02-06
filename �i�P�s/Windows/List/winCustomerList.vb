@@ -101,7 +101,7 @@
 
         Dim count As Integer = access.GetSalesListByCustomer(item.Label).Rows.Count
 
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then count += c.GetSalesListByCustomer(item.Label).Rows.Count
         Next
         If count > 0 Then
@@ -137,7 +137,7 @@
     Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
     Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
 
-    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.CreatedCustomer
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Customer) Handles access.CreatedCustomer
         If Me.InvokeRequired Then
             Me.Invoke(invCreate, sender, item)
             Exit Sub
@@ -147,7 +147,7 @@
         End With
     End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.ChangedCustomer
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Customer) Handles access.ChangedCustomer
         If Me.InvokeRequired Then
             Me.Invoke(invChange, sender, item)
             Exit Sub
@@ -159,7 +159,7 @@
     End Sub
 
 
-    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Customer) Handles access.DeletedCustomer
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Customer) Handles access.DeletedCustomer
         If Me.InvokeRequired Then
             Me.Invoke(invDelete, sender, item)
             Exit Sub
@@ -174,5 +174,11 @@
             dt.Rows.Remove(r)
         Next
 
+    End Sub
+
+    Private Sub dgList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgList.RowsAdded
+        Dim row As DataGridViewRow = CType(sender, DataGridView).Rows(e.RowIndex)
+        Filter.FilterRow(row)
+        Filter.AddComboBoxItem(row)
     End Sub
 End Class

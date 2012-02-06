@@ -1,30 +1,30 @@
 ﻿Namespace Database
     Public Class AccessServer
-        Public WithEvents Server As New TCPTool
+        Inherits TCPTool
         Public WithEvents Access As Access
         Public Port As Integer = 3600
 
         Public Name As String
 
         Public Sub Open()
-            Server.ServerOpen(Port)
+            ServerOpen(Port)
         End Sub
 
         Public Sub Close()
-            Server.ServerClose()
+            ServerClose()
         End Sub
 
         Public Sub ChangeName(ByVal newName As String)
             Name = newName
-            Server.ServerSend("ServerName", Code.SerializeWithZIP(Name))
+            ServerSend("ServerName", Code.SerializeWithZIP(Name))
         End Sub
 
-        Private Sub Server_ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As TCPTool.Client) Handles Server.ReceiveConnected
+        Private Sub Server_ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As TCPTool.Client) Handles MyBase.ReceiveConnected
             Client.Send("ServerName", Code.SerializeWithZIP(Name))
         End Sub
 
 
-        Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Server.ServerReceiveSplitMessage
+        Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ServerReceiveSplitMessage
             Select Case Data(0)
                 Case "ReadArgs"
                     Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(1))
@@ -64,103 +64,103 @@
             End Select
         End Sub
 
-        Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As StructureBase.Contract) Handles Access.ChangedContract
-            Server.ServerSend("ChangedContract", Code.SerializeWithZIP(con))
+        Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract
+            ServerSend("ChangedContract", Code.SerializeWithZIP(con))
         End Sub
 
-        Private Sub Access_ChangedCustomer(ByVal sender As Object, ByVal cus As StructureBase.Customer) Handles Access.ChangedCustomer
-            Server.ServerSend("ChangedCustomer", Code.SerializeWithZIP(cus))
+        Private Sub Access_ChangedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.ChangedCustomer
+            ServerSend("ChangedCustomer", Code.SerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_ChangedGoods(ByVal sender As Object, ByVal goods As StructureBase.Goods) Handles Access.ChangedGoods
-            Server.ServerSend("ChangedGoods", Code.SerializeWithZIP(goods))
+        Private Sub Access_ChangedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.ChangedGoods
+            ServerSend("ChangedGoods", Code.SerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As StructureBase.HistoryPrice) Handles Access.ChangedHistoryPrice
-            Server.ServerSend("ChangedHistoryPrice", Code.SerializeWithZIP(hp))
+        Private Sub Access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.ChangedHistoryPrice
+            ServerSend("ChangedHistoryPrice", Code.SerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_ChangedPersonnel(ByVal sender As Object, ByVal per As StructureBase.Personnel) Handles Access.ChangedPersonnel
-            Server.ServerSend("ChangedPersonnel", Code.SerializeWithZIP(per))
+        Private Sub Access_ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.ChangedPersonnel
+            ServerSend("ChangedPersonnel", Code.SerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As StructureBase.Sales, ByVal GoodsList() As StructureBase.SalesGoods, ByVal OrderList() As StructureBase.OrderGoods, ByVal SalesContracts() As StructureBase.SalesContract) Handles Access.ChangedSales
-            Server.ServerSend("ChangedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+        Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales
+            ServerSend("ChangedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
         End Sub
 
-        Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As StructureBase.Stock) Handles Access.ChangedStock
-            Server.ServerSend("ChangedStock", Code.SerializeWithZIP(stock))
+        Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.ChangedStock
+            ServerSend("ChangedStock", Code.SerializeWithZIP(stock))
         End Sub
 
-        Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As StructureBase.Supplier) Handles Access.ChangedSupplier
-            Server.ServerSend("ChangedSupplier", Code.SerializeWithZIP(sup))
+        Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier
+            ServerSend("ChangedSupplier", Code.SerializeWithZIP(sup))
         End Sub
-        Private Sub Access_CreatedContract(ByVal sender As Object, ByVal con As StructureBase.Contract) Handles Access.CreatedContract
-            Server.ServerSend("CreatedContract", Code.SerializeWithZIP(con))
-        End Sub
-
-        Private Sub Access_CreatedCustomer(ByVal sender As Object, ByVal cus As StructureBase.Customer) Handles Access.CreatedCustomer
-            Server.ServerSend("CreatedCustomer", Code.SerializeWithZIP(cus))
+        Private Sub Access_CreatedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.CreatedContract
+            ServerSend("CreatedContract", Code.SerializeWithZIP(con))
         End Sub
 
-        Private Sub Access_CreatedGoods(ByVal sender As Object, ByVal goods As StructureBase.Goods) Handles Access.CreatedGoods
-            Server.ServerSend("CreatedGoods", Code.SerializeWithZIP(goods))
+        Private Sub Access_CreatedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.CreatedCustomer
+            ServerSend("CreatedCustomer", Code.SerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_CreatedHistoryPrice(ByVal sender As Object, ByVal hp As StructureBase.HistoryPrice) Handles Access.CreatedHistoryPrice
-            Server.ServerSend("CreatedHistoryPrice", Code.SerializeWithZIP(hp))
+        Private Sub Access_CreatedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.CreatedGoods
+            ServerSend("CreatedGoods", Code.SerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_CreatedPersonnel(ByVal sender As Object, ByVal per As StructureBase.Personnel) Handles Access.CreatedPersonnel
-            Server.ServerSend("CreatedPersonnel", Code.SerializeWithZIP(per))
+        Private Sub Access_CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.CreatedHistoryPrice
+            ServerSend("CreatedHistoryPrice", Code.SerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As StructureBase.Sales, ByVal GoodsList() As StructureBase.SalesGoods, ByVal OrderList() As StructureBase.OrderGoods, ByVal SalesContracts() As StructureBase.SalesContract) Handles Access.CreatedSales
-            Server.ServerSend("CreatedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+        Private Sub Access_CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.CreatedPersonnel
+            ServerSend("CreatedPersonnel", Code.SerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As StructureBase.Stock) Handles Access.CreatedStock
-            Server.ServerSend("CreatedStock", Code.SerializeWithZIP(stock))
+        Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales
+            ServerSend("CreatedSales", Code.SerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
         End Sub
 
-        Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As StructureBase.Supplier) Handles Access.CreatedSupplier
-            Server.ServerSend("CreatedSupplier", Code.SerializeWithZIP(sup))
+        Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.CreatedStock
+            ServerSend("CreatedStock", Code.SerializeWithZIP(stock))
         End Sub
-        Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As StructureBase.Contract) Handles Access.DeletedContract
+
+        Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier
+            ServerSend("CreatedSupplier", Code.SerializeWithZIP(sup))
+        End Sub
+        Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
             Server.ServerSend("DeletedContract", Code.SerializeWithZIP(con))
         End Sub
 
 
-        Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As StructureBase.Customer) Handles Access.DeletedCustomer
-            Server.ServerSend("DeletedCustomer", Code.SerializeWithZIP(cus))
+        Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer
+            ServerSend("DeletedCustomer", Code.SerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_DeletedGoods(ByVal sender As Object, ByVal goods As StructureBase.Goods) Handles Access.DeletedGoods
-            Server.ServerSend("DeletedGoods", Code.SerializeWithZIP(goods))
+        Private Sub Access_DeletedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.DeletedGoods
+            ServerSend("DeletedGoods", Code.SerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_DeletedHistoryPrice(ByVal sender As Object, ByVal hp As StructureBase.HistoryPrice) Handles Access.DeletedHistoryPrice
-            Server.ServerSend("DeletedHistoryPrice", Code.SerializeWithZIP(hp))
+        Private Sub Access_DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPrice
+            ServerSend("DeletedHistoryPrice", Code.SerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As StructureBase.HistoryPrice) Handles Access.DeletedHistoryPriceList
-            Server.ServerSend("DeletedHistoryPriceList", Code.SerializeWithZIP(hp))
+        Private Sub Access_DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPriceList
+            ServerSend("DeletedHistoryPriceList", Code.SerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_DeletedPersonnel(ByVal sender As Object, ByVal per As StructureBase.Personnel) Handles Access.DeletedPersonnel
-            Server.ServerSend("DeletedPersonnel", Code.SerializeWithZIP(per))
+        Private Sub Access_DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.DeletedPersonnel
+            ServerSend("DeletedPersonnel", Code.SerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_DeletedSales(ByVal sender As Object, ByVal sales As StructureBase.Sales) Handles Access.DeletedSales
-            Server.ServerSend("DeletedSales", Code.SerializeWithZIP(sales))
+        Private Sub Access_DeletedSales(ByVal sender As Object, ByVal sales As Sales) Handles Access.DeletedSales
+            ServerSend("DeletedSales", Code.SerializeWithZIP(sales))
         End Sub
 
-        Private Sub Access_DeletedStock(ByVal sender As Object, ByVal stock As StructureBase.Stock) Handles Access.DeletedStock
-            Server.ServerSend("DeletedStock", Code.SerializeWithZIP(stock))
+        Private Sub Access_DeletedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.DeletedStock
+            ServerSend("DeletedStock", Code.SerializeWithZIP(stock))
         End Sub
 
-        Private Sub Access_DeletedSupplier(ByVal sender As Object, ByVal sup As StructureBase.Supplier) Handles Access.DeletedSupplier
-            Server.ServerSend("DeletedSupplier", Code.SerializeWithZIP(sup))
+        Private Sub Access_DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.DeletedSupplier
+            ServerSend("DeletedSupplier", Code.SerializeWithZIP(sup))
         End Sub
     End Class
 

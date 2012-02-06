@@ -110,7 +110,7 @@
         If Not CheckAuthority(3, WithAdmin:=True) Then Exit Sub
 
         Dim SelectedItem As Database.Personnel = GetSelectedItem()
-        If winLogIn.ShowDialog("請輸入使用者密碼", CurrentUser.ID).State <> LoginState.Success Then Exit Sub
+        If winLogIn.ShowDialog(access, "請輸入使用者密碼", CurrentUser.ID).State <> Database.LoginState.Success Then Exit Sub
         If SelectedItem.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
@@ -153,7 +153,7 @@
     Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
     Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
 
-    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Personnel) Handles access.CreatedPersonnel
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.CreatedPersonnel
         If Me.InvokeRequired Then
             Me.Invoke(invCreate, sender, item)
             Exit Sub
@@ -163,7 +163,7 @@
         End With
     End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Personnel) Handles access.ChangedPersonnel
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.ChangedPersonnel
         If Me.InvokeRequired Then
             Me.Invoke(invChange, sender, item)
             Exit Sub
@@ -175,7 +175,7 @@
     End Sub
 
 
-    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.StructureBase.Personnel) Handles access.DeletedPersonnel
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.DeletedPersonnel
         If Me.InvokeRequired Then
             Me.Invoke(invDelete, sender, item)
             Exit Sub
@@ -192,4 +192,9 @@
 
     End Sub
 
+    Private Sub dgList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgList.RowsAdded
+        Dim row As DataGridViewRow = CType(sender, DataGridView).Rows(e.RowIndex)
+        Filter.FilterRow(row)
+        Filter.AddComboBoxItem(row)
+    End Sub
 End Class

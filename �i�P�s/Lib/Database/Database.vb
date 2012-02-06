@@ -11,9 +11,9 @@
 
     Public Structure SalesArgs
         Dim Sales As Sales
-        Dim GoodsList() As StructureBase.SalesGoods
-        Dim OrderList() As StructureBase.OrderGoods
-        Dim SalesContracts() As StructureBase.SalesContract
+        Dim GoodsList() As SalesGoods
+        Dim OrderList() As OrderGoods
+        Dim SalesContracts() As SalesContract
         Sub New(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
             Me.Sales = sales
             Me.GoodsList = GoodsList
@@ -23,11 +23,31 @@
 
     End Structure
 
+    Public Structure LoginResult
+        Dim User As Personnel
+        Dim State As LoginState
+        Dim msg As String
+
+        Sub New(ByVal state As LoginState, ByVal msg As String, ByVal user As Personnel)
+            Me.State = state : Me.msg = msg : Me.User = user
+        End Sub
+    End Structure
+
+    Public Enum LoginState
+        IdError = 0
+        PasswordError = 1
+        Success = 2
+        Disconnect = 3
+    End Enum
+
 #Region "Access"
     Public Class Access
         Inherits TCPTool.Client
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
+
+        Event Account_Logout(ByVal sender As Object, ByVal result As LoginResult)
+        Event Account_LogIn(ByVal sender As Object, ByVal result As LoginResult)
 
         Event CreatedContract(ByVal sender As Object, ByVal con As Contract)
         Event ChangedContract(ByVal sender As Object, ByVal con As Contract)
@@ -74,6 +94,34 @@
         '    BasePath = Dir & "\base.mdb"
         '    SalesPath = Dir & "\sales.mdb"
         'End Sub
+
+        Public Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
+
+            Dim result As LoginResult
+
+            Dim user As Personnel = myDatabase.GetPersonnelByID(ID)
+
+            If user.IsNull() Then
+                result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest)
+            ElseIf user.Password <> Password Then
+                result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest)
+            Else
+                result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Guest)
+                CurrentUser = user
+            End If
+
+            If TriggerEvent Then OnLogin(result)
+            Return result
+        End Function
+
+        Friend Sub OnLogin(ByVal result As LoginResult)
+            RaiseEvent Account_LogIn(Me, result)
+        End Sub
+
+        Public Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
+            Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest)
+            If TriggerEvent Then RaiseEvent Account_Logout(Me, result)
+        End Sub
 
         Public Function GetHistoryPriceList(ByVal Label As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
@@ -409,11 +457,13 @@
         Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.TypeOfPayment) As String
             Dim lst As New List(Of String)
             Dim dt As DataTable = GetContractListBySalesLabel(Label)
-            If dt Is Nothing Then Return ""
 
-            For Each r As DataRow In dt.Rows
-                lst.Add(r("Name"))
-            Next
+
+            If dt IsNot Nothing Then
+                For Each r As DataRow In dt.Rows
+                    lst.Add(r("Name"))
+                Next
+            End If
 
             If style = TypeOfPayment.Commission Then
                 dt = GetOrderListBySalesLabel(Label)
@@ -421,9 +471,11 @@
                 dt = GetGoodsListBySalesLabel(Label)
             End If
 
-            For Each r As DataRow In dt.Rows
-                lst.Add(r("Name") & " x " & r("Number"))
-            Next
+            If dt IsNot Nothing Then
+                For Each r As DataRow In dt.Rows
+                    lst.Add(r("Name") & " x " & r("Number"))
+                Next
+            End If
 
             If lst.Count = 0 Then Return ""
             Return Join(lst.ToArray, vbCrLf)

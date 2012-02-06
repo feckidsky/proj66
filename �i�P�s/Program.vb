@@ -1,21 +1,8 @@
-﻿Imports 進銷存.Database.StructureBase
+﻿Imports 進銷存.Database.DatabaseType
+Imports 進銷存.Database
 
 Public Module Program
 #Region "Structure"
-    Structure LoginResult
-        Dim State As LoginState
-        Dim msg As String
-
-        Sub New(ByVal state As LoginState, ByVal msg As String)
-            Me.State = state : Me.msg = msg
-        End Sub
-    End Structure
-
-    Enum LoginState
-        IdError = 0
-        PasswordError = 1
-        Success = 2
-    End Enum
 
     Enum Connect
         Client = 0
@@ -57,8 +44,7 @@ Public Module Program
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
 
-    Event Account_Logout(ByVal personnel As Database.Personnel, ByVal Message As String)
-    Event Account_LogIn(ByVal personnel As Database.Personnel, ByVal Message As String)
+
     Public SystemTitle As String = "進銷存管理系統"
 
     Public Sub InitialProgram()
@@ -81,7 +67,7 @@ Public Module Program
         Client.StartConnect()
 
 
-        LogOut(False)
+        'LogOut(False)
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
         'LogIn(admin.ID, admin.Password, False)
     End Sub
@@ -135,29 +121,9 @@ Public Module Program
         End If
     End Function
 
-    Public Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
 
-        Dim result As LoginResult
 
-        Dim user As Personnel = myDatabase.GetPersonnelByID(ID)
 
-        If user.IsNull() Then
-            result = New LoginResult(LoginState.IdError, "帳號不存在!")
-        ElseIf user.Password <> Password Then
-            result = New LoginResult(LoginState.PasswordError, "密碼錯誤!")
-        Else
-            result = New LoginResult(LoginState.Success, "登入成功!")
-            CurrentUser = user
-        End If
-
-        If TriggerEvent Then RaiseEvent Account_LogIn(user, result.msg)
-        Return result
-    End Function
-
-    Public Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
-        CurrentUser = Database.Personnel.Guest
-        If TriggerEvent Then RaiseEvent Account_Logout(CurrentUser, "已經登出!")
-    End Sub
 
     Public Function GetNewSupplier() As Supplier
         Dim data As Supplier = Nothing
@@ -335,9 +301,11 @@ Public Module Program
 
     WithEvents ccc As Database.AccessClient
     Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeConnect
-        'Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
-        'For i = 0 To Client.Length - 1
+
         With client
+            AddHandler .Account_LogIn, AddressOf ccc_Account_LogIn
+            AddHandler .Account_Logout, AddressOf ccc_Account_LogIn
+
             AddHandler .CreatedContract, AddressOf CreatedContract
             AddHandler .CreatedCustomer, AddressOf CreatedCustomer
             AddHandler .CreatedSupplier, AddressOf CreatedSupplier
@@ -361,14 +329,17 @@ Public Module Program
             AddHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
             AddHandler .ConnectedSuccess, AddressOf ConnectSuccess
             AddHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
+
         End With
-        'Next
+
     End Sub
 
     Private Sub Client_BeforeDisconnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeDisconnect
-        'Dim Client() As Database.AccessClient = CType(sender, Database.AccessClientMenage).Client
-        'For i = 0 To Client.Length - 1
+
         With client
+            RemoveHandler .Account_LogIn, AddressOf ccc_Account_LogIn
+            RemoveHandler .Account_Logout, AddressOf ccc_Account_LogIn
+
             RemoveHandler .CreatedContract, AddressOf CreatedContract
             RemoveHandler .CreatedCustomer, AddressOf CreatedCustomer
             RemoveHandler .CreatedSupplier, AddressOf CreatedSupplier
@@ -393,10 +364,12 @@ Public Module Program
             RemoveHandler .ConnectedSuccess, AddressOf ConnectSuccess
             RemoveHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
         End With
-        'Next
+
     End Sub
 
     Dim UpdateDataLock As String = "UpdateDataLock"
+
+
 
     Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
         If Config.Mode = Connect.Client Then Exit Sub
@@ -495,84 +468,89 @@ Public Module Program
         Return Compare.NoExist
     End Function
 
-    Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.ChangedContract
+    Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.ChangedContract
         If Config.Mode = Connect.Server Then myDatabase.ChangeContract(con, False)
     End Sub
 
-    Private Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.ChangedCustomer
+    Private Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.ChangedCustomer
         If Config.Mode = Connect.Server Then myDatabase.ChangeCustomer(cus, False)
     End Sub
 
-    Private Sub ChangedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.ChangedGoods
+    Private Sub ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.ChangedGoods
         If Config.Mode = Connect.Server Then myDatabase.ChangeGoods(goods, False)
     End Sub
 
-    Private Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.ChangedHistoryPrice
+    Private Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.ChangedHistoryPrice
         If Config.Mode = Connect.Server Then myDatabase.ChangeHistoryPrice(hp, False)
     End Sub
 
-    Private Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.ChangedPersonnel
+    Private Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.ChangedPersonnel
         If Config.Mode = Connect.Server Then myDatabase.ChangePersonnel(per, False)
     End Sub
 
 
-    Private Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.ChangedSupplier
+    Private Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.ChangedSupplier
         If Config.Mode = Connect.Server Then myDatabase.ChangeSupplier(sup, False)
     End Sub
 
-    Private Sub CreatedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.CreatedContract
+    Private Sub CreatedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.CreatedContract
         If Config.Mode = Connect.Server Then myDatabase.AddContract(con, False)
     End Sub
 
-    Private Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.CreatedCustomer
+    Private Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.CreatedCustomer
         If Config.Mode = Connect.Server Then myDatabase.AddCustomer(cus, False)
     End Sub
 
-    Private Sub CreatedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.CreatedGoods
+    Private Sub CreatedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.CreatedGoods
         If Config.Mode = Connect.Server Then myDatabase.AddGoods(goods, False)
     End Sub
 
-    Private Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.CreatedHistoryPrice
+    Private Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.CreatedHistoryPrice
         If Config.Mode = Connect.Server Then myDatabase.AddHistoryPrice(hp, False)
     End Sub
 
-    Private Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.CreatedPersonnel
+    Private Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.CreatedPersonnel
         If Config.Mode = Connect.Server Then myDatabase.AddPersonnel(per, False)
     End Sub
 
-    Private Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.CreatedSupplier
+    Private Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.CreatedSupplier
         If Config.Mode = Connect.Server Then myDatabase.AddSupplier(sup, False)
     End Sub
 
-    Private Sub DeletedContract(ByVal sender As Object, ByVal con As Database.StructureBase.Contract) Handles ccc.DeletedContract
+    Private Sub DeletedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.DeletedContract
         If Config.Mode = Connect.Server Then myDatabase.DeleteContract(con, False)
     End Sub
 
-    Private Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Database.StructureBase.Customer) Handles ccc.DeletedCustomer
+    Private Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.DeletedCustomer
         If Config.Mode = Connect.Server Then myDatabase.DeleteCustomer(cus, False)
     End Sub
 
-    Private Sub DeletedGoods(ByVal sender As Object, ByVal goods As Database.StructureBase.Goods) Handles ccc.DeletedGoods
+    Private Sub DeletedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.DeletedGoods
         If Config.Mode = Connect.Server Then myDatabase.DeleteGoods(goods, False)
     End Sub
 
-    Private Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPrice
+    Private Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.DeletedHistoryPrice
         If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPrice(hp, False)
     End Sub
 
-    Private Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As Database.StructureBase.HistoryPrice) Handles ccc.DeletedHistoryPriceList
+    Private Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.DeletedHistoryPriceList
         If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPriceList(hp.GoodsLabel, False)
     End Sub
 
-    Private Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Database.StructureBase.Personnel) Handles ccc.DeletedPersonnel
+    Private Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.DeletedPersonnel
         If Config.Mode = Connect.Server Then myDatabase.DeletePersonnel(per, False)
     End Sub
 
-    Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.StructureBase.Supplier) Handles ccc.DeletedSupplier
+    Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.DeletedSupplier
         If Config.Mode = Connect.Server Then myDatabase.DeleteSupplier(sup, False)
     End Sub
 
     Private Sub ccc_ReceiveServerName(ByVal sender As Object, ByVal Name As String) Handles ccc.ReceiveServerName
         Client.Save(ClientPath)
     End Sub
+
+    Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles ccc.Account_LogIn, ccc.Account_Logout
+        CurrentUser = result.User
+    End Sub
+
 End Module

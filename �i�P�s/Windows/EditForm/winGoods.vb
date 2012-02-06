@@ -1,4 +1,5 @@
-﻿Imports 進銷存.Database.StructureBase
+﻿Imports 進銷存.Database.DatabaseType
+Imports 進銷存.Database
 
 Public Class winGoods
     Enum Mode

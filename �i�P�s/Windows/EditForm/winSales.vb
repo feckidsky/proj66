@@ -1,4 +1,5 @@
-﻿Imports 進銷存.Database.StructureBase
+﻿Imports 進銷存.Database.DatabaseType
+Imports 進銷存.Database
 
 Public Class winSales
 
@@ -391,12 +392,12 @@ Public Class winSales
 
     Private Sub btResetPersonnel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btResetPersonnel.Click
 
-        If winLogIn.ShowDialog("請重新登入銷售帳號", Personnel.ID).State = LoginState.Success Then
-            Personnel = CurrentUser
-            txtPersonnel.Text = Personnel.Name
-            Personnel = Database.Personnel.Null()
-            txtPersonnel.Text = Personnel.Name
-        End If
+        'If winLogIn.ShowDialog("請重新登入銷售帳號", Personnel.ID).State = LoginState.Success Then
+        'Personnel = CurrentUser
+        'txtPersonnel.Text = Personnel.Name
+        Personnel = Database.Personnel.Null()
+        txtPersonnel.Text = Personnel.Name
+        'End If
 
 
     End Sub
