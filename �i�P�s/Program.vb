@@ -29,6 +29,35 @@ Public Module Program
 
     End Structure
 
+
+
+    Public Structure LoginInfo
+        Dim Shop As String
+        Dim ID As String
+        Dim Password As String
+        Dim AutoLog As Boolean
+        Sub New(ByVal shop As String, ByVal id As String, ByVal password As String, ByVal autoLogIn As Boolean)
+            Me.Shop = shop : Me.ID = id : Me.Password = password : Me.AutoLog = autoLogIn
+        End Sub
+
+        Shared ReadOnly Property Null() As LoginInfo
+            Get
+                Return New LoginInfo("", "", "", False)
+            End Get
+        End Property
+
+        Public Shared Function Load(ByVal path As String) As LoginInfo
+            Return Code.Load(path, LoginInfo.Null, Code.ZipMode.ZIP)
+        End Function
+
+        Public Sub Save(ByVal path As String)
+            Code.Save(Me, path, Code.ZipMode.ZIP)
+        End Sub
+
+
+    End Structure
+
+
 #End Region
 
     Public myDatabase As New Database.Access("本機資料庫")
@@ -41,9 +70,11 @@ Public Module Program
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
     Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
     Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
+    Public LoginInfoPath As String = My.Application.Info.DirectoryPath & "\Login.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
-
+    Public LoginSetting As LoginInfo
+    Public CurrentAccess As Access
 
     Public SystemTitle As String = "進銷存管理系統"
 
@@ -66,6 +97,7 @@ Public Module Program
         Client.Client = lstClient.ToArray()
         Client.StartConnect()
 
+        LoginSetting = LoginInfo.Load(LoginInfoPath)
 
         'LogOut(False)
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
@@ -550,7 +582,9 @@ Public Module Program
     End Sub
 
     Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles ccc.Account_LogIn, ccc.Account_Logout
+        CurrentAccess = sender
         CurrentUser = result.User
+
     End Sub
 
 End Module

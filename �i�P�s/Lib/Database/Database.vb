@@ -353,8 +353,8 @@
         Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType) As Data.DataTable
 
             Dim cnd As String = ""
-            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
-            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & TypeOfPayment.Commission
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Commission
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Commission
             Dim condition1 As String = " WHERE ((sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#) " & cnd & ") "
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
@@ -372,8 +372,8 @@
         Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "") As Data.DataTable
 
             Dim cnd As String = ""
-            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & TypeOfPayment.Commission
-            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & TypeOfPayment.Commission
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Commission
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Commission
 
             Dim OrderTime As String = "(sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
             Dim SalesTime As String = "(sales.Salesdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
@@ -454,7 +454,7 @@
             Return DT
         End Function
 
-        Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.TypeOfPayment) As String
+        Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.Payment) As String
             Dim lst As New List(Of String)
             Dim dt As DataTable = GetContractListBySalesLabel(Label)
 
@@ -465,7 +465,7 @@
                 Next
             End If
 
-            If style = TypeOfPayment.Commission Then
+            If style = Payment.Commission Then
                 dt = GetOrderListBySalesLabel(Label)
             Else
                 dt = GetGoodsListBySalesLabel(Label)

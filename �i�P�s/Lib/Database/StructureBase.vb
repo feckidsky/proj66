@@ -50,6 +50,13 @@ Namespace Database
 
     End Class
 
+    Class ColumnList
+        Inherits List(Of Column)
+        Overloads Sub Add(ByVal label As String, ByVal Type As String)
+            MyBase.Add(New Column(label, Type))
+        End Sub
+    End Class
+
 
 
 #Region "供應商/客戶/員工"
@@ -643,25 +650,68 @@ Namespace Database
 
     Public Structure StockMove
         Shared Table As String = "StockMove"
-        Dim Time As Date
+        Dim Label As String
+        Dim [Date] As Date
         Dim StockLabel As String
         Dim Number As Integer
+        Dim Cost As Integer
+        Dim IMEI As String
         Dim SourceShop As String
         Dim DestineShop As String
-        Dim SroucePersonnel As String
+        Dim SourcePersonnel As String
         Dim DestinePersonnel As String
         Dim Action As Type
 
         Public Enum Type
-            Out = 0
-            [In] = 1
+            Request = 0
+            Out = 1
+            Sending = 2
+            [In] = 3
+            Cancel = 4
         End Enum
+
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList
+            Columns.Add("Label", DBTypeLabel)
+            Columns.Add("Date", DBTypeDate)
+            Columns.Add("StockLabel", DBTypeLabel)
+            Columns.Add("Number", DBTypeInteger)
+            Columns.Add("Cost", DBTypeSingle)
+            Columns.Add("IMEI", DBTypeIMEI)
+            Columns.Add("SourceShop", DBTypeLabel)
+            Columns.Add("DestineShop", DBTypeLabel)
+            Columns.Add("SourcePersonnel", DBTypeLabel)
+            Columns.Add("DestinePersonnel", DBTypeLabel)
+            Columns.Add("Action", DBTypeInteger)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            Return New Object() {Label, Me.Date, StockLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel}
+        End Function
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As StockMove
+            Dim R As New MyDataRow(Row)
+            Dim data As StockMove
+            data.Label = R("Label")
+            data.Date = R("Date")
+            data.StockLabel = R("StockLabel")
+            data.Number = R("Number")
+            data.Cost = R("Cost")
+            data.IMEI = R("IMEI")
+            data.SourceShop = R("SourceShop")
+            data.DestineShop = R("DestineShop")
+            data.SourcePersonnel = R("SourcePersonnel")
+            data.DestinePersonnel = R("DestinePersonnel")
+            data.Action = CType(R("Action"), Type)
+            Return data
+        End Function
     End Structure
 
 
 
     ''' <summary>付款方式</summary>
-    Public Enum TypeOfPayment
+    Public Enum Payment
 
         Cash = 0
         Card = 1
@@ -812,7 +862,7 @@ Namespace Database
         ''' <summary>訂金</summary>
         Dim Deposit As Single
         ''' <summary>付款方式</summary>
-        Dim TypeOfPayment As TypeOfPayment
+        Dim TypeOfPayment As Payment
         ''' <summary>備註</summary>
         Dim Note As String
 

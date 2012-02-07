@@ -49,10 +49,20 @@ Public Class winMain
 
         cbClient.Items.Clear()
         cbClient.Items.AddRange(Client.GetNameList())
-        If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
+        'If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
         cbForm.SelectedIndex = 2
 
-        Client.Login("kidsky", "3883", False)
+        '自動登入
+        If LoginSetting.AutoLog Then
+            Dim db As Access = Client(LoginSetting.Shop)
+            If db IsNot Nothing Then
+                Me.access = db
+                db.LogIn(LoginSetting.ID, LoginSetting.Password)
+                cbClient.SelectedIndex = Array.FindIndex(Of Access)(Client.Client, Function(a As Access) db.Name = a.Name)
+            End If
+        Else '沒有預設登入的資料庫，選擇第一個Client當預設值
+            If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
+        End If
     End Sub
 
     Private Sub cbForm_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbForm.SelectedIndexChanged
@@ -338,7 +348,7 @@ Public Class winMain
 
         '取得商品資訊
         Dim tip As String = access.GetSalesTip(arr(idxLabel), arr(idxPayType))
-        If arr(idxPayType) = TypeOfPayment.Commission Then arr(2) = ""
+        If arr(idxPayType) = Payment.Commission Then arr(2) = ""
 
         '將付款方式由數字改為中文描述
         arr(idxPayType) = TypeOfPaymentsDescribe(arr(idxPayType))
@@ -358,7 +368,12 @@ Public Class winMain
 
     Private Sub access_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles access.Account_LogIn, access.Account_Logout
 
-        If result.State <> Database.LoginState.Success Then MsgBox(result.msg, MsgBoxStyle.Information)
+        If result.State <> Database.LoginState.Success Then
+            MsgBox(result.msg, MsgBoxStyle.Information)
+        Else
+
+        End If
+
         If Not Me.Created Then Exit Sub
         UpdateTitle()
     End Sub

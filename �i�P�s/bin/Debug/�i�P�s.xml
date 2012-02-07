@@ -100,7 +100,7 @@
 	<summary>備註</summary>
 </member><member name="T:進銷存.Database.Stock">
 	<summary>庫存</summary>
-</member><member name="T:進銷存.Database.TypeOfPayment">
+</member><member name="T:進銷存.Database.Payment">
 	<summary>付款方式</summary>
 </member><member name="F:進銷存.Database.SalesGoods.SalesLabel">
 	<summary>單號識別碼</summary>

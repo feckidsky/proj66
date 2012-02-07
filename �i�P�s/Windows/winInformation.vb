@@ -76,12 +76,12 @@
         dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales)
 
         Dim Cash As Single = 0
-        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.TypeOfPayment.Cash))
+        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
             Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
         Next
 
         Dim Card As Single = 0
-        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.TypeOfPayment.Card))
+        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
             Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
         Next
 

@@ -44,7 +44,7 @@ Public Class winSales
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         cbPayMode.Items.AddRange(TypeOfPaymentsDescribe)
-        cbPayMode.SelectedIndex = TypeOfPayment.Commission
+        cbPayMode.SelectedIndex = Payment.Commission
     End Sub
 
 
@@ -313,7 +313,7 @@ Public Class winSales
     Private Sub btOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder.Click
         Dim sales As Sales = GetSalesInfo()
 
-        If sales.TypeOfPayment <> TypeOfPayment.Commission Then
+        If sales.TypeOfPayment <> Payment.Commission Then
             MsgBox("訂單的付款方式必須是訂金", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
@@ -344,7 +344,7 @@ Public Class winSales
         End If
 
         Dim sales As Sales = GetSalesInfo()
-        If sales.TypeOfPayment = TypeOfPayment.Commission Then
+        If sales.TypeOfPayment = Payment.Commission Then
             MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
