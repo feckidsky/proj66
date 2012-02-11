@@ -2,7 +2,21 @@
 Imports 進銷存.Database
 
 Public Class winMain
-    WithEvents access As Database.Access '= Program.DB
+    WithEvents m_access As Database.Access '= Program.DB
+
+    Property access() As Database.Access
+        Get
+            Return m_access
+        End Get
+        Set(ByVal value As Database.Access)
+            Dim Changed As Boolean = value IsNot m_access
+            m_access = value
+            If Changed Then
+                If Me.Created Then UpdateSalesList()
+                UpdateTitle()
+            End If
+        End Set
+    End Property
 
 
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -72,8 +86,7 @@ Public Class winMain
 
     Private Sub cbClient_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.SelectedIndexChanged
         access = Client(cbClient.Text)
-        If Me.Created Then UpdateSalesList()
-        UpdateTitle()
+
     End Sub
 
 
@@ -158,10 +171,12 @@ Public Class winMain
 
     End Sub
 
-
-
     Private Sub 進貨記錄ToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨記錄ToolStripMenuItem1.Click
         winStockInLog.Show(access)
+    End Sub
+
+    Private Sub 調貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 調貨ToolStripMenuItem.Click
+        winStockMoveList.Show(access)
     End Sub
 
     Private Sub 查詢庫存ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 查詢庫存ToolStripMenuItem.Click
@@ -221,6 +236,10 @@ Public Class winMain
     Private Sub 關閉CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 關閉CToolStripMenuItem.Click, 關閉QToolStripMenuItem.Click
         RealClose = True
         Me.Close()
+    End Sub
+
+    Private Sub NotifyIcon1_BalloonTipClicked(ByVal sender As Object, ByVal e As System.EventArgs) Handles NotifyIcon1.BalloonTipClicked
+        winStockMoveList.Show(access)
     End Sub
 
     Private Sub NotifyIcon1_MouseDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles NotifyIcon1.MouseDoubleClick
@@ -366,7 +385,7 @@ Public Class winMain
 
     End Sub
 
-    Private Sub access_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles access.Account_LogIn, access.Account_Logout
+    Private Sub access_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles m_access.Account_LogIn, m_access.Account_Logout
 
         If result.State <> Database.LoginState.Success Then
             MsgBox(result.msg, MsgBoxStyle.Information)
@@ -378,12 +397,12 @@ Public Class winMain
         UpdateTitle()
     End Sub
 
-    Private Sub access_ConnectedFail(ByVal Client As TCPTool.Client) Handles access.ConnectedFail
+    Private Sub access_ConnectedFail(ByVal Client As TCPTool.Client) Handles m_access.ConnectedFail
         UpdateTitle()
     End Sub
 
     Dim UpdateSalesListHandler As New Action(AddressOf UpdateSalesList)
-    Private Sub access_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles access.ConnectedSuccess
+    Private Sub access_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles m_access.ConnectedSuccess
         If Me.InvokeRequired Then
             Me.Invoke(UpdateTitleHandler)
             Me.Invoke(UpdateSalesListHandler)
@@ -393,20 +412,20 @@ Public Class winMain
         UpdateSalesListHandler()
     End Sub
 
-    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.CreatedSales
+    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
     End Sub
 
 
-    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles access.ChangedSales
+    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)
     End Sub
 
-    Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.Sales) Handles access.DeletedSales
+    Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.Sales) Handles m_access.DeletedSales
         'UpdateSalesList()
         If Me.InvokeRequired Then
             Me.Invoke(DeleteRowHandler, sales)
@@ -414,7 +433,6 @@ Public Class winMain
             DeleteRowHandler.Invoke(sales)
         End If
     End Sub
-
 
 
 

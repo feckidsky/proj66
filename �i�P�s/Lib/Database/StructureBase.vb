@@ -652,7 +652,9 @@ Namespace Database
         Shared Table As String = "StockMove"
         Dim Label As String
         Dim [Date] As Date
+        Dim GoodsLabel As String
         Dim StockLabel As String
+        Dim SupplierLabel As String
         Dim Number As Integer
         Dim Cost As Integer
         Dim IMEI As String
@@ -666,15 +668,19 @@ Namespace Database
             Request = 0
             Out = 1
             Sending = 2
-            [In] = 3
-            Cancel = 4
+            Receiving = 3
+            [In] = 4
+            Cancel = 5
         End Enum
+        Shared TypeText As String() = {"申請", "調出", "調出(未送達)", "調貨中", "入庫", "取消"}
 
         Shared Function ToColumns() As Column()
             Dim Columns As New ColumnList
             Columns.Add("Label", DBTypeLabel)
             Columns.Add("Date", DBTypeDate)
+            Columns.Add("GoodsLabel", DBTypeLabel)
             Columns.Add("StockLabel", DBTypeLabel)
+            Columns.Add("SupplierLabel", DBTypeLabel)
             Columns.Add("Number", DBTypeInteger)
             Columns.Add("Cost", DBTypeSingle)
             Columns.Add("IMEI", DBTypeIMEI)
@@ -687,7 +693,7 @@ Namespace Database
         End Function
 
         Function ToObjects() As Object()
-            Return New Object() {Label, Me.Date, StockLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel}
+            Return New Object() {Label, Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, CType(Action, Int16)}
         End Function
 
         Public Shared Function GetFrom(ByVal Row As Data.DataRow) As StockMove
@@ -695,7 +701,9 @@ Namespace Database
             Dim data As StockMove
             data.Label = R("Label")
             data.Date = R("Date")
+            data.GoodsLabel = R("GoodsLabel")
             data.StockLabel = R("StockLabel")
+            data.SupplierLabel = R("SupplierLabel")
             data.Number = R("Number")
             data.Cost = R("Cost")
             data.IMEI = R("IMEI")
@@ -705,6 +713,31 @@ Namespace Database
             data.DestinePersonnel = R("DestinePersonnel")
             data.Action = CType(R("Action"), Type)
             Return data
+        End Function
+
+        Public Shared ReadOnly Property Null() As StockMove
+            Get
+                Dim s As New StockMove
+                s.Label = ""
+                Return s
+            End Get
+
+        End Property
+
+        Public Function IsNull() As Boolean
+            Return Label = ""
+        End Function
+
+        Public Function GetUpdateSqlCommand() As String
+            Dim Column As String() = New String() {"Date", "GoodsLabel", "StockLabel", "SupplierLabel", "Number", "Cost", "IMEI", "SourceShop", "DestineShop", "SourcePersonnel", "DestinePersonnel", "Action"}
+            Dim Value As String() = New String() {Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, Action}
+            Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+        End Function
+
+        Public Shared Function GetUpdateStateSqlCommand(ByVal Label As String, ByVal newState As Type) As String
+            Dim Column As String() = New String() {"Action"}
+            Dim Value As String() = New String() {newState}
+            Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
         End Function
     End Structure
 

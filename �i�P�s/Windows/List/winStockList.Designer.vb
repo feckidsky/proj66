@@ -24,17 +24,17 @@ Partial Class winStockList
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Me.dgItemList = New System.Windows.Forms.DataGridView
+        Me.cmsStock = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.進貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.調貨ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.cbStock = New System.Windows.Forms.ToolStripComboBox
         Me.列印PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
-        Me.cmsStock = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.調貨ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         CType(Me.dgItemList, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.MenuStrip1.SuspendLayout()
         Me.cmsStock.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'dgItemList
@@ -55,6 +55,18 @@ Partial Class winStockList
         Me.dgItemList.Size = New System.Drawing.Size(620, 348)
         Me.dgItemList.TabIndex = 0
         '
+        'cmsStock
+        '
+        Me.cmsStock.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.調貨ToolStripMenuItem})
+        Me.cmsStock.Name = "cmsStock"
+        Me.cmsStock.Size = New System.Drawing.Size(101, 26)
+        '
+        '調貨ToolStripMenuItem
+        '
+        Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
+        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(100, 22)
+        Me.調貨ToolStripMenuItem.Text = "調貨"
+        '
         'MenuStrip1
         '
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨ToolStripMenuItem, Me.調貨ToolStripMenuItem1, Me.cbStock, Me.列印PToolStripMenuItem})
@@ -69,6 +81,12 @@ Partial Class winStockList
         Me.進貨ToolStripMenuItem.Name = "進貨ToolStripMenuItem"
         Me.進貨ToolStripMenuItem.Size = New System.Drawing.Size(44, 24)
         Me.進貨ToolStripMenuItem.Text = "進貨"
+        '
+        '調貨ToolStripMenuItem1
+        '
+        Me.調貨ToolStripMenuItem1.Name = "調貨ToolStripMenuItem1"
+        Me.調貨ToolStripMenuItem1.Size = New System.Drawing.Size(44, 24)
+        Me.調貨ToolStripMenuItem1.Text = "調貨"
         '
         'cbStock
         '
@@ -87,24 +105,6 @@ Partial Class winStockList
         Me.Timer1.Enabled = True
         Me.Timer1.Interval = 1000
         '
-        'cmsStock
-        '
-        Me.cmsStock.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.調貨ToolStripMenuItem})
-        Me.cmsStock.Name = "cmsStock"
-        Me.cmsStock.Size = New System.Drawing.Size(101, 26)
-        '
-        '調貨ToolStripMenuItem
-        '
-        Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
-        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(100, 22)
-        Me.調貨ToolStripMenuItem.Text = "調貨"
-        '
-        '調貨ToolStripMenuItem1
-        '
-        Me.調貨ToolStripMenuItem1.Name = "調貨ToolStripMenuItem1"
-        Me.調貨ToolStripMenuItem1.Size = New System.Drawing.Size(44, 24)
-        Me.調貨ToolStripMenuItem1.Text = "調貨"
-        '
         'winStockList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -116,9 +116,9 @@ Partial Class winStockList
         Me.Name = "winStockList"
         Me.Text = "庫存查詢"
         CType(Me.dgItemList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.cmsStock.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
-        Me.cmsStock.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

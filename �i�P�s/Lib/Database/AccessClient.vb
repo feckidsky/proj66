@@ -206,6 +206,9 @@
                 Case "CreatedSales" : OnCreatedSales(Repair(Of SalesArgs)(args))
                 Case "ChangedSales" : OnChangedSales(Repair(Of SalesArgs)(args))
                 Case "DeletedSales" : OnDeletedSales(Repair(Of Sales)(args))
+                Case "CreatedStockMove" : OnCreatedStockMove(Repair(Of StockMove)(args))
+                Case "UpdatedStockMove" : OnChangedStockMove(Repair(Of StockMove)(args))
+                Case "DeletedStockMove" : OnDeletedStockMove(Repair(Of StockMove)(args))
                 Case "MsgBox" : MsgBox(Code.DeserializeWithUnzip(Of String)(args))
                 Case Else
                     MsgBox("不明指令:" & vbCrLf & Data(0))
@@ -294,6 +297,17 @@
             Send("DeleteSales", sales)
         End Sub
 
+        Overrides Sub AddStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            Send("CreateStockMove", data)
+        End Sub
+
+        Public Overrides Sub ChangeStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            Send("ChangeStockMove", data)
+        End Sub
+
+        Public Overrides Sub DeleteStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            Send("DeleteStockMove", data)
+        End Sub
     End Class
 
 

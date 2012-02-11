@@ -89,6 +89,11 @@
             SalesPath = Dir & "\sales.mdb"
         End Sub
 
+        Public Overloads Function Connected() As Boolean
+            If Me.GetType Is GetType(Access) Then Return True
+            Return MyBase.Connected()
+        End Function
+
         'Public Sub New()
         '    Dir = My.Application.Info.DirectoryPath & "\data"
         '    BasePath = Dir & "\base.mdb"
@@ -106,8 +111,8 @@
             ElseIf user.Password <> Password Then
                 result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest)
             Else
-                result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Guest)
-                CurrentUser = user
+                result = New LoginResult(LoginState.Success, "登入成功!", user)
+                'CurrentUser = user
             End If
 
             If TriggerEvent Then OnLogin(result)
@@ -293,6 +298,29 @@
 
             Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
             Return DT
+        End Function
+
+        Public Function GetStockMoveList() As Data.DataTable
+            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
+            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label; "
+            Return Read("table", BasePath, SqlCommand)
+        End Function
+
+        Public Function GetStockMoveRow(ByVal StockMoveLabel As String) As DataRow
+            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
+           "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Label='" & StockMoveLabel & "' ; "
+            Try
+                Return Read("table", BasePath, SqlCommand).Rows(0)
+            Catch
+                Return Nothing
+            End Try
+        End Function
+
+        Public Function GetStockMove(ByVal Label As String) As StockMove
+            Dim SQLCommand As String = "SELECT * FROM " & StockMove.Table & " WHERE Label='" & Label & "';"
+            Dim dt As DataTable = Read("table", BasePath, SQLCommand)
+            If dt.Rows.Count = 0 Then Return StockMove.Null()
+            Return StockMove.GetFrom(dt.Rows(0))
         End Function
 
 
@@ -915,6 +943,43 @@
             Command(data.GetUpdateSqlCommand(), BasePath)
             If trigger Then OnChangedSupplier(data)
         End Sub
+
+        Public Overridable Sub AddStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            AddBase(data)
+            If trigger Then OnCreatedStockMove(data)
+        End Sub
+
+        Public Overridable Sub ChangeStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            Command(data.GetUpdateSqlCommand(), BasePath)
+            If trigger Then OnChangedStockMove(data)
+        End Sub
+
+        'Public Overridable Sub ChangeStockMove(ByVal StockMoveLabel As String, ByVal state As StockMove.Type, Optional ByVal trigger As Boolean = True)
+        '    Dim stockMove As StockMove = GetStockMove(StockMoveLabel)
+        '    Command(stockMove.GetUpdateStateSqlCommand(StockMoveLabel, state), BasePath)
+        '    stockMove.Action = state
+        '    If trigger Then OnChangedStockMove(stockMove)
+        'End Sub
+
+        Public Overridable Sub DeleteStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
+            Command(GetSqlDelete(StockMove.Table, "Label", data.Label), BasePath)
+            If trigger Then OnDeletedStockMove(data)
+        End Sub
+
+        Event ChangedStockMove(ByVal sender As Object, ByVal data As StockMove)
+        Event CreatedStockMove(ByVal sender As Object, ByVal data As StockMove)
+        Event DeletedStockMove(ByVal sender As Object, ByVal data As StockMove)
+        Public Overridable Sub OnCreatedStockMove(ByVal Data As StockMove)
+            RaiseEvent CreatedStockMove(Me, Data)
+        End Sub
+        Public Overridable Sub OnChangedStockMove(ByVal Data As StockMove)
+            RaiseEvent ChangedStockMove(Me, Data)
+        End Sub
+        Public Overridable Sub OnDeletedStockMove(ByVal Data As StockMove)
+            RaiseEvent DeletedStockMove(Me, Data)
+        End Sub
+
+
 
         ''' <summary>新增客戶</summary>
         Public Overridable Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)

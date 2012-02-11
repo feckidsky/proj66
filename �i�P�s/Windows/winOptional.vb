@@ -49,7 +49,11 @@
         Config.SalesBackColor = btSalesBackColor.BackColor.ToArgb
 
         Config.ServerName = txtServerName.Text
-        If Config.Mode = Connect.Server Then Server.ChangeName(Config.ServerName)
+        If Config.Mode = Connect.Server Then
+            Server.ChangeName(Config.ServerName)
+            myDatabase.Name = Config.ServerName
+        End If
+
 
         Dim newPort As Integer
         If Not Integer.TryParse(txtPort.Text, newPort) Then

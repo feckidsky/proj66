@@ -60,7 +60,7 @@ Public Module Program
 
 #End Region
 
-    Public myDatabase As New Database.Access("本機資料庫")
+    Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public Server As New Database.AccessServer
     Public WithEvents Client As New Database.AccessClientMenage()
@@ -70,11 +70,12 @@ Public Module Program
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
     Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
     Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
+    Public StockMoveVisiblePath As String = My.Application.Info.DirectoryPath & "StockVisible.xml"
     Public LoginInfoPath As String = My.Application.Info.DirectoryPath & "\Login.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
     Public LoginSetting As LoginInfo
-    Public CurrentAccess As Access
+    Public WithEvents CurrentAccess As Access
 
     Public SystemTitle As String = "進銷存管理系統"
 
@@ -84,6 +85,7 @@ Public Module Program
         ConfigLoad()
 
         If Config.Mode = Connect.Server Then
+            myDatabase.Name = Config.ServerName
             Server.Access = myDatabase
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
@@ -122,6 +124,7 @@ Public Module Program
         Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
+        Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
         myDatabase.DeleteColumn(Stock.Table, "Price")
         myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
         myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
@@ -581,10 +584,40 @@ Public Module Program
         Client.Save(ClientPath)
     End Sub
 
-    Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles ccc.Account_LogIn, ccc.Account_Logout
+    Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles myDatabase.Account_Logout, myDatabase.Account_LogIn
         CurrentAccess = sender
         CurrentUser = result.User
+    End Sub
 
+    Private Sub CurrentAccess_ChangedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.ChangedStockMove
+        If data.Action = StockMove.Type.Sending And data.DestineShop = CurrentAccess.Name Then
+
+        End If
+    End Sub
+
+    Public Function GetMain() As Form
+        Return My.Application.OpenForms("winMain")
+        'Return My.Forms.winMain ' (winMain.Name)(0)
+    End Function
+
+    Private Sub CurrentAccess_CreatedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.CreatedStockMove
+        If data.Action = StockMove.Type.Request And data.SourceShop = CurrentAccess.Name Then
+            Dim goods As Goods = CurrentAccess.GetGoods(data.GoodsLabel)
+            ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
+            'Dim action As New Action(Of String)(AddressOf winNotify.Show)
+            'GetMain().Invoke(action, data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
+            'winNotify.Show(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
+        End If
+    End Sub
+
+
+    Dim ShowNotifyHandler As New Action(Of String)(AddressOf ShowNotify)
+    Private Sub ShowNotify(ByVal msg As String)
+        If GetMain().InvokeRequired Then
+            GetMain().Invoke(ShowNotifyHandler, msg)
+            Exit Sub
+        End If
+        winNotify.Show(msg)
     End Sub
 
 End Module

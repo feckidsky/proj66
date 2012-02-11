@@ -25,8 +25,13 @@ Public Class winLogIn
         cbShop.Items.AddRange(Client.GetNameList())
 
         cbShop.Enabled = Config.Mode = Connect.Client
-        cbShop.Text = access.Name
+        'cbShop.Text = access.Name
 
+        If Config.Mode = Connect.Server Then
+            cbShop.Text = myDatabase.Name
+        Else
+            cbShop.Text = access.Name
+        End If
     End Sub
 
     Private Sub winLogIn_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated

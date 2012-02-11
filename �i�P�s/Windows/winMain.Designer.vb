@@ -39,12 +39,14 @@ Partial Class winMain
         Me.合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.結算ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.列印PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.cbClient = New System.Windows.Forms.ToolStripComboBox
         Me.dgSales = New System.Windows.Forms.DataGridView
         Me.cSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cTime = New System.Windows.Forms.DataGridViewTextBoxColumn
@@ -76,7 +78,6 @@ Partial Class winMain
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.cbForm = New System.Windows.Forms.ComboBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.cbClient = New System.Windows.Forms.ToolStripComboBox
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsEdit.SuspendLayout()
@@ -168,7 +169,7 @@ Partial Class winMain
         '
         '庫存ToolStripMenuItem
         '
-        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
+        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨記錄ToolStripMenuItem1, Me.調貨ToolStripMenuItem, Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem})
         Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
         Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
         Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
@@ -176,19 +177,25 @@ Partial Class winMain
         '進貨記錄ToolStripMenuItem1
         '
         Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(141, 22)
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
         Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
+        '
+        '調貨ToolStripMenuItem
+        '
+        Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
+        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
+        Me.調貨ToolStripMenuItem.Text = "調貨記錄(&M)"
         '
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
         '
         '商品項目GToolStripMenuItem
         '
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
         '
         '銷貨ToolStripMenuItem
@@ -214,6 +221,12 @@ Partial Class winMain
         Me.列印PToolStripMenuItem.Name = "列印PToolStripMenuItem"
         Me.列印PToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
         Me.列印PToolStripMenuItem.Text = "列印(&P)"
+        '
+        'cbClient
+        '
+        Me.cbClient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbClient.Name = "cbClient"
+        Me.cbClient.Size = New System.Drawing.Size(121, 24)
         '
         'dgSales
         '
@@ -456,12 +469,6 @@ Partial Class winMain
         Me.cbForm.Size = New System.Drawing.Size(121, 20)
         Me.cbForm.TabIndex = 0
         '
-        'cbStock
-        '
-        Me.cbClient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cbClient.Name = "cbStock"
-        Me.cbClient.Size = New System.Drawing.Size(121, 24)
-        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -540,4 +547,5 @@ Partial Class winMain
     Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents cbClient As System.Windows.Forms.ToolStripComboBox
+    Friend WithEvents 調貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

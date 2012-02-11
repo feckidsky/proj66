@@ -361,6 +361,12 @@
     End Sub
 
 
+    'Private Sub DataGrid_ContextMenuStripChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGrid.ContextMenuStripChanged
+    '    ContextMenuStrip = DataGrid.ContextMenuStrip
+    '    DataGrid.ContextMenuStrip = Nothing
+    'End Sub
+
+
     '顯示預設的快捷功能表
     Private Sub DataGrid_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DataGrid.MouseClick
         If e.Button = MouseButtons.Right And ContextMenuStrip IsNot Nothing Then ContextMenuStrip.Show(sender, e.X, e.Y)
@@ -398,6 +404,7 @@
 
     Private Function GetValue(ByVal obj As Object) As String
         If obj Is DBNull.Value Then Return ""
+        If obj Is Nothing Then Return ""
         Return obj.ToString
     End Function
 

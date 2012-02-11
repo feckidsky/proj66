@@ -115,6 +115,14 @@
         'Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
+    Private Sub access_ChangedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.ChangedStock
+        UpdateStockList()
+    End Sub
+
+    Private Sub access_DeletedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.DeletedStock
+        UpdateStockList()
+    End Sub
+
 
     Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.CreatedStock
         UpdateStockList()
@@ -146,4 +154,26 @@
     Private Sub cbStock_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.TextChanged
 
     End Sub
+
+    Private Sub 調貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 調貨ToolStripMenuItem.Click, 調貨ToolStripMenuItem1.Click
+        If dgItemList.SelectedRows.Count = 0 Then
+            MsgBox("您尚未選任何項目")
+            Exit Sub
+        End If
+
+        If Not access.Connected Then
+            MsgBox(access.Name & "已經斷線")
+            Exit Sub
+        End If
+
+        If CurrentAccess Is access Then
+            DialogStockMove.DialogStockOut(access, dgItemList.SelectedRows(0).Cells("庫存編號").Value)
+        Else
+            DialogStockMove.DialogStockIn(access, dgItemList.SelectedRows(0).Cells("庫存編號").Value)
+
+        End If
+
+    End Sub
+
+
 End Class

@@ -56,7 +56,9 @@
                 Case "CreateSales" : Access.CreateSales(Code.DeserializeWithUnzip(Of SalesArgs)(Data(1)))
                 Case "ChangeSales" : Access.ChangeSales(Code.DeserializeWithUnzip(Of SalesArgs)(Data(1)))
                 Case "DeleteSales" : Access.DeleteSales(Code.DeserializeWithUnzip(Of Sales)(Data(1)))
-
+                Case "CreateStockMove" : Access.AddStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
+                Case "ChangeStockMove" : Access.ChangeStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
+                Case "DeleteStockMove" : Access.DeleteStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
                     MsgBox("Server" & msg)
@@ -92,6 +94,10 @@
             ServerSend("ChangedStock", Code.SerializeWithZIP(stock))
         End Sub
 
+        Private Sub Access_ChangedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.ChangedStockMove
+            ServerSend("ChangedStockMove", Code.SerializeWithZIP(data))
+        End Sub
+
         Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier
             ServerSend("ChangedSupplier", Code.SerializeWithZIP(sup))
         End Sub
@@ -123,13 +129,16 @@
             ServerSend("CreatedStock", Code.SerializeWithZIP(stock))
         End Sub
 
+        Private Sub Access_CreatedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.CreatedStockMove
+            ServerSend("CreatedStockMove", Code.SerializeWithZIP(data))
+        End Sub
+
         Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier
             ServerSend("CreatedSupplier", Code.SerializeWithZIP(sup))
         End Sub
         Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
             Server.ServerSend("DeletedContract", Code.SerializeWithZIP(con))
         End Sub
-
 
         Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer
             ServerSend("DeletedCustomer", Code.SerializeWithZIP(cus))
@@ -157,6 +166,10 @@
 
         Private Sub Access_DeletedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.DeletedStock
             ServerSend("DeletedStock", Code.SerializeWithZIP(stock))
+        End Sub
+
+        Private Sub Access_DeletedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.DeletedStockMove
+            ServerSend("DeletedStockMove", Code.SerializeWithZIP(data))
         End Sub
 
         Private Sub Access_DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.DeletedSupplier
