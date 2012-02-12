@@ -59,6 +59,9 @@
                 Case "CreateStockMove" : Access.AddStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
                 Case "ChangeStockMove" : Access.ChangeStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
                 Case "DeleteStockMove" : Access.DeleteStockMove(Code.DeserializeWithUnzip(Of StockMove)(Data(1)))
+                Case "CreateLog" : Access.AddLog(Code.DeserializeWithUnzip(Of Log)(Data(1)))
+                Case "DeleteLog" : Access.DeleteLog(Code.DeserializeWithUnzip(Of Log)(Data(1)))
+                Case "DeleteAllLog" : Access.DeleteAllLog()
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
                     MsgBox("Server" & msg)
@@ -117,6 +120,10 @@
             ServerSend("CreatedHistoryPrice", Code.SerializeWithZIP(hp))
         End Sub
 
+        Private Sub Access_CreatedLog(ByVal sender As Object, ByVal log As Log) Handles Access.CreatedLog
+            ServerSend("CreatedLog", Code.SerializeWithZIP(log))
+        End Sub
+
         Private Sub Access_CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.CreatedPersonnel
             ServerSend("CreatedPersonnel", Code.SerializeWithZIP(per))
         End Sub
@@ -136,6 +143,10 @@
         Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier
             ServerSend("CreatedSupplier", Code.SerializeWithZIP(sup))
         End Sub
+
+        Private Sub Access_DeletedAllLog(ByVal sender As Object) Handles Access.DeletedAllLog
+            ServerSend("DeletedAllLog")
+        End Sub
         Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
             Server.ServerSend("DeletedContract", Code.SerializeWithZIP(con))
         End Sub
@@ -154,6 +165,10 @@
 
         Private Sub Access_DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPriceList
             ServerSend("DeletedHistoryPriceList", Code.SerializeWithZIP(hp))
+        End Sub
+
+        Private Sub Access_DeletedLog(ByVal sender As Object, ByVal log As Log) Handles Access.DeletedLog
+            ServerSend("DeletedLog", Code.SerializeWithZIP(log))
         End Sub
 
         Private Sub Access_DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.DeletedPersonnel

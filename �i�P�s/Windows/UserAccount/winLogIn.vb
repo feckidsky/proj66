@@ -3,9 +3,9 @@
 Public Class winLogIn
 
     Dim result As LoginResult
-    Dim access As Access
+    'Dim access As Access
     Public Overloads Function ShowDialog(ByVal db As Access, Optional ByVal Title As String = "登入", Optional ByVal ID As String = "") As LoginResult
-        Me.access = db
+        ' Me.access = db
         txtID.Enabled = ID = ""
         Me.Text = Title
         txtID.Text = ID
@@ -30,7 +30,12 @@ Public Class winLogIn
         If Config.Mode = Connect.Server Then
             cbShop.Text = myDatabase.Name
         Else
-            cbShop.Text = access.Name
+            If CurrentAccess IsNot Nothing Then
+                cbShop.Text = CurrentAccess.Name
+            Else
+                cbShop.Text = LoginSetting.Shop ' Access.Name
+            End If
+
         End If
     End Sub
 

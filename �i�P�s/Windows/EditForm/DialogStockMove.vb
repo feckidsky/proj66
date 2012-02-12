@@ -22,7 +22,11 @@ Public Class DialogStockMove
 
         cbDestine.Items.Clear()
         cbDestine.Items.AddRange(Client.GetNameList())
-        cbDestine.Text = DestineShop.Name
+        If DestineShop IsNot Nothing Then
+            cbDestine.Text = DestineShop.Name
+        Else
+            btOK.Enabled = False
+        End If
 
     End Sub
 
@@ -36,6 +40,7 @@ Public Class DialogStockMove
 
     Public Sub DialogStockIn(ByVal sourceShop As Access, ByVal StockLabel As String)
         Me.SourceShop = sourceShop
+        Me.DestineShop = CurrentAccess
         Me.stock = Stock
         mode = Action.In
         stock = sourceShop.GetStock(StockLabel)
@@ -44,6 +49,7 @@ Public Class DialogStockMove
 
     Private Sub cbDestine_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbDestine.SelectedIndexChanged
         DestineShop = Client(cbDestine.Text)
+        btOK.Enabled = DestineShop IsNot Nothing
     End Sub
 
     Private Sub btCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btCancel.Click

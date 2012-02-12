@@ -70,7 +70,7 @@ Partial Class winContract
         Me.btAdd.Location = New System.Drawing.Point(354, 244)
         Me.btAdd.Name = "btAdd"
         Me.btAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btAdd.TabIndex = 9
+        Me.btAdd.TabIndex = 6
         Me.btAdd.Text = "新增"
         Me.btAdd.UseVisualStyleBackColor = True
         '
@@ -80,35 +80,35 @@ Partial Class winContract
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(394, 77)
-        Me.txtNote.TabIndex = 4
+        Me.txtNote.TabIndex = 5
         '
         'txtCommission
         '
         Me.txtCommission.Location = New System.Drawing.Point(292, 56)
         Me.txtCommission.Name = "txtCommission"
         Me.txtCommission.Size = New System.Drawing.Size(115, 22)
-        Me.txtCommission.TabIndex = 7
+        Me.txtCommission.TabIndex = 2
         '
         'txtLabel
         '
         Me.txtLabel.Location = New System.Drawing.Point(292, 18)
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.Size = New System.Drawing.Size(115, 22)
-        Me.txtLabel.TabIndex = 6
+        Me.txtLabel.TabIndex = 0
         '
         'txtName
         '
         Me.txtName.Location = New System.Drawing.Point(88, 56)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(115, 22)
-        Me.txtName.TabIndex = 7
+        Me.txtName.TabIndex = 1
         '
         'txtDiscount
         '
         Me.txtDiscount.Location = New System.Drawing.Point(292, 95)
         Me.txtDiscount.Name = "txtDiscount"
         Me.txtDiscount.Size = New System.Drawing.Size(115, 22)
-        Me.txtDiscount.TabIndex = 7
+        Me.txtDiscount.TabIndex = 4
         '
         'Label3
         '
@@ -133,7 +133,7 @@ Partial Class winContract
         Me.txtPrepay.Location = New System.Drawing.Point(88, 98)
         Me.txtPrepay.Name = "txtPrepay"
         Me.txtPrepay.Size = New System.Drawing.Size(115, 22)
-        Me.txtPrepay.TabIndex = 7
+        Me.txtPrepay.TabIndex = 3
         '
         'Label5
         '
@@ -150,7 +150,7 @@ Partial Class winContract
         Me.ckEnable.Location = New System.Drawing.Point(43, 21)
         Me.ckEnable.Name = "ckEnable"
         Me.ckEnable.Size = New System.Drawing.Size(48, 16)
-        Me.ckEnable.TabIndex = 15
+        Me.ckEnable.TabIndex = 0
         Me.ckEnable.Text = "有效"
         Me.ckEnable.UseVisualStyleBackColor = True
         '

@@ -40,7 +40,7 @@ Partial Class DataGridViewVisibleDialog
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(100, 30)
         Me.btCancel.TabIndex = 4
-        Me.btCancel.Text = "關閉"
+        Me.btCancel.Text = "確定"
         Me.btCancel.UseVisualStyleBackColor = True
         '
         'DataGridViewVisibleDialog

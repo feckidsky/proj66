@@ -24,6 +24,7 @@ Partial Class winMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -54,7 +55,7 @@ Partial Class winMain
         Me.Customer = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cDposit = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.cmsEdit = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.cmsSales = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.欄位顯示VToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
         Me.銷貨AToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -78,12 +79,20 @@ Partial Class winMain
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.cbForm = New System.Windows.Forms.ComboBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.dgLog = New System.Windows.Forms.DataGridView
+        Me.cmsLog = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.cmsEdit.SuspendLayout()
+        Me.cmsSales.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.cmsSystem.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        CType(Me.dgLog, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.cmsLog.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -239,14 +248,14 @@ Partial Class winMain
         Me.dgSales.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells
         Me.dgSales.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgSales.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSalesLabel, Me.cTime, Me.cPersonnel, Me.Customer, Me.cDposit, Me.cPrice})
-        Me.dgSales.ContextMenuStrip = Me.cmsEdit
-        Me.dgSales.Location = New System.Drawing.Point(12, 79)
+        Me.dgSales.ContextMenuStrip = Me.cmsSales
+        Me.dgSales.Location = New System.Drawing.Point(12, 82)
         Me.dgSales.Name = "dgSales"
         Me.dgSales.ReadOnly = True
         Me.dgSales.RowTemplate.Height = 24
         Me.dgSales.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgSales.ShowCellToolTips = False
-        Me.dgSales.Size = New System.Drawing.Size(771, 471)
+        Me.dgSales.Size = New System.Drawing.Size(771, 406)
         Me.dgSales.TabIndex = 1
         '
         'cSalesLabel
@@ -291,11 +300,11 @@ Partial Class winMain
         Me.cPrice.ReadOnly = True
         Me.cPrice.Width = 54
         '
-        'cmsEdit
+        'cmsSales
         '
-        Me.cmsEdit.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.欄位顯示VToolStripMenuItem, Me.ToolStripSeparator4, Me.銷貨AToolStripMenuItem, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
-        Me.cmsEdit.Name = "cmsEdit"
-        Me.cmsEdit.Size = New System.Drawing.Size(141, 98)
+        Me.cmsSales.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.欄位顯示VToolStripMenuItem, Me.ToolStripSeparator4, Me.銷貨AToolStripMenuItem, Me.修改CToolStripMenuItem, Me.刪除DToolStripMenuItem})
+        Me.cmsSales.Name = "cmsEdit"
+        Me.cmsSales.Size = New System.Drawing.Size(141, 98)
         '
         '欄位顯示VToolStripMenuItem
         '
@@ -336,7 +345,7 @@ Partial Class winMain
         Me.GroupBox1.Controls.Add(Me.rToday)
         Me.GroupBox1.Controls.Add(Me.rUserTime)
         Me.GroupBox1.Controls.Add(Me.r30Day)
-        Me.GroupBox1.Location = New System.Drawing.Point(222, 27)
+        Me.GroupBox1.Location = New System.Drawing.Point(222, 30)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(561, 46)
         Me.GroupBox1.TabIndex = 3
@@ -452,7 +461,7 @@ Partial Class winMain
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.cbForm)
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 27)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 30)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(204, 45)
         Me.GroupBox2.TabIndex = 4
@@ -469,11 +478,67 @@ Partial Class winMain
         Me.cbForm.Size = New System.Drawing.Size(121, 20)
         Me.cbForm.TabIndex = 0
         '
+        'GroupBox3
+        '
+        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox3.Controls.Add(Me.dgLog)
+        Me.GroupBox3.Location = New System.Drawing.Point(13, 494)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(776, 156)
+        Me.GroupBox3.TabIndex = 5
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "事件記錄"
+        '
+        'dgLog
+        '
+        Me.dgLog.AllowUserToAddRows = False
+        Me.dgLog.AllowUserToDeleteRows = False
+        Me.dgLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgLog.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle1
+        Me.dgLog.Location = New System.Drawing.Point(6, 21)
+        Me.dgLog.Name = "dgLog"
+        Me.dgLog.ReadOnly = True
+        Me.dgLog.RowTemplate.Height = 24
+        Me.dgLog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.dgLog.Size = New System.Drawing.Size(758, 129)
+        Me.dgLog.TabIndex = 0
+        '
+        'cmsLog
+        '
+        Me.cmsLog.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.刪除ToolStripMenuItem, Me.全部刪除ToolStripMenuItem})
+        Me.cmsLog.Name = "cmsLog"
+        Me.cmsLog.Size = New System.Drawing.Size(153, 70)
+        '
+        '刪除ToolStripMenuItem
+        '
+        Me.刪除ToolStripMenuItem.Name = "刪除ToolStripMenuItem"
+        Me.刪除ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.刪除ToolStripMenuItem.Text = "刪除"
+        '
+        '全部刪除ToolStripMenuItem
+        '
+        Me.全部刪除ToolStripMenuItem.Name = "全部刪除ToolStripMenuItem"
+        Me.全部刪除ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.全部刪除ToolStripMenuItem.Text = "全部刪除"
+        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(795, 562)
+        Me.ClientSize = New System.Drawing.Size(795, 662)
+        Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.dgSales)
         Me.Controls.Add(Me.MenuStrip1)
@@ -485,11 +550,14 @@ Partial Class winMain
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.cmsEdit.ResumeLayout(False)
+        Me.cmsSales.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.cmsSystem.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox3.ResumeLayout(False)
+        CType(Me.dgLog, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.cmsLog.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -513,7 +581,7 @@ Partial Class winMain
     Friend WithEvents rToday As System.Windows.Forms.RadioButton
     Friend WithEvents rUserTime As System.Windows.Forms.RadioButton
     Friend WithEvents r30Day As System.Windows.Forms.RadioButton
-    Friend WithEvents cmsEdit As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents cmsSales As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents 銷貨AToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 修改CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 刪除DToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -548,4 +616,9 @@ Partial Class winMain
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents cbClient As System.Windows.Forms.ToolStripComboBox
     Friend WithEvents 調貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents dgLog As System.Windows.Forms.DataGridView
+    Friend WithEvents cmsLog As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents 刪除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 全部刪除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

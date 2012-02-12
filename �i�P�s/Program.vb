@@ -70,7 +70,7 @@ Public Module Program
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
     Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
     Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
-    Public StockMoveVisiblePath As String = My.Application.Info.DirectoryPath & "StockVisible.xml"
+    Public StockMoveVisiblePath As String = My.Application.Info.DirectoryPath & "\StockVisible.xml"
     Public LoginInfoPath As String = My.Application.Info.DirectoryPath & "\Login.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
@@ -125,12 +125,15 @@ Public Module Program
         Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
         Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
+        Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
+        d.Close()
         myDatabase.DeleteColumn(Stock.Table, "Price")
         myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
         myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
         myDatabase.AddColumn(Personnel.Table, "Modify", Database.DBTypeDate)
         myDatabase.AddColumn(Goods.Table, "Modify", Database.DBTypeDate)
         myDatabase.AddColumn(Contract.Table, "Modify", Database.DBTypeDate)
+
     End Sub
 
     Public Sub ConfigLoad()

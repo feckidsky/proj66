@@ -42,7 +42,7 @@ Partial Class winLogIn
         Me.btLogin.Location = New System.Drawing.Point(175, 194)
         Me.btLogin.Name = "btLogin"
         Me.btLogin.Size = New System.Drawing.Size(75, 23)
-        Me.btLogin.TabIndex = 2
+        Me.btLogin.TabIndex = 5
         Me.btLogin.Text = "登入"
         Me.btLogin.UseVisualStyleBackColor = True
         '
@@ -51,7 +51,7 @@ Partial Class winLogIn
         Me.btCancel.Location = New System.Drawing.Point(94, 194)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btCancel.TabIndex = 3
+        Me.btCancel.TabIndex = 4
         Me.btCancel.Text = "取消"
         Me.btCancel.UseVisualStyleBackColor = True
         '
@@ -74,14 +74,14 @@ Partial Class winLogIn
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtPassword.Size = New System.Drawing.Size(119, 22)
-        Me.txtPassword.TabIndex = 1
+        Me.txtPassword.TabIndex = 2
         '
         'txtID
         '
         Me.txtID.Location = New System.Drawing.Point(93, 28)
         Me.txtID.Name = "txtID"
         Me.txtID.Size = New System.Drawing.Size(119, 22)
-        Me.txtID.TabIndex = 0
+        Me.txtID.TabIndex = 1
         '
         'Label2
         '
@@ -136,7 +136,7 @@ Partial Class winLogIn
         Me.ckAutoLogin.Location = New System.Drawing.Point(16, 198)
         Me.ckAutoLogin.Name = "ckAutoLogin"
         Me.ckAutoLogin.Size = New System.Drawing.Size(72, 16)
-        Me.ckAutoLogin.TabIndex = 5
+        Me.ckAutoLogin.TabIndex = 3
         Me.ckAutoLogin.Text = "自動登入"
         Me.ckAutoLogin.UseVisualStyleBackColor = True
         '

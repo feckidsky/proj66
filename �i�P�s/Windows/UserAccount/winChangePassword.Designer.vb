@@ -48,7 +48,7 @@ Partial Class winChangePassword
         Me.btCancel.Location = New System.Drawing.Point(65, 142)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btCancel.TabIndex = 5
+        Me.btCancel.TabIndex = 3
         Me.btCancel.Text = "取消"
         Me.btCancel.UseVisualStyleBackColor = True
         '
@@ -73,7 +73,7 @@ Partial Class winChangePassword
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtPassword.Size = New System.Drawing.Size(119, 22)
-        Me.txtPassword.TabIndex = 1
+        Me.txtPassword.TabIndex = 0
         '
         'txtNewPassword2
         '
@@ -81,7 +81,7 @@ Partial Class winChangePassword
         Me.txtNewPassword2.Name = "txtNewPassword2"
         Me.txtNewPassword2.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtNewPassword2.Size = New System.Drawing.Size(119, 22)
-        Me.txtNewPassword2.TabIndex = 3
+        Me.txtNewPassword2.TabIndex = 2
         '
         'Label3
         '
@@ -98,7 +98,7 @@ Partial Class winChangePassword
         Me.txtNewPassword1.Name = "txtNewPassword1"
         Me.txtNewPassword1.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
         Me.txtNewPassword1.Size = New System.Drawing.Size(119, 22)
-        Me.txtNewPassword1.TabIndex = 2
+        Me.txtNewPassword1.TabIndex = 1
         '
         'Label2
         '

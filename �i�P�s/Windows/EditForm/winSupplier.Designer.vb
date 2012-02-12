@@ -52,14 +52,14 @@ Partial Class winSupplier
         Me.txtName.Location = New System.Drawing.Point(65, 64)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(115, 22)
-        Me.txtName.TabIndex = 0
+        Me.txtName.TabIndex = 1
         '
         'txtTel1
         '
         Me.txtTel1.Location = New System.Drawing.Point(259, 23)
         Me.txtTel1.Name = "txtTel1"
         Me.txtTel1.Size = New System.Drawing.Size(128, 22)
-        Me.txtTel1.TabIndex = 0
+        Me.txtTel1.TabIndex = 2
         '
         'btAdd
         '
@@ -67,7 +67,7 @@ Partial Class winSupplier
         Me.btAdd.Location = New System.Drawing.Point(339, 276)
         Me.btAdd.Name = "btAdd"
         Me.btAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btAdd.TabIndex = 1
+        Me.btAdd.TabIndex = 7
         Me.btAdd.Text = "新增"
         Me.btAdd.UseVisualStyleBackColor = True
         '
@@ -76,7 +76,7 @@ Partial Class winSupplier
         Me.txtTel2.Location = New System.Drawing.Point(259, 64)
         Me.txtTel2.Name = "txtTel2"
         Me.txtTel2.Size = New System.Drawing.Size(128, 22)
-        Me.txtTel2.TabIndex = 0
+        Me.txtTel2.TabIndex = 3
         '
         'Label1
         '
@@ -119,7 +119,7 @@ Partial Class winSupplier
         Me.txtAddr.Location = New System.Drawing.Point(63, 101)
         Me.txtAddr.Name = "txtAddr"
         Me.txtAddr.Size = New System.Drawing.Size(324, 22)
-        Me.txtAddr.TabIndex = 0
+        Me.txtAddr.TabIndex = 4
         '
         'Label5
         '
@@ -136,7 +136,7 @@ Partial Class winSupplier
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(369, 77)
-        Me.txtNote.TabIndex = 0
+        Me.txtNote.TabIndex = 5
         '
         'Label6
         '
@@ -173,11 +173,11 @@ Partial Class winSupplier
         Me.btAccount.Location = New System.Drawing.Point(28, 276)
         Me.btAccount.Name = "btAccount"
         Me.btAccount.Size = New System.Drawing.Size(188, 23)
-        Me.btAccount.TabIndex = 4
+        Me.btAccount.TabIndex = 6
         Me.btAccount.Text = "帳號"
         Me.btAccount.UseVisualStyleBackColor = True
         '
-        'winPeople
+        'winSupplier
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -186,7 +186,7 @@ Partial Class winSupplier
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btAdd)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
-        Me.Name = "winPeople"
+        Me.Name = "winSupplier"
         Me.Text = "供應商"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()

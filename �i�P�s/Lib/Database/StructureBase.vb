@@ -15,6 +15,7 @@ Namespace Database
         Public DBTypeSingle As String = "single"
         Public DBTypeInteger As String = "int"
         Public DBTypeBoolean As String = "bit"
+        Public DBTypeAutoNumber As String = "IDENTITY"
 
         Public TimeFormat As String = "#yyyy/MM/dd HH:mm:ss#"
 
@@ -56,6 +57,66 @@ Namespace Database
             MyBase.Add(New Column(label, Type))
         End Sub
     End Class
+
+    Public Structure Log
+        Shared Table As String = "Log"
+        'Dim No As Long
+        Dim Personnel As String
+        Dim [Date] As Date
+        Dim Message As String
+
+        Sub New(ByVal Personnel As String, ByVal [Date] As Date, ByVal message As String)
+            Me.Personnel = Personnel : Me.Date = [Date] : Me.Message = message
+        End Sub
+
+        Public Function GetSqlInsert() As String
+            Dim columns As Column() = ToColumns()
+            Dim values As Object = ToObjects()
+
+            Dim newColumn As New List(Of Column)
+            Dim newValues As New List(Of Object)
+            For i As Integer = 0 To columns.Length - 1
+                If columns(i).Type <> DBTypeAutoNumber Then
+                    newColumn.Add(columns(i))
+                    newValues.Add(values(i))
+                End If
+            Next
+
+            Return Access.GetSqlInsert(Table, newColumn.ToArray, newValues.ToArray)
+        End Function
+
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList
+            'Columns.Add("No", DBTypeAutoNumber)
+            Columns.Add("Date", DBTypeDate)
+            Columns.Add("Personnel", DBTypeLabel)
+            Columns.Add("Message", DBTypeNote)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            'Return New Object() {No, [Date], Personnel, Message}
+            Return New Object() {[Date], Personnel, Message}
+        End Function
+
+        Sub UpdateRow(ByVal r As DataRow)
+            Dim columns() As Column = ToColumns()
+            Dim obj() As Object = ToObjects()
+            For i As Integer = 0 To columns.Count - 1
+                r(columns(i).Name) = obj(i)
+            Next
+        End Sub
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Log
+            Dim R As New MyDataRow(Row)
+            Dim data As Log
+            ' data.No = R("No")
+            data.Personnel = R("Personnel")
+            data.Date = R("Date")
+            data.Message = R("Message")
+            Return data
+        End Function
+    End Structure
 
 
 

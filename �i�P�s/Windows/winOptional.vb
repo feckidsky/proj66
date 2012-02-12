@@ -107,8 +107,8 @@
 
     Private Sub btRepairMDB_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btRepairMDB.Click
         If Config.Mode = Connect.Server Then
-            Database.Access.RepairAccess(myDatabase.BasePath)
-            MsgBox("修復/壓縮完成")
+            Dim res As Database.Access.RepairAccessResult = Database.Access.RepairAccess(myDatabase.BasePath)
+            MsgBox(res.Message)
         Else
             MsgBox("Client無此功能")
         End If

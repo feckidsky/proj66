@@ -47,6 +47,7 @@
         End If
 
         MyBase.Show()
+        MyBase.BringToFront()
         GoodsFilterText = ""
         Config()
         'Filter.SetTextFilter("商品編號", "")
@@ -55,8 +56,13 @@
 
     End Sub
 
+    Dim UpdateStockListHandler As New Action(AddressOf UpdateStockList)
     Public Sub UpdateStockList()
         If Not Me.Created Then Exit Sub
+        If Me.InvokeRequired Then
+            Me.Invoke(UpdateStockListHandler)
+            Exit Sub
+        End If
         Dim DT As Data.DataTable = access.GetStockListWithHistoryPrice()
         'If cbStock.SelectedIndex = 0 Then
 

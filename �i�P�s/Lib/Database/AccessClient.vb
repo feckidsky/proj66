@@ -6,7 +6,7 @@
     End Structure
 
     
-
+#Region "AccessClientMenage"
     Public Class AccessClientMenage
 
         Public Client() As Access
@@ -33,7 +33,12 @@
 
             Dim lstClient As New List(Of Database.AccessClient)
 
+            Dim idx As Integer = 0
             For Each c As ClientInfo In lstInfo
+                If c.Name Is Nothing Then '避免Clien沒有名稱的狀況
+                    c.Name = "C" & idx
+                    idx += 1
+                End If
                 lstClient.Add(New AccessClient(c.Name, c.IP, c.Port))
             Next
 
@@ -93,9 +98,10 @@
             End Get
         End Property
 
-    
+
 
     End Class
+#End Region
 
     Public Class AccessClient
         Inherits Access
@@ -127,7 +133,7 @@
             Return Count
         End Function
 
-        Dim ReadLock As String = "ReadLck"
+        Dim ReadLock As String = "ReadLock"
 
         Dim Waiter As New Threading.AutoResetEvent(True)
 
@@ -164,9 +170,7 @@
             Return Code.DeserializeWithUnzip(Of T)(s)
         End Function
 
-
         Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ReceiveSplitMessage
-
 
             Dim args As String = ""
             If Data.Length > 1 Then args = Data(1)
@@ -207,8 +211,11 @@
                 Case "ChangedSales" : OnChangedSales(Repair(Of SalesArgs)(args))
                 Case "DeletedSales" : OnDeletedSales(Repair(Of Sales)(args))
                 Case "CreatedStockMove" : OnCreatedStockMove(Repair(Of StockMove)(args))
-                Case "UpdatedStockMove" : OnChangedStockMove(Repair(Of StockMove)(args))
+                Case "ChangedStockMove" : OnChangedStockMove(Repair(Of StockMove)(args))
                 Case "DeletedStockMove" : OnDeletedStockMove(Repair(Of StockMove)(args))
+                Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
+                Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
+                Case "DeletedAllLog" : OnDeletedAllLog()
                 Case "MsgBox" : MsgBox(Code.DeserializeWithUnzip(Of String)(args))
                 Case Else
                     MsgBox("不明指令:" & vbCrLf & Data(0))
@@ -308,6 +315,24 @@
         Public Overrides Sub DeleteStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
             Send("DeleteStockMove", data)
         End Sub
+
+        Public Overrides Sub AddLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
+            Send("CreateLog", data)
+        End Sub
+
+        Public Overrides Sub DeleteLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
+            Send("DeleteLog", data)
+        End Sub
+
+        Public Overrides Sub DeleteAllLog(Optional ByVal trigger As Boolean = True)
+            Send("DeleteAllLog")
+        End Sub
+
+        'Public Overrides Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
+        '    Send("LogOut")
+        'End Sub
+
+
     End Class
 
 

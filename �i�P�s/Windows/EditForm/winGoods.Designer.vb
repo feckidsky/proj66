@@ -29,14 +29,14 @@ Partial Class winGoods
         Me.txtNote = New System.Windows.Forms.TextBox
         Me.txtName = New System.Windows.Forms.TextBox
         Me.txtLabel = New System.Windows.Forms.TextBox
-        Me.txtKind = New System.Windows.Forms.TextBox
-        Me.txtBrand = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.txtCost = New System.Windows.Forms.TextBox
         Me.txtPrice = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
         Me.Label7 = New System.Windows.Forms.Label
+        Me.cbKind = New System.Windows.Forms.ComboBox
+        Me.cbBrand = New System.Windows.Forms.ComboBox
         Me.SuspendLayout()
         '
         'Label6
@@ -71,7 +71,7 @@ Partial Class winGoods
         Me.btAdd.Location = New System.Drawing.Point(350, 220)
         Me.btAdd.Name = "btAdd"
         Me.btAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btAdd.TabIndex = 9
+        Me.btAdd.TabIndex = 7
         Me.btAdd.Text = "新增"
         Me.btAdd.UseVisualStyleBackColor = True
         '
@@ -81,35 +81,21 @@ Partial Class winGoods
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(394, 77)
-        Me.txtNote.TabIndex = 4
+        Me.txtNote.TabIndex = 6
         '
         'txtName
         '
         Me.txtName.Location = New System.Drawing.Point(77, 52)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(115, 22)
-        Me.txtName.TabIndex = 7
+        Me.txtName.TabIndex = 2
         '
         'txtLabel
         '
         Me.txtLabel.Location = New System.Drawing.Point(77, 23)
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.Size = New System.Drawing.Size(115, 22)
-        Me.txtLabel.TabIndex = 6
-        '
-        'txtKind
-        '
-        Me.txtKind.Location = New System.Drawing.Point(281, 23)
-        Me.txtKind.Name = "txtKind"
-        Me.txtKind.Size = New System.Drawing.Size(115, 22)
-        Me.txtKind.TabIndex = 7
-        '
-        'txtBrand
-        '
-        Me.txtBrand.Location = New System.Drawing.Point(281, 52)
-        Me.txtBrand.Name = "txtBrand"
-        Me.txtBrand.Size = New System.Drawing.Size(115, 22)
-        Me.txtBrand.TabIndex = 7
+        Me.txtLabel.TabIndex = 0
         '
         'Label3
         '
@@ -134,14 +120,14 @@ Partial Class winGoods
         Me.txtCost.Location = New System.Drawing.Point(77, 82)
         Me.txtCost.Name = "txtCost"
         Me.txtCost.Size = New System.Drawing.Size(115, 22)
-        Me.txtCost.TabIndex = 7
+        Me.txtCost.TabIndex = 4
         '
         'txtPrice
         '
         Me.txtPrice.Location = New System.Drawing.Point(281, 82)
         Me.txtPrice.Name = "txtPrice"
         Me.txtPrice.Size = New System.Drawing.Size(115, 22)
-        Me.txtPrice.TabIndex = 7
+        Me.txtPrice.TabIndex = 5
         '
         'Label5
         '
@@ -161,11 +147,29 @@ Partial Class winGoods
         Me.Label7.TabIndex = 14
         Me.Label7.Text = "建議售價"
         '
+        'cbKind
+        '
+        Me.cbKind.FormattingEnabled = True
+        Me.cbKind.Location = New System.Drawing.Point(281, 25)
+        Me.cbKind.Name = "cbKind"
+        Me.cbKind.Size = New System.Drawing.Size(115, 20)
+        Me.cbKind.TabIndex = 1
+        '
+        'cbBrand
+        '
+        Me.cbBrand.FormattingEnabled = True
+        Me.cbBrand.Location = New System.Drawing.Point(281, 54)
+        Me.cbBrand.Name = "cbBrand"
+        Me.cbBrand.Size = New System.Drawing.Size(115, 20)
+        Me.cbBrand.TabIndex = 3
+        '
         'winGoods
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(450, 256)
+        Me.Controls.Add(Me.cbBrand)
+        Me.Controls.Add(Me.cbKind)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label4)
@@ -176,9 +180,7 @@ Partial Class winGoods
         Me.Controls.Add(Me.btAdd)
         Me.Controls.Add(Me.txtNote)
         Me.Controls.Add(Me.txtPrice)
-        Me.Controls.Add(Me.txtBrand)
         Me.Controls.Add(Me.txtCost)
-        Me.Controls.Add(Me.txtKind)
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.txtLabel)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
@@ -195,12 +197,12 @@ Partial Class winGoods
     Friend WithEvents txtNote As System.Windows.Forms.TextBox
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents txtLabel As System.Windows.Forms.TextBox
-    Friend WithEvents txtKind As System.Windows.Forms.TextBox
-    Friend WithEvents txtBrand As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents txtCost As System.Windows.Forms.TextBox
     Friend WithEvents txtPrice As System.Windows.Forms.TextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents cbKind As System.Windows.Forms.ComboBox
+    Friend WithEvents cbBrand As System.Windows.Forms.ComboBox
 End Class

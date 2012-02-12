@@ -21,6 +21,7 @@ Public Class winGoodsList
         If Not CheckAuthority(1) Then Exit Sub
         work = Mode.Normal
         MyBase.Show()
+        MyBase.BringToFront()
     End Sub
 
 

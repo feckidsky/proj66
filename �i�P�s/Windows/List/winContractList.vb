@@ -27,6 +27,7 @@
         If Not CheckAuthority(2) Then Exit Sub
         work = Mode.Normal
         MyBase.Show()
+        MyBase.BringToFront()
     End Sub
 
 
@@ -111,7 +112,7 @@
 
 
         Dim count As Integer = access.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then count += c.GetSalesListByContractLabel(selectedItem.Label).Rows.Count
         Next
 

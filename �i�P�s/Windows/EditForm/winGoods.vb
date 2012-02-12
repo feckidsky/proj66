@@ -16,6 +16,10 @@ Public Class winGoods
         txtLabel.Enabled = Work = Mode.Create
         txtPrice.Enabled = txtLabel.Enabled
         txtCost.Enabled = txtLabel.Enabled
+        cbBrand.Items.Clear()
+        cbBrand.Items.AddRange(CurrentAccess.GetBrandList())
+        cbKind.Items.Clear()
+        cbKind.Items.AddRange(CurrentAccess.GetKindList())
     End Sub
 
     Public Sub Open(ByVal Data As Goods, ByVal DB As Database.Access)
@@ -37,8 +41,8 @@ Public Class winGoods
     Public Sub UpdateText(ByVal Data As Goods)
         txtLabel.Text = Data.Label
         txtName.Text = Data.Name
-        txtKind.Text = Data.Kind
-        txtBrand.Text = Data.Brand
+        cbKind.Text = Data.Kind
+        cbBrand.Text = Data.Brand
         txtNote.Text = Data.Note
     End Sub
 
@@ -46,8 +50,8 @@ Public Class winGoods
         Dim Data As Goods
         Data.Label = txtLabel.Text
         Data.Name = txtName.Text
-        Data.Kind = txtKind.Text
-        Data.Brand = txtBrand.Text
+        Data.Kind = cbKind.Text
+        Data.Brand = cbBrand.Text
         Data.Note = txtNote.Text
         Data.Modify = Now
         Return Data

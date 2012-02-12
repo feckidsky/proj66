@@ -57,7 +57,7 @@ Partial Class winHistoryPrice
         Me.btAdd.Location = New System.Drawing.Point(321, 116)
         Me.btAdd.Name = "btAdd"
         Me.btAdd.Size = New System.Drawing.Size(75, 23)
-        Me.btAdd.TabIndex = 9
+        Me.btAdd.TabIndex = 5
         Me.btAdd.Text = "新增"
         Me.btAdd.UseVisualStyleBackColor = True
         '
@@ -68,7 +68,7 @@ Partial Class winHistoryPrice
         Me.txtTime.Name = "txtTime"
         Me.txtTime.ReadOnly = True
         Me.txtTime.Size = New System.Drawing.Size(115, 22)
-        Me.txtTime.TabIndex = 7
+        Me.txtTime.TabIndex = 1
         '
         'txtLabel
         '
@@ -77,21 +77,21 @@ Partial Class winHistoryPrice
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.ReadOnly = True
         Me.txtLabel.Size = New System.Drawing.Size(115, 22)
-        Me.txtLabel.TabIndex = 6
+        Me.txtLabel.TabIndex = 0
         '
         'txtPrice
         '
         Me.txtPrice.Location = New System.Drawing.Point(281, 70)
         Me.txtPrice.Name = "txtPrice"
         Me.txtPrice.Size = New System.Drawing.Size(115, 22)
-        Me.txtPrice.TabIndex = 7
+        Me.txtPrice.TabIndex = 3
         '
         'txtCost
         '
         Me.txtCost.Location = New System.Drawing.Point(70, 70)
         Me.txtCost.Name = "txtCost"
         Me.txtCost.Size = New System.Drawing.Size(115, 22)
-        Me.txtCost.TabIndex = 7
+        Me.txtCost.TabIndex = 2
         '
         'Label3
         '
@@ -116,7 +116,7 @@ Partial Class winHistoryPrice
         Me.btCancel.Location = New System.Drawing.Point(236, 116)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
-        Me.btCancel.TabIndex = 15
+        Me.btCancel.TabIndex = 4
         Me.btCancel.Text = "取消"
         Me.btCancel.UseVisualStyleBackColor = True
         '

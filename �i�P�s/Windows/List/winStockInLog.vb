@@ -19,6 +19,7 @@
         access = DB
         If Not CheckAuthority(1) Then Exit Sub
         MyBase.Show()
+        MyBase.BringToFront()
     End Sub
 
     Dim dt As DataTable

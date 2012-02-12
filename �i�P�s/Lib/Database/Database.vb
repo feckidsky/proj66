@@ -23,6 +23,7 @@
 
     End Structure
 
+
     Public Structure LoginResult
         Dim User As Personnel
         Dim State As LoginState
@@ -45,6 +46,8 @@
         Inherits TCPTool.Client
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
+
+        Public User As Personnel = Personnel.Guest
 
         Event Account_Logout(ByVal sender As Object, ByVal result As LoginResult)
         Event Account_LogIn(ByVal sender As Object, ByVal result As LoginResult)
@@ -104,29 +107,66 @@
 
             Dim result As LoginResult
 
-            Dim user As Personnel = myDatabase.GetPersonnelByID(ID)
+            Dim r_user As Personnel = myDatabase.GetPersonnelByID(ID)
 
-            If user.IsNull() Then
+            If r_user.IsNull() Then
                 result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest)
-            ElseIf user.Password <> Password Then
+            ElseIf r_user.Password <> Password Then
                 result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest)
             Else
-                result = New LoginResult(LoginState.Success, "登入成功!", user)
+                result = New LoginResult(LoginState.Success, "登入成功!", r_user)
                 'CurrentUser = user
             End If
 
+            User = result.User
             If TriggerEvent Then OnLogin(result)
             Return result
         End Function
 
-        Friend Sub OnLogin(ByVal result As LoginResult)
+        Friend Overridable Sub OnLogin(ByVal result As LoginResult)
             RaiseEvent Account_LogIn(Me, result)
         End Sub
 
-        Public Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
+        Public Overridable Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
             Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest)
             If TriggerEvent Then RaiseEvent Account_Logout(Me, result)
         End Sub
+
+        Public Function GetKindList() As String()
+            Dim SqlCommand As String = "SELECT Kind FROM goods Group By Kind;"
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            Dim lst As New List(Of String)
+            For Each r As DataRow In dt.Rows
+                lst.Add(Strings.Trim(r("Kind").ToString))
+            Next
+            Return lst.ToArray
+        End Function
+
+        Public Function GetBrandList() As String()
+            Dim SqlCommand As String = "SELECT Brand FROM goods Group By Brand;"
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            Dim lst As New List(Of String)
+            For Each r As DataRow In dt.Rows
+                lst.Add(Strings.Trim(r("Brand").ToString))
+            Next
+            Return lst.ToArray
+        End Function
+
+        Public Function GetLogList(ByVal StartTime As Date, ByVal EndTime As Date, ByVal Personnel As String) As DataTable
+            Dim between As String = "(Log.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & ")"
+            Dim perCondition As String = IIf(Personnel = "", "", "AND Log.Personnel='" & Personnel & "'")
+            Dim SqlCommand As String = "SELECT Log.Date as 日期,Log.Personnel as 員工編號, Personnel.Name as 員工 ,Log.Message as 內容 FROM Log Left Join Personnel ON Log.personnel=Personnel.Label WHERE" & between & perCondition & ";"
+            Return Read("table", BasePath, SqlCommand)
+        End Function
+
+        Public Function GetLogRow(ByVal Time As Date, ByVal Personnel As String) As DataRow
+            Dim between As String = "(Log.Date =" & Time.ToString("#yyyy/MM/dd HH:mm:ss#") & ")"
+            Dim perCondition As String = IIf(Personnel = "", "", "AND Log.Personnel='" & Personnel & "'")
+            Dim SqlCommand As String = "SELECT Log.Date as 日期,Log.Personnel as 員工編號, Personnel.Name as 員工 ,Log.Message as 內容 FROM Log Left Join Personnel ON Log.personnel=Personnel.Label WHERE" & between & perCondition & ";"
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return Nothing
+            Return dt.Rows(0)
+        End Function
 
         Public Function GetHistoryPriceList(ByVal Label As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel='" & Label & "';"
@@ -249,17 +289,20 @@
 
         '更新庫存內容
         Public Overridable Sub ChangeStock(ByVal newStock As Stock)
+            Dim goods As Goods = GetGoods(newStock.GoodsLabel)
+            Dim stock As Stock = GetStock(newStock.Label)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
             Command(SQLCommand, BasePath)
+            AddLog(Now, "修改庫存資料:" & goods.Name & IIf(stock.Number = newStock.Number, "", "(數量:" & stock.Number & "->" & newStock.Number & ")"))
             OnChangedStock(newStock)
-            'RaiseEvent ChangedStock(newStock)
         End Sub
 
         '刪除一筆庫存
         Public Overridable Sub DeleteStock(ByVal dStock As Stock)
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
-            'RaiseEvent DeletedStock(dStock)
+            Dim goods As Goods = GetGoods(dStock.GoodsLabel)
+            AddLog(Now, "刪除庫存:" & goods.Name)
             OnDeletedStock(dStock)
         End Sub
 
@@ -300,9 +343,9 @@
             Return DT
         End Function
 
-        Public Function GetStockMoveList() As Data.DataTable
+        Public Function GetStockMoveList(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
             Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
-            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label; "
+            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " ; "
             Return Read("table", BasePath, SqlCommand)
         End Function
 
@@ -557,23 +600,49 @@
 
         '新增銷貨單
         Public Overridable Sub CreateSales(ByVal newSales As Sales, ByVal salesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
+
+            Dim total As Single = 0
+            Select Case newSales.TypeOfPayment
+                Case Payment.Commission
+                    total = Array.ConvertAll(Of OrderGoods, Single)(OrderGoods, Function(o As OrderGoods) o.Number * o.Price).Sum()
+                Case Else
+                    total = Array.ConvertAll(Of SalesGoods, Single)(salesGoods, Function(o As SalesGoods) o.Number * o.SellingPrice).Sum()
+            End Select
+
+            AddLog(Now, "新增" & IIf(newSales.TypeOfPayment = Payment.Commission, "訂單", "銷貨單") & ":" & newSales.Label & "(" & total & ")")
+
             CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods, SalesContracts)
-            'RaiseEvent CreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
+
             OnCreatedSales(newSales, salesGoods, OrderGoods, SalesContracts)
         End Sub
 
         '刪除銷貨單
         Public Overridable Sub DeleteSales(ByVal dSales As Sales)
             DeleteSalesWithoutEvent(dSales)
-            'RaiseEvent DeletedSales(dSales)
+            AddLog(Now, "刪除" & IIf(dSales.TypeOfPayment = Payment.Commission, "訂單", "銷貨單") & ":" & dSales.Label)
             OnDeletedSales(dSales)
         End Sub
 
         '修改銷貨單
         Public Overridable Sub ChangeSales(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
+            Dim sales As Sales = GetSales(newSales.Label)
+            Dim total As Single = 0
+            Dim title As String = ""
+            If sales.TypeOfPayment = Payment.Commission And sales.TypeOfPayment <> newSales.TypeOfPayment Then
+                title = "訂單轉銷貨:"
+                total = Array.ConvertAll(Of SalesGoods, Single)(SalesGoods, Function(o As SalesGoods) o.Number * o.SellingPrice).Sum()
+            ElseIf newSales.TypeOfPayment = Payment.Commission Then
+                title = "修改訂單:"
+                total = Array.ConvertAll(Of OrderGoods, Single)(OrderGoods, Function(o As OrderGoods) o.Number * o.Price).Sum()
+            Else
+                title = "修改銷貨單:"
+                total = Array.ConvertAll(Of SalesGoods, Single)(SalesGoods, Function(o As SalesGoods) o.Number * o.SellingPrice).Sum()
+            End If
+
+            AddLog(Now, title & newSales.Label & "(" & total & ")")
             DeleteSalesWithoutEvent(newSales)
             CreateSalesWithoutEvent(newSales, SalesGoods, OrderGoods, SalesContracts)
-            'RaiseEvent ChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
+
             OnChangedSales(newSales, SalesGoods, OrderGoods, SalesContracts)
         End Sub
 
@@ -687,6 +756,7 @@
             CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), DBControl)
+            CreateTable(Log.Table, Log.ToColumns, DBControl)
             myDatabase.AddBase(Personnel.Administrator)
             Return DBControl
         End Function
@@ -931,26 +1001,39 @@
         ''' <summary>新增供應商</summary>
         Public Overridable Sub AddSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             AddBase(data)
+            AddLog(Now, "新增供應商:" & data.Name)
             If trigger Then OnCreatedSupplier(data)
         End Sub
 
         Public Overridable Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Supplier.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除供應商:" & data.Name)
             If trigger Then OnDeletedSupplier(data)
         End Sub
 
         Public Overridable Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            AddLog(Now, "編輯供應商:" & data.Name)
             If trigger Then OnChangedSupplier(data)
         End Sub
 
         Public Overridable Sub AddStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
             AddBase(data)
+            Select Case data.Action
+                Case StockMove.Type.Request, StockMove.Type.Sending
+                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.Label).Name & " - " & data.SourceShop & "->" & data.DestineShop)
+            End Select
+
             If trigger Then OnCreatedStockMove(data)
         End Sub
 
         Public Overridable Sub ChangeStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            Select Case data.Action
+                Case StockMove.Type.Cancel, StockMove.Type.In, StockMove.Type.Sending
+                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.Label).Name & " - " & data.SourceShop & "->" & data.DestineShop)
+            End Select
+
             If trigger Then OnChangedStockMove(data)
         End Sub
 
@@ -963,6 +1046,7 @@
 
         Public Overridable Sub DeleteStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(StockMove.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除調貨記錄:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.Label).Name & " - " & data.SourceShop & "->" & data.DestineShop)
             If trigger Then OnDeletedStockMove(data)
         End Sub
 
@@ -979,87 +1063,118 @@
             RaiseEvent DeletedStockMove(Me, Data)
         End Sub
 
+        Public Overridable Sub AddLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
+            'AddBase(Data)
+            Command(data.GetSqlInsert(), BasePath)
+            If trigger Then OnCreatedLog(Data)
+        End Sub
+
+        Public Overridable Sub DeleteLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
+            Command(GetSqlDelete(Log.Table, New String() {"Date", "Personnel"}, New Object() {data.Date, data.Personnel}), BasePath)
+            If trigger Then OnDeletedLog(data)
+        End Sub
+
+        Public Overridable Sub DeleteAllLog(Optional ByVal trigger As Boolean = True)
+            Command("DELETE FROM " & Log.Table & " ;", BasePath)
+            If trigger Then OnDeletedAllLog()
+        End Sub
 
 
         ''' <summary>新增客戶</summary>
         Public Overridable Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             AddBase(data)
+            AddLog(Now, "新增客戶資料:" & data.Name)
             If trigger Then OnCreatedCustomer(data)
         End Sub
 
         Public Overridable Sub DeleteCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Customer.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除客戶資料:" & data.Name)
             If trigger Then OnDeletedCustomer(data)
         End Sub
 
         Public Overridable Sub ChangeCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            AddLog(Now, "修改客戶資料:" & data.Name)
             If trigger Then OnChangedCustomer(data)
         End Sub
 
         ''' <summary>新增員工</summary>
         Public Overridable Sub AddPersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            'PersonnelList.Add(data)
+            AddLog(Now, "新增員工資料:" & data.Name)
             If trigger Then OnCreatedPersonnel(data)
         End Sub
 
         Public Overridable Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Personnel.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除員工資料:" & data.Name)
             If trigger Then OnDeletedPersonnel(data)
         End Sub
 
         Public Overridable Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            AddLog(Now, "修改員工資料:" & data.Name)
             If trigger Then OnChangedPersonnel(data)
         End Sub
 
         ''' <summary>新增商品</summary>
         Public Overridable Sub AddGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             AddBase(data)
-            'GoodsList.Add(data)
+            AddLog(Now, "新增商品項目:" & data.Name)
             If trigger Then OnCreatedGoods(data)
         End Sub
 
         Public Overridable Sub DeleteGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Goods.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除商品項目:" & data.Name)
             If trigger Then OnDeletedGoods(data)
         End Sub
 
         Public Overridable Sub ChangeGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            AddLog(Now, "編輯商品項目:" & data.Name)
             If trigger Then OnChangedGoods(data)
         End Sub
 
         ''' <summary>新增門號</summary>
         Public Overridable Sub AddContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             AddBase(data)
+            AddLog(Now, "新增合約種類:" & data.Name)
             If trigger Then OnCreatedContract(data)
         End Sub
 
         Public Overridable Sub ChangeContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            AddLog(Now, "編輯合約種類:" & data.Name)
             If trigger Then OnChangedContract(data)
         End Sub
 
         Public Overridable Sub DeleteContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(Contract.Table, "Label", data.Label), BasePath)
+            AddLog(Now, "刪除合約種類:" & data.Name)
             If trigger Then OnDeletedContract(data)
         End Sub
 
 
         Public Overridable Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             AddBase(data)
+            Dim goods As Goods = GetGoods(data.GoodsLabel)
+            AddLog(Now, "新增歷史訂價:" & goods.Name & "-" & data.Price)
             If trigger Then OnCreatedHistoryPrice(data)
         End Sub
 
         Public Overridable Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(data.GetUpdateSqlCommand(), BasePath)
+            Dim goods As Goods = GetGoods(data.GoodsLabel)
+            AddLog(Now, "修改歷史訂價:" & goods.Name & "-" & data.Price)
             If trigger Then OnChangedHistoryPrice(data)
         End Sub
 
         Public Overridable Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
             Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
+            Dim goods As Goods = GetGoods(data.GoodsLabel)
+            AddLog(Now, "刪除歷史訂價:" & goods.Name & "-" & data.Price)
             If trigger Then OnDeletedHistoryPrice(data)
         End Sub
 
@@ -1073,6 +1188,8 @@
         ''' <summary>新增庫存</summary>
         Public Overridable Sub AddStock(ByVal data As Stock)
             AddBase(data)
+            Dim goods As Goods = GetGoods(data.Label)
+            AddLog(Now, "入庫:" & goods.Name & " x " & data.Number)
             OnCreatedStock(data)
         End Sub
 
@@ -1101,6 +1218,31 @@
         'Public Function ReadMobile() As Mobile()
         '    Return ReadMobile()
         'End Function
+
+        Public Sub AddLog(ByVal Time As Date, ByVal Message As String)
+            AddLog(New Log(User.Label, Time, Message))
+        End Sub
+
+        Event CreatedLog(ByVal sender As Object, ByVal log As Log)
+        Event ChangedLog(ByVal sender As Object, ByVal log As Log)
+        Event DeletedLog(ByVal sender As Object, ByVal log As Log)
+        Event DeletedAllLog(ByVal sender As Object)
+
+        Friend Sub OnCreatedLog(ByVal log As Log)
+            RaiseEvent CreatedLog(Me, log)
+        End Sub
+
+        Friend Sub OnChangedLog(ByVal log As Log)
+            RaiseEvent ChangedLog(Me, log)
+        End Sub
+
+        Friend Sub OnDeletedLog(ByVal log As Log)
+            RaiseEvent DeletedLog(Me, log)
+        End Sub
+
+        Friend Sub OnDeletedAllLog()
+            RaiseEvent DeletedAllLog(Me)
+        End Sub
 
         Friend Sub OnCreatedContract(ByVal con As Contract)
             RaiseEvent CreatedContract(Me, con)
@@ -1163,8 +1305,6 @@
             RaiseEvent DeletedStock(Me, stock)
         End Sub
 
-
-
         Friend Sub OnCreatedSales(ByVal sales As SalesArgs)
             OnCreatedSales(sales.Sales, sales.GoodsList, sales.OrderList, sales.SalesContracts)
         End Sub
@@ -1194,63 +1334,85 @@
             RaiseEvent DeletedHistoryPriceList(Me, hp)
         End Sub
 
-        Public Shared Function RepairAccess(ByVal FilePath As String) As Boolean
-            Dim strFile As String = FilePath
+        Structure RepairAccessResult
+            Dim Success As Boolean
+            Dim Message As String
+        End Structure
+        Public Shared Function RepairAccess(ByVal FilePath As String) As RepairAccessResult
+            Dim result As New RepairAccessResult
             Try
-                ' Jet Access (MDB) 連線字串; Jet ( Joint Engine Technology ) 
-                Dim strCn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}"
+                Dim tmpFile As String = IO.Path.GetDirectoryName(FilePath) & "\tmp.mdb"
+                Dim j As New JRO.JetEngine
+                Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password
+                Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & tmpFile & ";Jet OLEDB:Database Password=" & Password
+                j.CompactDatabase(sourceConnect, desConnect)
+                IO.File.Delete(FilePath)
 
-                ' 或"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5"
-
-                ' Path.GetTempFileName 方法: 在磁碟上建立具命之零位元組的唯一暫存檔案，
-                '   然後傳回該檔案的完整路徑。
-                Dim strTmpFile As String = IO.Path.GetTempFileName.Replace(".tmp", ".mdb") ' 把tmp 副檔名改成mdb
-
-
-
-                ' 建立物件陣列存放引數(參數) , 來源, 目的
-                Dim objPara As Object() = New Object() {String.Format(strCn, strFile), String.Format(strCn, strTmpFile)}
-
-
-                ' Activator 成員: 包含本機或遠端建立物件型別的方法，或者取得對現有遠端物件的參考。
-                ' Activator.CreateInstance 方法(Type)  : 使用最符合指定參數的建構函式，建立指定型別的執行個體。
-                Dim objJRO As Object = Activator.CreateInstance(System.Type.GetTypeFromProgID("JRO.JetEngine"))
-
-                ' Type.GetTypeFromProgID 方法: 取得與指定的程式識別項(ProgID) 關聯的型別；
-                '   如果在載入Type 時發生錯誤，則傳回null。
-                ' JRO.JetEngine 為Microsoft Jet and Replication Objects X.X library  
-
-
-                ' Type.InvokeMember 方法
-                ' Type.InvokeMember (String, BindingFlags, Binder, Object, Object[]) 
-                objJRO.GetType.InvokeMember("CompactDatabase", Reflection.BindingFlags.InvokeMethod, Nothing, objJRO, objPara)
-
-
-
-                ' 使用指定的繫結條件約束並符合指定的引數清單，來叫用指定的成員。
-                ' BindingFlags 列舉型別,InvokeMethod 指定要叫用方法。
-
-
-                IO.File.Delete(strFile) ' File.Delete 方法: 刪除Compact 前之mdb 檔
-                IO.File.Move(strTmpFile, strFile) ' File.Move 方法: 將Compact 過的mdb 檔改成(回)正確檔名
-
-
-
-                ' Marshal.ReleaseComObject 方法釋放JRO COM 物件
-
-                Runtime.InteropServices.Marshal.ReleaseComObject(objJRO)
-
-                objJRO = Nothing
-                Return True
-            Catch
-                'MsgBox(Err.Description)
-                Return False
+                IO.File.Move(tmpFile, FilePath)
+                result.Success = True
+                result.Message = "資料庫壓縮/修復成功!"
+            Catch ex As Exception
+                result.Success = False
+                result.Message = ex.Message
             End Try
+            Return result
+
+
+            'Dim strFile As String = FilePath
+            'Try
+            '    ' Jet Access (MDB) 連線字串; Jet ( Joint Engine Technology ) 
+            '    Dim strCn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}"
+
+            '    ' 或"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5"
+
+            '    ' Path.GetTempFileName 方法: 在磁碟上建立具命之零位元組的唯一暫存檔案，
+            '    '   然後傳回該檔案的完整路徑。
+            '    Dim strTmpFile As String = IO.Path.GetTempFileName.Replace(".tmp", ".mdb") ' 把tmp 副檔名改成mdb
+
+
+
+            '    ' 建立物件陣列存放引數(參數) , 來源, 目的
+            '    Dim objPara As Object() = New Object() {String.Format(strCn, strFile), String.Format(strCn, strTmpFile)}
+
+
+            '    ' Activator 成員: 包含本機或遠端建立物件型別的方法，或者取得對現有遠端物件的參考。
+            '    ' Activator.CreateInstance 方法(Type)  : 使用最符合指定參數的建構函式，建立指定型別的執行個體。
+            '    Dim objJRO As Object = Activator.CreateInstance(System.Type.GetTypeFromProgID("JRO.JetEngine"))
+
+            '    ' Type.GetTypeFromProgID 方法: 取得與指定的程式識別項(ProgID) 關聯的型別；
+            '    '   如果在載入Type 時發生錯誤，則傳回null。
+            '    ' JRO.JetEngine 為Microsoft Jet and Replication Objects X.X library  
+
+            '    ' Type.InvokeMember 方法
+            '    ' Type.InvokeMember (String, BindingFlags, Binder, Object, Object[]) 
+            '    objJRO.GetType.InvokeMember("CompactDatabase", Reflection.BindingFlags.InvokeMethod, Nothing, objJRO, objPara)
+
+
+
+            '    ' 使用指定的繫結條件約束並符合指定的引數清單，來叫用指定的成員。
+            '    ' BindingFlags 列舉型別,InvokeMethod 指定要叫用方法。
+
+
+            '    IO.File.Delete(strFile) ' File.Delete 方法: 刪除Compact 前之mdb 檔
+            '    IO.File.Move(strTmpFile, strFile) ' File.Move 方法: 將Compact 過的mdb 檔改成(回)正確檔名
+
+
+
+            '    ' Marshal.ReleaseComObject 方法釋放JRO COM 物件
+
+            '    Runtime.InteropServices.Marshal.ReleaseComObject(objJRO)
+
+            '    objJRO = Nothing
+            '    Return True
+            'Catch
+            '    'MsgBox(Err.Description)
+            '    Return False
+            'End Try
 
         End Function
     End Class
 #End Region
 
-   
+
 
 End Namespace

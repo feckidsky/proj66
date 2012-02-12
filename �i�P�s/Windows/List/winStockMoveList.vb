@@ -22,12 +22,56 @@ Public Class winStockMoveList
         access = db
 
         MyBase.Show()
-        GetStockMoveList()
+        MyBase.BringToFront()
+        UpdateTitle()
+        UpdateStockMoveList()
     End Sub
 
+    Private Sub rToday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged, dtpStart.ValueChanged, dtpEnd.ValueChanged
+        If Me.Created Then UpdateStockMoveList()
+    End Sub
+
+    Dim UpdateTitleHandler As New Action(AddressOf UpdateTitle)
+    Public Sub UpdateTitle()
+        If Not Me.Created Then Exit Sub
+        If Me.InvokeRequired Then
+            Me.Invoke(UpdateTitleHandler)
+            Exit Sub
+        End If
+
+
+        Me.Text = "調貨記錄 - " & access.Name & " - " & IIf(access.Connected, "已連線", "斷線")
+    End Sub
+
+    Structure Period
+        Dim StartTime As Date
+        Dim EndTime As Date
+        Sub New(ByVal Start As Date, ByVal [End] As Date)
+            StartTime = Start : EndTime = [End]
+        End Sub
+    End Structure
+
+    Delegate Function DelegateGetPeriod() As Period
+    Dim GetPeriodHandler As New DelegateGetPeriod(AddressOf GetPeriod)
+    Private Function GetPeriod() As Period
+        If Me.InvokeRequired Then
+            Return Me.Invoke(GetPeriodHandler)
+        End If
+
+        If r30Day.Checked Then
+            Return New Period(Today.AddDays(1).AddSeconds(-1), Today.AddDays(-30))
+        ElseIf rToday.Checked Then
+            Return New Period(Today.AddDays(1).AddSeconds(-1), Today)
+        Else
+            Return New Period(dtpStart.Value.Date, dtpEnd.Value.Date.AddDays(1).AddSeconds(-1))
+        End If
+    End Function
+
     Dim dt As DataTable
-    Public Sub GetStockMoveList()
-        dt = access.GetStockMoveList()
+    Public Sub UpdateStockMoveList()
+
+        Dim Period As Period = GetPeriod()
+        dt = access.GetStockMoveList(Period.StartTime, Period.EndTime)
 
 
         If dgList.Columns.Count = 0 Then
@@ -106,9 +150,16 @@ Public Class winStockMoveList
         Dim cancelState As String() = {"申請", "調出(未送達)", "調貨中"}
         Dim InState As String() = {"調貨中", "取消"}
         Dim OutState As String() = {"申請", "取消"}
-        tsCancel.Visible = Array.Exists(cancelState, Function(s As String) s = text)
-        tsIn.Visible = Array.Exists(InState, Function(s As String) s = text) And shop.Destine Is CurrentAccess
-        tsOut.Visible = Array.Exists(OutState, Function(s As String) s = text) And shop.Source Is CurrentAccess
+        Dim IsSource As Boolean = shop.Source Is CurrentAccess
+        Dim IsDestine As Boolean = shop.Destine Is CurrentAccess
+
+        tsCancel.Visible = Array.Exists(cancelState, Function(s As String) s = text) And (IsSource Or IsDestine)
+        tsIn.Visible = Array.Exists(InState, Function(s As String) s = text) And IsDestine
+        tsOut.Visible = Array.Exists(OutState, Function(s As String) s = text) And IsSource
+    End Sub
+
+    Private Sub access_ConnectStateChanged(ByVal Client As TCPTool.Client) Handles access.ConnectedFail, access.ConnectedSuccess
+        UpdateTitle()
     End Sub
 
 
@@ -255,6 +306,10 @@ Public Class winStockMoveList
     Private Sub 欄位顯示ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 欄位顯示ToolStripMenuItem.Click
         If DataGridViewVisibleDialog.ShowDialog(dgList) Then Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
     End Sub
+
+
+
+
 
 
 

@@ -60,7 +60,7 @@ Partial Class winStockIn
         Me.txtLabel.Location = New System.Drawing.Point(75, 29)
         Me.txtLabel.Name = "txtLabel"
         Me.txtLabel.Size = New System.Drawing.Size(127, 22)
-        Me.txtLabel.TabIndex = 14
+        Me.txtLabel.TabIndex = 0
         '
         'Label2
         '
@@ -85,7 +85,7 @@ Partial Class winStockIn
         Me.txtDate.Location = New System.Drawing.Point(284, 29)
         Me.txtDate.Name = "txtDate"
         Me.txtDate.Size = New System.Drawing.Size(127, 22)
-        Me.txtDate.TabIndex = 14
+        Me.txtDate.TabIndex = 1
         '
         'Label4
         '
@@ -101,7 +101,7 @@ Partial Class winStockIn
         Me.txtIMEI.Location = New System.Drawing.Point(77, 128)
         Me.txtIMEI.Name = "txtIMEI"
         Me.txtIMEI.Size = New System.Drawing.Size(127, 22)
-        Me.txtIMEI.TabIndex = 14
+        Me.txtIMEI.TabIndex = 6
         '
         'Label5
         '
@@ -127,14 +127,14 @@ Partial Class winStockIn
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
         Me.txtNote.Size = New System.Drawing.Size(394, 77)
-        Me.txtNote.TabIndex = 17
+        Me.txtNote.TabIndex = 11
         '
         'txtCost
         '
         Me.txtCost.Location = New System.Drawing.Point(77, 168)
         Me.txtCost.Name = "txtCost"
         Me.txtCost.Size = New System.Drawing.Size(127, 22)
-        Me.txtCost.TabIndex = 14
+        Me.txtCost.TabIndex = 8
         '
         'Label7
         '
@@ -151,7 +151,7 @@ Partial Class winStockIn
         Me.txtPrice.Location = New System.Drawing.Point(286, 165)
         Me.txtPrice.Name = "txtPrice"
         Me.txtPrice.Size = New System.Drawing.Size(127, 22)
-        Me.txtPrice.TabIndex = 14
+        Me.txtPrice.TabIndex = 9
         '
         'Label8
         '
@@ -167,7 +167,7 @@ Partial Class winStockIn
         Me.txtNumber.Location = New System.Drawing.Point(286, 128)
         Me.txtNumber.Name = "txtNumber"
         Me.txtNumber.Size = New System.Drawing.Size(127, 22)
-        Me.txtNumber.TabIndex = 14
+        Me.txtNumber.TabIndex = 7
         '
         'Label9
         '
@@ -183,7 +183,7 @@ Partial Class winStockIn
         Me.btOK.Location = New System.Drawing.Point(351, 337)
         Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
-        Me.btOK.TabIndex = 19
+        Me.btOK.TabIndex = 12
         Me.btOK.Text = "新增"
         Me.btOK.UseVisualStyleBackColor = True
         '
@@ -192,7 +192,7 @@ Partial Class winStockIn
         Me.btSelectSupplier.Location = New System.Drawing.Point(77, 93)
         Me.btSelectSupplier.Name = "btSelectSupplier"
         Me.btSelectSupplier.Size = New System.Drawing.Size(284, 23)
-        Me.btSelectSupplier.TabIndex = 20
+        Me.btSelectSupplier.TabIndex = 4
         Me.btSelectSupplier.Text = "新增"
         Me.btSelectSupplier.UseVisualStyleBackColor = True
         '
@@ -201,7 +201,7 @@ Partial Class winStockIn
         Me.btSelectGoods.Location = New System.Drawing.Point(75, 61)
         Me.btSelectGoods.Name = "btSelectGoods"
         Me.btSelectGoods.Size = New System.Drawing.Size(286, 23)
-        Me.btSelectGoods.TabIndex = 20
+        Me.btSelectGoods.TabIndex = 2
         Me.btSelectGoods.Text = "新增"
         Me.btSelectGoods.UseVisualStyleBackColor = True
         '
@@ -210,7 +210,7 @@ Partial Class winStockIn
         Me.btResetGoods.Location = New System.Drawing.Point(367, 61)
         Me.btResetGoods.Name = "btResetGoods"
         Me.btResetGoods.Size = New System.Drawing.Size(46, 23)
-        Me.btResetGoods.TabIndex = 21
+        Me.btResetGoods.TabIndex = 3
         Me.btResetGoods.Text = "清除"
         Me.btResetGoods.UseVisualStyleBackColor = True
         '
@@ -219,7 +219,7 @@ Partial Class winStockIn
         Me.btResetSupplier.Location = New System.Drawing.Point(367, 93)
         Me.btResetSupplier.Name = "btResetSupplier"
         Me.btResetSupplier.Size = New System.Drawing.Size(46, 23)
-        Me.btResetSupplier.TabIndex = 21
+        Me.btResetSupplier.TabIndex = 5
         Me.btResetSupplier.Text = "清除"
         Me.btResetSupplier.UseVisualStyleBackColor = True
         '
@@ -228,7 +228,7 @@ Partial Class winStockIn
         Me.btUpdateCostByHistory.Location = New System.Drawing.Point(107, 196)
         Me.btUpdateCostByHistory.Name = "btUpdateCostByHistory"
         Me.btUpdateCostByHistory.Size = New System.Drawing.Size(97, 23)
-        Me.btUpdateCostByHistory.TabIndex = 22
+        Me.btUpdateCostByHistory.TabIndex = 10
         Me.btUpdateCostByHistory.Text = "與商品進價同步"
         Me.btUpdateCostByHistory.UseVisualStyleBackColor = True
         '
