@@ -1,3 +1,8 @@
+20120213
+1.修正Client端登入依然會從本機資料庫登入的Bug。
+2.修正當登入的Server不是預設的連線端時，主畫面的Title不會變的Bug。
+3.當選擇不同的Server登入時，主畫面的資料會自動切換到所登入的Server。
+
 20120212
 1.修正當儲存的Client資料沒有Name時發生的錯誤。
 2.修正AccessClient接收指令UpdateStockMove錯誤的問題，改為ChangedStockMove。

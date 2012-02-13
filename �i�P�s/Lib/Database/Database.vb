@@ -28,9 +28,10 @@
         Dim User As Personnel
         Dim State As LoginState
         Dim msg As String
+        Dim Client As Access
 
-        Sub New(ByVal state As LoginState, ByVal msg As String, ByVal user As Personnel)
-            Me.State = state : Me.msg = msg : Me.User = user
+        Sub New(ByVal state As LoginState, ByVal msg As String, ByVal user As Personnel, ByVal Client As Access)
+            Me.State = state : Me.msg = msg : Me.User = user : Me.Client = Client
         End Sub
     End Structure
 
@@ -107,14 +108,13 @@
 
             Dim result As LoginResult
 
-            Dim r_user As Personnel = myDatabase.GetPersonnelByID(ID)
-
+            Dim r_user As Personnel = GetPersonnelByID(ID)
             If r_user.IsNull() Then
-                result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest)
+                result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest, Me)
             ElseIf r_user.Password <> Password Then
-                result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest)
+                result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest, Me)
             Else
-                result = New LoginResult(LoginState.Success, "登入成功!", r_user)
+                result = New LoginResult(LoginState.Success, "登入成功!", r_user, Me)
                 'CurrentUser = user
             End If
 
@@ -128,7 +128,7 @@
         End Sub
 
         Public Overridable Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
-            Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest)
+            Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest, Me)
             If TriggerEvent Then RaiseEvent Account_Logout(Me, result)
         End Sub
 
@@ -647,18 +647,18 @@
         End Sub
 
         Private Sub CreateSalesWithoutEvent(ByVal newSales As Sales, ByVal SalesGoods() As SalesGoods, ByVal OrderGoods() As OrderGoods, ByVal SalesContracts() As SalesContract)
-            myDatabase.AddBase(newSales)
+            AddBase(newSales)
 
             For Each g As SalesGoods In SalesGoods
-                myDatabase.AddBase(g)
+                AddBase(g)
             Next
 
             For Each o As OrderGoods In OrderGoods
-                myDatabase.AddBase(o)
+                AddBase(o)
             Next
 
             For Each c As SalesContract In SalesContracts
-                myDatabase.AddBase(c)
+                AddBase(c)
             Next
         End Sub
 
@@ -1220,7 +1220,7 @@
         'End Function
 
         Public Sub AddLog(ByVal Time As Date, ByVal Message As String)
-            AddLog(New Log(User.Label, Time, Message))
+            AddLog(New Log(User.Label, Time, Strings.Left(Message, 40)))
         End Sub
 
         Event CreatedLog(ByVal sender As Object, ByVal log As Log)

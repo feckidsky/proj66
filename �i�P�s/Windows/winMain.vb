@@ -139,7 +139,8 @@ Public Class winMain
 
 
     Private Sub 登入IToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登入IToolStripMenuItem.Click, 登入IToolStripMenuItem1.Click
-        winLogIn.ShowDialog(access)
+        Dim result As LoginResult = winLogIn.ShowDialog(access)
+        If result.State = LoginState.Success Then access = result.Client
     End Sub
 
 

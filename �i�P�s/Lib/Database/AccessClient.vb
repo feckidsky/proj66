@@ -67,15 +67,15 @@
             Next
         End Sub
 
-        Public Function Login(ByVal ID As String, ByVal Password As String, Optional ByVal Trigger As Boolean = True) As LoginResult
-            For Each c As Access In Client
-                If c.GetType Is GetType(Access) OrElse (c.GetType Is GetType(AccessClient) AndAlso c.Connected) Then
-                    Return c.LogIn(ID, Password, Trigger)
-                End If
-            Next
+        'Public Function Login(ByVal ID As String, ByVal Password As String, Optional ByVal Trigger As Boolean = True) As LoginResult
+        '    For Each c As Access In Client
+        '        If c.GetType Is GetType(Access) OrElse (c.GetType Is GetType(AccessClient) AndAlso c.Connected) Then
+        '            Return c.LogIn(ID, Password, Trigger)
+        '        End If
+        '    Next
 
-            Return New LoginResult(LoginState.Disconnect, "尚未連線", Personnel.Guest)
-        End Function
+        '    Return New LoginResult(LoginState.Disconnect, "尚未連線", Personnel.Guest, Nothing)
+        'End Function
 
         Public Function GetNameList() As String()
             Return Array.ConvertAll(Client, Function(c As Access) c.Name)

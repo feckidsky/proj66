@@ -80,6 +80,4 @@ Public Class winLogIn
         End If
 
     End Sub
-
-
 End Class
