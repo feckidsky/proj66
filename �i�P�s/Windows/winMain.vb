@@ -397,7 +397,7 @@ Public Class winMain
 
 
     Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
-        Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex, sales.Label)
+        Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
     End Sub
@@ -444,6 +444,7 @@ Public Class winMain
             Me.Invoke(UpdateSalesListHandler)
             Exit Sub
         End If
+        If LoginSetting.AutoLog And m_access.User.IsGuest() Then access.LogIn(LoginSetting.ID, LoginSetting.Password)
         UpdateTitleHandler()
         UpdateSalesListHandler()
         UpdateLogList()
@@ -453,15 +454,19 @@ Public Class winMain
     Dim UpdateLogListHandler As New Action(AddressOf UpdateLogList)
     Private Sub UpdateLogList()
         If Not Me.Created Or access Is Nothing Then Exit Sub
+
         If Me.InvokeRequired Then
             Me.Invoke(UpdateLogListHandler)
             Exit Sub
         End If
 
+
         dtLog = access.GetLogList(StartTime, EndTime, "")
+
         dgLog.DataSource = dtLog
 
-        If dtLog Is Nothing Then Exit Sub
+        If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
+
         dgLog.Columns("員工編號").Visible = False
         dgLog.Columns("內容").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
         dgLog.Sort(dgLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
@@ -470,6 +475,16 @@ Public Class winMain
     Dim CreateLogHandler As New Action(Of Object())(AddressOf CreateLogRow)
 
     Private Sub CreateLogRow(ByVal arr As Object)
+        'If dtLog Is Nothing Then
+        '    dtLog = New DataTable() {}
+
+        'End If
+
+        For Each row As DataRow In dtLog.Rows
+            If row(0) = arr(0) And row(1) = arr(1) Then
+                Exit Sub
+            End If
+        Next
 
         dtLog.Rows.Add(CType(arr, Object()))
         dgLog.Sort(dgLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
@@ -567,5 +582,15 @@ Public Class winMain
         Me.登入IToolStripMenuItem.Visible = CurrentUser.IsGuest()
         Me.登出OToolStripMenuItem.Visible = Not CurrentUser.IsGuest()
         Me.修改密碼PToolStripMenuItem.Visible = Not CurrentUser.IsGuest()
+    End Sub
+
+    Private Sub 還原ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 還原ToolStripMenuItem.Click
+        'Me.Visible = True
+        Me.Show()
+    End Sub
+
+    Private Sub cmsSystem_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cmsSystem.Opening
+        還原ToolStripMenuItem.Visible = Not Me.Visible
+        縮到工具列TToolStripMenuItem.Visible = Me.Visible
     End Sub
 End Class

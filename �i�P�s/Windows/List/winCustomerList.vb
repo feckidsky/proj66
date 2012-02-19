@@ -27,7 +27,8 @@
     End Sub
 
 
-    Public Function SelectDialog() As Database.Customer
+    Public Function SelectDialog(ByVal db As Database.Access) As Database.Customer
+        Me.access = db
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         work = Mode.SelectItem
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then

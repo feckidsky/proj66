@@ -382,7 +382,7 @@ Public Class winSales
     End Sub
 
     Private Sub txtCustomer_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtCustomer.Click
-        Dim cur As Database.Customer = winCustomerList.SelectDialog()
+        Dim cur As Database.Customer = winCustomerList.SelectDialog(access)
         If Not cur.IsNull() Then
             Customer = cur
             txtCustomer.Text = cur.Name

@@ -147,7 +147,7 @@ Public Class winStockMoveList
         Dim shop As ShopArgs = GetShopState(row)
         Dim text As String = row.Cells(idxAction).Value
 
-        Dim cancelState As String() = {"申請", "調出(未送達)", "調貨中"}
+        Dim cancelState As String() = {"申請", "調出(未送達)"}
         Dim InState As String() = {"調貨中", "取消"}
         Dim OutState As String() = {"申請", "取消"}
         Dim IsSource As Boolean = shop.Source Is CurrentAccess

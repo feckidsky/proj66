@@ -93,7 +93,7 @@
         stock.Label = dgStockLog.SelectedRows(0).Cells(0).Value
 
         Dim Count As Integer = access.GetSalesListByStockLabel(stock.Label).Rows.Count
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then Count += c.GetSalesListByStockLabel(stock.Label).Rows.Count
         Next
 
@@ -146,7 +146,7 @@
         If Me.InvokeRequired Then
             Me.Invoke(invChange, row)
         Else
-            invCreate.Invoke(row)
+            invChange.Invoke(row)
         End If
     End Sub
 

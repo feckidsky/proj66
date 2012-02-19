@@ -1021,7 +1021,7 @@
             AddBase(data)
             Select Case data.Action
                 Case StockMove.Type.Request, StockMove.Type.Sending
-                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.Label).Name & " - " & data.SourceShop & "->" & data.DestineShop)
+                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.GoodsLabel).Name & " - " & data.SourceShop & "->" & data.DestineShop)
             End Select
 
             If trigger Then OnCreatedStockMove(data)
@@ -1031,7 +1031,7 @@
             Command(data.GetUpdateSqlCommand(), BasePath)
             Select Case data.Action
                 Case StockMove.Type.Cancel, StockMove.Type.In, StockMove.Type.Sending
-                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.Label).Name & " - " & data.SourceShop & "->" & data.DestineShop)
+                    AddLog(Now, "調貨:" & StockMove.TypeText(data.Action) & " - " & GetGoods(data.GoodsLabel).Name & " - " & data.SourceShop & "->" & data.DestineShop)
             End Select
 
             If trigger Then OnChangedStockMove(data)

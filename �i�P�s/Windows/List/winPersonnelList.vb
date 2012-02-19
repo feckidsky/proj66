@@ -19,7 +19,7 @@
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
         access = DB
-        ShowDialog()
+        ShowDialog(DB)
     End Sub
 
     Public Overloads Sub ShowDialog(ByVal DB As Database.Access)
