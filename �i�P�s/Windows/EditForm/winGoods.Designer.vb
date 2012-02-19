@@ -35,8 +35,8 @@ Partial Class winGoods
         Me.txtPrice = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
         Me.Label7 = New System.Windows.Forms.Label
-        Me.cbKind = New System.Windows.Forms.ComboBox
-        Me.cbBrand = New System.Windows.Forms.ComboBox
+        Me.cbKind = New FilterComboBox
+        Me.cbBrand = New FilterComboBox
         Me.SuspendLayout()
         '
         'Label6
@@ -203,6 +203,6 @@ Partial Class winGoods
     Friend WithEvents txtPrice As System.Windows.Forms.TextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents cbKind As System.Windows.Forms.ComboBox
-    Friend WithEvents cbBrand As System.Windows.Forms.ComboBox
+    Friend WithEvents cbKind As FilterComboBox
+    Friend WithEvents cbBrand As FilterComboBox
 End Class

@@ -27,8 +27,8 @@ Partial Class winHistoryPrice
         Me.btAdd = New System.Windows.Forms.Button
         Me.txtTime = New System.Windows.Forms.TextBox
         Me.txtLabel = New System.Windows.Forms.TextBox
-        Me.txtPrice = New System.Windows.Forms.TextBox
-        Me.txtCost = New System.Windows.Forms.TextBox
+        Me.txtPrice = New NumberBox
+        Me.txtCost = New NumberBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.btCancel = New System.Windows.Forms.Button
@@ -148,8 +148,8 @@ Partial Class winHistoryPrice
     Friend WithEvents btAdd As System.Windows.Forms.Button
     Friend WithEvents txtTime As System.Windows.Forms.TextBox
     Friend WithEvents txtLabel As System.Windows.Forms.TextBox
-    Friend WithEvents txtPrice As System.Windows.Forms.TextBox
-    Friend WithEvents txtCost As System.Windows.Forms.TextBox
+    Friend WithEvents txtPrice As NumberBox
+    Friend WithEvents txtCost As NumberBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents btCancel As System.Windows.Forms.Button

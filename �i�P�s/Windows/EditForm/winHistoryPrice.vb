@@ -45,18 +45,20 @@ Public Class winHistoryPrice
     Public Function GetData() As HistoryPrice
         Dim Data As HistoryPrice
         Data.GoodsLabel = txtLabel.Text
-        Data.Time = txtTime.Text
-        Data.Price = txtPrice.Text
-        Data.Cost = txtCost.Text
+        Date.TryParse(txtTime.Text, Data.Time)
+        Single.TryParse(txtPrice.Text, Data.Price)
+        Single.TryParse(txtCost.Text, Data.Cost)
         Return Data
     End Function
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
 
+        Dim data As HistoryPrice = GetData()
+
         If Work = Mode.Create Then
-            access.AddHistoryPrice(GetData())
+            access.AddHistoryPrice(data)
         Else
-            access.ChangeHistoryPrice(GetData())
+            access.ChangeHistoryPrice(data)
         End If
 
         Me.Close()

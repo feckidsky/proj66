@@ -63,6 +63,7 @@
         UpdateTitle("Note", "備註")
         UpdateTitle("Authority", "權限")
         UpdateTitle("ID", "帳號")
+        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.UpdateComboBox()
     End Sub
 
@@ -118,7 +119,7 @@
 
 
         Dim count As Integer = access.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then count += c.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
         Next
         If count > 0 Then

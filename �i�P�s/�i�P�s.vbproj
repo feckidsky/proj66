@@ -19,6 +19,12 @@
     <OptionInfer>On</OptionInfer>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ApplicationIcon>0017.ico</ApplicationIcon>
+    <ManifestCertificateThumbprint>99CD26B5A9437C0A843EDF762B47999F8CBDACD8</ManifestCertificateThumbprint>
+    <ManifestKeyFile>進銷存_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <TargetZone>LocalIntranet</TargetZone>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <SignManifests>true</SignManifests>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,7 +35,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -89,12 +95,19 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Controls\FilterComboBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Lib\Database\AccessServer.vb" />
     <Compile Include="Lib\DataGridViewFilter.vb" />
     <Compile Include="Lib\Database\Database.vb" />
     <Compile Include="Lib\ErrorLog.vb" />
     <Compile Include="Lib\Database\AccessClient.vb" />
     <Compile Include="Lib\TCPTool.vb" />
+    <Compile Include="Controls\NumberBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Windows\Dialog\DataGridViewPrintDialog.Designer.vb">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
     </Compile>
@@ -129,6 +142,12 @@
       <DependentUpon>winCustomer.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\EditForm\winCustomer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Dialog\ErrorDialog.Designer.vb">
+      <DependentUpon>ErrorDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Dialog\ErrorDialog.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\winNotify.Designer.vb">
@@ -295,6 +314,10 @@
       <DependentUpon>winCustomer.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Dialog\ErrorDialog.resx">
+      <DependentUpon>ErrorDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\List\winContractList.resx">
       <DependentUpon>winContractList.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -383,6 +406,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

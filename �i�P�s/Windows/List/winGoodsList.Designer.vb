@@ -177,25 +177,25 @@ Partial Class winGoodsList
         '
         Me.cmsHistory.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsAddHistoryPrice, Me.tsEditHistoryPrice, Me.tsDeleteHistoryPrice})
         Me.cmsHistory.Name = "cmsEdit"
-        Me.cmsHistory.Size = New System.Drawing.Size(118, 70)
+        Me.cmsHistory.Size = New System.Drawing.Size(166, 70)
         '
         'tsAddHistoryPrice
         '
         Me.tsAddHistoryPrice.Name = "tsAddHistoryPrice"
-        Me.tsAddHistoryPrice.Size = New System.Drawing.Size(117, 22)
-        Me.tsAddHistoryPrice.Text = "新增(&A)"
+        Me.tsAddHistoryPrice.Size = New System.Drawing.Size(165, 22)
+        Me.tsAddHistoryPrice.Text = "新增歷史售價(&A)"
         '
         'tsEditHistoryPrice
         '
         Me.tsEditHistoryPrice.Name = "tsEditHistoryPrice"
-        Me.tsEditHistoryPrice.Size = New System.Drawing.Size(117, 22)
-        Me.tsEditHistoryPrice.Text = "修改(&C)"
+        Me.tsEditHistoryPrice.Size = New System.Drawing.Size(165, 22)
+        Me.tsEditHistoryPrice.Text = "修改歷史售價(&C)"
         '
         'tsDeleteHistoryPrice
         '
         Me.tsDeleteHistoryPrice.Name = "tsDeleteHistoryPrice"
-        Me.tsDeleteHistoryPrice.Size = New System.Drawing.Size(117, 22)
-        Me.tsDeleteHistoryPrice.Text = "刪除(&D)"
+        Me.tsDeleteHistoryPrice.Size = New System.Drawing.Size(165, 22)
+        Me.tsDeleteHistoryPrice.Text = "刪除歷史售價(&D)"
         '
         'SplitContainer1
         '

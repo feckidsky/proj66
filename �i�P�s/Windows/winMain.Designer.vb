@@ -24,7 +24,7 @@ Partial Class winMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -76,6 +76,7 @@ Partial Class winMain
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.關閉QToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.縮到工具列TToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.還原ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.cbForm = New System.Windows.Forms.ComboBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
@@ -84,7 +85,7 @@ Partial Class winMain
         Me.cmsLog = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.還原ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.Button1 = New System.Windows.Forms.Button
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsSales.SuspendLayout()
@@ -151,24 +152,24 @@ Partial Class winMain
         '供應商ToolStripMenuItem
         '
         Me.供應商ToolStripMenuItem.Name = "供應商ToolStripMenuItem"
-        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.供應商ToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.供應商ToolStripMenuItem.Text = "供應商(&S)"
         '
         '客戶CToolStripMenuItem
         '
         Me.客戶CToolStripMenuItem.Name = "客戶CToolStripMenuItem"
-        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.客戶CToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.客戶CToolStripMenuItem.Text = "客戶(&C)"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(124, 6)
         '
         '員工PToolStripMenuItem
         '
         Me.員工PToolStripMenuItem.Name = "員工PToolStripMenuItem"
-        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.員工PToolStripMenuItem.Size = New System.Drawing.Size(127, 22)
         Me.員工PToolStripMenuItem.Text = "員工(&P)"
         '
         '合約CToolStripMenuItem
@@ -422,42 +423,48 @@ Partial Class winMain
         '
         Me.cmsSystem.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem1, Me.登出OToolStripMenuItem1, Me.開啟OToolStripMenuItem, Me.ToolStripSeparator1, Me.關閉QToolStripMenuItem, Me.縮到工具列TToolStripMenuItem, Me.還原ToolStripMenuItem})
         Me.cmsSystem.Name = "cmsSystem"
-        Me.cmsSystem.Size = New System.Drawing.Size(153, 164)
+        Me.cmsSystem.Size = New System.Drawing.Size(137, 142)
         '
         '登入IToolStripMenuItem1
         '
         Me.登入IToolStripMenuItem1.Name = "登入IToolStripMenuItem1"
-        Me.登入IToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+        Me.登入IToolStripMenuItem1.Size = New System.Drawing.Size(136, 22)
         Me.登入IToolStripMenuItem1.Text = "登入"
         '
         '登出OToolStripMenuItem1
         '
         Me.登出OToolStripMenuItem1.Name = "登出OToolStripMenuItem1"
-        Me.登出OToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+        Me.登出OToolStripMenuItem1.Size = New System.Drawing.Size(136, 22)
         Me.登出OToolStripMenuItem1.Text = "登出"
         '
         '開啟OToolStripMenuItem
         '
         Me.開啟OToolStripMenuItem.Name = "開啟OToolStripMenuItem"
-        Me.開啟OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.開啟OToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.開啟OToolStripMenuItem.Text = "開啟"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(133, 6)
         '
         '關閉QToolStripMenuItem
         '
         Me.關閉QToolStripMenuItem.Name = "關閉QToolStripMenuItem"
-        Me.關閉QToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.關閉QToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.關閉QToolStripMenuItem.Text = "關閉"
         '
         '縮到工具列TToolStripMenuItem
         '
         Me.縮到工具列TToolStripMenuItem.Name = "縮到工具列TToolStripMenuItem"
-        Me.縮到工具列TToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.縮到工具列TToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.縮到工具列TToolStripMenuItem.Text = "縮到工具列"
+        '
+        '還原ToolStripMenuItem
+        '
+        Me.還原ToolStripMenuItem.Name = "還原ToolStripMenuItem"
+        Me.還原ToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.還原ToolStripMenuItem.Text = "還原"
         '
         'GroupBox2
         '
@@ -500,14 +507,14 @@ Partial Class winMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgLog.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
-        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgLog.Location = New System.Drawing.Point(6, 21)
         Me.dgLog.Name = "dgLog"
         Me.dgLog.ReadOnly = True
@@ -534,17 +541,21 @@ Partial Class winMain
         Me.全部刪除ToolStripMenuItem.Size = New System.Drawing.Size(124, 22)
         Me.全部刪除ToolStripMenuItem.Text = "全部刪除"
         '
-        '還原ToolStripMenuItem
+        'Button1
         '
-        Me.還原ToolStripMenuItem.Name = "還原ToolStripMenuItem"
-        Me.還原ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.還原ToolStripMenuItem.Text = "還原"
+        Me.Button1.Location = New System.Drawing.Point(720, 4)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 6
+        Me.Button1.Text = "test"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(795, 662)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.dgSales)
@@ -629,4 +640,5 @@ Partial Class winMain
     Friend WithEvents 刪除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 全部刪除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 還原ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class

@@ -30,6 +30,7 @@ Public Class winGoodsList
 
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         work = Mode.SelectItem
+        If Me.Visible Then Me.Visible = False
         If MyBase.ShowDialog() = Windows.Forms.DialogResult.OK Then
             Return GetSelectedGoods()
         Else
@@ -49,6 +50,7 @@ Public Class winGoodsList
         UpdateTitle("Kind", "種類")
         UpdateTitle("Brand", "廠牌")
         UpdateTitle("Note", "備註")
+        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.UpdateComboBox()
 
         If dgGoodsList.Rows.Count > 0 Then
@@ -110,7 +112,7 @@ Public Class winGoodsList
 
         'Dim SelectedGoods As Database.Goods = selected
         Dim count As Integer = access.GetStockLogByGoodsLabel(selected.Label).Rows.Count
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then count += c.GetStockLogByGoodsLabel(selected.Label).Rows.Count
         Next
         If count > 0 Then
@@ -149,7 +151,11 @@ Public Class winGoodsList
     Delegate Sub ItemUpdate()
     Dim invGoods As New ItemUpdate(AddressOf UpdateGoodsList)
     Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
-        Me.Invoke(invGoods)
+        If Me.InvokeRequired Then
+            Me.Invoke(invGoods)
+        Else
+            invGoods()
+        End If
         'UpdateGoodsList()
     End Sub
 
@@ -226,6 +232,11 @@ Public Class winGoodsList
         Dim selectedHisPrice As Database.HistoryPrice = GetSelectedHistoryPrice()
         If selectedHisPrice.IsNull Then
             MsgBox("您至少必須選擇一個項目", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        If dgHistory.Rows.Count = 1 Then
+            MsgBox("無法刪除，商品最少必須有一筆歷史售價!", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
 

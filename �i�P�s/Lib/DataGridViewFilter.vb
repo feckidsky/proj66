@@ -334,10 +334,11 @@
 
         If e.Button <> Windows.Forms.MouseButtons.Right Then Exit Sub
         Dim rec As Rectangle = DataGrid.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, False)
-        Dim loc As New Point(rec.X, rec.Y + rec.Height)
+        Dim loc As New Point(rec.X, rec.Y) '+ rec.Height)
         Dim HeaderText As String = DataGrid.Columns(e.ColumnIndex).HeaderText
         For i As Integer = 0 To TextFilters.Count - 1
             If TextFilters(i).HeaderName = HeaderText Then
+                loc.Offset(0, -TextFilters(i).cms.Height)
                 TextFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If
@@ -346,6 +347,7 @@
 
         For i As Integer = 0 To NumberFilters.Count - 1
             If NumberFilters(i).HeaderName = HeaderText Then
+                loc.Offset(0, -NumberFilters(i).cms.Height)
                 NumberFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If
@@ -354,6 +356,7 @@
 
         For i As Integer = 0 To BoolFilters.Count - 1
             If BoolFilters(i).HeaderName = HeaderText Then
+                loc.Offset(0, -BoolFilters(i).cms.Height)
                 BoolFilters(i).cms.Show(sender, loc)
                 Exit Sub
             End If

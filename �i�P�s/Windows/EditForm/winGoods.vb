@@ -58,15 +58,25 @@ Public Class winGoods
     End Function
 
     Public Function GetHistoryPrice() As HistoryPrice
-        Dim data As HistoryPrice
-        data.Cost = Val(txtCost.Text)
-        data.Price = Val(txtPrice.Text)
+        Dim data As New HistoryPrice
+        Single.TryParse(txtCost.Text, data.Cost)
+        Single.TryParse(txtPrice.Text, data.Price)
         data.GoodsLabel = txtLabel.Text
         data.Time = Now
         Return data
     End Function
 
     Private Sub btAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAdd.Click
+
+        If txtCost.Text = "" And Work = Mode.Create Then
+            MsgBox("尚未輸入進貨價", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        If txtPrice.Text = "" And Work = Mode.Create Then
+            MsgBox("尚未輸入建議售價", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
 
         If Work = Mode.Create Then
             access.AddGoods(GetData())

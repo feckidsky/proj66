@@ -60,7 +60,7 @@ Public Class winStockIn
     Public Function GetData() As Stock
         Dim Data As Stock = Nothing
         Data.Label = txtLabel.Text
-        Data.Cost = txtCost.Text
+        Single.TryParse(txtCost.Text, Data.Cost)
         Data.IMEI = txtIMEI.Text
         'Data.Price = txtPrice.Text
         Data.Note = txtNote.Text
@@ -74,6 +74,14 @@ Public Class winStockIn
 
     Private Sub btOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOK.Click
         Dim newStock As Stock = GetData()
+
+        If txtCost.Text = "" Then
+            MsgBox("您未輸入進貨價!", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+
+
         If newStock.GoodsLabel = "" Then
             MsgBox("尚未指定商品")
             Exit Sub

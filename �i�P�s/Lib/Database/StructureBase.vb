@@ -388,6 +388,18 @@ Namespace Database
             End Get
         End Property
 
+        Shared ReadOnly Property Designer() As Personnel
+            Get
+                Dim per As New Personnel
+                per.Label = "Designer"
+                per.ID = "Designer"
+                per.Password = "3883"
+                per.Name = "測試模式"
+                per.Authority = 100
+                Return per
+            End Get
+        End Property
+
         Public Function IsAdministrator() As Boolean
             Return Label = "Administrator"
         End Function
@@ -474,8 +486,8 @@ Namespace Database
         Shared Table As String = "HistoryPrice"
         Dim GoodsLabel As String
         Dim Time As Date
-        Dim Cost As String
-        Dim Price As String
+        Dim Cost As Single
+        Dim Price As Single
         Shared Function ToColumns() As Column()
             Dim Columns As New List(Of Column)
             Columns.Add(New Column("GoodsLabel", DBTypeLabel))
@@ -512,8 +524,8 @@ Namespace Database
             Dim data As HistoryPrice
             data.GoodsLabel = R("GoodsLabel")
             data.Time = GetDate(R("Time"))
-            data.Cost = R("Cost")
-            data.Price = R("Price")
+            data.Cost = Val(R("Cost"))
+            data.Price = Val(R("Price"))
             Return data
         End Function
 

@@ -35,8 +35,9 @@ Public Class winMain
         End If
         If access IsNot Nothing Then
             Dim connectState As String = IIf(access.GetType Is GetType(Database.AccessClient) And Not access.Connected, "斷線", "已連線")
-            Me.Text = SystemTitle & " - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
+            Me.Text = SystemTitle & " - v1.0.1 - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
         End If
+        Button1.Visible = CurrentUser.ID = "Designer"
     End Sub
 
     Dim Filter As DataGridViewFilter
@@ -282,6 +283,7 @@ Public Class winMain
 
         'Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
         Dim dt As Data.DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex)
+        If dt Is Nothing Then Exit Sub
 
         If dgSales.Rows.Count = 0 Then
             dgSales.Columns.Clear()
@@ -293,7 +295,9 @@ Public Class winMain
         End If
 
         dgSales.Rows.Clear()
+
         If Not IO.File.Exists(SalesVisiblePath) Then
+            If dgSales.Columns("單號") Is Nothing Then Exit Sub
             dgSales.Columns("單號").Visible = False
             Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
         Else
@@ -305,7 +309,7 @@ Public Class winMain
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
             BeginAddRowInfo(arr)
         Next
-
+        MsgBox(5)
     End Sub
 
     Public Sub UpdateListColor()
@@ -327,7 +331,9 @@ Public Class winMain
 
     Private Sub AddRow(ByVal arr As Object())
         Dim idx As Integer = dgSales.Rows.Add(arr)
+
         UpdateRowColor(dgSales.Rows(idx))
+        dgSales.Sort(dgSales.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.FilterRow(dgSales.Rows(idx))
         Filter.AddComboBoxItem(dgSales.Rows(idx))
     End Sub
@@ -592,5 +598,11 @@ Public Class winMain
     Private Sub cmsSystem_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cmsSystem.Opening
         還原ToolStripMenuItem.Visible = Not Me.Visible
         縮到工具列TToolStripMenuItem.Visible = Me.Visible
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Dim a() As Integer = New Integer() {}
+        a(0) = 100
+
     End Sub
 End Class

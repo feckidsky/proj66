@@ -50,6 +50,7 @@
         UpdateTitle("Tel2", "電話2")
         UpdateTitle("Addr", "地址")
         UpdateTitle("Note", "備註")
+        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.UpdateComboBox()
     End Sub
 
@@ -103,7 +104,7 @@
 
 
         Dim count As Integer = access.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
-        For Each c As Database.AccessClient In Client.Client
+        For Each c As Database.Access In Client.Client
             If c.Connected Then count += c.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
         Next
 

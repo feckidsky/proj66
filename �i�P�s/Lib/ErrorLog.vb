@@ -10,7 +10,9 @@ Public Class ErrorLog
 
     Public Shared Sub Enable()
         '委派錯誤訊息
+        'Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException)
         AddHandler AppDomain.CurrentDomain.UnhandledException, AddressOf OnUnhandledException
+        AddHandler Application.ThreadException, AddressOf OnThreadException
     End Sub
 
     Public Shared Sub Enable(ByVal Dir As String)
@@ -29,8 +31,15 @@ Public Class ErrorLog
 
 
 #Region "記錄錯誤訊息"
+
+    Public Shared Sub OnThreadException(ByVal sender As Object, ByVal e As Threading.ThreadExceptionEventArgs)
+        WriteErrorLog(e.Exception)
+        ErrorDialog.ShowDialog(Dir, GetErrorMessage(e.Exception))
+        RaiseEvent ErrorOccur()
+    End Sub
     Public Shared Sub OnUnhandledException(ByVal sender As Object, ByVal e As UnhandledExceptionEventArgs)
         WriteErrorLog(e.ExceptionObject)
+        ErrorDialog.ShowDialog(Dir, GetErrorMessage(e.ExceptionObject))
         RaiseEvent ErrorOccur()
     End Sub
 
@@ -51,6 +60,7 @@ Public Class ErrorLog
         Msg &= "實體記憶體：" & Math.Round((TPM - APM) / 1024 / 1024, 2) & " MB -> " & Math.Round((TPM - APM) / TPM * 100, 2) & "%" & vbCrLf
         Msg &= "虛擬記憶體：" & Math.Round((TVM - AVM) / 1024 / 1024, 2) & " MB -> " & Math.Round((TVM - AVM) / TVM * 100, 2) & "%" & vbCrLf
         Msg &= "---------------------------------------------------" & vbCrLf
+        Msg &= e.TargetSite.DeclaringType.ToString & vbCrLf
         Msg &= e.TargetSite.ToString & ":" & vbCrLf
         Msg &= e.Message & vbCrLf
         Msg &= "---------------------------------------------------" & vbCrLf

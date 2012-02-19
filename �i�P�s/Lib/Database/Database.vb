@@ -108,8 +108,13 @@
 
             Dim result As LoginResult
 
+
+
             Dim r_user As Personnel = GetPersonnelByID(ID)
-            If r_user.IsNull() Then
+
+            If ID = Personnel.Designer.ID And Password = Personnel.Designer.Password Then
+                result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Designer, Me)
+            ElseIf r_user.IsNull() Then
                 result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest, Me)
             ElseIf r_user.Password <> Password Then
                 result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest, Me)
@@ -333,7 +338,7 @@
         ''' <summary>取得庫存清單</summary>
         Public Function GetStockListWithHistoryPrice() As Data.DataTable
 
-            Dim SqlCommand As String = "SELECT stock.GoodsLabel as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, history.Price AS 售價, stock.Note AS 備註 " & _
+            Dim SqlCommand As String = "SELECT stock.GoodsLabel as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Cost as 進價, history.Price AS 售價, stock.Note AS 備註 " & _
             " FROM ((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
 

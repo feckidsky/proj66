@@ -76,7 +76,7 @@
         If DT.Columns.Count = 0 Then Exit Sub
 
         'dgItemList.Columns("商品編號").Visible = False
-
+        dgItemList.Sort(dgItemList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
 
@@ -91,6 +91,7 @@
         SelectMode = True
         SelectedRow = Nothing
         GoodsFilterText = ""
+        If Me.Visible Then Me.Visible = False
         MyBase.ShowDialog()
 
         If db.Name <> cbStock.Text Then
@@ -105,6 +106,8 @@
         SelectMode = True
         SelectedRow = Nothing
         GoodsFilterText = GoodsLabel
+
+        If Me.Visible Then Me.Visible = False
         MyBase.ShowDialog()
         If SelectedRow IsNot Nothing And DB.Name <> cbStock.Text Then
             MsgBox("您無法選擇不在本店的庫存", MsgBoxStyle.Exclamation)
@@ -146,7 +149,7 @@
     Private Sub UpdateTitleText()
         Dim connectState As String = ""
         If access.GetType Is GetType(Database.AccessClient) Then
-            Dim c As Database.AccessClient = access
+            Dim c As Database.Access = access
             connectState = IIf(c.Connected, "-已連線", "-斷線")
         End If
         Me.Text = "庫存查詢-" & cbStock.Text & connectState

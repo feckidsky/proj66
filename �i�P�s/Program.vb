@@ -80,7 +80,7 @@ Public Module Program
     Public SystemTitle As String = "進銷存管理系統"
 
     Public Sub InitialProgram()
-        ErrorLog.Enable()
+
 
         ConfigLoad()
 

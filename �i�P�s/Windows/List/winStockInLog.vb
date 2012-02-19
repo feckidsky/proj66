@@ -42,6 +42,7 @@
 
         dt = access.GetStockLog(StartTime, EndTime)
         dgStockLog.DataSource = dt
+        dgStockLog.Sort(dgStockLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
 

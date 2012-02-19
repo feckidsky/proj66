@@ -112,6 +112,7 @@ Public Class winStockMoveList
         Dim idxAction As Integer = dgList.Columns("狀態").Index
         arr(idxAction) = StockMove.TypeText(arr(idxAction))
         Dim idx As Integer = dgList.Rows.Add(CType(arr, Object()))
+        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.AddComboBoxItem(dgList.Rows(idx))
         Filter.FilterRow(dgList.Rows(idx))
     End Sub
