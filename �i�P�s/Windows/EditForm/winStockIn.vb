@@ -9,7 +9,7 @@ Public Class winStockIn
     End Enum
     Dim Work As Mode
 
-    Dim access As Database.Access
+    WithEvents access As Database.Access
 
     Private SelectedGoods As Database.Goods = Database.Goods.Null()
     Private SelectedSupplier As Database.Supplier = Database.Supplier.Null()
@@ -32,6 +32,17 @@ Public Class winStockIn
 
         MyBase.ShowDialog()
     End Sub
+
+    Public Function Create(ByVal DB As Database.Access, ByVal GoodsLabel As String) As DialogResult
+        access = DB
+        If Not CheckAuthority(2) Then Return Windows.Forms.DialogResult.Cancel
+        Dim data As Stock = GetNewStock()
+        data.GoodsLabel = GoodsLabel
+        Work = Mode.Create
+        UpdateText(data)
+
+        Return MyBase.ShowDialog()
+    End Function
 
     Public Sub Open(ByVal stock As Stock, ByVal DB As Database.Access)
         access = DB
@@ -91,9 +102,10 @@ Public Class winStockIn
             access.AddStock(newStock)
         Else
             access.ChangeStock(newStock)
-
         End If
-        Me.Close()
+
+        ' Me.DialogResult = Windows.Forms.DialogResult.OK
+
     End Sub
 
     Private Sub btAddSupplier_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSelectSupplier.Click
@@ -113,9 +125,6 @@ Public Class winStockIn
             Dim hp As HistoryPrice = access.GetListHistoryPrice(sel.Label)
             txtPrice.Text = hp.Price
             If txtCost.Text = "" Then txtCost.Text = hp.Cost
-
-
-
         End If
     End Sub
 
@@ -134,5 +143,30 @@ Public Class winStockIn
 
     Private Sub btUpdateCostByHistory_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUpdateCostByHistory.Click
         txtCost.Text = access.GetListHistoryPrice(SelectedGoods.Label).Cost
+    End Sub
+
+    Public Sub New()
+
+        ' 此為 Windows Form 設計工具所需的呼叫。
+        InitializeComponent()
+
+        ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
+        Me.DefaultTextBoxImeMode()
+    End Sub
+
+    Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.CreatedStock, access.ChangedStock
+
+
+        If Me.InvokeRequired Then
+            Dim handler As New Action(Of Stock)(AddressOf ReturnDialogResult)
+            Me.Invoke(handler, stock)
+        Else
+            ReturnDialogResult(stock)
+        End If
+    End Sub
+
+    Private Sub ReturnDialogResult(ByVal stock As Stock)
+        If stock.Label <> txtLabel.Text Then Exit Sub
+        DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 End Class

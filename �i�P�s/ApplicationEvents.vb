@@ -10,7 +10,8 @@
     Partial Friend Class MyApplication
 
         Private Sub MyApplication_Startup(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
-            ErrorLog.Enable()
+            Dim errLog As Boolean = Not IO.File.Exists(My.Application.Info.DirectoryPath & "\design")
+            If errLog Then ErrorLog.Enable()
         End Sub
         Private Sub MyApplication_StartupNextInstance(ByVal sender As Object, ByVal e As Microsoft.VisualBasic.ApplicationServices.StartupNextInstanceEventArgs) Handles Me.StartupNextInstance
             'Dim proc As Process() = Process.GetProcessesByName("進銷存")

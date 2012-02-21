@@ -1,5 +1,6 @@
 ﻿Imports 進銷存.Database.DatabaseType
 Imports 進銷存.Database
+Imports System.Runtime.CompilerServices
 
 Public Module Program
 #Region "Structure"
@@ -79,8 +80,16 @@ Public Module Program
 
     Public SystemTitle As String = "進銷存管理系統"
 
-    Public Sub InitialProgram()
+    <Extension()> _
+    Public Sub DefaultTextBoxImeMode(ByVal Form As Form)
+        With Form
+            For Each ctl As Control In .Controls
+                If ctl.GetType() Is GetType(TextBox) Then CType(ctl, TextBox).ImeMode = Windows.Forms.ImeMode.OnHalf
+            Next
+        End With
+    End Sub
 
+    Public Sub InitialProgram()
 
         ConfigLoad()
 
@@ -158,8 +167,6 @@ Public Module Program
             Return False
         End If
     End Function
-
-
 
 
 

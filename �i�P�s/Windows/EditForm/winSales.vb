@@ -28,6 +28,7 @@ Public Class winSales
         Dim Name As String
         Dim Brand As String
         Dim Kind As String
+        Dim Cost As Single
         Dim Price As Single
         Dim SellingPrice As Single
         Dim Number As Integer
@@ -41,7 +42,7 @@ Public Class winSales
 
         ' 此為 Windows Form 設計工具所需的呼叫。
         InitializeComponent()
-
+        Me.DefaultTextBoxImeMode()
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         cbPayMode.Items.AddRange(TypeOfPaymentsDescribe)
         cbPayMode.SelectedIndex = Payment.Commission
@@ -151,7 +152,7 @@ Public Class winSales
         Next
 
         If row IsNot Nothing Then
-            dgSalesList.Rows.Add(New String() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, row.Cells("售價").Value, row.Cells("售價").Value, 1})
+            dgSalesList.Rows.Add(New String() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, row.Cells("進價").Value, row.Cells("售價").Value, row.Cells("售價").Value, 1})
         End If
         CalTotalPrice()
     End Sub
@@ -266,6 +267,7 @@ Public Class winSales
         item.Name = r.Cells(cOName.Index).Value
         item.Number = r.Cells(cONumber.Index).Value
         item.SellingPrice = r.Cells(cOSellingPrice.Index).Value
+        item.Cost = r.Cells(cOCost.Index).Value
         item.StockLabel = ""
         item.Price = GetSingle(r.Cells(cOPrice.Index).Value)
         Return item
@@ -428,7 +430,7 @@ Public Class winSales
         Dim dt As Data.DataTable = access.GetGoodsWithPrice(newGoods.Label)
         Dim row As Data.DataRow = dt.Rows(0)
         If row IsNot Nothing Then
-            dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Price")), GetSingle(row("Price")), 1})
+            dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Cost")), GetSingle(row("Price")), GetSingle(row("Price")), 1})
         End If
         CalTotalPrice()
     End Sub
@@ -481,21 +483,58 @@ Public Class winSales
     End Sub
 
     Private Sub TabControl1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
-        If TabControl1.SelectedTab Is Me.tpSales Then TransToSales()
         CalTotalPrice()
     End Sub
 
     Private Sub TransToSales()
+
+        If MsgBox("要將訂單內容匯到銷貨單嗎？", MsgBoxStyle.YesNo + MsgBoxStyle.Question) = MsgBoxResult.No Then Exit Sub
+
+
         For Each row As DataGridViewRow In dgOrderList.Rows
-            If Not SalesItemExist(row.Cells(cOLabel.Index).Value) Then
+            Dim GoodsLabel As String = row.Cells(cOLabel.Index).Value
+
+
+            If Not SalesItemExist(GoodsLabel) Then
+                Dim dt As DataTable
+ReadStockList:
+                dt = access.GetStockListByGoodsLabel(GoodsLabel)
+
                 Dim item As GoodsInfo = OrderRow2GoodsInfo(row)
-                Dim idx As Integer = dgSalesList.Rows.Add(item.GoodsLabel, "", item.Kind, item.Brand, item.Name, item.Price, item.SellingPrice, item.Number)
-                dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+
+                If dt Is Nothing OrElse dt.Rows.Count = 0 Then '沒有庫存
+                    '新增庫存
+                    If MsgBox(item.Name & "目前沒有庫存，現在要新增嗎？", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                        If winStockIn.Create(access, item.GoodsLabel) = Windows.Forms.DialogResult.OK Then GoTo ReadStockList
+                    End If
+
+                    Dim idx As Integer = dgSalesList.Rows.Add(item.GoodsLabel, "", item.Kind, item.Brand, item.Name, item.Cost, item.Price, item.SellingPrice, item.Number)
+                    dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+                ElseIf dt.Rows.Count = 1 Then '有一筆庫存
+                    Dim r As DataRow = dt.Rows(0)
+                    Dim num As Integer = IIf(item.Number > r("數量"), r("數量"), item.Number)
+                    Dim idx As Integer = dgSalesList.Rows.Add(item.GoodsLabel, r("庫存編號"), item.Kind, item.Brand, item.Name, r("進價"), r("售價"), item.SellingPrice, num)
+                    If item.Number > r("數量") Then dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+                Else '有兩筆以上的庫存
+                    MsgBox(item.Name & "有" & dt.Rows.Count & "筆庫存，請選擇其中一筆!", MsgBoxStyle.Information, "銷貨提示")
+                    Dim r As DataGridViewRow = winStockList.SelectStock(GoodsLabel, access)
+                    Dim idx As Integer
+                    If r Is Nothing Then
+                        idx = dgSalesList.Rows.Add(item.GoodsLabel, "", item.Kind, item.Brand, item.Name, item.Cost, item.Price, item.SellingPrice, item.Number)
+                        dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+                    Else
+                        Dim num As Integer = IIf(item.Number > r.Cells("數量").Value, r.Cells("數量").Value, item.Number)
+                        idx = dgSalesList.Rows.Add(item.GoodsLabel, r.Cells("庫存編號").Value, item.Kind, item.Brand, item.Name, r.Cells("進價").Value, r.Cells("售價").Value, item.SellingPrice, num)
+                        If item.Number > r.Cells("數量").Value Then dgSalesList.Rows(idx).DefaultCellStyle.BackColor = Color.Red
+                    End If
+
+
+                End If
             End If
         Next
 
 
-        'CalTotalPrice()
+        CalTotalPrice()
     End Sub
 
     Private Function SalesItemExist(ByVal GoodsLabel As String) As Boolean
@@ -548,5 +587,10 @@ Public Class winSales
 
     Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged
         CalTotalPrice()
+    End Sub
+
+
+    Private Sub btOrder2Sales_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder2Sales.Click
+        TransToSales()
     End Sub
 End Class

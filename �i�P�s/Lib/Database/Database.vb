@@ -205,10 +205,10 @@
         End Function
 
         Public Function GetGoodsWithPrice(ByVal Label As String) As Data.DataTable
-            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price " & _
-            " FROM (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label " & _
+            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name,history.Cost, history.Price " & _
+            " FROM (SELECT HistoryPrice.GoodsLabel,HistoryPrice.Cost, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label " & _
             " WHERE(Goods.Label = '" & Label & "') " & _
-            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price; "
+            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name,history.Cost, history.Price; "
             Return Read("table", BasePath, SqlCommand)
         End Function
 
@@ -325,10 +325,24 @@
 
         ''' <summary>取得庫存清單</summary>
         Public Function GetStockList() As Data.DataTable
+
             'Dims SQLCommand As String = "SELECT stock.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
             Dim SqlCommand As String = "SELECT Goods.Label as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Note AS 備註 " & _
             " FROM (stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
+
+
+            Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
+            Return DT
+        End Function
+
+        ''' <summary>取得庫存清單</summary>
+        Public Function GetStockListByGoodsLabel(ByVal GoodsLabel As String) As Data.DataTable
+
+            'Dims SQLCommand As String = "SELECT stock.Label as 庫存編號,IMEI,Kind as 種類, Brand as 廠牌, [Name] as 品名,  Number as 數量 , Price as 售價, stock.Note as 備註 FROM stock LEFT JOIN goods AS [a] ON stock.GoodsLabel = [a].Label;"
+            Dim SqlCommand As String = "SELECT stock.GoodsLabel as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Cost as 進價, history.Price AS 售價, stock.Note AS 備註 " & _
+                      " FROM ((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
+                      " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0) AND Goods.Label='" & GoodsLabel & "');"
 
 
             Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
@@ -510,13 +524,13 @@
         End Function
 
         Public Function GetOrderListBySalesLabel(ByVal label) As Data.DataTable
-            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price, OrderGoods.Price, OrderGoods.Number " & _
-            " FROM OrderGoods LEFT JOIN ((SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price " & _
+            Dim SqlCommand As String = "SELECT Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Cost ,history.Price, OrderGoods.Price, OrderGoods.Number " & _
+            " FROM OrderGoods LEFT JOIN ((SELECT HistoryPrice.GoodsLabel,HistoryPrice.Cost ,HistoryPrice.Price " & _
             " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 " & _
             " FROM HistoryPrice " & _
             " GROUP BY HistoryPrice.GoodsLabel )  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1 = HistoryPrice.Time) AND (tmp.GoodsLabel = HistoryPrice.GoodsLabel) )  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON OrderGoods.GoodsLabel = Goods.Label " & _
             " WHERE (OrderGoods.SalesLabel='" & label & "') " & _
-            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, history.Price, OrderGoods.Price, OrderGoods.Number;"
+            " GROUP BY Goods.Label, Goods.Kind, Goods.Brand, Goods.Name,history.Cost, history.Price, OrderGoods.Price, OrderGoods.Number;"
 
             Return Read("table", BasePath, SqlCommand)
         End Function
@@ -560,9 +574,9 @@
 
         '取得銷貨單的商品清單-根據銷貨單號
         Public Function GetGoodsListBySalesLabelWithHistoryPrice(ByVal Label As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number " & _
+            Dim SQLCommand As String = "SELECT Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name,Stock.Cost, history.Price, SalesGoods.SellingPrice, SalesGoods.Number " & _
             " FROM (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) LEFT JOIN ((SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.GoodsLabel=HistoryPrice.GoodsLabel) AND (tmp.Time1=HistoryPrice.Time))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON Stock.GoodsLabel = Goods.Label " & _
-            " GROUP BY Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number, SalesGoods.SalesLabel " & _
+            " GROUP BY Stock.Cost,Goods.Label, SalesGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, history.Price, SalesGoods.SellingPrice, SalesGoods.Number, SalesGoods.SalesLabel " & _
             " HAVING (((SalesGoods.SalesLabel)='" & Label & "'));"
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -881,21 +895,21 @@
             Dim i As Integer
             For i = 1 To totFile
                 TmpFile = FileList(i - 1)
-                SyncLock Lock
-                    Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
-                    Try
-                        'tmpDB.Open()
-                        For j As Integer = 0 To SQLCommand.Length - 1
-                            DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
-                            DA.Fill(DS, Table)
-                            DA.Dispose()
-                        Next
-                    Catch
-                    Finally
-                        tmpDB.Close()
-                        tmpDB.Dispose()
-                    End Try
-                End SyncLock
+                'SyncLock Lock
+                Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
+                Try
+                    'tmpDB.Open()
+                    For j As Integer = 0 To SQLCommand.Length - 1
+                        DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
+                        DA.Fill(DS, Table)
+                        DA.Dispose()
+                    Next
+                Catch
+                Finally
+                    tmpDB.Close()
+                    tmpDB.Dispose()
+                End Try
+                ' End SyncLock
             Next
 
 

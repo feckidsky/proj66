@@ -190,8 +190,11 @@ Public Class winMain
     End Sub
 
     Private Sub rToday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged
-        If Me.Created Then UpdateSalesList()
-        UpdateLogList()
+        If Me.Created And CType(sender, RadioButton).Checked = True Then
+            UpdateSalesList()
+            UpdateLogList()
+        End If
+
     End Sub
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
@@ -309,7 +312,7 @@ Public Class winMain
             Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
             BeginAddRowInfo(arr)
         Next
-        MsgBox(5)
+
     End Sub
 
     Public Sub UpdateListColor()
@@ -330,12 +333,15 @@ Public Class winMain
     Dim DeleteRowHandler As New Action(Of Database.Sales)(AddressOf DeleteSales)
 
     Private Sub AddRow(ByVal arr As Object())
+        Me.SuspendLayout()
         Dim idx As Integer = dgSales.Rows.Add(arr)
 
         UpdateRowColor(dgSales.Rows(idx))
         dgSales.Sort(dgSales.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Filter.FilterRow(dgSales.Rows(idx))
         Filter.AddComboBoxItem(dgSales.Rows(idx))
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
     End Sub
 
     Private Sub UpdateRow(ByVal arr As Object())

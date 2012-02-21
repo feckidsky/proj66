@@ -173,6 +173,7 @@ Partial Class winContract
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.txtCommission)
         Me.Controls.Add(Me.txtLabel)
+        Me.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.Name = "winContract"
         Me.Text = "合約"
         Me.ResumeLayout(False)
