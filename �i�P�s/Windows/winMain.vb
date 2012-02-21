@@ -610,5 +610,12 @@ Public Class winMain
         Dim a() As Integer = New Integer() {}
         a(0) = 100
 
+        'Dim lst As New List(Of String)
+        'For i = 0 To 10
+        '    Dim s As System.Guid = System.Guid.NewGuid
+        '    lst.Add(Join(Array.ConvertAll(s.ToByteArray, Function(b As Byte) Hex(b)), "") & vbTab & s.ToString)
+        'Next
+
+        'MsgBox(Join(lst.ToArray, vbCrLf))
     End Sub
 End Class

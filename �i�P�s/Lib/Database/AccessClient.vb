@@ -108,7 +108,7 @@
 
         Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
 
-        Dim ResponseDataTable As Data.DataTable = Nothing
+        'Dim ResponseDataTable As Data.DataTable = Nothing
 
         Sub New()
             MyBase.New("遠端資料庫")
@@ -135,7 +135,51 @@
 
         Dim ReadLock As String = "ReadLock"
 
-        Dim Waiter As New Threading.AutoResetEvent(True)
+        'Dim Waiter As New Threading.AutoResetEvent(True)
+
+        Public lstReader As New List(Of Reader)
+
+        Class Reader
+            Dim Name As String
+            Dim Guid As String
+            Dim Args As ReadArgs
+            Dim Waiter As New Threading.AutoResetEvent(True)
+            Dim DT As DataTable = Nothing
+            Dim TimeOut As Long = 10000
+            Sub New(ByVal Name As String, ByVal args As ReadArgs, ByVal Timeout As Long)
+                Me.Name = Name
+                Me.Args = args
+                'Dim g As System.Guid = System.Guid.NewGuid
+                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray) ' Join(Array.ConvertAll(System.Guid.NewGuid.ToByteArray, Function(b As Byte) Hex(b)), "")
+                'Dim gg As String = Join(Array.ConvertAll(g.ToByteArray, Function(b As Byte) Hex(b)), "")
+                Me.TimeOut = Timeout
+            End Sub
+
+            Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As DataTable
+                Waiter.Reset()
+                SendHandler("ReadArgs", Guid, Code.SerializeWithZIP(Args))
+                If Not Waiter.WaitOne(TimeOut, False) Then
+                    DT = New DataTable
+                    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
+                End If
+
+                Return DT
+            End Function
+
+
+            Public Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
+                If Me.Guid <> Guid Then Return False
+                DT = Repair(Of DataTable)(SerializeData)
+                Waiter.Set()
+                Return True
+            End Function
+
+
+            Public Shared Sub Receive(ByVal Reader As Reader, ByVal Guid As String, ByVal SerializeData As String)
+                Reader.Receive(Guid, SerializeData)
+            End Sub
+
+        End Class
 
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
             If Not Connected() Then
@@ -143,30 +187,42 @@
                 Return New DataTable
             End If
 
+            'SyncLock ReadLock
+            Dim args As ReadArgs
+            args.Table = Table
+            args.FileList = FileList
+            args.SqlCommand = SQLCommand
+            '    ResponseDataTable = Nothing
+
+            '    Waiter.Reset()
+            '    Send("ReadArgs", args)
+
+            '    If Not Waiter.WaitOne(10000, False) Then
+            '        ResponseDataTable = New DataTable
+            '        MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
+            '    End If
+
+            'End SyncLock
+
+            Dim reader As New Reader(Name, args, 10000)
             SyncLock ReadLock
-                Dim args As ReadArgs
-                args.Table = Table
-                args.FileList = FileList
-                args.SqlCommand = SQLCommand
-                ResponseDataTable = Nothing
-
-                Waiter.Reset()
-                Send("ReadArgs", args)
-
-                If Not Waiter.WaitOne(10000, False) Then
-                    ResponseDataTable = New DataTable
-                    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
-                End If
-
+                lstReader.Add(reader)
             End SyncLock
-            Return ResponseDataTable
+            Dim dt As DataTable = reader.Read(AddressOf Send)
+            SyncLock ReadLock
+                lstReader.Remove(reader)
+            End SyncLock
+            Return dt
+            'Return ResponseDataTable
         End Function
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             MyBase.Send(cmd, Code.SerializeWithZIP(args))
         End Sub
-
-        Private Function Repair(Of T)(ByVal s As String) As T
+        Public Overloads Sub Send(ByVal cmd As String, ByVal Guid As String, ByVal args As String)
+            MyBase.Send(cmd, Guid & "," & args)
+        End Sub
+        Private Shared Function Repair(Of T)(ByVal s As String) As T
             Return Code.DeserializeWithUnzip(Of T)(s)
         End Function
 
@@ -183,8 +239,16 @@
                         RaiseEvent ReceiveServerName(Me, Name)
                     End If
                 Case "ReadResponse"
-                    ResponseDataTable = Repair(Of DataTable)(args)
-                    Waiter.Set()
+                    SyncLock ReadLock
+                        For i As Integer = 0 To lstReader.Count - 1
+                            If lstReader(i).Receive(Data(1), Data(2)) Then
+                                'lstReader.RemoveAt(i)
+                                Exit For
+                            End If
+                        Next
+                    End SyncLock
+                    'ResponseDataTable = Repair(Of DataTable)(args)
+                    'Waiter.Set()
                 Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args))
                 Case "DeletedContract" : OnDeletedContract(Repair(Of Contract)(args))
                 Case "ChangedContract" : OnChangedContract(Repair(Of Contract)(args))

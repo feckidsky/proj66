@@ -27,10 +27,11 @@
         Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ServerReceiveSplitMessage
             Select Case Data(0)
                 Case "ReadArgs"
-                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(1))
+                    Dim guid As String = Data(1)
+                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(2))
                     Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
                     Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
-                    Client.Send("ReadResponse", Code.SerializeWithZIP(dt))
+                    Client.Send("ReadResponse", guid & "," & Code.SerializeWithZIP(dt))
                 Case "CreatePersonnel" : Access.AddPersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
                 Case "DeletePersonnel" : Access.DeletePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
                 Case "ChangePersonnel" : Access.ChangePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
