@@ -32,7 +32,7 @@ Namespace Database
             Return CType(obj, Date)
         End Function
 
-        Public TypeOfPaymentsDescribe As String() = New String() {"現金", "刷卡", "訂金"}
+        'Public TypeOfPaymentsDescribe As String() = New String() {"現金", "刷卡", "訂金"}
     End Module
 #End Region
 
@@ -818,10 +818,10 @@ Namespace Database
 
     ''' <summary>付款方式</summary>
     Public Enum Payment
-
         Cash = 0
         Card = 1
         Commission = 2
+        Cancel = 3
     End Enum
 
 
@@ -846,27 +846,27 @@ Namespace Database
             Return Columns.ToArray
         End Function
 
-        Function ToObjects() As Object()
-            Return New Object() {SalesLabel, StockLabel, SellingPrice, Number}
-        End Function
+    Function ToObjects() As Object()
+        Return New Object() {SalesLabel, StockLabel, SellingPrice, Number}
+    End Function
 
-        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesGoods
-            Dim R As New MyDataRow(Row)
-            Dim data As SalesGoods
-            data.SalesLabel = R("SalesLabel")
-            data.StockLabel = R("StockLabel")
-            data.SellingPrice = R("SellingPrice")
-            data.Number = R("Number")
-            Return data
-        End Function
+    Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesGoods
+        Dim R As New MyDataRow(Row)
+        Dim data As SalesGoods
+        data.SalesLabel = R("SalesLabel")
+        data.StockLabel = R("StockLabel")
+        data.SellingPrice = R("SellingPrice")
+        data.Number = R("Number")
+        Return data
+    End Function
 
-        Sub UpdateRow(ByVal r As DataRow)
-            Dim columns() As Column = ToColumns()
-            Dim obj() As Object = ToObjects()
-            For i As Integer = 0 To columns.Count - 1
-                r(columns(i).Name) = obj(i)
-            Next
-        End Sub
+    Sub UpdateRow(ByVal r As DataRow)
+        Dim columns() As Column = ToColumns()
+        Dim obj() As Object = ToObjects()
+        For i As Integer = 0 To columns.Count - 1
+            r(columns(i).Name) = obj(i)
+        Next
+    End Sub
 
     End Structure
 
@@ -971,6 +971,12 @@ Namespace Database
         Dim TypeOfPayment As Payment
         ''' <summary>備註</summary>
         Dim Note As String
+
+        Public Shared PaymentDescribe As String() = New String() {"現金", "刷卡", "訂金", "退訂"}
+
+        Public Function GetPayment() As String
+            Return PaymentDescribe(TypeOfPayment)
+        End Function
 
         Shared Function ToColumns() As Column()
             Dim Columns As New List(Of Column)

@@ -44,7 +44,7 @@ Public Class winSales
         InitializeComponent()
         Me.DefaultTextBoxImeMode()
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
-        cbPayMode.Items.AddRange(TypeOfPaymentsDescribe)
+        cbPayMode.Items.AddRange(Sales.PaymentDescribe)
         cbPayMode.SelectedIndex = Payment.Commission
     End Sub
 
@@ -57,7 +57,7 @@ Public Class winSales
         Me.Text = IIf(FormKind = Form.Order, "訂單", "銷貨單")
 
         btOrder.Text = IIf(Work = Mode.Create, "新增訂單", "修改訂單")
-        btOrder.Enabled = FormKind = Form.Order
+        'btOrder.Enabled = FormKind = Form.Order
 
         btSales.Text = IIf(Work = Mode.Create Or FormKind = Form.Order, "銷貨", "修改銷貨單")
 
@@ -320,6 +320,14 @@ Public Class winSales
             Exit Sub
         End If
 
+        If dgSalesList.RowCount > 0 Then
+            If MsgBox("此單已有銷貨項目，儲存此訂單將會刪除這些項目，您確定要儲存？", MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
+                Exit Sub
+            Else
+                dgSalesList.Rows.Clear()
+            End If
+        End If
+
         If Work = Mode.Create Then
             '新增銷貨單
             access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
@@ -349,6 +357,14 @@ Public Class winSales
         If sales.TypeOfPayment = Payment.Commission Then
             MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
             Exit Sub
+        End If
+
+        If sales.TypeOfPayment = Payment.Cancel And dgSalesList.RowCount > 0 Then
+            If MsgBox("此單已有銷貨項目，退訂將會刪除這些項目，您確定要儲存？", MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
+                Exit Sub
+            Else
+                dgSalesList.Rows.Clear()
+            End If
         End If
 
         If txtSalesDate.Text = "" Then txtSalesDate.Text = Now.ToString("yyyy/MM/dd HH:mm:ss")

@@ -85,6 +85,11 @@
             Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
         Next
 
+        Dim cancel As Single = 0
+        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
+            cancel += GetSingle(row.Item("訂金"))
+        Next
+
 
         Dim Profit As Single = 0
         Dim SalesVolume As Single = 0
@@ -93,7 +98,7 @@
             SalesVolume += GetSingle(row.Item("金額"))
         Next
 
-        Return New Info(SalesVolume, Profit, Cash + Deposit, Card)
+        Return New Info(SalesVolume, Profit, Cash + Deposit - cancel, Card)
     End Function
 
 

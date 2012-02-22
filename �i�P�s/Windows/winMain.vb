@@ -390,7 +390,7 @@ Public Class winMain
         If arr(idxPayType) = Payment.Commission Then arr(2) = ""
 
         '將付款方式由數字改為中文描述
-        arr(idxPayType) = TypeOfPaymentsDescribe(arr(idxPayType))
+        arr(idxPayType) = Sales.PaymentDescribe(arr(idxPayType))
 
         Dim lst As New List(Of String)(arr)
         lst.Add(tip)
@@ -618,4 +618,9 @@ Public Class winMain
 
         'MsgBox(Join(lst.ToArray, vbCrLf))
     End Sub
+
+
+
+
+
 End Class
