@@ -266,8 +266,8 @@ Public Class winSales
         item.Brand = r.Cells(cOBrand.Index).Value
         item.Name = r.Cells(cOName.Index).Value
         item.Number = r.Cells(cONumber.Index).Value
-        item.SellingPrice = r.Cells(cOSellingPrice.Index).Value
-        item.Cost = r.Cells(cOCost.Index).Value
+        item.SellingPrice = GetSingle(r.Cells(cOSellingPrice.Index).Value)
+        item.Cost = GetSingle(r.Cells(cOCost.Index).Value)
         item.StockLabel = ""
         item.Price = GetSingle(r.Cells(cOPrice.Index).Value)
         Return item
@@ -279,7 +279,7 @@ Public Class winSales
         With newGoods
             .SalesLabel = txtLabel.Text
             .GoodsLabel = r.Cells(cOLabel.Index).Value
-            .Price = r.Cells(cOSellingPrice.Index).Value
+            .Price = GetSingle(r.Cells(cOSellingPrice.Index).Value)
             .Number = r.Cells(cONumber.Index).Value
             .PurchaseLabel = ""
         End With

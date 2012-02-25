@@ -484,7 +484,7 @@
 
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit]) AS 利潤, Sales.Note AS 備註 " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, int(Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])*iif(Sales.TypeOfPayment=" & Payment.Card & ",0.98,1)) AS 利潤, Sales.Note AS 備註 " & _
             " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
             condition1 & _
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
@@ -895,21 +895,21 @@
             Dim i As Integer
             For i = 1 To totFile
                 TmpFile = FileList(i - 1)
-                'SyncLock Lock
-                Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
-                Try
-                    'tmpDB.Open()
-                    For j As Integer = 0 To SQLCommand.Length - 1
-                        DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
-                        DA.Fill(DS, Table)
-                        DA.Dispose()
-                    Next
-                Catch
-                Finally
-                    tmpDB.Close()
-                    tmpDB.Dispose()
-                End Try
-                ' End SyncLock
+                SyncLock Lock
+                    Dim tmpDB As OleDb.OleDbConnection = ConnectBase(TmpFile) ' New OleDb.OleDbConnection("PROVIDER=MICROSOFT.Jet.OLEDB.4.0;DATA SOURCE=" & TmpFile)
+                    Try
+                        'tmpDB.Open()
+                        For j As Integer = 0 To SQLCommand.Length - 1
+                            DA = New OleDb.OleDbDataAdapter(SQLCommand(j), tmpDB)
+                            DA.Fill(DS, Table)
+                            DA.Dispose()
+                        Next
+                    Catch
+                    Finally
+                        tmpDB.Close()
+                        tmpDB.Dispose()
+                    End Try
+                End SyncLock
             Next
 
 
@@ -1358,21 +1358,25 @@
             Dim Message As String
         End Structure
         Public Shared Function RepairAccess(ByVal FilePath As String) As RepairAccessResult
+
             Dim result As New RepairAccessResult
             Try
-                Dim tmpFile As String = IO.Path.GetDirectoryName(FilePath) & "\tmp.mdb"
-                Dim j As New JRO.JetEngine
-                Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password
-                Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & tmpFile & ";Jet OLEDB:Database Password=" & Password
-                j.CompactDatabase(sourceConnect, desConnect)
-                IO.File.Delete(FilePath)
+                SyncLock Lock
+                    Dim tmpFile As String = IO.Path.GetDirectoryName(FilePath) & "\tmp.mdb"
+                    Dim j As New JRO.JetEngine
+                    Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password
+                    Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & tmpFile & ";Jet OLEDB:Database Password=" & Password
+                    j.CompactDatabase(sourceConnect, desConnect)
+                    IO.File.Delete(FilePath)
 
-                IO.File.Move(tmpFile, FilePath)
-                result.Success = True
-                result.Message = "資料庫壓縮/修復成功!"
+                    IO.File.Move(tmpFile, FilePath)
+                    result.Success = True
+                    result.Message = "資料庫壓縮/修復成功!"
+                End SyncLock
             Catch ex As Exception
                 result.Success = False
                 result.Message = ex.Message
+
             End Try
             Return result
 
