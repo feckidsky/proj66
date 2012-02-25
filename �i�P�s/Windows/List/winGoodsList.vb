@@ -143,7 +143,12 @@ Public Class winGoodsList
 
     Dim invHistoryPrice As New ItemUpdate(AddressOf UpdateHistory)
     Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
-        Me.Invoke(invHistoryPrice)
+        If Me.InvokeRequired Then
+
+            Me.Invoke(invHistoryPrice)
+        Else
+            invHistoryPrice()
+        End If
         'UpdateHistory()
     End Sub
 

@@ -323,7 +323,12 @@ Public Class winMain
     End Sub
 
     Public Sub UpdateRowColor(ByVal row As DataGridViewRow)
-        row.DefaultCellStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+        If row.Cells("付款方式").Value = "退訂" Then
+            row.DefaultCellStyle.BackColor = Color.Yellow
+        Else
+            row.DefaultCellStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+        End If
+
     End Sub
 
     Delegate Sub DelegateObjArr(ByVal arr As Object())
@@ -410,6 +415,7 @@ Public Class winMain
 
     Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
+        If dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
     End Sub
@@ -417,6 +423,7 @@ Public Class winMain
 
     Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
+        If dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)
     End Sub

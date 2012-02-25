@@ -24,7 +24,7 @@ Partial Class winMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -380,10 +380,12 @@ Partial Class winMain
         'rToday
         '
         Me.rToday.AutoSize = True
+        Me.rToday.Checked = True
         Me.rToday.Location = New System.Drawing.Point(22, 21)
         Me.rToday.Name = "rToday"
         Me.rToday.Size = New System.Drawing.Size(47, 16)
         Me.rToday.TabIndex = 0
+        Me.rToday.TabStop = True
         Me.rToday.Text = "今日"
         Me.rToday.UseVisualStyleBackColor = True
         '
@@ -400,12 +402,10 @@ Partial Class winMain
         'r30Day
         '
         Me.r30Day.AutoSize = True
-        Me.r30Day.Checked = True
         Me.r30Day.Location = New System.Drawing.Point(76, 21)
         Me.r30Day.Name = "r30Day"
         Me.r30Day.Size = New System.Drawing.Size(71, 16)
         Me.r30Day.TabIndex = 0
-        Me.r30Day.TabStop = True
         Me.r30Day.Text = "30天以內"
         Me.r30Day.UseVisualStyleBackColor = True
         '
@@ -507,14 +507,14 @@ Partial Class winMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgLog.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle1
         Me.dgLog.Location = New System.Drawing.Point(6, 21)
         Me.dgLog.Name = "dgLog"
         Me.dgLog.ReadOnly = True
