@@ -133,51 +133,79 @@
             Return Count
         End Function
 
-        Dim ReadLock As String = "ReadLock"
 
-        'Dim Waiter As New Threading.AutoResetEvent(True)
 
-        Public lstReader As New List(Of Reader)
+        Class ReaderList
+            Inherits List(Of ReaderBase)
+            Dim ReadLock As String = "ReadLock"
 
-        Class Reader
-            Dim Name As String
-            Dim Guid As String
-            Dim Args As ReadArgs
-            Dim Waiter As New Threading.AutoResetEvent(True)
-            Dim DT As DataTable = Nothing
-            Dim TimeOut As Long = 10000
-            Sub New(ByVal Name As String, ByVal args As ReadArgs, ByVal Timeout As Long)
-                Me.Name = Name
-                Me.Args = args
-                'Dim g As System.Guid = System.Guid.NewGuid
-                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray) ' Join(Array.ConvertAll(System.Guid.NewGuid.ToByteArray, Function(b As Byte) Hex(b)), "")
-                'Dim gg As String = Join(Array.ConvertAll(g.ToByteArray, Function(b As Byte) Hex(b)), "")
-                Me.TimeOut = Timeout
+            Public Overloads Sub Add(ByVal Item As ReaderBase)
+                SyncLock ReadLock
+                    MyBase.Add(Item)
+                End SyncLock
             End Sub
 
-            Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As DataTable
+            Public Overloads Sub Remove(ByVal item As ReaderBase)
+                SyncLock ReadLock
+                    MyBase.Remove(item)
+                End SyncLock
+            End Sub
+
+            Public Sub Receive(ByVal Guid As String, ByVal SerializeData As String)
+                SyncLock ReadLock
+                    Dim Readers As List(Of ReaderBase) = FindAll(Function(i As ReaderBase) i.Guid = Guid)
+                    For Each r As ReaderBase In Readers
+                        r.Receive(Guid, SerializeData)
+                    Next
+                End SyncLock
+            End Sub
+        End Class
+
+        Public lstReader As New ReaderList
+
+        MustInherit Class ReaderBase
+            Public Name As String
+            Public Guid As String
+            Public Waiter As New Threading.AutoResetEvent(True)
+            Public TimeOut As Long = 10000
+            Public Cmd As String = "ReaderBase"
+            Sub New()
+                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+            End Sub
+
+            Sub New(ByVal Name As String)
+                Me.Name = Name
+                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+            End Sub
+
+            Public MustOverride Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
+        End Class
+
+        Class Reader(Of T, ResultT)
+            Inherits ReaderBase
+            Public Args As T
+            Public Result As ResultT
+            Public DefaultResult As ResultT
+            Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.DeserializeWithUnzip
+
+            Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
                 Waiter.Reset()
-                SendHandler("ReadArgs", Guid, Code.SerializeWithZIP(Args))
+                SendHandler("ReaderRequest", Guid & "," & Cmd, Code.SerializeWithZIP(Args))
                 If Not Waiter.WaitOne(TimeOut, False) Then
-                    DT = New DataTable
+                    Result = DefaultResult
                     MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
                 End If
 
-                Return DT
+                Return Result
             End Function
 
 
-            Public Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
+            Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
                 If Me.Guid <> Guid Then Return False
-                DT = Repair(Of DataTable)(SerializeData)
+                Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
                 Waiter.Set()
                 Return True
             End Function
-
-
-            Public Shared Sub Receive(ByVal Reader As Reader, ByVal Guid As String, ByVal SerializeData As String)
-                Reader.Receive(Guid, SerializeData)
-            End Sub
 
         End Class
 
@@ -187,34 +215,58 @@
                 Return New DataTable
             End If
 
-            'SyncLock ReadLock
             Dim args As ReadArgs
             args.Table = Table
             args.FileList = FileList
             args.SqlCommand = SQLCommand
-            '    ResponseDataTable = Nothing
 
-            '    Waiter.Reset()
-            '    Send("ReadArgs", args)
 
-            '    If Not Waiter.WaitOne(10000, False) Then
-            '        ResponseDataTable = New DataTable
-            '        MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
-            '    End If
+            Dim Reader As New Reader(Of ReadArgs, DataTable)
+            Reader.Name = Name
+            Reader.DefaultResult = Nothing
+            Reader.Cmd = "DataTable"
+            Reader.Args = args
 
-            'End SyncLock
+            lstReader.Add(Reader)
+            Dim dt As DataTable = Reader.Read(AddressOf Send)
+            lstReader.Remove(Reader)
 
-            Dim reader As New Reader(Name, args, 10000)
-            SyncLock ReadLock
-                lstReader.Add(reader)
-            End SyncLock
-            Dim dt As DataTable = reader.Read(AddressOf Send)
-            SyncLock ReadLock
-                lstReader.Remove(reader)
-            End SyncLock
             Return dt
-            'Return ResponseDataTable
+
         End Function
+
+        Public Overrides Function GetErrorLogFileNames() As String()
+            Dim reader As New Reader(Of String, String())
+            reader.Name = Name
+            reader.DefaultResult = New String() {}
+            reader.Cmd = "GetErrorLogFiles"
+            lstReader.Add(reader)
+            Dim files As String() = reader.Read(AddressOf Send)
+            lstReader.Remove(reader)
+            Return files
+        End Function
+
+        Public Function Base64toByteWithZip(ByVal base64 As String) As Byte()
+            Dim zipBytes() As Byte = Convert.FromBase64String(base64)
+            Return Code.Unzip(zipBytes)
+        End Function
+
+        Public Overrides Sub Download(ByVal sourcePath As String, ByVal DestPath As String)
+            Dim reader As New Reader(Of String, Byte())
+            reader.Name = Name
+            reader.DefaultResult = New Byte() {}
+            reader.Cmd = "Download"
+            reader.Args = sourcePath
+            reader.DeserializeFun = AddressOf Base64toByteWithZip
+
+            lstReader.Add(reader)
+            Dim data As Byte() = reader.Read(AddressOf Send)
+            lstReader.Remove(reader)
+
+            Dim writer As New IO.FileStream(DestPath, IO.FileMode.Create)
+            writer.Write(data, 0, data.Length)
+            writer.Close()
+        End Sub
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             MyBase.Send(cmd, Code.SerializeWithZIP(args))
@@ -238,15 +290,16 @@
                         Name = newName
                         RaiseEvent ReceiveServerName(Me, Name)
                     End If
-                Case "ReadResponse"
-                    SyncLock ReadLock
-                        For i As Integer = 0 To lstReader.Count - 1
-                            If lstReader(i).Receive(Data(1), Data(2)) Then
-                                'lstReader.RemoveAt(i)
-                                Exit For
-                            End If
-                        Next
-                    End SyncLock
+                Case "ReaderResponse"
+                    lstReader.Receive(Data(1), Data(2))
+                    'SyncLock ReadLock
+                    '    For i As Integer = 0 To lstReader.Count - 1
+                    '        If lstReader(i).Receive(Data(1), Data(2)) Then
+                    '            'lstReader.RemoveAt(i)
+                    '            Exit For
+                    '        End If
+                    '    Next
+                    'End SyncLock
                     'ResponseDataTable = Repair(Of DataTable)(args)
                     'Waiter.Set()
                 Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args))
@@ -282,7 +335,7 @@
                 Case "DeletedAllLog" : OnDeletedAllLog()
                 Case "MsgBox" : MsgBox(Code.DeserializeWithUnzip(Of String)(args))
                 Case Else
-                    MsgBox("不明指令:" & vbCrLf & Data(0))
+                    MsgBox("Client:不明指令:" & vbCrLf & Data(0))
             End Select
         End Sub
 
@@ -391,6 +444,8 @@
         Public Overrides Sub DeleteAllLog(Optional ByVal trigger As Boolean = True)
             Send("DeleteAllLog")
         End Sub
+
+
 
         'Public Overrides Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
         '    Send("LogOut")

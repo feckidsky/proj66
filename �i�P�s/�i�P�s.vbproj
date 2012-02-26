@@ -114,6 +114,12 @@
     <Compile Include="Windows\Dialog\DataGridViewPrintDialog.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Dialog\DialogErrorFileList.Designer.vb">
+      <DependentUpon>DialogErrorFileList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Dialog\DialogErrorFileList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\EditForm\DialogStockMove.Designer.vb">
       <DependentUpon>DialogStockMove.vb</DependentUpon>
     </Compile>
@@ -298,6 +304,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Windows\Dialog\DataGridViewPrintDialog.resx">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Dialog\DialogErrorFileList.resx">
+      <DependentUpon>DialogErrorFileList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\EditForm\DialogStockMove.resx">

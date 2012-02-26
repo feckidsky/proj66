@@ -38,6 +38,7 @@ Public Class winMain
             Me.Text = SystemTitle & " - v1.0.1 - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
         End If
         Button1.Visible = CurrentUser.ID = "Designer"
+        錯誤記錄ToolStripMenuItem.Visible = CurrentUser.ID = "Designer"
     End Sub
 
     Dim Filter As DataGridViewFilter
@@ -614,8 +615,8 @@ Public Class winMain
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        Dim a() As Integer = New Integer() {}
-        a(0) = 100
+        'Dim a() As Integer = New Integer() {}
+        'a(0) = 100
 
         'Dim lst As New List(Of String)
         'For i = 0 To 10
@@ -624,10 +625,14 @@ Public Class winMain
         'Next
 
         'MsgBox(Join(lst.ToArray, vbCrLf))
+        MsgBox(Join(access.GetErrorLogFileNames(), vbCrLf))
     End Sub
 
 
 
 
 
+    Private Sub 錯誤記錄ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 錯誤記錄ToolStripMenuItem.Click
+        DialogErrorFileList.ShowDialog(access)
+    End Sub
 End Class

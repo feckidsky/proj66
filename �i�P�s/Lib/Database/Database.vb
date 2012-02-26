@@ -226,6 +226,21 @@
             Return Customer.GetFrom(dt.Rows(0))
         End Function
 
+
+        Public Overridable Function GetErrorLogFileNames() As String()
+            If Not IO.Directory.Exists(ErrorLog.Dir) Then Return New String() {}
+            Return IO.Directory.GetFiles(ErrorLog.Dir)
+        End Function
+
+        Public Overridable Sub Download(ByVal sourcePath As String, ByVal DestPath As String)
+            Try
+                IO.File.Copy(sourcePath, DestPath, True)
+            Catch
+                MsgBox(Err.Description)
+            End Try
+        End Sub
+
+
         Public Function Change(ByVal columns() As Column, ByVal Name1 As String, ByVal Name2 As String) As Column()
             Dim c1 As Integer = Array.FindIndex(columns, Function(c As Column) c.Name = Name1)
             Dim c2 As Integer = Array.FindIndex(columns, Function(c As Column) c.Name = Name2)
@@ -1085,7 +1100,7 @@
         Public Overridable Sub AddLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
             'AddBase(Data)
             Command(data.GetSqlInsert(), BasePath)
-            If trigger Then OnCreatedLog(Data)
+            If trigger Then OnCreatedLog(data)
         End Sub
 
         Public Overridable Sub DeleteLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)
@@ -1212,31 +1227,6 @@
             OnCreatedStock(data)
         End Sub
 
-        '''' <summary>新增銷貨單</summary>
-        'Public Sub AddSales(ByVal data As Sales)
-        '    File.AddSales(data)
-        'End Sub
-
-        '''' <summary>新增訂單</summary>
-        'Public Sub AddOrder(ByVal data As Order)
-        '    File.AddSales(data)
-        'End Sub
-
-        'Public Function ReadSupplier() As Supplier()
-        '    Return ReadSupplier()
-        'End Function
-
-        'Public Function ReadPersonnel() As Personnel()
-        '    Return ReadPersonnel
-        'End Function
-
-        'Public Function ReadGoods() As Goods()
-        '    Return ReadGoods
-        'End Function
-
-        'Public Function ReadMobile() As Mobile()
-        '    Return ReadMobile()
-        'End Function
 
         Public Sub AddLog(ByVal Time As Date, ByVal Message As String)
             AddLog(New Log(User.Label, Time, Strings.Left(Message, 40)))

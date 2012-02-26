@@ -289,7 +289,7 @@ Public Module Program
             output.Dispose()
         End Function
 
-        Public Shared Function SerializeWithZIP(ByVal obj As Object) As String
+        Public Shared Function SerializeWithZIP(Of T)(ByVal obj As T) As String
             Return Zip(Serialize(obj))
         End Function
 
@@ -302,20 +302,29 @@ Public Module Program
         End Function
 
         Public Shared Function Serialize(ByVal Obj As Object) As String
-            Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(Obj.GetType)
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            Dim writer As IO.StringWriter = New IO.StringWriter(sb)
-            ser.Serialize(writer, Obj)
-            Return sb.ToString()
-            writer.Dispose()
+            Try
+                Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(Obj.GetType)
+                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+                Dim writer As IO.StringWriter = New IO.StringWriter(sb)
+                ser.Serialize(writer, Obj)
+                Return sb.ToString()
+                writer.Dispose()
+            Catch
+                Return ""
+            End Try
         End Function
 
         Public Shared Function Deserialize(Of T)(ByVal Text As String) As T
             ''將取得的內容進行反序列化
             Dim mySerializer As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(GetType(T)) 'GetType(SerializeData))
             Dim reader As New IO.StringReader(Text)
-            Return mySerializer.Deserialize(reader)
-            reader.Dispose()
+            Try
+                Return mySerializer.Deserialize(reader)
+            Catch
+                Return Nothing
+            Finally
+                reader.Dispose()
+            End Try
         End Function
 
         Public Enum ZipMode

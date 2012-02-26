@@ -26,12 +26,11 @@
 
         Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ServerReceiveSplitMessage
             Select Case Data(0)
-                Case "ReadArgs"
+                Case "ReaderRequest"
                     Dim guid As String = Data(1)
-                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(Data(2))
-                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
-                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
-                    Client.Send("ReadResponse", guid & "," & Code.SerializeWithZIP(dt))
+                    Dim Cmd As String = Data(2)
+                    Dim argsSerialize As String = Data(3)
+                    ReaderRequest(Client, guid, Cmd, argsSerialize)
                 Case "CreatePersonnel" : Access.AddPersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
                 Case "DeletePersonnel" : Access.DeletePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
                 Case "ChangePersonnel" : Access.ChangePersonnel(Code.DeserializeWithUnzip(Of Personnel)(Data(1)))
@@ -68,6 +67,33 @@
                     MsgBox("Server" & msg)
                     Client.Send("MsgBox", Code.SerializeWithZIP(msg))
             End Select
+        End Sub
+
+        Private Sub ReaderRequest(ByVal client As TCPTool.Client, ByVal Guid As String, ByVal Cmd As String, ByVal ArgsSerialize As String)
+
+            Dim ResultText As String = ""
+            Select Case Cmd
+                '讀取資料表
+                Case "DataTable"
+                    Dim args As ReadArgs = Code.DeserializeWithUnzip(Of ReadArgs)(ArgsSerialize)
+                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
+                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
+                    ResultText = Code.SerializeWithZIP(dt)
+                    dt.Dispose()
+                    'client.Send("ReadResponse", Guid & "," & Code.SerializeWithZIP(dt))
+                Case "GetErrorLogFiles"
+                    ResultText = Code.SerializeWithZIP(Access.GetErrorLogFileNames())
+                Case "Download"
+                    Dim path As String = Code.DeserializeWithUnzip(Of String)(ArgsSerialize)
+                    Dim fs As New IO.FileStream(path, IO.FileMode.Open, IO.FileAccess.Read)
+                    Dim data(fs.Length - 1) As Byte
+                    fs.Read(data, 0, fs.Length)
+                    Dim zipData As Byte() = Code.Zip(data)
+                    ResultText = Convert.ToBase64String(zipData)
+            End Select
+
+
+            client.Send("ReaderResponse", Guid & "," & ResultText)
         End Sub
 
         Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract
