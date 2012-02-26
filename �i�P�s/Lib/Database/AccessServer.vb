@@ -62,6 +62,7 @@
                 Case "CreateLog" : Access.AddLog(Code.DeserializeWithUnzip(Of Log)(Data(1)))
                 Case "DeleteLog" : Access.DeleteLog(Code.DeserializeWithUnzip(Of Log)(Data(1)))
                 Case "DeleteAllLog" : Access.DeleteAllLog()
+                Case "DeleteFile" : Access.DeleteFile(Code.DeserializeWithUnzip(Of String)(Data(1)))
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
                     MsgBox("Server" & msg)
@@ -83,13 +84,8 @@
                     'client.Send("ReadResponse", Guid & "," & Code.SerializeWithZIP(dt))
                 Case "GetErrorLogFiles"
                     ResultText = Code.SerializeWithZIP(Access.GetErrorLogFileNames())
-                Case "Download"
-                    Dim path As String = Code.DeserializeWithUnzip(Of String)(ArgsSerialize)
-                    Dim fs As New IO.FileStream(path, IO.FileMode.Open, IO.FileAccess.Read)
-                    Dim data(fs.Length - 1) As Byte
-                    fs.Read(data, 0, fs.Length)
-                    Dim zipData As Byte() = Code.Zip(data)
-                    ResultText = Convert.ToBase64String(zipData)
+                Case "GetDir"
+                    ResultText = Code.SerializeWithZIP(Access.GetCloneBasePath())
             End Select
 
 

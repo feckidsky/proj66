@@ -1017,6 +1017,8 @@ Public Class TCPTool
                         RaiseEvent SetIPAddressFinish(Me)
                     Case "%ReceiveSetIPAddress%"
 
+                    Case "%FileTransmitter%"
+                        lstFileTransmitter.Receive(Me, MsgPart)
                 End Select
 
                 Exit Sub
@@ -1054,7 +1056,268 @@ Public Class TCPTool
             Send("%RequestSetIPAddress%," & e.ToString)
         End Sub
 
+        Public Function Download(ByVal sourceFile As String, ByVal destFile As String) As Downloader
+            Dim downloader As New Downloader(Me)
+            lstFileTransmitter.Add(downloader)
+            downloader.StartDownload(sourceFile, destFile)
+            Return downloader
+        End Function
+
+        Friend Class TransmitterList
+            Inherits List(Of FileTransmitter)
+            Dim ReadLock As String = "ReadLock"
+
+            Public Overloads Sub Add(ByVal Item As FileTransmitter)
+                SyncLock ReadLock
+                    MyBase.Add(Item)
+                    Item.parent = Me
+                End SyncLock
+            End Sub
+
+            Public Overloads Sub Remove(ByVal item As FileTransmitter)
+                SyncLock ReadLock
+                    MyBase.Remove(item)
+                End SyncLock
+            End Sub
+
+            Public Sub Receive(ByVal Client As Client, ByVal para() As String)
+                Dim Guid As String = para(1)
+                Dim Transmitters As List(Of FileTransmitter)
+
+                SyncLock ReadLock
+                    Transmitters = FindAll(Function(i As FileTransmitter) i.Guid = Guid)
+                    For Each r As FileTransmitter In Transmitters
+                        r.Receive(para)
+                    Next
+                End SyncLock
+
+                If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
+                    If para(2) = "StartDownload" Then
+                        Dim sender As New Uploader(Client, para(1))
+                        Add(sender)
+                        sender.StartSend(para(3))
+                    End If
+
+                End If
+
+            End Sub
+        End Class
+
+        Friend lstFileTransmitter As New TransmitterList
+
 #End Region
+
+        Public MustInherit Class FileTransmitter
+            Friend parent As TransmitterList
+            Public Guid As String
+            Public Client As Client
+            Friend fs As IO.FileStream
+
+            Event TransFail(ByVal sender As Object, ByVal Message As String)
+
+            Public Sub Send(ByVal cmd As String, ByVal Args As String)
+                Client.Send("%FileTransmitter%," & Guid & "," & cmd, Args)
+            End Sub
+
+            Friend Overridable Sub OnTransFail(ByVal Message As String)
+                RaiseEvent TransFail(Me, Message)
+            End Sub
+
+
+            Public MustOverride Sub Receive(ByVal msg() As String)
+
+        End Class
+
+
+        Public Class Uploader
+            Inherits FileTransmitter
+            Dim ReadToEnd As Boolean = False
+            Dim BufferSize As Integer = 32767
+
+            Sub New(ByVal Client As Client, ByVal newGuid As String)
+                Me.Client = Client
+                Me.Guid = newGuid
+            End Sub
+
+            Public Sub StartSend(ByVal Path As String)
+                Try
+                    fs = New IO.FileStream(Path, IO.FileMode.Open, IO.FileAccess.Read)
+
+                Catch
+                    OnTransFail(Err.Description)
+                    Send("Fail", Err.Description)
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+                ReadToEnd = False
+                Send("StartSendFile", fs.Length)
+            End Sub
+
+            Private Sub Upload()
+                If ReadToEnd Then
+                    fs.Close()
+                    Send("EndSendFile", "")
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                    Exit Sub
+                End If
+
+                Dim data(BufferSize - 1) As Byte
+
+                Try
+                    If fs.Length - fs.Position < BufferSize Then  '如果剩下位傳送的位元組不到BufferSize
+                        System.Array.Resize(data, fs.Length - fs.Position)
+                    End If
+                Catch
+
+                End Try
+                Try
+                    fs.Read(data, 0, data.Length)
+                Catch
+                    OnTransFail(Err.Description)
+                    Send("Fail", Err.Description)
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+
+
+                Dim zipByte As Byte() = Code.Zip(data)
+                Dim base64 As String = Convert.ToBase64String(zipByte)
+                Send("SendFileData", base64)
+
+                Try
+                    ReadToEnd = fs.Length - fs.Position <= BufferSize
+                Catch
+                    ReadToEnd = True
+                End Try
+
+            End Sub
+
+            Private Sub Cancel()
+                Try
+                    fs.Close()
+                    fs.Dispose()
+                Catch
+                    Send("Fail", Err.Description)
+                Finally
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+            End Sub
+
+            Public Overrides Sub Receive(ByVal msg() As String)
+                Dim cmd As String = msg(2)
+                'Dim args As String = msg(3)
+
+                Select Case cmd
+                    Case "RequestData"
+                        Upload()
+                    Case "Cancel"
+                        Cancel()
+                End Select
+            End Sub
+
+
+        End Class
+
+        Public Class Downloader
+            Inherits FileTransmitter
+            Dim totalSize As Long
+            Public destFile As String
+            Public sourceFile As String
+
+            Event Progress(ByVal sender As Object, ByVal percent As Integer)
+            Event Downloaded(ByVal sender As Object)
+
+
+            Sub New(ByVal Client As Client)
+                Me.Client = Client
+                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+            End Sub
+
+            Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
+                Me.destFile = destFile
+                Me.sourceFile = sourceFile
+                Send("StartDownload", sourceFile)
+            End Sub
+
+            Private Sub StartReceiveFile(ByVal size As String)
+                totalSize = size
+                Try
+                    fs = New IO.FileStream(destFile, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.None)
+
+                Catch
+                    OnTransFail(Err.Description)
+                    Send("Cancel", "")
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+                Send("RequestData", "")
+            End Sub
+
+            Private Sub WriteFile(ByVal base64 As String)
+                Dim zipByte() As Byte = Convert.FromBase64String(base64)
+                Dim data() As Byte = Code.Unzip(zipByte)
+                Try
+                    fs.Write(data, 0, data.Length)
+                Catch
+                    OnTransFail(Err.Description)
+                    Send("Cancel", "")
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+
+                Dim percent As Integer
+                If totalSize = 0 Then
+                    percent = 0
+                Else
+                    percent = fs.Position / totalSize * 100
+                End If
+
+
+                RaiseEvent Progress(Me, percent)
+                Send("RequestData", "")
+            End Sub
+
+            Private Sub CloseFile()
+                Try
+                    fs.Close()
+                    fs.Dispose()
+                Catch
+                Finally
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+                OnDownLoaded()
+            End Sub
+
+            Friend Sub OnDownLoaded()
+                RaiseEvent Downloaded(Me)
+            End Sub
+
+            Private Sub Fail(ByVal Message As String)
+                Try
+                    fs.Close()
+                    fs.Dispose()
+                Catch
+                Finally
+                    If parent IsNot Nothing Then parent.Remove(Me)
+                End Try
+                OnTransFail(Message)
+            End Sub
+
+
+            Public Overrides Sub Receive(ByVal msg() As String)
+                Dim cmd As String = msg(2)
+                Dim args As String = msg(3)
+                Select Case cmd
+                    Case "StartSendFile"
+                        StartReceiveFile(args)
+                    Case "SendFileData"
+                        WriteFile(args)
+                    Case "EndSendFile"
+                        CloseFile()
+                    Case "SendFail"
+                        Fail(args)
+                End Select
+
+            End Sub
+
+
+        End Class
 
 #Region "檔案傳送"
         '發送傳送檔案請求

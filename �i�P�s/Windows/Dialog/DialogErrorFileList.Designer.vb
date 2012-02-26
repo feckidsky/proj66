@@ -25,6 +25,7 @@ Partial Class DialogErrorFileList
         Me.ListBox1 = New System.Windows.Forms.ListBox
         Me.btDownload = New System.Windows.Forms.Button
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog
+        Me.btDownloadAccess = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'ListBox1
@@ -45,11 +46,21 @@ Partial Class DialogErrorFileList
         Me.btDownload.Text = "下載"
         Me.btDownload.UseVisualStyleBackColor = True
         '
+        'btDownloadAccess
+        '
+        Me.btDownloadAccess.Location = New System.Drawing.Point(12, 249)
+        Me.btDownloadAccess.Name = "btDownloadAccess"
+        Me.btDownloadAccess.Size = New System.Drawing.Size(94, 23)
+        Me.btDownloadAccess.TabIndex = 2
+        Me.btDownloadAccess.Text = "下載資料庫"
+        Me.btDownloadAccess.UseVisualStyleBackColor = True
+        '
         'DialogErrorFileList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(489, 284)
+        Me.Controls.Add(Me.btDownloadAccess)
         Me.Controls.Add(Me.btDownload)
         Me.Controls.Add(Me.ListBox1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
@@ -61,4 +72,5 @@ Partial Class DialogErrorFileList
     Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
     Friend WithEvents btDownload As System.Windows.Forms.Button
     Friend WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog
+    Friend WithEvents btDownloadAccess As System.Windows.Forms.Button
 End Class

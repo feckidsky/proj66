@@ -135,6 +135,8 @@
 
 
 
+
+
         Class ReaderList
             Inherits List(Of ReaderBase)
             Dim ReadLock As String = "ReadLock"
@@ -246,27 +248,26 @@
             Return files
         End Function
 
-        Public Function Base64toByteWithZip(ByVal base64 As String) As Byte()
-            Dim zipBytes() As Byte = Convert.FromBase64String(base64)
-            Return Code.Unzip(zipBytes)
+        Public Overrides Function GetCloneBasePath() As String
+            Dim reader As New Reader(Of String, String)
+            reader.Name = Name
+            reader.DefaultResult = ""
+            reader.Cmd = "GetDir"
+            lstReader.Add(reader)
+            Dim result As String = reader.Read(AddressOf Send)
+            lstReader.Remove(reader)
+            Return result
         End Function
 
-        Public Overrides Sub Download(ByVal sourcePath As String, ByVal DestPath As String)
-            Dim reader As New Reader(Of String, Byte())
-            reader.Name = Name
-            reader.DefaultResult = New Byte() {}
-            reader.Cmd = "Download"
-            reader.Args = sourcePath
-            reader.DeserializeFun = AddressOf Base64toByteWithZip
-
-            lstReader.Add(reader)
-            Dim data As Byte() = reader.Read(AddressOf Send)
-            lstReader.Remove(reader)
-
-            Dim writer As New IO.FileStream(DestPath, IO.FileMode.Create)
-            writer.Write(data, 0, data.Length)
-            writer.Close()
+        Public Overrides Sub DeleteFile(ByVal File As String)
+            Send("DeleteFile", File)
         End Sub
+
+        'Public Function Base64toByteWithZip(ByVal base64 As String) As Byte()
+        '    Dim zipBytes() As Byte = Convert.FromBase64String(base64)
+        '    Return Code.Unzip(zipBytes)
+        'End Function
+
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             MyBase.Send(cmd, Code.SerializeWithZIP(args))
@@ -292,16 +293,6 @@
                     End If
                 Case "ReaderResponse"
                     lstReader.Receive(Data(1), Data(2))
-                    'SyncLock ReadLock
-                    '    For i As Integer = 0 To lstReader.Count - 1
-                    '        If lstReader(i).Receive(Data(1), Data(2)) Then
-                    '            'lstReader.RemoveAt(i)
-                    '            Exit For
-                    '        End If
-                    '    Next
-                    'End SyncLock
-                    'ResponseDataTable = Repair(Of DataTable)(args)
-                    'Waiter.Set()
                 Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args))
                 Case "DeletedContract" : OnDeletedContract(Repair(Of Contract)(args))
                 Case "ChangedContract" : OnChangedContract(Repair(Of Contract)(args))

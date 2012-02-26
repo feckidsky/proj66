@@ -232,13 +232,39 @@
             Return IO.Directory.GetFiles(ErrorLog.Dir)
         End Function
 
-        Public Overridable Sub Download(ByVal sourcePath As String, ByVal DestPath As String)
+        Public Overridable Function GetCloneBasePath() As String
+            Dim tmp As String = Dir & "\Clone\" & Now.ToString("yyMMddHHmmss") & ".tmp"
+            SyncLock Lock
+                RepairAccess(BasePath, tmp)
+                'IO.File.Copy(BasePath, tmp)
+            End SyncLock
+            Return tmp
+        End Function
+
+        Public Overridable Sub DeleteFile(ByVal File As String)
             Try
-                IO.File.Copy(sourcePath, DestPath, True)
-            Catch
-                MsgBox(Err.Description)
+                IO.File.Delete(File)
+            Catch ex As Exception
             End Try
         End Sub
+
+        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As Downloader
+
+            If Me.GetType Is GetType(Access) Then
+                Dim downloader As New Downloader(Me)
+                Try
+                    IO.File.Copy(sourcePath, DestPath, True)
+                    Return downloader
+                Catch
+                    MsgBox(Err.Description)
+                    Return downloader
+                Finally
+                    downloader.OnDownLoaded()
+                End Try
+            Else
+                Return MyBase.Download(sourcePath, DestPath)
+            End If
+        End Function
 
 
         Public Function Change(ByVal columns() As Column, ByVal Name1 As String, ByVal Name2 As String) As Column()
@@ -1347,16 +1373,28 @@
             Dim Success As Boolean
             Dim Message As String
         End Structure
+
+        Public Shared Sub RepairAccess(ByVal source As String, ByVal destine As String)
+            'Dim tmpFile As String = IO.Path.GetDirectoryName(source) & "\tmp.mdb"
+            Dim dir As String = IO.Path.GetDirectoryName(destine)
+            If Not IO.Directory.Exists(dir) Then IO.Directory.CreateDirectory(dir)
+            Dim j As New JRO.JetEngine
+            Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & source & ";Jet OLEDB:Database Password=" & Password
+            Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & destine & ";Jet OLEDB:Database Password=" & Password
+            j.CompactDatabase(sourceConnect, desConnect)
+        End Sub
+
         Public Shared Function RepairAccess(ByVal FilePath As String) As RepairAccessResult
 
             Dim result As New RepairAccessResult
             Try
                 SyncLock Lock
                     Dim tmpFile As String = IO.Path.GetDirectoryName(FilePath) & "\tmp.mdb"
-                    Dim j As New JRO.JetEngine
-                    Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password
-                    Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & tmpFile & ";Jet OLEDB:Database Password=" & Password
-                    j.CompactDatabase(sourceConnect, desConnect)
+                    'Dim j As New JRO.JetEngine
+                    'Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & FilePath & ";Jet OLEDB:Database Password=" & Password
+                    'Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & tmpFile & ";Jet OLEDB:Database Password=" & Password
+                    'j.CompactDatabase(sourceConnect, desConnect)
+                    RepairAccess(FilePath, tmpFile)
                     IO.File.Delete(FilePath)
 
                     IO.File.Move(tmpFile, FilePath)
