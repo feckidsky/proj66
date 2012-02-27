@@ -18,8 +18,16 @@
         If Not Single.TryParse(Text, tmpValue) Then
             Dim loc As Integer = Me.SelectionStart
             Dim c As Integer = Text.Length - lastText.Length
-            Text = lastText
-            Me.SelectionStart = loc - c
+
+            Text = IIf(Text = "", 0, lastText)
+
+            If Text = "0" Then
+                Me.SelectionStart = 0
+                Me.SelectionLength = 1
+            Else
+                Me.SelectionStart = loc - c
+            End If
+
         End If
 
         lastText = Text

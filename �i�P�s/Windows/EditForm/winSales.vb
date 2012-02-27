@@ -45,7 +45,7 @@ Public Class winSales
         Me.DefaultTextBoxImeMode()
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         cbPayMode.Items.AddRange(Sales.PaymentDescribe)
-        cbPayMode.SelectedIndex = Payment.Commission
+        cbPayMode.SelectedIndex = Payment.Deposit
     End Sub
 
 
@@ -56,10 +56,10 @@ Public Class winSales
         FormKind = IIf(txtSalesDate.Text = "", Form.Order, Form.Sales)
         Me.Text = IIf(FormKind = Form.Order, "訂單", "銷貨單")
 
-        btOrder.Text = IIf(Work = Mode.Create, "新增訂單", "修改訂單")
+        btOrder.Text = IIf(Work = Mode.Create, "新增訂單", "儲存訂單")
         'btOrder.Enabled = FormKind = Form.Order
 
-        btSales.Text = IIf(Work = Mode.Create Or FormKind = Form.Order, "銷貨", "修改銷貨單")
+        btSales.Text = IIf(Work = Mode.Create Or FormKind = Form.Order, "銷貨", "儲存銷貨單")
 
 
         TabControl1.SelectedTab = IIf(FormKind = Form.Order, tpOrder, tpSales)
@@ -96,7 +96,8 @@ Public Class winSales
         txtOrderDate.Text = Sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
         txtSalesDate.Text = IIf(Sales.SalesDate = New Date(2001, 1, 1, 0, 0, 0), "", Sales.SalesDate.ToString("yyyy/MM/dd HH:mm:ss"))
         txtNote.Text = Sales.Note
-        txtDeposit.Text = Sales.Deposit
+        txtDeposit.Text = Sales.DepositByCash
+        txtDepositByCard.Text = Sales.DepositByCard
         cbPayMode.SelectedIndex = Sales.TypeOfPayment
 
         Personnel = DB.GetPersonnelByLabel(Sales.PersonnelLabel)
@@ -216,13 +217,16 @@ Public Class winSales
         Dim newSales As Sales
         With newSales
             .Label = txtLabel.Text
+            .TypeOfPayment = cbPayMode.SelectedIndex
             .OrderDate = Date.ParseExact(txtOrderDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing)
             Date.TryParseExact(txtSalesDate.Text, "yyyy/MM/dd HH:mm:ss", Nothing, Globalization.DateTimeStyles.None, .SalesDate)
-            .Deposit = Val(txtDeposit.Text)
+            If .TypeOfPayment = Payment.Deposit Then .SalesDate = Nothing
+            .DepositByCash = Val(txtDeposit.Text)
+            .DepositByCard = Val(txtDepositByCard.Text)
             .Note = txtNote.Text
             .CustomerLabel = Customer.Label
             .PersonnelLabel = Personnel.Label
-            .TypeOfPayment = cbPayMode.SelectedIndex
+
         End With
         Return newSales
     End Function
@@ -315,7 +319,7 @@ Public Class winSales
     Private Sub btOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder.Click
         Dim sales As Sales = GetSalesInfo()
 
-        If sales.TypeOfPayment <> Payment.Commission Then
+        If sales.TypeOfPayment <> Payment.Deposit Then
             MsgBox("訂單的付款方式必須是訂金", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
@@ -354,7 +358,7 @@ Public Class winSales
         End If
 
         Dim sales As Sales = GetSalesInfo()
-        If sales.TypeOfPayment = Payment.Commission Then
+        If sales.TypeOfPayment = Payment.Deposit Then
             MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
@@ -428,7 +432,8 @@ Public Class winSales
 
     Private Sub cbPayMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbPayMode.SelectedIndexChanged
         Me.BackColor = IIf(cbPayMode.SelectedIndex = 2, ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
-
+        btOrder.Enabled = cbPayMode.SelectedIndex = Payment.Deposit
+        btSales.Enabled = cbPayMode.SelectedIndex <> Payment.Deposit
     End Sub
 
     Private Sub btAddOrderItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddOrderItem.Click
@@ -486,7 +491,7 @@ Public Class winSales
         Dim Deposit As Single = 0
 
         Try
-            Deposit = Val(txtDeposit.Text)
+            Deposit = Val(txtDeposit.Text) + Val(txtDepositByCard.Text)
         Catch ex As Exception
         End Try
 
@@ -601,7 +606,7 @@ ReadStockList:
         CalTotalPrice()
     End Sub
 
-    Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged
+    Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged, txtDepositByCard.TextChanged
         CalTotalPrice()
     End Sub
 

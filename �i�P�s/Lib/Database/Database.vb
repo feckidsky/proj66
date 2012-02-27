@@ -484,8 +484,8 @@
         Public Function GetSalesList(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType) As Data.DataTable
 
             Dim cnd As String = ""
-            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Commission
-            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Commission
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Deposit
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Deposit
             Dim condition1 As String = " WHERE ((sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#) " & cnd & ") "
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
@@ -500,11 +500,11 @@
         End Function
 
         '讀取銷貨單
-        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "") As Data.DataTable
+        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "", Optional ByVal WithDepositByCash As Boolean = False) As Data.DataTable
 
             Dim cnd As String = ""
-            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Commission
-            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Commission
+            If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Deposit
+            If ListType = GetSalesListType.Sales Then cnd = " AND TypeOfPayment<>" & Payment.Deposit
 
             Dim OrderTime As String = "(sales.Orderdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
             Dim SalesTime As String = "(sales.Salesdate Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)"
@@ -525,10 +525,10 @@
 
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, int(Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])*iif(Sales.TypeOfPayment=" & Payment.Card & ",0.98,1)) AS 利潤, Sales.Note AS 備註 " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金]", "") & ", Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
             " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
             condition1 & _
-            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
+            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
 
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
@@ -543,11 +543,14 @@
 
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit]) AS 利潤, Sales.Note AS 備註 " & _
-            " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
-            condition1 & _
-            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
-
+            'Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit AS 訂金, Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit]) AS 利潤, Sales.Note AS 備註 " & _
+            '" FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+            'condition1 & _
+            '" GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金, Sales.Deposit as [訂金-現金], Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
+ " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+ condition1 & _
+ " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT
@@ -596,7 +599,7 @@
                 Next
             End If
 
-            If style = Payment.Commission Then
+            If style = Payment.Deposit Then
                 dt = GetOrderListBySalesLabel(Label)
             Else
                 dt = GetGoodsListBySalesLabel(Label)
@@ -663,13 +666,13 @@
 
             Dim total As Single = 0
             Select Case newSales.TypeOfPayment
-                Case Payment.Commission
+                Case Payment.Deposit
                     total = Array.ConvertAll(Of OrderGoods, Single)(OrderGoods, Function(o As OrderGoods) o.Number * o.Price).Sum()
                 Case Else
                     total = Array.ConvertAll(Of SalesGoods, Single)(salesGoods, Function(o As SalesGoods) o.Number * o.SellingPrice).Sum()
             End Select
 
-            AddLog(Now, "新增" & IIf(newSales.TypeOfPayment = Payment.Commission, "訂單", "銷貨單") & ":" & newSales.Label & "(" & total & ")")
+            AddLog(Now, "新增" & IIf(newSales.TypeOfPayment = Payment.Deposit, "訂單", "銷貨單") & ":" & newSales.Label & "(" & total & ")")
 
             CreateSalesWithoutEvent(newSales, salesGoods, OrderGoods, SalesContracts)
 
@@ -679,7 +682,7 @@
         '刪除銷貨單
         Public Overridable Sub DeleteSales(ByVal dSales As Sales)
             DeleteSalesWithoutEvent(dSales)
-            AddLog(Now, "刪除" & IIf(dSales.TypeOfPayment = Payment.Commission, "訂單", "銷貨單") & ":" & dSales.Label)
+            AddLog(Now, "刪除" & IIf(dSales.TypeOfPayment = Payment.Deposit, "訂單", "銷貨單") & ":" & dSales.Label)
             OnDeletedSales(dSales)
         End Sub
 
@@ -688,10 +691,10 @@
             Dim sales As Sales = GetSales(newSales.Label)
             Dim total As Single = 0
             Dim title As String = ""
-            If sales.TypeOfPayment = Payment.Commission And sales.TypeOfPayment <> newSales.TypeOfPayment Then
+            If sales.TypeOfPayment = Payment.Deposit And sales.TypeOfPayment <> newSales.TypeOfPayment Then
                 title = "訂單轉銷貨:"
                 total = Array.ConvertAll(Of SalesGoods, Single)(SalesGoods, Function(o As SalesGoods) o.Number * o.SellingPrice).Sum()
-            ElseIf newSales.TypeOfPayment = Payment.Commission Then
+            ElseIf newSales.TypeOfPayment = Payment.Deposit Then
                 title = "修改訂單:"
                 total = Array.ConvertAll(Of OrderGoods, Single)(OrderGoods, Function(o As OrderGoods) o.Number * o.Price).Sum()
             Else
@@ -1008,6 +1011,13 @@
             Dim SqlCommand As String = "ALTER TABLE [" & Table & "] ADD [" & ColumnName & "] " & Type & ";"
             Command(SqlCommand, BasePath)
         End Sub
+
+        Public Sub RenameColumn(ByVal Table As String, ByVal ColumnName As String, ByVal NewColumnName As String, ByVal Type As String)
+            Dim SqlCommand As String = "ALTER TABLE [" & Table & "] CHANGE [" & ColumnName & "] [" & NewColumnName & "] ;"
+            Command(SqlCommand, BasePath)
+        End Sub
+
+
 
         Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As Object) As String
             Dim lst As New List(Of String)
@@ -1382,6 +1392,7 @@
             Dim sourceConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & source & ";Jet OLEDB:Database Password=" & Password
             Dim desConnect As String = "PROVIDER=Microsoft.Jet.OLEDB.4.0;DATA SOURCE=" & destine & ";Jet OLEDB:Database Password=" & Password
             j.CompactDatabase(sourceConnect, desConnect)
+
         End Sub
 
         Public Shared Function RepairAccess(ByVal FilePath As String) As RepairAccessResult

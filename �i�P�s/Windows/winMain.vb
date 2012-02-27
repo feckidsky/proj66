@@ -393,7 +393,7 @@ Public Class winMain
 
         '取得商品資訊
         Dim tip As String = access.GetSalesTip(arr(idxLabel), arr(idxPayType))
-        If arr(idxPayType) = Payment.Commission Then arr(2) = ""
+        If arr(idxPayType) = Payment.Deposit Then arr(2) = ""
 
         '將付款方式由數字改為中文描述
         arr(idxPayType) = Sales.PaymentDescribe(arr(idxPayType))

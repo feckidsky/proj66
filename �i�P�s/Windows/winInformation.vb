@@ -64,16 +64,54 @@
         Return Val(obj)
     End Function
 
+    'Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
+
+    '    Dim dt As DataTable = access.GetOrderListWithContract(St, Ed)
+
+    '    Dim Deposit As Single = 0
+    '    For Each row As DataRow In dt.Rows
+    '        Deposit += GetSingle(row.Item("訂金"))
+    '    Next
+
+    '    dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , True)
+
+    '    Dim Cash As Single = 0
+    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
+    '        Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+    '    Next
+
+    '    Dim Card As Single = 0
+    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
+    '        Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+    '    Next
+
+    '    Dim cancel As Single = 0
+    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
+    '        cancel += GetSingle(row.Item("訂金"))
+    '    Next
+
+
+    '    Dim Profit As Single = 0
+    '    Dim SalesVolume As Single = 0
+    '    For Each row As DataRow In dt.Rows
+    '        Profit += GetSingle(row.Item("利潤"))
+    '        SalesVolume += GetSingle(row.Item("金額"))
+    '    Next
+
+    '    Return New Info(SalesVolume, Profit, Cash + Deposit - cancel, Card)
+    'End Function
+
     Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
 
         Dim dt As DataTable = access.GetOrderListWithContract(St, Ed)
-
-        Dim Deposit As Single = 0
+        Dim DepositByCash As Single = 0
+        Dim DepositByCard As Single = 0
         For Each row As DataRow In dt.Rows
-            Deposit += GetSingle(row.Item("訂金"))
+            DepositByCash += GetSingle(row.Item("訂金-現金"))
+            DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
         Next
 
-        dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales)
+        dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
 
         Dim Cash As Single = 0
         For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
@@ -98,9 +136,8 @@
             SalesVolume += GetSingle(row.Item("金額"))
         Next
 
-        Return New Info(SalesVolume, Profit, Cash + Deposit - cancel, Card)
+        Return New Info(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
     End Function
-
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
         UpdateUserDefInfo()

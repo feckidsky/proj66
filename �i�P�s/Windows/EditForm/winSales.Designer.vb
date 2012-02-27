@@ -36,7 +36,7 @@ Partial Class winSales
         Me.cbPayMode = New System.Windows.Forms.ComboBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
-        Me.txtDeposit = New System.Windows.Forms.TextBox
+        Me.txtDeposit = New 進銷存.NumberBox
         Me.Label7 = New System.Windows.Forms.Label
         Me.Label8 = New System.Windows.Forms.Label
         Me.txtCustomer = New System.Windows.Forms.TextBox
@@ -85,6 +85,8 @@ Partial Class winSales
         Me.cCPhone = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.btDeleteContract = New System.Windows.Forms.Button
         Me.btAddContract = New System.Windows.Forms.Button
+        Me.txtDepositByCard = New 進銷存.NumberBox
+        Me.Label2 = New System.Windows.Forms.Label
         Me.GroupBox2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tpOrder.SuspendLayout()
@@ -99,7 +101,7 @@ Partial Class winSales
         '
         Me.Label6.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(19, 547)
+        Me.Label6.Location = New System.Drawing.Point(19, 544)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(29, 12)
         Me.Label6.TabIndex = 38
@@ -109,10 +111,10 @@ Partial Class winSales
         '
         Me.txtNote.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNote.Location = New System.Drawing.Point(21, 562)
+        Me.txtNote.Location = New System.Drawing.Point(21, 559)
         Me.txtNote.Multiline = True
         Me.txtNote.Name = "txtNote"
-        Me.txtNote.Size = New System.Drawing.Size(337, 93)
+        Me.txtNote.Size = New System.Drawing.Size(371, 93)
         Me.txtNote.TabIndex = 37
         '
         'Label4
@@ -152,7 +154,7 @@ Partial Class winSales
         '
         Me.lbRealTotal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lbRealTotal.AutoSize = True
-        Me.lbRealTotal.Location = New System.Drawing.Point(376, 606)
+        Me.lbRealTotal.Location = New System.Drawing.Point(410, 655)
         Me.lbRealTotal.Name = "lbRealTotal"
         Me.lbRealTotal.Size = New System.Drawing.Size(53, 12)
         Me.lbRealTotal.TabIndex = 44
@@ -162,7 +164,7 @@ Partial Class winSales
         '
         Me.lbTotal.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lbTotal.AutoSize = True
-        Me.lbTotal.Location = New System.Drawing.Point(376, 578)
+        Me.lbTotal.Location = New System.Drawing.Point(410, 627)
         Me.lbTotal.Name = "lbTotal"
         Me.lbTotal.Size = New System.Drawing.Size(29, 12)
         Me.lbTotal.TabIndex = 45
@@ -171,7 +173,7 @@ Partial Class winSales
         'btOrder
         '
         Me.btOrder.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btOrder.Location = New System.Drawing.Point(493, 636)
+        Me.btOrder.Location = New System.Drawing.Point(511, 670)
         Me.btOrder.Name = "btOrder"
         Me.btOrder.Size = New System.Drawing.Size(75, 35)
         Me.btOrder.TabIndex = 46
@@ -183,16 +185,16 @@ Partial Class winSales
         Me.cbPayMode.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cbPayMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbPayMode.FormattingEnabled = True
-        Me.cbPayMode.Location = New System.Drawing.Point(557, 544)
+        Me.cbPayMode.Location = New System.Drawing.Point(469, 596)
         Me.cbPayMode.Name = "cbPayMode"
-        Me.cbPayMode.Size = New System.Drawing.Size(79, 20)
+        Me.cbPayMode.Size = New System.Drawing.Size(124, 20)
         Me.cbPayMode.TabIndex = 47
         '
         'Label3
         '
         Me.Label3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(496, 547)
+        Me.Label3.Location = New System.Drawing.Point(408, 599)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(53, 12)
         Me.Label3.TabIndex = 44
@@ -202,16 +204,16 @@ Partial Class winSales
         '
         Me.Label5.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(373, 547)
+        Me.Label5.Location = New System.Drawing.Point(410, 564)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(29, 12)
+        Me.Label5.Size = New System.Drawing.Size(68, 12)
         Me.Label5.TabIndex = 44
-        Me.Label5.Text = "訂金"
+        Me.Label5.Text = "訂金 =  現金"
         '
         'txtDeposit
         '
         Me.txtDeposit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDeposit.Location = New System.Drawing.Point(408, 544)
+        Me.txtDeposit.Location = New System.Drawing.Point(479, 559)
         Me.txtDeposit.Name = "txtDeposit"
         Me.txtDeposit.Size = New System.Drawing.Size(74, 22)
         Me.txtDeposit.TabIndex = 48
@@ -307,7 +309,7 @@ Partial Class winSales
         Me.GroupBox2.Controls.Add(Me.txtLabel)
         Me.GroupBox2.Location = New System.Drawing.Point(21, 6)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(650, 117)
+        Me.GroupBox2.Size = New System.Drawing.Size(668, 117)
         Me.GroupBox2.TabIndex = 50
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "資訊"
@@ -315,7 +317,7 @@ Partial Class winSales
         'btSales
         '
         Me.btSales.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btSales.Location = New System.Drawing.Point(574, 636)
+        Me.btSales.Location = New System.Drawing.Point(592, 670)
         Me.btSales.Name = "btSales"
         Me.btSales.Size = New System.Drawing.Size(75, 35)
         Me.btSales.TabIndex = 46
@@ -332,7 +334,7 @@ Partial Class winSales
         Me.TabControl1.Location = New System.Drawing.Point(21, 129)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(650, 268)
+        Me.TabControl1.Size = New System.Drawing.Size(668, 275)
         Me.TabControl1.TabIndex = 51
         '
         'tpOrder
@@ -343,7 +345,7 @@ Partial Class winSales
         Me.tpOrder.Location = New System.Drawing.Point(4, 22)
         Me.tpOrder.Name = "tpOrder"
         Me.tpOrder.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpOrder.Size = New System.Drawing.Size(642, 242)
+        Me.tpOrder.Size = New System.Drawing.Size(660, 249)
         Me.tpOrder.TabIndex = 0
         Me.tpOrder.Text = "訂單"
         Me.tpOrder.UseVisualStyleBackColor = True
@@ -351,7 +353,7 @@ Partial Class winSales
         'btDeleteOrderItem
         '
         Me.btDeleteOrderItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btDeleteOrderItem.Location = New System.Drawing.Point(521, 213)
+        Me.btDeleteOrderItem.Location = New System.Drawing.Point(539, 220)
         Me.btDeleteOrderItem.Name = "btDeleteOrderItem"
         Me.btDeleteOrderItem.Size = New System.Drawing.Size(75, 23)
         Me.btDeleteOrderItem.TabIndex = 49
@@ -361,7 +363,7 @@ Partial Class winSales
         'btAddOrderItem
         '
         Me.btAddOrderItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btAddOrderItem.Location = New System.Drawing.Point(440, 213)
+        Me.btAddOrderItem.Location = New System.Drawing.Point(458, 220)
         Me.btAddOrderItem.Name = "btAddOrderItem"
         Me.btAddOrderItem.Size = New System.Drawing.Size(75, 23)
         Me.btAddOrderItem.TabIndex = 48
@@ -383,7 +385,7 @@ Partial Class winSales
         DataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White
         Me.dgOrderList.RowsDefaultCellStyle = DataGridViewCellStyle1
         Me.dgOrderList.RowTemplate.Height = 24
-        Me.dgOrderList.Size = New System.Drawing.Size(599, 198)
+        Me.dgOrderList.Size = New System.Drawing.Size(617, 205)
         Me.dgOrderList.TabIndex = 0
         '
         'cOLabel
@@ -456,7 +458,7 @@ Partial Class winSales
         Me.tpSales.Location = New System.Drawing.Point(4, 22)
         Me.tpSales.Name = "tpSales"
         Me.tpSales.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpSales.Size = New System.Drawing.Size(642, 242)
+        Me.tpSales.Size = New System.Drawing.Size(660, 249)
         Me.tpSales.TabIndex = 1
         Me.tpSales.Text = "銷貨單"
         Me.tpSales.UseVisualStyleBackColor = True
@@ -592,9 +594,9 @@ Partial Class winSales
         Me.GroupBox1.Controls.Add(Me.dgContract)
         Me.GroupBox1.Controls.Add(Me.btDeleteContract)
         Me.GroupBox1.Controls.Add(Me.btAddContract)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 403)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 410)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(650, 130)
+        Me.GroupBox1.Size = New System.Drawing.Size(668, 130)
         Me.GroupBox1.TabIndex = 52
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "合約"
@@ -612,7 +614,7 @@ Partial Class winSales
         Me.dgContract.Location = New System.Drawing.Point(10, 16)
         Me.dgContract.Name = "dgContract"
         Me.dgContract.RowTemplate.Height = 24
-        Me.dgContract.Size = New System.Drawing.Size(630, 77)
+        Me.dgContract.Size = New System.Drawing.Size(648, 77)
         Me.dgContract.TabIndex = 48
         '
         'cCLabel
@@ -650,7 +652,7 @@ Partial Class winSales
         'btDeleteContract
         '
         Me.btDeleteContract.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btDeleteContract.Location = New System.Drawing.Point(556, 99)
+        Me.btDeleteContract.Location = New System.Drawing.Point(574, 99)
         Me.btDeleteContract.Name = "btDeleteContract"
         Me.btDeleteContract.Size = New System.Drawing.Size(75, 23)
         Me.btDeleteContract.TabIndex = 47
@@ -660,27 +662,47 @@ Partial Class winSales
         'btAddContract
         '
         Me.btAddContract.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btAddContract.Location = New System.Drawing.Point(475, 99)
+        Me.btAddContract.Location = New System.Drawing.Point(493, 99)
         Me.btAddContract.Name = "btAddContract"
         Me.btAddContract.Size = New System.Drawing.Size(75, 23)
         Me.btAddContract.TabIndex = 46
         Me.btAddContract.Text = "新增"
         Me.btAddContract.UseVisualStyleBackColor = True
         '
+        'txtDepositByCard
+        '
+        Me.txtDepositByCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDepositByCard.Location = New System.Drawing.Point(596, 559)
+        Me.txtDepositByCard.Name = "txtDepositByCard"
+        Me.txtDepositByCard.Size = New System.Drawing.Size(74, 22)
+        Me.txtDepositByCard.TabIndex = 48
+        '
+        'Label2
+        '
+        Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(558, 564)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(35, 12)
+        Me.Label2.TabIndex = 44
+        Me.Label2.Text = "+刷卡"
+        '
         'winSales
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(687, 683)
+        Me.ClientSize = New System.Drawing.Size(705, 717)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.txtDepositByCard)
         Me.Controls.Add(Me.txtDeposit)
         Me.Controls.Add(Me.cbPayMode)
         Me.Controls.Add(Me.btSales)
         Me.Controls.Add(Me.btOrder)
         Me.Controls.Add(Me.lbTotal)
         Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.lbRealTotal)
         Me.Controls.Add(Me.Label6)
@@ -713,7 +735,7 @@ Partial Class winSales
     Friend WithEvents cbPayMode As System.Windows.Forms.ComboBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents txtDeposit As System.Windows.Forms.TextBox
+    Friend WithEvents txtDeposit As NumberBox
     Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents txtCustomer As System.Windows.Forms.TextBox
@@ -762,4 +784,6 @@ Partial Class winSales
     Friend WithEvents cSNumber As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents btOrder2Sales As System.Windows.Forms.Button
+    Friend WithEvents txtDepositByCard As NumberBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
 End Class
