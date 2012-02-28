@@ -48,11 +48,11 @@ Public Module Program
         End Property
 
         Public Shared Function Load(ByVal path As String) As LoginInfo
-            Return Code.Load(path, LoginInfo.Null, Code.ZipMode.ZIP)
+            Return Code.LoadXml(path, LoginInfo.Null, Code.ZipMode.ZIP)
         End Function
 
         Public Sub Save(ByVal path As String)
-            Code.Save(Me, path, Code.ZipMode.ZIP)
+            Code.SaveXml(Me, path, Code.ZipMode.ZIP)
         End Sub
 
 
@@ -148,11 +148,11 @@ Public Module Program
     End Sub
 
     Public Sub ConfigLoad()
-        Config = Code.Load(Of SystemOptional)(ConfigPath, SystemOptional.DefaultConfig)
+        Config = Code.LoadXml(Of SystemOptional)(ConfigPath, SystemOptional.DefaultConfig)
     End Sub
 
     Public Sub ConfigSave()
-        Code.Save(Config, ConfigPath)
+        Code.SaveXml(Config, ConfigPath)
     End Sub
 
 
@@ -291,19 +291,19 @@ Public Module Program
             output.Dispose()
         End Function
 
-        Public Shared Function SerializeWithZIP(Of T)(ByVal obj As T) As String
-            Return Zip(Serialize(obj))
+        Public Shared Function XmlSerializeWithZIP(Of T)(ByVal obj As T) As String
+            Return Zip(XmlSerialize(obj))
         End Function
 
-        Public Shared Function DeserializeWithUnzip(Of T)(ByVal ZipText As String, ByVal Type As Type) As T
-            Return Deserialize(Of T)(Unzip(ZipText))
+        Public Shared Function XmlDeserializeWithUnzip(Of T)(ByVal ZipText As String, ByVal Type As Type) As T
+            Return XmlDeserialize(Of T)(Unzip(ZipText))
         End Function
 
-        Public Shared Function DeserializeWithUnzip(Of T)(ByVal ZipText As String) As T
-            Return Deserialize(Of T)(Unzip(ZipText))
+        Public Shared Function XmlDeserializeWithUnzip(Of T)(ByVal ZipText As String) As T
+            Return XmlDeserialize(Of T)(Unzip(ZipText))
         End Function
 
-        Public Shared Function Serialize(Of T)(ByVal Obj As T) As String
+        Public Shared Function XmlSerialize(Of T)(ByVal Obj As T) As String
             Try
                 Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(GetType(T))
                 Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
@@ -316,7 +316,7 @@ Public Module Program
             End Try
         End Function
 
-        Public Shared Function Deserialize(Of T)(ByVal Text As String) As T
+        Public Shared Function XmlDeserialize(Of T)(ByVal Text As String) As T
             ''將取得的內容進行反序列化
             Dim mySerializer As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(GetType(T)) 'GetType(SerializeData))
             Dim reader As New IO.StringReader(Text)
@@ -329,28 +329,57 @@ Public Module Program
             End Try
         End Function
 
+        Public Shared Function BinSerailzie(Of T)(ByVal obj As T) As Byte()
+            Dim sfFormatter As New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            Dim fStream As New IO.MemoryStream() 'New FileStream("1.dat", FileMode.Create)
+            Try
+                sfFormatter.Serialize(fStream, obj)
+                Return fStream.ToArray
+            Catch
+                Return New Byte() {}
+            Finally
+                fStream.Dispose()
+            End Try
+        End Function
+
+        Public Shared Function BinDeserialize(Of T)(ByVal data() As Byte) As T
+            Dim sfFormatter As New System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+
+            Dim fStream As New IO.MemoryStream(data)
+            Try
+                Return sfFormatter.Deserialize(fStream)
+            Catch ex As Exception
+                Return Nothing
+            Finally
+                fStream.Dispose()
+            End Try
+        End Function
+
         Public Enum ZipMode
             Normal = 0
             ZIP = 1
         End Enum
 
-        Public Shared Sub Save(Of T)(ByVal Data As T, ByVal FilePath As String, Optional ByVal Mode As ZipMode = ZipMode.Normal)
+        Public Shared Sub SaveXml(Of T)(ByVal Data As T, ByVal FilePath As String, Optional ByVal Mode As ZipMode = ZipMode.Normal)
             Dim Dir As String = IO.Path.GetDirectoryName(FilePath)
             If Not IO.Directory.Exists(Dir) Then IO.Directory.CreateDirectory(Dir)
-            Dim Text As String = Code.Serialize(Data)
+            Dim Text As String = Code.XmlSerialize(Data)
             If Mode = ZipMode.ZIP Then Text = Code.Zip(Text)
             My.Computer.FileSystem.WriteAllText(FilePath, Text, False, System.Text.Encoding.Unicode)
         End Sub
 
-        Public Shared Function Load(Of T)(ByVal FilePath As String, ByVal DefaultData As T, Optional ByVal Mode As ZipMode = ZipMode.Normal) As T
+        Public Shared Function LoadXml(Of T)(ByVal FilePath As String, ByVal DefaultData As T, Optional ByVal Mode As ZipMode = ZipMode.Normal) As T
             If IO.File.Exists(FilePath) Then
                 Dim Text As String = My.Computer.FileSystem.ReadAllText(FilePath, System.Text.Encoding.Unicode)
                 If Mode = ZipMode.ZIP Then Text = Code.Unzip(Text)
-                Return Code.Deserialize(Of T)(Text)
+                Return Code.XmlDeserialize(Of T)(Text)
             Else
                 Return DefaultData
             End If
         End Function
+
+
+
 
     End Class
 #End Region

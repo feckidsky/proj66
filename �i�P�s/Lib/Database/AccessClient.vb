@@ -24,12 +24,12 @@
                     If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(cc.Name, cc.IP, cc.Port))
                 Next
 
-                Code.Save(lstInfo.ToArray, Path)
+                Code.SaveXml(lstInfo.ToArray, Path)
             End SyncLock
         End Sub
 
         Public Shared Function Load(ByVal Path As String) As AccessClient()
-            Dim lstInfo As ClientInfo() = Code.Load(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
+            Dim lstInfo As ClientInfo() = Code.LoadXml(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
 
             Dim lstClient As New List(Of Database.AccessClient)
 
@@ -107,8 +107,6 @@
         Inherits Access
 
         Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
-
-        'Dim ResponseDataTable As Data.DataTable = Nothing
 
         Sub New()
             MyBase.New("遠端資料庫")
@@ -202,11 +200,11 @@
             Public Args As T
             Public Result As ResultT
             Public DefaultResult As ResultT
-            Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.DeserializeWithUnzip
+            Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip
 
             Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
                 Waiter.Reset()
-                SendHandler("ReaderRequest", Guid & "," & Cmd, Code.SerializeWithZIP(Args))
+                SendHandler("ReaderRequest", Guid & "," & Cmd, Code.XmlSerializeWithZIP(Args))
                 Waiter.WaitOne()
                 'If Not Waiter.WaitOne(TimeOut, False) Then
                 '    Result = DefaultResult
@@ -217,6 +215,7 @@
             End Function
 
 
+
             Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
                 'If Me.Guid <> Guid Then Return False
                 Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
@@ -225,7 +224,9 @@
             End Function
         End Class
 
-        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
+
+
+        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Action(Of Integer) = Nothing) As Data.DataTable
             If Not Connected() Then
                 MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return New DataTable
@@ -237,19 +238,55 @@
             args.SqlCommand = SQLCommand
 
 
-            Dim Reader As New Reader(Of ReadArgs, DataTable)
-            Reader.Name = Name
-            Reader.DefaultResult = Nothing
-            Reader.Cmd = "DataTable"
-            Reader.Args = args
+            'Dim Reader As New Reader(Of ReadArgs, DataTable)
+            'Reader.Name = Name
+            'Reader.DefaultResult = Nothing
+            'Reader.Cmd = "DataTable"
+            'Reader.Args = args
 
-            lstReader.Add(Reader)
-            Dim dt As DataTable = Reader.Read(AddressOf Send)
-            lstReader.Remove(Reader)
+            'lstReader.Add(Reader)
+            'Dim dt As DataTable = Reader.Read(AddressOf Send)
+            'lstReader.Remove(Reader)
 
+            Dim receiver As Receiver = RequestStream("DataTable", Code.XmlSerializeWithZIP(args))
+            receiver.stream = New IO.MemoryStream()
+            Dim reader As New DataTableReader(receiver)
+            Dim dt = reader.Read()
             Return dt
 
         End Function
+
+        Class DataTableReader
+            WithEvents receiver As Receiver
+            Public Waiter As New Threading.AutoResetEvent(True)
+            Public Progress As Action(Of Integer)
+            Dim dt As DataTable
+
+            Sub New(ByVal receiver As Receiver)
+                Me.receiver = receiver
+            End Sub
+            Public Function Read() As DataTable
+                Waiter.Reset()
+                Waiter.WaitOne()
+                Return dt
+            End Function
+
+            Private Sub receiver_Progress(ByVal sender As Object, ByVal percent As Integer) Handles receiver.Progress
+                If Progress IsNot Nothing Then Progress(percent)
+            End Sub
+
+            Private Sub receiver_Received(ByVal sender As Object, ByVal stream As System.IO.Stream) Handles receiver.Received
+                'Dim bytes(stream.Length - 1) As Byte
+                Dim bytes() As Byte = CType(stream, IO.MemoryStream).ToArray '     stream.Read(bytes, 0, bytes.Length)
+                Dim text As String = System.Text.Encoding.ASCII.GetString(bytes)
+                dt = Code.XmlDeserializeWithUnzip(Of DataTable)(text)
+                Waiter.Set()
+            End Sub
+
+            Private Sub receiver_TransFail(ByVal sender As Object, ByVal Message As String) Handles receiver.TransFail
+                Waiter.Set()
+            End Sub
+        End Class
 
         Public Overrides Function GetErrorLogFileNames() As String()
             Dim reader As New Reader(Of String, String())
@@ -284,13 +321,13 @@
 
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
-            MyBase.Send(cmd, Code.SerializeWithZIP(args))
+            MyBase.Send(cmd, Code.XmlSerializeWithZIP(args))
         End Sub
         Public Overloads Sub Send(ByVal cmd As String, ByVal Guid As String, ByVal args As String)
             MyBase.Send(cmd, Guid & "," & args)
         End Sub
         Private Shared Function Repair(Of T)(ByVal s As String) As T
-            Return Code.DeserializeWithUnzip(Of T)(s)
+            Return Code.XmlDeserializeWithUnzip(Of T)(s)
         End Function
 
         Private Sub AccessClient_ConnectedFail(ByVal Client As TCPTool.Client) Handles Me.ConnectedFail
@@ -342,7 +379,7 @@
                 Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
                 Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
                 Case "DeletedAllLog" : OnDeletedAllLog()
-                Case "MsgBox" : MsgBox(Code.DeserializeWithUnzip(Of String)(args))
+                Case "MsgBox" : MsgBox(Code.XmlDeserializeWithUnzip(Of String)(args))
                 Case Else
                     MsgBox("Client:不明指令:" & vbCrLf & Data(0))
             End Select

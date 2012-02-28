@@ -174,7 +174,7 @@ Public Class winMain
     End Sub
 
     Private Sub 欄位顯示VToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 欄位顯示VToolStripMenuItem.Click
-        If DataGridViewVisibleDialog.ShowDialog(dgSales) Then Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
+        If DataGridViewVisibleDialog.ShowDialog(dgSales) Then Code.SaveXml(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
 
     End Sub
 
@@ -308,9 +308,9 @@ Public Class winMain
         If Not IO.File.Exists(SalesVisiblePath) Then
             If dgSales.Columns("單號") Is Nothing Then Exit Sub
             dgSales.Columns("單號").Visible = False
-            Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
+            Code.SaveXml(DataGridViewVisibleDialog.GetVisibleColumns(dgSales), SalesVisiblePath)
         Else
-            DataGridViewVisibleDialog.SetVisible(dgSales, Code.Load(Of String())(SalesVisiblePath, New String() {}))
+            DataGridViewVisibleDialog.SetVisible(dgSales, Code.LoadXml(Of String())(SalesVisiblePath, New String() {}))
         End If
 
         If Filter IsNot Nothing Then Filter.ClearComboBoxItem()
@@ -620,8 +620,8 @@ Public Class winMain
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        Dim a() As Integer = New Integer() {}
-        a(0) = 100
+        'Dim a() As Integer = New Integer() {}
+        'a(0) = 100
 
         'Dim lst As New List(Of String)
         'For i = 0 To 10
@@ -631,6 +631,7 @@ Public Class winMain
 
         'MsgBox(Join(lst.ToArray, vbCrLf))
         'MsgBox(Join(access.GetErrorLogFileNames(), vbCrLf))
+
     End Sub
 
 

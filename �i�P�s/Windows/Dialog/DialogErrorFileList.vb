@@ -2,7 +2,7 @@
 
     Dim access As Database.Access
 
-    WithEvents downloader As TCPTool.Client.Downloader
+    WithEvents downloader As TCPTool.Client.Receiver
 
     Public Overloads Sub ShowDialog(ByVal db As Database.Access)
         access = db
@@ -28,7 +28,7 @@
 
     End Sub
 
-    Private Sub downloader_Downloaded(ByVal sender As Object) Handles downloader.Downloaded
+    Private Sub downloader_Downloaded(ByVal sender As Object, ByVal stream As IO.Stream) Handles downloader.Received
         DownloadDialog.Finish()
         If MsgBox("下載完成，是否要立即開啟", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
             Try
@@ -37,7 +37,7 @@
                 MsgBox(Err.Description)
             End Try
         End If
-        If DeleteHandler IsNot Nothing Then DeleteHandler(CType(sender, TCPTool.Client.Downloader).sourceFile)
+        If DeleteHandler IsNot Nothing Then DeleteHandler(CType(sender, TCPTool.Client.Receiver).sourceFile)
     End Sub
 
     Private Sub downloader_Progress(ByVal sender As Object, ByVal percent As Integer) Handles downloader.Progress

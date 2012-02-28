@@ -33,6 +33,8 @@ Public Class TCPTool
     Event ServerConnectedFail(ByVal Client As Client)
     Event ClientConnectedFail(ByVal Client As Client)
 
+    Event ServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.Sender)
+
     '檔案傳送事件
     Event SendFileRequest(ByVal Client As Client, ByVal IP As String, ByVal FileName As String, ByVal FileSize As Long, ByVal Message As String)
     Event SendProgressChanged(ByVal Client As Client, ByVal FilePath As String, ByVal FileName As String, ByVal FinishByte As Long, ByVal Percent As Integer, ByVal Message As String)
@@ -159,11 +161,11 @@ Public Class TCPTool
         End Function
 
         Public Overrides Function ToString() As String
-            Return Code.Serialize(Me)
+            Return Code.XmlSerialize(Me)
         End Function
 
         Public Shared Function Parse(ByVal s As String) As IPConfig
-            Return Code.Deserialize(Of IPConfig)(s)
+            Return Code.XmlDeserialize(Of IPConfig)(s)
         End Function
 
     End Structure
@@ -267,11 +269,11 @@ Public Class TCPTool
                 Me.IP = IP : Me.Port = Port : Me.Message = Msg
             End Sub
             Public Overrides Function ToString() As String
-                Return Code.Serialize(Me)
+                Return Code.XmlSerialize(Me)
             End Function
 
             Public Shared Function Parse(ByVal Text As String) As UdpArgs
-                Return Code.Deserialize(Of UdpArgs)(Text)
+                Return Code.XmlDeserialize(Of UdpArgs)(Text)
             End Function
         End Structure
 
@@ -380,12 +382,17 @@ Public Class TCPTool
             AddHandler cClient.SendProgressChanged, AddressOf SendProgressChanged_Trigger
             AddHandler cClient.SendProgressFinished, AddressOf SendProgressFinished_Trigger
             AddHandler cClient.SetIPAddressFinish, AddressOf OnServerSetIPAddressFinish
+            AddHandler cClient.ReceiveStreamRequest, AddressOf OnServerReceiveStreamRequest
             '記錄元件
             ServerClientList.Add(cClient)
 
             '連線事件觸發
             RaiseEvent ReceiveConnected(Me, cClient)
         Loop
+    End Sub
+
+    Friend Sub OnServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.Sender)
+        RaiseEvent ServerReceiveStreamRequest(Client, sender)
     End Sub
 
     Friend Sub OnServerSetIPAddressFinish(ByVal Client As Client)
@@ -491,6 +498,7 @@ Public Class TCPTool
         AddHandler Client.SendFileRequest, AddressOf SendFileRequest_Trigger
         AddHandler Client.SendProgressChanged, AddressOf SendProgressChanged_Trigger
         AddHandler Client.SendProgressFinished, AddressOf SendProgressFinished_Trigger
+
         ClientList.Add(Client)
         Return Client
     End Function
@@ -626,11 +634,18 @@ Public Class TCPTool
         Event ConnectedFail(ByVal Client As Client)
         Event ConnectedSuccess(ByVal Client As Client)
         Event ReceiveSplitMessage(ByVal Client As Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String)
+        Event ReceiveStreamRequest(ByVal Client As Client, ByVal sender As Sender)
 
 
         Event GetReceive(ByVal ClientClass As Client, ByVal Client As TcpClient, ByVal IP As String, ByVal Port As Integer, ByVal Msg As String)
 
         Public MyEncoding As System.Text.Encoding
+
+        'Public Structure ReceiveStreamRequestArgs
+        '    Dim cmd As String
+        '    Dim args As String
+        '    Dim stream As IO.Stream
+        'End Structure
 
         Public Enum Encoding
             AscII = 0
@@ -685,12 +700,12 @@ Public Class TCPTool
         End Structure
 
         Public Sub Save(ByVal Path As String)
-            Code.Save(New Address(IP, Port), Path)
+            Code.SaveXml(New Address(IP, Port), Path)
         End Sub
 
         Public Function Load(ByVal Path As String, ByVal DefaultAddress As Address) As Address
             Dim LoadAddress As Address = DefaultAddress
-            LoadAddress = Code.Load(Path, DefaultAddress)
+            LoadAddress = Code.LoadXml(Path, DefaultAddress)
             Me.IP = LoadAddress.IP
             Me.Port = LoadAddress.Port
             Return LoadAddress
@@ -1018,7 +1033,7 @@ Public Class TCPTool
                     Case "%ReceiveSetIPAddress%"
 
                     Case "%FileTransmitter%"
-                        lstFileTransmitter.Receive(Me, MsgPart)
+                        lstTransmitter.Receive(Me, MsgPart)
                 End Select
 
                 Exit Sub
@@ -1056,25 +1071,47 @@ Public Class TCPTool
             Send("%RequestSetIPAddress%," & e.ToString)
         End Sub
 
-        Public Function Download(ByVal sourceFile As String, ByVal destFile As String) As Downloader
-            Dim downloader As New Downloader(Me)
-            lstFileTransmitter.Add(downloader)
-            downloader.StartDownload(sourceFile, destFile)
-            Return downloader
+        Public Function Download(ByVal sourceFile As String, ByVal destFile As String) As Receiver
+
+
+            Try
+                Dim fs As IO.FileStream = New IO.FileStream(destFile, IO.FileMode.Create)
+                Dim Receiver As New Receiver(Me, Receiver.GetGuid(), fs)
+                lstTransmitter.Add(Receiver)
+                Receiver.Request("Download", sourceFile)
+                Return Receiver
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
+            'Receiver.RequestData() ' .StartDownload(sourceFile, destFile)
+        End Function
+
+        Public Function RequestStream(ByVal cmd As String, ByVal args As String) As Receiver
+            Dim ms As New IO.MemoryStream
+            Dim receiver As New Receiver(Me, receiver.GetGuid, ms)
+            lstTransmitter.Add(receiver)
+            receiver.Request(cmd, args)
+            Return receiver
         End Function
 
         Friend Class TransmitterList
-            Inherits List(Of FileTransmitter)
+            Inherits List(Of Transmitter)
             Dim ReadLock As String = "ReadLock"
+            Dim ElseRequestHandler As Action(Of Sender)
+            Sub New(ByVal ElseRequest As Action(Of Sender))
+                ElseRequestHandler = ElseRequest
+            End Sub
 
-            Public Overloads Sub Add(ByVal Item As FileTransmitter)
+
+            Public Overloads Sub Add(ByVal Item As Transmitter)
                 SyncLock ReadLock
                     MyBase.Add(Item)
                     Item.parent = Me
                 End SyncLock
             End Sub
 
-            Public Overloads Sub Remove(ByVal item As FileTransmitter)
+            Public Overloads Sub Remove(ByVal item As Transmitter)
                 SyncLock ReadLock
                     MyBase.Remove(item)
                 End SyncLock
@@ -1082,38 +1119,65 @@ Public Class TCPTool
 
             Public Sub Receive(ByVal Client As Client, ByVal para() As String)
                 Dim Guid As String = para(1)
-                Dim Transmitters As List(Of FileTransmitter)
+                Dim Transmitters As List(Of Transmitter)
 
                 SyncLock ReadLock
-                    Transmitters = FindAll(Function(i As FileTransmitter) i.Guid = Guid)
-                    For Each r As FileTransmitter In Transmitters
+                    Transmitters = FindAll(Function(i As Transmitter) i.Guid = Guid)
+                    For Each r As Transmitter In Transmitters
                         r.Receive(para)
                     Next
                 End SyncLock
 
                 If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
-                    If para(2) = "StartDownload" Then
-                        Dim sender As New Uploader(Client, para(1))
-                        Add(sender)
-                        sender.StartSend(para(3))
-                    End If
+                    Select Case para(2)
+                        Case "Download"
+                            Dim sender As New Sender(Client, Guid)
+                            Try
+                                Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
+                                Add(sender)
+                                sender.stream = fs
+                                sender.StartSend()
+                            Catch
+                                sender.Fail(Err.Description)
+                            End Try
+
+                        Case Else
+                            Dim sender As New Sender(Client, Guid)
+                            Add(sender)
+                            sender.Cmd = para(2)
+                            sender.Args = para(3)
+                            ElseRequestHandler(sender)
+                            sender.StartSend()
+                            'Dim receiver As New Receiver(Client, Guid)
+                            'receiver.TotalSize = para(3)
+                            'Add(receiver)
+                            'receiver.RequestData()
+                    End Select
 
                 End If
 
             End Sub
         End Class
 
-        Friend lstFileTransmitter As New TransmitterList
+        Public Sub OnReceiveStreamRequest(ByVal e As Sender)
+            RaiseEvent ReceiveStreamRequest(Me, e)
+        End Sub
+
+        Friend lstTransmitter As New TransmitterList(AddressOf OnReceiveStreamRequest)
 
 #End Region
 
-        Public MustInherit Class FileTransmitter
+        Public MustInherit Class Transmitter
             Friend parent As TransmitterList
             Public Guid As String
-            Public Client As Client
-            Friend fs As IO.FileStream
-
+            Public WithEvents Client As Client
+            'Friend fs As IO.FileStream
+            Friend stream As IO.Stream
             Event TransFail(ByVal sender As Object, ByVal Message As String)
+
+            Public Shared Function GetGuid() As String
+                Return Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+            End Function
 
             Public Sub Send(ByVal cmd As String, ByVal Args As String)
                 Client.Send("%FileTransmitter%," & Guid & "," & cmd, Args)
@@ -1126,35 +1190,53 @@ Public Class TCPTool
 
             Public MustOverride Sub Receive(ByVal msg() As String)
 
+            Private Sub Client_ConnectedFail(ByVal Client As Client) Handles Client.ConnectedFail
+                If parent IsNot Nothing Then parent.Remove(Me)
+                OnTransFail("連線中斷!")
+                Try
+                    stream.Close()
+                    stream.Dispose()
+                Catch
+                End Try
+            End Sub
         End Class
 
 
-        Public Class Uploader
-            Inherits FileTransmitter
+        Public Class Sender
+            Inherits Transmitter
             Dim ReadToEnd As Boolean = False
             Dim BufferSize As Integer = 32767
+            Public Cmd As String
+            Public Args As String
 
-            Sub New(ByVal Client As Client, ByVal newGuid As String)
+            Sub New(ByVal Client As Client, ByVal Guid As String)
                 Me.Client = Client
-                Me.Guid = newGuid
+                Me.Guid = Guid
+                'Me.stream = stream
             End Sub
 
-            Public Sub StartSend(ByVal Path As String)
-                Try
-                    fs = New IO.FileStream(Path, IO.FileMode.Open, IO.FileAccess.Read)
+            'Public Sub WriteString(ByVal text As String)
+            '    stream = New IO.MemoryStream()
+            '    Dim sw As New IO.StreamWriter(stream)
+            '    sw.Write(text)
+            '    sw.Dispose()
+            'End Sub
 
-                Catch
-                    OnTransFail(Err.Description)
-                    Send("Fail", Err.Description)
-                    If parent IsNot Nothing Then parent.Remove(Me)
-                End Try
+            Public Sub StartSend()
+                'Try
+                '    Me.stream = stream ' New IO.FileStream(Path, IO.FileMode.Open, IO.FileAccess.Read)
+                'Catch
+                '    OnTransFail(Err.Description)
+                '    Send("Fail", Err.Description)
+                '    If parent IsNot Nothing Then parent.Remove(Me)
+                'End Try
                 ReadToEnd = False
-                Send("StartSendFile", fs.Length)
+                Send("StartSendFile", stream.Length)
             End Sub
 
             Private Sub Upload()
                 If ReadToEnd Then
-                    fs.Close()
+                    stream.Close()
                     Send("EndSendFile", "")
                     If parent IsNot Nothing Then parent.Remove(Me)
                     Exit Sub
@@ -1163,17 +1245,24 @@ Public Class TCPTool
                 Dim data(BufferSize - 1) As Byte
 
                 Try
-                    If fs.Length - fs.Position < BufferSize Then  '如果剩下位傳送的位元組不到BufferSize
-                        System.Array.Resize(data, fs.Length - fs.Position)
+                    If stream.Length - stream.Position < BufferSize Then  '如果剩下位傳送的位元組不到BufferSize
+                        System.Array.Resize(data, stream.Length - stream.Position)
                     End If
                 Catch
 
                 End Try
+
                 Try
-                    fs.Read(data, 0, data.Length)
+                    ReadToEnd = stream.Length - stream.Position <= BufferSize
+                Catch
+                    ReadToEnd = True
+                End Try
+
+                Try
+                    stream.Read(data, 0, data.Length)
                 Catch
                     OnTransFail(Err.Description)
-                    Send("Fail", Err.Description)
+                    Fail(Err.Description)
                     If parent IsNot Nothing Then parent.Remove(Me)
                 End Try
 
@@ -1182,23 +1271,28 @@ Public Class TCPTool
                 Dim base64 As String = Convert.ToBase64String(zipByte)
                 Send("SendFileData", base64)
 
-                Try
-                    ReadToEnd = fs.Length - fs.Position <= BufferSize
-                Catch
-                    ReadToEnd = True
-                End Try
+
+                'Try
+                '    ReadToEnd = stream.Length - stream.Position <= BufferSize
+                'Catch
+                '    ReadToEnd = True
+                'End Try
 
             End Sub
 
-            Private Sub Cancel()
+            Private Sub ReceiveCancel()
                 Try
-                    fs.Close()
-                    fs.Dispose()
+                    stream.Close()
+                    stream.Dispose()
                 Catch
-                    Send("Fail", Err.Description)
+                    Fail(Err.Description)
                 Finally
                     If parent IsNot Nothing Then parent.Remove(Me)
                 End Try
+            End Sub
+
+            Public Sub Fail(ByVal msg As String)
+                Send("Fail", msg)
             End Sub
 
             Public Overrides Sub Receive(ByVal msg() As String)
@@ -1209,89 +1303,102 @@ Public Class TCPTool
                     Case "RequestData"
                         Upload()
                     Case "Cancel"
-                        Cancel()
+                        ReceiveCancel()
                 End Select
             End Sub
 
 
         End Class
 
-        Public Class Downloader
-            Inherits FileTransmitter
-            Dim totalSize As Long
+        Public Class Receiver
+            Inherits Transmitter
+            Public TotalSize As Long
             Public destFile As String
             Public sourceFile As String
 
             Event Progress(ByVal sender As Object, ByVal percent As Integer)
-            Event Downloaded(ByVal sender As Object)
+            Event Received(ByVal sender As Object, ByVal stream As IO.Stream)
 
 
-            Sub New(ByVal Client As Client)
+            Sub New(ByVal Client As Client, ByVal Guid As String, Optional ByVal stream As IO.Stream = Nothing)
                 Me.Client = Client
-                Me.Guid = Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+                Me.Guid = Guid 'Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+                If stream Is Nothing Then stream = New IO.MemoryStream
+                Me.stream = stream
             End Sub
 
-            Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
-                Me.destFile = destFile
-                Me.sourceFile = sourceFile
-                Send("StartDownload", sourceFile)
+            Public Sub Request(ByVal cmd As String, ByVal Args As String)
+                Send(cmd, Args)
             End Sub
+            'Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
+            '    Me.destFile = destFile
+            '    Me.sourceFile = sourceFile
+            '    Send("StartDownload", sourceFile)
+            'End Sub
 
             Private Sub StartReceiveFile(ByVal size As String)
-                totalSize = size
-                Try
-                    fs = New IO.FileStream(destFile, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.None)
+                TotalSize = size
+                'Try
+                '    stream = New IO.FileStream(destFile, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.None)
 
-                Catch
-                    OnTransFail(Err.Description)
-                    Send("Cancel", "")
-                    If parent IsNot Nothing Then parent.Remove(Me)
-                End Try
-                Send("RequestData", "")
+                'Catch
+                '    OnTransFail(Err.Description)
+                '    Send("Cancel", "")
+                '    If parent IsNot Nothing Then parent.Remove(Me)
+                'End Try
+                RequestData()
             End Sub
 
             Private Sub WriteFile(ByVal base64 As String)
                 Dim zipByte() As Byte = Convert.FromBase64String(base64)
                 Dim data() As Byte = Code.Unzip(zipByte)
                 Try
-                    fs.Write(data, 0, data.Length)
+                    stream.Write(data, 0, data.Length)
                 Catch
                     OnTransFail(Err.Description)
-                    Send("Cancel", "")
+                    Cancel()
                     If parent IsNot Nothing Then parent.Remove(Me)
                 End Try
 
                 Dim percent As Integer
-                If totalSize = 0 Then
+                If TotalSize = 0 Then
                     percent = 0
                 Else
-                    percent = fs.Position / totalSize * 100
+                    percent = stream.Position / TotalSize * 100
                 End If
 
 
                 RaiseEvent Progress(Me, percent)
+                RequestData()
+            End Sub
+
+            Public Sub RequestData()
                 Send("RequestData", "")
             End Sub
 
             Private Sub CloseFile()
+                OnReceived()
                 Try
-                    fs.Close()
-                    fs.Dispose()
+                    stream.Close()
+                    stream.Dispose()
                 Catch
                 Finally
                     If parent IsNot Nothing Then parent.Remove(Me)
                 End Try
-                OnDownLoaded()
             End Sub
 
-            Friend Sub OnDownLoaded()
-                RaiseEvent Downloaded(Me)
+            Public Sub Cancel()
+                Send("Cancel", "")
+            End Sub
+
+            Friend Sub OnReceived()
+                RaiseEvent Received(Me, stream)
             End Sub
 
             Private Sub Fail(ByVal Message As String)
                 Try
-                    fs.Close()
-                    fs.Dispose()
+                    stream.Close()
+                    stream.Dispose()
                 Catch
                 Finally
                     If parent IsNot Nothing Then parent.Remove(Me)

@@ -82,9 +82,9 @@ Public Class winStockMoveList
 
         dgList.Rows.Clear()
         If Not IO.File.Exists(StockMoveVisiblePath) Then
-            Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
+            Code.SaveXml(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
         Else
-            DataGridViewVisibleDialog.SetVisible(dgList, Code.Load(Of String())(StockMoveVisiblePath, New String() {}))
+            DataGridViewVisibleDialog.SetVisible(dgList, Code.LoadXml(Of String())(StockMoveVisiblePath, New String() {}))
         End If
 
         If Filter IsNot Nothing Then Filter.ClearComboBoxItem()
@@ -305,7 +305,7 @@ Public Class winStockMoveList
 
 
     Private Sub 欄位顯示ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 欄位顯示ToolStripMenuItem.Click
-        If DataGridViewVisibleDialog.ShowDialog(dgList) Then Code.Save(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
+        If DataGridViewVisibleDialog.ShowDialog(dgList) Then Code.SaveXml(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
     End Sub
 
 

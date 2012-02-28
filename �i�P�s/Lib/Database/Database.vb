@@ -239,18 +239,18 @@
             End Try
         End Sub
 
-        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As Downloader
+        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As Receiver
 
             If Me.GetType Is GetType(Access) Then
-                Dim downloader As New Downloader(Me)
+                Dim Receiver As New Receiver(Me, Receiver.GetGuid())
                 Try
                     IO.File.Copy(sourcePath, DestPath, True)
-                    Return downloader
+                    Return Receiver
                 Catch
                     MsgBox(Err.Description)
-                    Return downloader
+                    Return Receiver
                 Finally
-                    downloader.OnDownLoaded()
+                    Receiver.OnReceived()
                 End Try
             Else
                 Return MyBase.Download(sourcePath, DestPath)
@@ -915,7 +915,7 @@
             Return Read(Table, FileList, New String() {SqlCommand})
         End Function
 
-        Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
+        Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Action(Of Integer) = Nothing) As Data.DataTable
 
 
 
