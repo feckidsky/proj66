@@ -133,10 +133,6 @@
             Return Count
         End Function
 
-
-
-
-
         Class ReaderList
             Inherits List(Of ReaderBase)
             Dim ReadLock As String = "ReadLock"
@@ -161,6 +157,15 @@
                     Next
                 End SyncLock
             End Sub
+
+            Public Sub Desconnect()
+                SyncLock ReadLock
+                    For Each r As ReaderBase In Me
+                        r.Desconnect()
+                    Next
+                    Me.Clear()
+                End SyncLock
+            End Sub
         End Class
 
         Public lstReader As New ReaderList
@@ -181,6 +186,15 @@
             End Sub
 
             Public MustOverride Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
+
+            Public Sub Desconnect()
+                Try
+                    Waiter.Set()
+                Catch ex As Exception
+
+                End Try
+                MsgBox(Name & "已經斷線!", MsgBoxStyle.Exclamation)
+            End Sub
         End Class
 
         Class Reader(Of T, ResultT)
@@ -193,22 +207,22 @@
             Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
                 Waiter.Reset()
                 SendHandler("ReaderRequest", Guid & "," & Cmd, Code.SerializeWithZIP(Args))
-                If Not Waiter.WaitOne(TimeOut, False) Then
-                    Result = DefaultResult
-                    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
-                End If
+                Waiter.WaitOne()
+                'If Not Waiter.WaitOne(TimeOut, False) Then
+                '    Result = DefaultResult
+                '    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
+                'End If
 
                 Return Result
             End Function
 
 
             Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
-                If Me.Guid <> Guid Then Return False
+                'If Me.Guid <> Guid Then Return False
                 Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
                 Waiter.Set()
                 Return True
             End Function
-
         End Class
 
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String) As Data.DataTable
@@ -278,6 +292,10 @@
         Private Shared Function Repair(Of T)(ByVal s As String) As T
             Return Code.DeserializeWithUnzip(Of T)(s)
         End Function
+
+        Private Sub AccessClient_ConnectedFail(ByVal Client As TCPTool.Client) Handles Me.ConnectedFail
+            lstReader.Desconnect()
+        End Sub
 
         Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ReceiveSplitMessage
 

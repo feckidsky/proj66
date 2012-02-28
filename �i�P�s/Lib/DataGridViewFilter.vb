@@ -340,6 +340,7 @@
             If TextFilters(i).HeaderName = HeaderText Then
                 loc.Offset(0, -TextFilters(i).cms.Height)
                 TextFilters(i).cms.Show(sender, loc)
+                CType(TextFilters(i).cms.Items("cbText"), ToolStripComboBox).Focus()
                 Exit Sub
             End If
         Next

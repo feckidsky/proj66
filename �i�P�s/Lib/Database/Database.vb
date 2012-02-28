@@ -98,18 +98,9 @@
             Return MyBase.Connected()
         End Function
 
-        'Public Sub New()
-        '    Dir = My.Application.Info.DirectoryPath & "\data"
-        '    BasePath = Dir & "\base.mdb"
-        '    SalesPath = Dir & "\sales.mdb"
-        'End Sub
-
         Public Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
 
             Dim result As LoginResult
-
-
-
             Dim r_user As Personnel = GetPersonnelByID(ID)
 
             If ID = Personnel.Designer.ID And Password = Personnel.Designer.Password Then
@@ -345,6 +336,7 @@
 
         '刪除一筆庫存
         Public Overridable Sub DeleteStock(ByVal dStock As Stock)
+            If dStock.GoodsLabel = "" Then dStock.GoodsLabel = GetStock(dStock.Label).GoodsLabel
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
             Dim goods As Goods = GetGoods(dStock.GoodsLabel)
@@ -391,13 +383,12 @@
         End Function
 
         ''' <summary>取得庫存清單</summary>
-        Public Function GetStockListWithHistoryPrice() As Data.DataTable
-
-            Dim SqlCommand As String = "SELECT stock.GoodsLabel as 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Cost as 進價, history.Price AS 售價, stock.Note AS 備註 " & _
-            " FROM ((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label " & _
-            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0));"
-
-
+        Public Function GetStockListWithHistoryPrice(Optional ByVal StockLabel As String = "") As Data.DataTable
+            Dim stockCondition As String = ""
+            If StockLabel <> "" Then stockCondition = " And stock.Label='" & StockLabel & "'"
+            Dim SqlCommand As String = "SELECT stock.GoodsLabel AS 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, stock.number AS 進貨數量, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Cost AS 進價, history.Price AS 售價, stock.Note AS 備註, Supplier.Name AS 供應商 " & _
+            " FROM (((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label) INNER JOIN Supplier ON stock.SupplierLabel = Supplier.Label " & _
+            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0) " & stockCondition & ");"
 
             Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
             Return DT
@@ -525,7 +516,7 @@
 
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金]", "") & ", Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金]", "") & ", Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(-int(-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0))) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
             " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
             condition1 & _
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
@@ -1258,7 +1249,7 @@
         ''' <summary>新增庫存</summary>
         Public Overridable Sub AddStock(ByVal data As Stock)
             AddBase(data)
-            Dim goods As Goods = GetGoods(data.Label)
+            Dim goods As Goods = GetGoods(data.GoodsLabel)
             AddLog(Now, "入庫:" & goods.Name & " x " & data.Number)
             OnCreatedStock(data)
         End Sub

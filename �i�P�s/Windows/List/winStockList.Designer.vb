@@ -25,6 +25,10 @@ Partial Class winStockList
         Me.components = New System.ComponentModel.Container
         Me.dgItemList = New System.Windows.Forms.DataGridView
         Me.cmsStock = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.進貨ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.修改ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
         Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.進貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -52,14 +56,37 @@ Partial Class winStockList
         Me.dgItemList.ReadOnly = True
         Me.dgItemList.RowTemplate.Height = 24
         Me.dgItemList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgItemList.Size = New System.Drawing.Size(620, 348)
+        Me.dgItemList.Size = New System.Drawing.Size(804, 348)
         Me.dgItemList.TabIndex = 0
         '
         'cmsStock
         '
-        Me.cmsStock.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.調貨ToolStripMenuItem})
+        Me.cmsStock.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨ToolStripMenuItem1, Me.修改ToolStripMenuItem, Me.刪除ToolStripMenuItem, Me.ToolStripSeparator1, Me.調貨ToolStripMenuItem})
         Me.cmsStock.Name = "cmsStock"
-        Me.cmsStock.Size = New System.Drawing.Size(101, 26)
+        Me.cmsStock.Size = New System.Drawing.Size(101, 98)
+        '
+        '進貨ToolStripMenuItem1
+        '
+        Me.進貨ToolStripMenuItem1.Name = "進貨ToolStripMenuItem1"
+        Me.進貨ToolStripMenuItem1.Size = New System.Drawing.Size(100, 22)
+        Me.進貨ToolStripMenuItem1.Text = "進貨"
+        '
+        '修改ToolStripMenuItem
+        '
+        Me.修改ToolStripMenuItem.Name = "修改ToolStripMenuItem"
+        Me.修改ToolStripMenuItem.Size = New System.Drawing.Size(100, 22)
+        Me.修改ToolStripMenuItem.Text = "修改"
+        '
+        '刪除ToolStripMenuItem
+        '
+        Me.刪除ToolStripMenuItem.Name = "刪除ToolStripMenuItem"
+        Me.刪除ToolStripMenuItem.Size = New System.Drawing.Size(100, 22)
+        Me.刪除ToolStripMenuItem.Text = "刪除"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(97, 6)
         '
         '調貨ToolStripMenuItem
         '
@@ -72,7 +99,7 @@ Partial Class winStockList
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.進貨ToolStripMenuItem, Me.調貨ToolStripMenuItem1, Me.cbStock, Me.列印PToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(640, 28)
+        Me.MenuStrip1.Size = New System.Drawing.Size(824, 28)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -109,7 +136,7 @@ Partial Class winStockList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(640, 387)
+        Me.ClientSize = New System.Drawing.Size(824, 387)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.dgItemList)
         Me.MainMenuStrip = Me.MenuStrip1
@@ -132,4 +159,8 @@ Partial Class winStockList
     Friend WithEvents cmsStock As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents 調貨ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 調貨ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 進貨ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 修改ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 刪除ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
 End Class

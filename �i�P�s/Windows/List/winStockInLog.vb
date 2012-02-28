@@ -42,8 +42,8 @@
 
         dt = access.GetStockLog(StartTime, EndTime)
         dgStockLog.DataSource = dt
-        dgStockLog.Sort(dgStockLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
+        dgStockLog.Sort(dgStockLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
     End Sub
 
     '改變篩選方式
@@ -105,6 +105,7 @@
 
         If MsgBox("您現在要刪除該筆進貨記錄，確定要這麼做？", MsgBoxStyle.OkCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Cancel Then Exit Sub
         stock.Label = dgStockLog.SelectedRows(0).Cells(0).Value
+        ' stock.GoodsLabel = dgStockLog.SelectedRows ( 0).cells
         access.DeleteStock(stock)
     End Sub
 

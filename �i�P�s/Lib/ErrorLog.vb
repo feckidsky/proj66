@@ -33,15 +33,41 @@ Public Class ErrorLog
 #Region "記錄錯誤訊息"
 
     Public Shared Sub OnThreadException(ByVal sender As Object, ByVal e As Threading.ThreadExceptionEventArgs)
-        WriteErrorLog(e.Exception)
-        ErrorDialog.ShowDialog(Dir, GetErrorMessage(e.Exception))
-        RaiseEvent ErrorOccur()
+        OnErrorOccur(e.Exception)
     End Sub
+
     Public Shared Sub OnUnhandledException(ByVal sender As Object, ByVal e As UnhandledExceptionEventArgs)
-        WriteErrorLog(e.ExceptionObject)
-        ErrorDialog.ShowDialog(Dir, GetErrorMessage(e.ExceptionObject))
+        OnErrorOccur(e.ExceptionObject)
+    End Sub
+
+    Private Shared Sub OnErrorOccur(ByVal e As Exception)
+        WriteErrorLog(e)
+        Dim t As Date = Now
+        For Each f As Form In My.Application.OpenForms
+            Save(f, Dir & "\" & t.ToString("yyyyMMddHHmmss") & f.Name & ".jpg")
+
+        Next
+        ErrorDialog.ShowDialog(Dir, GetErrorMessage(e))
         RaiseEvent ErrorOccur()
     End Sub
+
+
+    Public Shared Sub Save(ByVal F As Form, ByVal Path As String)
+        Dim myImage As New Bitmap(F.Width, F.Height)
+        Dim g = Graphics.FromImage(myImage)
+        Try
+            F.BringToFront()
+            'F.TopMost = True
+        Catch ex As Exception
+
+        End Try
+        g.CopyFromScreen(F.Location.X, F.Location.Y, 0, 0, New Size(F.Width, F.Height))
+        Dim dc1 As IntPtr = g.GetHdc()
+        g.ReleaseHdc(dc1)
+        myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
+    End Sub
+
+
 
     Public Shared Sub WriteErrorLog(ByVal e As Exception)
         Dim Msg As String = GetErrorMessage(e)
@@ -63,10 +89,13 @@ Public Class ErrorLog
         Msg &= e.TargetSite.DeclaringType.ToString & vbCrLf
         Msg &= e.TargetSite.ToString & ":" & vbCrLf
         Msg &= e.Message & vbCrLf
-        Msg &= "---------------------------------------------------" & vbCrLf
         Msg &= e.StackTrace & vbCrLf
+        Msg &= "---------------------------------------------------" & vbCrLf
+        'e.Source
         Return Msg
     End Function
+
+
 
     Public Shared Sub WriteErrorLog(ByVal Msg As String)
         ' Dim Dir As String = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\JNC ErrorLog\"

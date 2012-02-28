@@ -57,27 +57,23 @@
     End Sub
 
     Dim UpdateStockListHandler As New Action(AddressOf UpdateStockList)
+    Dim DT As Data.DataTable = Nothing
     Public Sub UpdateStockList()
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
             Me.Invoke(UpdateStockListHandler)
             Exit Sub
         End If
-        Dim DT As Data.DataTable = access.GetStockListWithHistoryPrice()
-        'If cbStock.SelectedIndex = 0 Then
-
-        '    DT = Program.myDatabase.GetStockListWithHistoryPrice() 'DB.GetStockList()
-        'Else
-        '    DT = access.GetStockListWithHistoryPrice
-        'End If
+        DT = access.GetStockListWithHistoryPrice()
 
         dgItemList.DataSource = DT
 
-        If DT.Columns.Count = 0 Then Exit Sub
+        If DT Is Nothing OrElse DT.Columns.Count = 0 Then Exit Sub
 
         'dgItemList.Columns("商品編號").Visible = False
-        dgItemList.Sort(dgItemList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+
         If Filter IsNot Nothing Then Filter.UpdateComboBox()
+        dgItemList.Sort(dgItemList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
     End Sub
 
 
@@ -119,25 +115,65 @@
     Private Sub DataGridView1_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgItemList.CellDoubleClick
         If e.RowIndex = -1 Then Exit Sub
         If dgItemList.SelectedCells(0).RowIndex >= dgItemList.Rows.Count Then Exit Sub
-        SelectedRow = dgItemList.Rows(e.RowIndex)
-        Me.Close()
+
+        If SelectMode Then
+            SelectedRow = dgItemList.Rows(e.RowIndex)
+            Me.Close()
+        Else
+            Modify()
+        End If
         'Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
+    Private Sub AddRow(ByVal arr() As Object)
+        DT.Rows.Add(arr)
+    End Sub
+
+    Private Sub RemoveRow(ByVal Label As String)
+        If DT Is Nothing Then Exit Sub
+        Dim rows() As DataRow = DT.Select("庫存編號 = '" & Label & "'")
+        For Each r As DataRow In rows
+            DT.Rows.Remove(r)
+        Next
+    End Sub
+
+    Private Sub ChangeRow(ByVal arr() As Object)
+        For i As Integer = 0 To dt.Rows.Count - 1
+            If arr(1) = DT.Rows(i)("庫存編號") Then DT.Rows(i).ItemArray = arr
+        Next
+    End Sub
+
     Private Sub access_ChangedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.ChangedStock
-        UpdateStockList()
+        Dim dt As DataTable = access.GetStockListWithHistoryPrice(stock.Label)
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+        Dim arr() As Object = dt.Rows(0).ItemArray
+        If Me.InvokeRequired Then
+            Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
+        Else
+            ChangeRow(arr)
+        End If
     End Sub
 
     Private Sub access_DeletedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.DeletedStock
-        UpdateStockList()
+        If Me.InvokeRequired Then
+            Me.Invoke(New Action(Of String)(AddressOf RemoveRow), stock.Label)
+        Else
+            RemoveRow(stock.Label)
+        End If
     End Sub
-
 
     Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.CreatedStock
-        UpdateStockList()
+        Dim dt As DataTable = access.GetStockListWithHistoryPrice(stock.Label)
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
+        Dim arr() As Object = dt.Rows(0).ItemArray
+        If Me.InvokeRequired Then
+            Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
+        Else
+            AddRow(arr)
+        End If
     End Sub
 
-    Private Sub 進貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨ToolStripMenuItem.Click
+    Private Sub 進貨ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 進貨ToolStripMenuItem.Click, 進貨ToolStripMenuItem1.Click
         winStockIn.Create(access)
     End Sub
 
@@ -184,5 +220,47 @@
 
     End Sub
 
+
+    Private Sub 修改ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改ToolStripMenuItem.Click
+        Modify()
+    End Sub
+
+    Public Sub Modify()
+        If Not Filter.HasSelectedItem() Then
+            MsgBox("您必須選取一個項目")
+            Exit Sub
+        End If
+
+        Dim label As String = dgItemList.SelectedRows(0).Cells("庫存編號").Value
+        Dim stock As Database.Stock = access.GetStock(label)
+        winStockIn.Open(stock, access)
+
+    End Sub
+
+    Private Sub 刪除ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 刪除ToolStripMenuItem.Click
+        If Not CheckAuthority(2) Then Exit Sub
+        If Not Filter.HasSelectedItem() Then
+            MsgBox("您必須選取一個項目")
+            Exit Sub
+        End If
+
+        Dim stock As New Database.Stock
+        stock.Label = dgItemList.SelectedRows(0).Cells("庫存編號").Value
+
+        Dim Count As Integer = access.GetSalesListByStockLabel(stock.Label).Rows.Count
+        For Each c As Database.Access In Client.Client
+            If c.Connected Then Count += c.GetSalesListByStockLabel(stock.Label).Rows.Count
+        Next
+
+        If Count > 0 Then
+            MsgBox("無法刪除，該商品已經有銷貨記錄!")
+            Exit Sub
+        End If
+
+        If MsgBox("您現在要刪除該筆進貨記錄，確定要這麼做？", MsgBoxStyle.OkCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Cancel Then Exit Sub
+        stock.Label = dgItemList.SelectedRows(0).Cells(1).Value
+        stock.GoodsLabel = dgItemList.SelectedRows(0).Cells(0).Value
+        access.DeleteStock(stock)
+    End Sub
 
 End Class

@@ -218,13 +218,18 @@ Public Class winMain
             Exit Sub
         End If
 
-        If MsgBox("刪除該筆銷貨單，您確定要這麼做？", MsgBoxStyle.OkCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Cancel Then
-            Exit Sub
-        End If
+        'If MsgBox("刪除該筆銷貨單，您確定要這麼做？", MsgBoxStyle.OkCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Cancel Then
+        '    Exit Sub
+        'End If
 
         Dim sales As New Sales
         sales.Label = dgSales.SelectedRows(0).Cells(0).Value
-        access.DeleteSales(sales)
+        sales.OrderDate = dgSales.SelectedRows(0).Cells("訂單時間").Value
+        If sales.OrderDate.Date = Today OrElse CheckAuthority(3) Then
+            If winLogIn.ShowDialog(access, "輸入密碼以刪除此資料", CurrentUser.ID).State = LoginState.Success Then
+                access.DeleteSales(sales)
+            End If
+        End If
     End Sub
 
     Private Sub 商品項目GToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 商品項目GToolStripMenuItem.Click
@@ -615,8 +620,8 @@ Public Class winMain
     End Sub
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        'Dim a() As Integer = New Integer() {}
-        'a(0) = 100
+        Dim a() As Integer = New Integer() {}
+        a(0) = 100
 
         'Dim lst As New List(Of String)
         'For i = 0 To 10
@@ -625,7 +630,7 @@ Public Class winMain
         'Next
 
         'MsgBox(Join(lst.ToArray, vbCrLf))
-        MsgBox(Join(access.GetErrorLogFileNames(), vbCrLf))
+        'MsgBox(Join(access.GetErrorLogFileNames(), vbCrLf))
     End Sub
 
 

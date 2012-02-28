@@ -63,8 +63,9 @@
         UpdateTitle("Note", "備註")
         UpdateTitle("Authority", "權限")
         UpdateTitle("ID", "帳號")
-        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+
         Filter.UpdateComboBox()
+        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)

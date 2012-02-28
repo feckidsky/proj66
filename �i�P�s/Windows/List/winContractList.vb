@@ -59,9 +59,9 @@
         UpdateTitle("Discount", "折扣")
         UpdateTitle("Prepay", "預付額")
         UpdateTitle("Note", "備註")
-        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
-        If Filter IsNot Nothing Then Filter.UpdateComboBox()
 
+        If Filter IsNot Nothing Then Filter.UpdateComboBox()
+        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)

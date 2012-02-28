@@ -303,9 +303,9 @@ Public Module Program
             Return Deserialize(Of T)(Unzip(ZipText))
         End Function
 
-        Public Shared Function Serialize(ByVal Obj As Object) As String
+        Public Shared Function Serialize(Of T)(ByVal Obj As T) As String
             Try
-                Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(Obj.GetType)
+                Dim ser As Xml.Serialization.XmlSerializer = New Xml.Serialization.XmlSerializer(GetType(T))
                 Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                 Dim writer As IO.StringWriter = New IO.StringWriter(sb)
                 ser.Serialize(writer, Obj)

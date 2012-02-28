@@ -65,7 +65,7 @@
                 Case "DeleteFile" : Access.DeleteFile(Code.DeserializeWithUnzip(Of String)(Data(1)))
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
-                    MsgBox("Server" & msg)
+                    'MsgBox("Server" & msg)
                     Client.Send("MsgBox", Code.SerializeWithZIP(msg))
             End Select
         End Sub
