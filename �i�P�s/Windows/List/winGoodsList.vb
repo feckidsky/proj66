@@ -50,14 +50,21 @@ Public Class winGoodsList
         UpdateTitle("Kind", "種類")
         UpdateTitle("Brand", "廠牌")
         UpdateTitle("Note", "備註")
-        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
-        Filter.UpdateComboBox()
 
+        Try
+            dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
+        Try
+            Filter.UpdateComboBox()
+        Catch
+        End Try
         If dgGoodsList.Rows.Count > 0 Then
             dgGoodsList.Rows(0).Selected = True
             UpdateHistory()
         End If
-        dgGoodsList.Rows(0).Selected = True
+        'dgGoodsList.Rows(0).Selected = True
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
