@@ -16,131 +16,113 @@
         access = DB
         MyBase.ShowDialog()
     End Sub
+    Dim infoYesterday As Database.Access.SalesInformation
+    Dim infoToday As Database.Access.SalesInformation
+    Dim infoLastMonth As Database.Access.SalesInformation
+    Dim infoMonth As Database.Access.SalesInformation
+    Dim infoUser As Database.Access.SalesInformation
 
-
-    Private Sub winInformation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
-        Dim infoYesterday As Info = GetInfo(Today.AddDays(-1), Today.AddSeconds(-1))
+    Public Sub UpdateYesterday()
         lbYesterdayCash.Text = infoYesterday.Cash
         lbYesterdayProfit.Text = infoYesterday.Profit
         lbYesterdaySalesVolume.Text = infoYesterday.Sales
         lbYesterdayCard.Text = infoYesterday.Card
+    End Sub
 
-        Dim infoToday As Info = GetInfo(Today, Today.AddDays(1).AddSeconds(-1))
+    Public Sub UpdateToday()
         lbTodayCash.Text = infoToday.Cash
         lbTodayProfit.Text = infoToday.Profit
         lbTodaySales.Text = infoToday.Sales
         lbTodayCard.Text = infoToday.Card
+    End Sub
 
-        Dim LastMonth As Date = New Date(Now.AddMonths(-1).Year, Now.AddMonths(-1).Month, 1)
-        Dim infoLastMonth As Info = GetInfo(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
+    Public Sub UpdateLastMonth()
         lbLastMonthCash.Text = infoLastMonth.Cash
         lbLastMonthProfit.Text = infoLastMonth.Profit
         lbLastMonthSales.Text = infoLastMonth.Sales
         lbLastMonthCard.Text = infoLastMonth.Card
+    End Sub
 
-        Dim Month As Date = New Date(Now.Year, Now.Month, 1)
-        Dim infoMonth As Info = GetInfo(Month, Month.AddMonths(1).AddSeconds(-1))
+    Public Sub UpdateTheMonth()
         lbTheMonthCash.Text = infoMonth.Cash
         lbTheMonthProfit.Text = infoMonth.Profit
         lbTheMonthSales.Text = infoMonth.Sales
         lbTheMonthCard.Text = infoMonth.Card
-
-        dtpStart.Value = Today
-        dtpEnd.Value = Today
-        UpdateUserDefInfo()
     End Sub
 
-    Public Sub UpdateUserDefInfo()
-        Dim info As Info = GetInfo(dtpStart.Value.Date, dtpEnd.Value.Date.AddDays(1).AddSeconds(-1))
-        lbUserCash.Text = info.Cash
-        lbUserProfit.Text = info.Profit
-        lbUserSales.Text = info.Sales
-        lbUserCard.Text = info.Card
+    Public Sub UpdateUserInfo()
+        lbUserCash.Text = infoUser.Cash
+        lbUserProfit.Text = infoUser.Profit
+        lbUserSales.Text = infoUser.Sales
+        lbUserCard.Text = infoUser.Card
     End Sub
 
-    Public Function GetSingle(ByVal obj As Object) As Single
-        If obj Is DBNull.Value Then Return 0
-        Return Val(obj)
+    Private Sub winInformation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateSalesInformation))
+        dialog.Start("讀取銷售資訊")
+     
+    End Sub
+
+    Public Sub UpdateSalesInformation(ByVal progress As Database.Access.Progress)
+
+        progress.Report("讀取昨日資訊", 15)
+        infoYesterday = access.GetSalesInformation(Today.AddDays(-1), Today.AddSeconds(-1))
+        Me.Invoke(New Action(AddressOf UpdateYesterday))
+
+        progress.Report("讀取今日資訊", 30)
+        infoToday = access.GetSalesInformation(Today, Today.AddDays(1).AddSeconds(-1))
+        Me.Invoke(New Action(AddressOf UpdateToday))
+
+        progress.Report("讀取上個資訊", 45)
+        Dim LastMonth As Date = New Date(Now.AddMonths(-1).Year, Now.AddMonths(-1).Month, 1)
+        infoLastMonth = access.GetSalesInformation(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
+        Me.Invoke(New Action(AddressOf UpdateLastMonth))
+
+        progress.Report("讀取本月資訊", 60)
+        Dim Month As Date = New Date(Now.Year, Now.Month, 1)
+        infoMonth = access.GetSalesInformation(Month, Month.AddMonths(1).AddSeconds(-1))
+        Me.Invoke(New Action(AddressOf UpdateTheMonth))
+
+        progress.Report("讀取自訂日期資訊", 75)
+        Dim st As Date = Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
+        Dim ed As Date = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
+        infoUser = access.GetSalesInformation(st, ed.AddDays(1).AddSeconds(-1))
+        Me.Invoke(New Action(AddressOf UpdateUserInfo))
+        progress.Finish()
+    End Sub
+
+    Function GetStartTime() As Date
+        Return dtpStart.Value.Date
     End Function
 
-    'Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
-
-    '    Dim dt As DataTable = access.GetOrderListWithContract(St, Ed)
-
-    '    Dim Deposit As Single = 0
-    '    For Each row As DataRow In dt.Rows
-    '        Deposit += GetSingle(row.Item("訂金"))
-    '    Next
-
-    '    dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , True)
-
-    '    Dim Cash As Single = 0
-    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
-    '        Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-    '    Next
-
-    '    Dim Card As Single = 0
-    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
-    '        Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-    '    Next
-
-    '    Dim cancel As Single = 0
-    '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
-    '        cancel += GetSingle(row.Item("訂金"))
-    '    Next
-
-
-    '    Dim Profit As Single = 0
-    '    Dim SalesVolume As Single = 0
-    '    For Each row As DataRow In dt.Rows
-    '        Profit += GetSingle(row.Item("利潤"))
-    '        SalesVolume += GetSingle(row.Item("金額"))
-    '    Next
-
-    '    Return New Info(SalesVolume, Profit, Cash + Deposit - cancel, Card)
-    'End Function
-
-    Public Function GetInfo(ByVal St As Date, ByVal Ed As Date) As Info
-
-        Dim dt As DataTable = access.GetOrderListWithContract(St, Ed)
-        Dim DepositByCash As Single = 0
-        Dim DepositByCard As Single = 0
-        For Each row As DataRow In dt.Rows
-            DepositByCash += GetSingle(row.Item("訂金-現金"))
-            DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
-        Next
-
-        dt = access.GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
-
-        Dim Cash As Single = 0
-        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
-            Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-        Next
-
-        Dim Card As Single = 0
-        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
-            Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-        Next
-
-        Dim cancel As Single = 0
-        For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
-            cancel += GetSingle(row.Item("訂金"))
-        Next
-
-
-        Dim Profit As Single = 0
-        Dim SalesVolume As Single = 0
-        For Each row As DataRow In dt.Rows
-            Profit += GetSingle(row.Item("利潤"))
-            SalesVolume += GetSingle(row.Item("金額"))
-        Next
-
-        Return New Info(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
+    Public Function GetEndTime() As Date
+        Return dtpEnd.Value.Date
     End Function
+
+
+    Public Sub BeginUpdateUserDefInfo()
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateUserDefInfo))
+        dialog.Start("取得使用者自訂資訊")
+
+    End Sub
+
+    Public Sub UpdateUserDefInfo(ByVal progress As Database.Access.Progress)
+
+        Dim st As Date = Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
+        Dim ed As Date = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
+        infoUser = access.GetSalesInformation(dtpStart.Value.Date, dtpEnd.Value.Date.AddDays(1).AddSeconds(-1))
+
+        Me.Invoke(New Action(AddressOf UpdateUserInfo))
+        progress.Finish()
+    End Sub
+
+
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
-        UpdateUserDefInfo()
+        BeginUpdateUserDefInfo()
     End Sub
 
     Private Sub btClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btClose.Click

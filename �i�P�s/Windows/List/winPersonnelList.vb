@@ -14,7 +14,7 @@
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註", "帳號")
         Filter.AddNumberFilter("權限")
 
-        UpdateList()
+        BeginUpdateList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -42,8 +42,19 @@
     End Function
 
     Dim dt As DataTable
-    Private Sub UpdateList()
-        dt = access.GetPersonnelList()
+    Private Sub BeginUpdateList()
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateList))
+        dialog.Start("讀取員工資料")
+    End Sub
+
+    Public Sub UpdateList(ByVal progress As Database.Access.Progress)
+        dt = access.GetPersonnelList(progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+        progress.Finish()
+    End Sub
+
+    Private Sub UpdateDataTable(ByVal dt As DataTable)
         Dim table As DataTable = dt
 
         Dim rowAdmin As Data.DataRow = table.Rows(0)
@@ -64,8 +75,12 @@
         UpdateTitle("Authority", "權限")
         UpdateTitle("ID", "帳號")
 
-        Filter.UpdateComboBox()
-        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Try
+            Filter.UpdateComboBox()
+            dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)

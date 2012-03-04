@@ -13,7 +13,7 @@ Public Class winGoodsList
     Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgGoodsList)
         Filter.AddTextFilter("編號", "品名", "種類", "廠牌", "備註")
-        UpdateGoodsList()
+        BeginUpdateGoodsList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -40,10 +40,21 @@ Public Class winGoodsList
     End Function
 
     Private GoodsLoading As Boolean = False
-    Private Sub UpdateGoodsList()
+    Private Sub BeginUpdateGoodsList()
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateGoodsList))
+        dialog.Start("讀取商品項目")
+    End Sub
 
+    Public Sub UpdateGoodsList(ByVal progress As Database.Access.Progress)
+        Dim dt As DataTable = access.GetGoodsList(progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateGoodsDataTable), dt)
+        progress.Finish()
+    End Sub
+
+    Public Sub UpdateGoodsDataTable(ByVal dt As DataTable)
         GoodsLoading = True
-        dgGoodsList.DataSource = access.GetGoodsList()
+        dgGoodsList.DataSource = dt
         GoodsLoading = False
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "品名")
@@ -51,14 +62,21 @@ Public Class winGoodsList
         UpdateTitle("Brand", "廠牌")
         UpdateTitle("Note", "備註")
         'dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
-        Filter.UpdateComboBox()
-        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+
+        Try
+            'Filter.UpdateComboBox()
+            'dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
         If dgGoodsList.Rows.Count > 0 Then
             dgGoodsList.Rows(0).Selected = True
             UpdateHistory()
         End If
 
     End Sub
+
+
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
         dgGoodsList.Columns(Label).HeaderText = Text
@@ -154,7 +172,7 @@ Public Class winGoodsList
 
 
     Delegate Sub ItemUpdate()
-    Dim invGoods As New ItemUpdate(AddressOf UpdateGoodsList)
+    Dim invGoods As New ItemUpdate(AddressOf BeginUpdateGoodsList)
     Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
         If Me.InvokeRequired Then
             Me.Invoke(invGoods)
@@ -182,7 +200,6 @@ Public Class winGoodsList
         Dim dt As Data.DataTable = access.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
         dgHistory.Columns(0).Visible = False
-
 
         dgHistory.Columns("Time").HeaderText = "時間"
         dgHistory.Columns("Cost").HeaderText = "進貨價"

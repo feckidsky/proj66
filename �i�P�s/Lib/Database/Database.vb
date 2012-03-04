@@ -86,6 +86,77 @@
         Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
         Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice)
 
+#Region "Progress"
+        Public Class Progress
+            Public Delegate Sub ProgressAction(ByVal Message As String, ByVal Percent As Integer)
+            Dim StartPercent As Integer
+            Dim EndPercent As Integer
+            Public Text As String
+            Public ProgressCallback As ProgressAction
+            Public FinishCallback As Action
+            'Public CancelHandler As New Action(AddressOf ChangeCanceled)
+            Public SubProgress As Progress
+            Public Canceled As Boolean
+
+            Public CancelHandler As CancelAction
+            Public Delegate Sub CancelAction()
+
+
+            Sub New(ByVal ProgressCallback As ProgressAction, ByVal Text As String, ByVal FinishAction As Action, Optional ByVal StartPercent As Integer = 0, Optional ByVal EndPercent As Integer = 100)
+                Me.ProgressCallback = ProgressCallback
+                Me.Text = Text
+                Me.StartPercent = StartPercent
+                Me.EndPercent = EndPercent
+                Me.FinishCallback = FinishAction
+                'Me.CancelHandler = CancelHandler
+                'If Me.CancelHandler IsNot Nothing Then
+                'Cancel = [Delegate].Combine(Cancel, New CancelAction(AddressOf ChangeCanceled)) ' = [Delegate].Combine(CancelHandler, Me.CancelHandler)
+                'Me.CancelHandler = Cancel
+                'Me.CancelHandler = CancelHandler
+                'End If
+            End Sub
+
+            Public Sub Reset(ByVal Text As String, ByVal StartPercent As Integer, ByVal EndPercent As Integer)
+                Me.Text = Text
+                Me.StartPercent = StartPercent
+                Me.EndPercent = EndPercent
+            End Sub
+
+            Public Sub Reset(ByVal StartPercent As Integer, ByVal EndPercent As Integer)
+                Me.StartPercent = StartPercent
+                Me.EndPercent = EndPercent
+            End Sub
+
+            Private Sub ChangeCanceled()
+                Canceled = True
+            End Sub
+
+            Public Sub Finish()
+                If FinishCallback IsNot Nothing Then FinishCallback()
+            End Sub
+
+            Public Function GetPercent(ByVal percent As Integer) As Integer
+                Try
+                    Return StartPercent + percent / 100 * (EndPercent - StartPercent)
+                Catch
+                    Return StartPercent
+                End Try
+            End Function
+
+            Public Sub Report(ByVal Message As String, ByVal percent As Integer)
+                ProgressCallback(Text & IIf(Text = "", "", ":") & Message, GetPercent(percent))
+                If SubProgress IsNot Nothing Then SubProgress.Report(Message, percent)
+            End Sub
+
+            Public Sub Report(ByVal Percent As Integer)
+                ProgressCallback(Text, GetPercent(Percent))
+                If SubProgress IsNot Nothing Then SubProgress.Report(Percent)
+            End Sub
+
+
+        End Class
+#End Region
+
         Public Sub New(ByVal Name As String)
             Me.Name = Name
             Dir = My.Application.Info.DirectoryPath & "\data"
@@ -169,9 +240,9 @@
             Return Read("table", BasePath, SqlCommand)
         End Function
 
-        Public Function GetHistoryPriceList() As DataTable
+        Public Function GetHistoryPriceList(Optional ByVal progress As Progress = Nothing) As DataTable
             Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & ";"
-            Return Read("table", BasePath, SqlCommand)
+            Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
         Public Function GetListHistoryPrice(ByVal Label As String) As HistoryPrice
@@ -183,9 +254,9 @@
             Return HistoryPrice.GetFrom(dt.Rows(0))
         End Function
 
-        Public Function GetGoodsList() As Data.DataTable
+        Public Function GetGoodsList(Optional ByVal ProgressBackcall As Progress = Nothing) As Data.DataTable
             Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & ";"
-            Return Read("table", BasePath, SQLCommand)
+            Return Read("table", BasePath, SQLCommand, ProgressBackcall)
         End Function
 
         Public Function GetGoods(ByVal Label As String) As Goods
@@ -203,10 +274,10 @@
             Return Read("table", BasePath, SqlCommand)
         End Function
 
-        Public Function GetCustomerList() As Data.DataTable
+        Public Function GetCustomerList(Optional ByVal Progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Customer.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
             Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Customer.Table & ";"
-            Return Read("table", BasePath, SQLCommand)
+            Return Read("table", BasePath, SQLCommand, Progress)
         End Function
 
         Public Function GetCustomerByLabel(ByVal Label As String) As Customer
@@ -239,10 +310,10 @@
             End Try
         End Sub
 
-        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As Receiver
+        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As StreamReceiver
 
             If Me.GetType Is GetType(Access) Then
-                Dim Receiver As New Receiver(Me, Receiver.GetGuid())
+                Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid())
                 Try
                     IO.File.Copy(sourcePath, DestPath, True)
                     Return Receiver
@@ -267,10 +338,10 @@
             Return columns
         End Function
 
-        Public Function GetSupplierList() As Data.DataTable
+        Public Function GetSupplierList(Optional ByVal Progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Supplier.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
             Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Supplier.Table & ";"
-            Return Read("table", BasePath, SQLCommand)
+            Return Read("table", BasePath, SQLCommand, Progress)
         End Function
 
         Public Function GetSupplier(ByVal Label As String) As Supplier
@@ -288,9 +359,9 @@
             Thread.Start()
         End Sub
 
-        Public Function GetContractList() As Data.DataTable
+        Public Function GetContractList(Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim SQLCommand As String = "SELECT * FROM " & Contract.Table & ";"
-            Dim dt As DataTable = Read("table", BasePath, SQLCommand)
+            Dim dt As DataTable = Read("table", BasePath, SQLCommand, progress)
             RaiseEvent ReadedContractList(Me, dt)
             Return dt
         End Function
@@ -302,10 +373,10 @@
             Return Read("table", BasePath, SqlCommand)
         End Function
 
-        Public Function GetPersonnelList() As Data.DataTable
+        Public Function GetPersonnelList(Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Personnel.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
             Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Personnel.Table & ";"
-            Return Read("table", BasePath, SQLCommand)
+            Return Read("table", BasePath, SQLCommand, progress)
         End Function
 
         Public Function GetPersonnelByID(ByVal ID As String) As Personnel
@@ -383,21 +454,21 @@
         End Function
 
         ''' <summary>取得庫存清單</summary>
-        Public Function GetStockListWithHistoryPrice(Optional ByVal StockLabel As String = "") As Data.DataTable
+        Public Function GetStockListWithHistoryPrice(Optional ByVal StockLabel As String = "", Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim stockCondition As String = ""
             If StockLabel <> "" Then stockCondition = " And stock.Label='" & StockLabel & "'"
             Dim SqlCommand As String = "SELECT stock.GoodsLabel AS 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, stock.number AS 進貨數量, [stock].[number]-IIf(IsNull([nn]),0,[nn]) AS 數量, stock.Cost AS 進價, history.Price AS 售價, stock.Note AS 備註, Supplier.Name AS 供應商 " & _
             " FROM (((stock LEFT JOIN (SELECT StockLabel,sum(number) as nn  From SalesGoods Group By StockLabel )  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time1=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel))  AS history ON stock.GoodsLabel = history.GoodsLabel) INNER JOIN Goods ON stock.GoodsLabel = Goods.Label) INNER JOIN Supplier ON stock.SupplierLabel = Supplier.Label " & _
             " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn]))>0) " & stockCondition & ");"
 
-            Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand)
+            Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand, progress)
             Return DT
         End Function
 
-        Public Function GetStockMoveList(ByVal StartTime As Date, ByVal EndTime As Date) As Data.DataTable
+        Public Function GetStockMoveList(ByVal StartTime As Date, ByVal EndTime As Date, Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
             "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " ; "
-            Return Read("table", BasePath, SqlCommand)
+            Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
         Public Function GetStockMoveRow(ByVal StockMoveLabel As String) As DataRow
@@ -491,7 +562,7 @@
         End Function
 
         '讀取銷貨單
-        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "", Optional ByVal WithDepositByCash As Boolean = False) As Data.DataTable
+        Public Function GetSalesListWithContract(ByVal StartTime As Date, ByVal EndTime As Date, ByVal ListType As GetSalesListType, Optional ByVal SalesLabel As String = "", Optional ByVal WithDepositByCash As Boolean = False, Optional ByVal Progress As Progress = Nothing) As Data.DataTable
 
             Dim cnd As String = ""
             If ListType = GetSalesListType.Order Then cnd = " AND TypeOfPayment=" & Payment.Deposit
@@ -522,7 +593,7 @@
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
 
 
-            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
+            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand, Progress)
             Return DT
         End Function
 
@@ -642,7 +713,63 @@
         '    Return DT
         'End Function
 
+        Public Structure SalesInformation
+            Dim Sales As Single
+            Dim Profit As Single
+            Dim Cash As Single
+            Dim Card As Single
+            Sub New(ByVal Sales As Single, ByVal Profit As Single, ByVal Cash As Single, ByVal Card As Single)
+                Me.Sales = Sales : Me.Profit = Profit : Me.Cash = Cash : Me.Card = Card
+            End Sub
+        End Structure
 
+        Public Structure GetSalesInformationArgs
+            Dim StartTime As Date
+            Dim EndTime As Date
+        End Structure
+
+        Public Overridable Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As SalesInformation
+
+            Dim dt As DataTable = GetOrderListWithContract(St, Ed)
+            Dim DepositByCash As Single = 0
+            Dim DepositByCard As Single = 0
+            For Each row As DataRow In dt.Rows
+                DepositByCash += GetSingle(row.Item("訂金-現金"))
+                DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
+            Next
+
+            dt = GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
+
+            Dim Cash As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
+                Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            Next
+
+            Dim Card As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
+                Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            Next
+
+            Dim cancel As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
+                cancel += GetSingle(row.Item("訂金"))
+            Next
+
+
+            Dim Profit As Single = 0
+            Dim SalesVolume As Single = 0
+            For Each row As DataRow In dt.Rows
+                Profit += GetSingle(row.Item("利潤"))
+                SalesVolume += GetSingle(row.Item("金額"))
+            Next
+
+            Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
+        End Function
+
+        Public Function GetSingle(ByVal obj As Object) As Single
+            If obj Is DBNull.Value Then Return 0
+            Return Val(obj)
+        End Function
 
         Public Sub CreateSales(ByVal args As SalesArgs)
             CreateSales(args.Sales, args.GoodsList, args.OrderList, args.SalesContracts)
@@ -810,6 +937,7 @@
             CreateTable(SalesContract.Table, SalesContract.ToColumns, DBControl)
             CreateTable(OrderGoods.Table, OrderGoods.ToColumns, DBControl)
             CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), DBControl)
+            CreateTable(StockMove.Table, StockMove.ToColumns(), DBControl)
             CreateTable(Log.Table, Log.ToColumns, DBControl)
             myDatabase.AddBase(Personnel.Administrator)
             Return DBControl
@@ -907,18 +1035,16 @@
 
 #End Region
 
-        Public Function Read(ByVal Table As String, ByVal File As String, ByVal SqlCommand As String) As Data.DataTable
-            Return Read(Table, New String() {File}, New String() {SqlCommand})
+        Public Function Read(ByVal Table As String, ByVal File As String, ByVal SqlCommand As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
+            Return Read(Table, New String() {File}, New String() {SqlCommand}, ProgressAction)
         End Function
 
-        Public Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SqlCommand As String) As Data.DataTable
-            Return Read(Table, FileList, New String() {SqlCommand})
+        Public Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SqlCommand As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
+            Return Read(Table, FileList, New String() {SqlCommand}, ProgressAction)
         End Function
 
-        Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Action(Of Integer) = Nothing) As Data.DataTable
-
-
-
+        Public Overridable Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
+            If ProgressAction IsNot Nothing Then ProgressAction.Report(10)
             '暫存表格
             Dim DS As DataSet = New DataSet()
             Dim DA As OleDb.OleDbDataAdapter
@@ -939,15 +1065,17 @@
                             DA.Fill(DS, Table)
                             DA.Dispose()
                         Next
+                        If ProgressAction IsNot Nothing Then ProgressAction.Report(50)
                     Catch
                     Finally
                         tmpDB.Close()
                         tmpDB.Dispose()
                     End Try
+
                 End SyncLock
             Next
 
-
+            If ProgressAction IsNot Nothing Then ProgressAction.Report(100)
             Return DS.Tables(Table)
         End Function
 

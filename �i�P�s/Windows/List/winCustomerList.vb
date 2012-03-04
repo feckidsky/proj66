@@ -12,7 +12,7 @@
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgList)
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
-        UpdateList()
+        BeginUpdateList()
     End Sub
 
     Public Overloads Sub Show(ByVal db As Database.Access)
@@ -39,18 +39,37 @@
     End Function
 
     Dim dt As DataTable
-    Private Sub UpdateList()
-        dt = access.GetCustomerList()
-        dgList.DataSource = dt
 
+
+
+    Private Sub BeginUpdateList()
+        Dim dialog As New ProgressDialog
+        Dim progress As Database.Access.Progress = dialog.GetProgress("讀取客戶資料")
+        dialog.Show()
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateList))
+        dialog.Thread.Start(progress)
+    End Sub
+
+    Private Sub UpdateList(ByVal progress As Database.Access.Progress)
+        dt = access.GetCustomerList(progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+        progress.Finish()
+    End Sub
+
+    Private Sub UpdateDataTable(ByVal newDT As DataTable)
+        dgList.DataSource = newDT
         UpdateTitle("Label", "編號")
         UpdateTitle("Name", "名稱")
         UpdateTitle("Tel1", "電話1")
         UpdateTitle("Tel2", "電話2")
         UpdateTitle("Addr", "地址")
         UpdateTitle("Note", "備註")
-        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
-        Filter.UpdateComboBox()
+        Try
+            dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+            Filter.UpdateComboBox()
+        Catch
+
+        End Try
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)

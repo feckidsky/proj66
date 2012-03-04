@@ -13,7 +13,7 @@ Public Class winMain
             m_access = value
             If Changed Then
                 If Me.Created Then UpdateSalesList()
-                UpdateLogList()
+                'UpdateLogList()
                 UpdateTitle()
             End If
         End Set
@@ -23,7 +23,7 @@ Public Class winMain
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         UpdateTitle()
         UpdateSalesList()
-        UpdateLogList()
+        'UpdateLogList()
     End Sub
 
     Dim UpdateTitleHandler As New Action(AddressOf UpdateTitle)
@@ -193,14 +193,14 @@ Public Class winMain
     Private Sub rToday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged
         If Me.Created And CType(sender, RadioButton).Checked = True Then
             UpdateSalesList()
-            UpdateLogList()
+            'UpdateLogList()
         End If
 
     End Sub
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
         If Me.Created Then UpdateSalesList()
-        UpdateLogList()
+        'UpdateLogList()
     End Sub
 
     Private Sub 銷貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨AToolStripMenuItem.Click, 銷貨ToolStripMenuItem.Click
@@ -283,17 +283,38 @@ Public Class winMain
             StartTime = Today.Date
             EndTime = Today.Date.AddDays(1)
         ElseIf r30Day.Checked Then
-            StartTime = Today.Date.AddDays(-30)
+            StartTime = Today.Date.AddDays(-2)
             EndTime = Today.Date.AddDays(1)
         Else
             StartTime = dtpStart.Value.Date
             EndTime = dtpEnd.Value.Date.AddDays(1)
         End If
 
-        'Dim dt As Data.DataTable = DB.GetSalesList(StartTime, EndTime, Me.cbForm.SelectedIndex)
-        Dim dt As Data.DataTable = access.GetSalesListWithContract(StartTime, EndTime, Me.cbForm.SelectedIndex)
-        If dt Is Nothing Then Exit Sub
 
+        Dim winProgress As New ProgressDialog
+        winProgress.AutoClose = False
+        Dim Progress As New Access.Progress(AddressOf winProgress.UpdateProgress, "讀取訂單/銷貨單", Nothing)
+        Dim thread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateSalesList))
+        Dim args As UpdateSalesListArgs
+        args.StartTime = StartTime
+        args.EndTime = EndTime
+        args.ListType = Me.cbForm.SelectedIndex
+        args.progress = Progress
+        args.Dialog = winProgress
+        winProgress.Thread = thread
+        winProgress.Show()
+        thread.Start(args)
+    End Sub
+
+    Structure UpdateSalesListArgs
+        Dim StartTime As Date
+        Dim EndTime As Date
+        Dim ListType As Access.GetSalesListType
+        Dim progress As Access.Progress
+        Dim Dialog As ProgressDialog
+    End Structure
+
+    Public Sub UpdateColumn(ByVal dt As DataTable)
         If dgSales.Rows.Count = 0 Then
             dgSales.Columns.Clear()
             For i As Integer = 0 To dt.Columns.Count - 1
@@ -314,11 +335,42 @@ Public Class winMain
         End If
 
         If Filter IsNot Nothing Then Filter.ClearComboBoxItem()
-        For i As Integer = 0 To dt.Rows.Count - 1
-            Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
-            BeginAddRowInfo(arr)
-        Next
+    End Sub
 
+    Dim UpdateColumnHandler As New Action(Of DataTable)(AddressOf UpdateColumn)
+    Public Sub UpdateSalesList(ByVal args As UpdateSalesListArgs)
+        args.progress.Reset("讀取訂單/銷貨單資料", 0, 50)
+        Dim dt As Data.DataTable = access.GetSalesListWithContract(args.StartTime, args.EndTime, args.ListType, , , args.progress)
+        If dt Is Nothing Then
+            args.Dialog.Close()
+            Exit Sub
+        End If
+
+        args.Dialog.Invoke(UpdateColumnHandler, dt)
+        If dt.Rows.Count = 0 Then
+            args.Dialog.Close()
+            Exit Sub
+        End If
+
+        'Me.Invoke(New Action(AddressOf StopUpdate))
+        args.progress.Reset("取得訂單/銷貨單內容", 50, 99)
+        For i As Integer = 0 To dt.Rows.Count - 1
+            args.progress.Report((i + 1) / dt.Rows.Count * 100)
+            Dim arr As String() = Array.ConvertAll(dt.Rows(i).ItemArray, Function(o As Object) o.ToString)
+            'BeginAddRowInfo(arr)
+            ShowRowInfo(arr, AddRowHandler)
+        Next
+        'Me.Invoke(New Action(AddressOf ResetUpdate))
+        UpdateLogList()
+        args.Dialog.Close()
+    End Sub
+
+    Public Sub StopUpdate()
+        dgSales.SuspendLayout()
+    End Sub
+
+    Public Sub ResetUpdate()
+        dgSales.ResumeLayout(False)
     End Sub
 
     Public Sub UpdateListColor()
@@ -331,8 +383,10 @@ Public Class winMain
     Public Sub UpdateRowColor(ByVal row As DataGridViewRow)
         If row.Cells("付款方式").Value = "退訂" Then
             row.DefaultCellStyle.BackColor = Color.Yellow
+            'row.InheritedStyle.BackColor = Color.Yellow
         Else
             row.DefaultCellStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+            'row.InheritedStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
         End If
 
     End Sub
@@ -472,7 +526,7 @@ Public Class winMain
         If LoginSetting.AutoLog And m_access.User.IsGuest() Then access.LogIn(LoginSetting.ID, LoginSetting.Password)
         UpdateTitleHandler()
         UpdateSalesListHandler()
-        UpdateLogList()
+        'UpdateLogList()
     End Sub
 
     Dim dtLog As DataTable

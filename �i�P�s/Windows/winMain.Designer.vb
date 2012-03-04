@@ -39,10 +39,11 @@ Partial Class winMain
         Me.員工PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
-        Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
+        Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.結算ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -87,7 +88,6 @@ Partial Class winMain
         Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Button1 = New System.Windows.Forms.Button
-        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsSales.SuspendLayout()
@@ -187,29 +187,34 @@ Partial Class winMain
         Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
         Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
         '
-        '進貨記錄ToolStripMenuItem1
-        '
-        Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
-        '
-        '調貨ToolStripMenuItem
-        '
-        Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
-        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.調貨ToolStripMenuItem.Text = "調貨記錄(&M)"
-        '
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
         '
         '商品項目GToolStripMenuItem
         '
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
+        '
+        'ToolStripSeparator5
+        '
+        Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(141, 6)
+        '
+        '進貨記錄ToolStripMenuItem1
+        '
+        Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
+        Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
+        '
+        '調貨ToolStripMenuItem
+        '
+        Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
+        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
+        Me.調貨ToolStripMenuItem.Text = "調貨記錄(&M)"
         '
         '銷貨ToolStripMenuItem
         '
@@ -413,9 +418,9 @@ Partial Class winMain
         Me.r30Day.AutoSize = True
         Me.r30Day.Location = New System.Drawing.Point(76, 21)
         Me.r30Day.Name = "r30Day"
-        Me.r30Day.Size = New System.Drawing.Size(71, 16)
+        Me.r30Day.Size = New System.Drawing.Size(59, 16)
         Me.r30Day.TabIndex = 0
-        Me.r30Day.Text = "30天以內"
+        Me.r30Day.Text = "兩天內"
         Me.r30Day.UseVisualStyleBackColor = True
         '
         'NotifyIcon1
@@ -558,11 +563,6 @@ Partial Class winMain
         Me.Button1.TabIndex = 6
         Me.Button1.Text = "test"
         Me.Button1.UseVisualStyleBackColor = True
-        '
-        'ToolStripSeparator5
-        '
-        Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(149, 6)
         '
         'winMain
         '

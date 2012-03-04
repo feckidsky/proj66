@@ -12,7 +12,7 @@
         Filter = New DataGridViewFilter(dgStockLog)
         Filter.AddTextFilter("庫存編號", "供應商", "種類", "廠牌", "品名", "備註", "IMEI")
         Filter.AddNumberFilter("進貨價", "定價", "數量")
-        UpdateStockInLog()
+        BeginUpdateStockInLog()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -26,9 +26,7 @@
 
 
 
-    Public Sub UpdateStockInLog()
-        'Dim StartTime As Date
-        'Dim EndTime As Date
+    Public Sub BeginUpdateStockInLog()
         If rToday.Checked Then
             StartTime = Today.Date
             EndTime = Today.Date.AddDays(1)
@@ -40,20 +38,35 @@
             EndTime = dtpEnd.Value.Date.AddDays(1)
         End If
 
-        dt = access.GetStockLog(StartTime, EndTime)
-        dgStockLog.DataSource = dt
-        If Filter IsNot Nothing Then Filter.UpdateComboBox()
-        dgStockLog.Sort(dgStockLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateStockInLog))
+        dialog.Start("讀取進貨記錄")
     End Sub
+
+    Public Sub UpdateStockInLog(ByVal progress As Database.Access.Progress)
+        dt = access.GetStockLog(StartTime, EndTime)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockInDataTable), dt)
+        progress.Finish()
+    End Sub
+
+    Public Sub UpdateStockInDataTable(ByVal dt As DataTable)
+        dgStockLog.DataSource = dt
+        Try
+            If Filter IsNot Nothing Then Filter.UpdateComboBox()
+            dgStockLog.Sort(dgStockLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+        End Try
+    End Sub
+
 
     '改變篩選方式
     Private Sub r_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged
-        If Me.IsHandleCreated Then UpdateStockInLog()
+        If Me.IsHandleCreated Then BeginUpdateStockInLog()
     End Sub
 
     '改變篩選時間
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
-        If rUserTime.Checked Then UpdateStockInLog()
+        If rUserTime.Checked Then BeginUpdateStockInLog()
     End Sub
 
     Private Sub dgStockLog_CellMouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles dgStockLog.CellMouseDoubleClick

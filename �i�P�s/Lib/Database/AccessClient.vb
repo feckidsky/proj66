@@ -195,38 +195,36 @@
             End Sub
         End Class
 
-        Class Reader(Of T, ResultT)
-            Inherits ReaderBase
-            Public Args As T
-            Public Result As ResultT
-            Public DefaultResult As ResultT
-            Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip
+        'Class Reader(Of T, ResultT)
+        '    Inherits ReaderBase
+        '    Public Args As T
+        '    Public Result As ResultT
+        '    Public DefaultResult As ResultT
+        '    Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip
 
-            Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
-                Waiter.Reset()
-                SendHandler("ReaderRequest", Guid & "," & Cmd, Code.XmlSerializeWithZIP(Args))
-                Waiter.WaitOne()
-                'If Not Waiter.WaitOne(TimeOut, False) Then
-                '    Result = DefaultResult
-                '    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
-                'End If
+        '    Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
+        '        Waiter.Reset()
+        '        SendHandler("ReaderRequest", Guid & "," & Cmd, Code.XmlSerializeWithZIP(Args))
+        '        Waiter.WaitOne()
+        '        'If Not Waiter.WaitOne(TimeOut, False) Then
+        '        '    Result = DefaultResult
+        '        '    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
+        '        'End If
 
-                Return Result
-            End Function
+        '        Return Result
+        '    End Function
 
-
-
-            Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
-                'If Me.Guid <> Guid Then Return False
-                Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
-                Waiter.Set()
-                Return True
-            End Function
-        End Class
+        '    Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
+        '        'If Me.Guid <> Guid Then Return False
+        '        Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
+        '        Waiter.Set()
+        '        Return True
+        '    End Function
+        'End Class
 
 
 
-        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Action(Of Integer) = Nothing) As Data.DataTable
+        Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
             If Not Connected() Then
                 MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return New DataTable
@@ -238,76 +236,112 @@
             args.SqlCommand = SQLCommand
 
 
-            'Dim Reader As New Reader(Of ReadArgs, DataTable)
-            'Reader.Name = Name
-            'Reader.DefaultResult = Nothing
-            'Reader.Cmd = "DataTable"
-            'Reader.Args = args
+            Dim receiver As StreamReceiver = GetReceiver()
 
-            'lstReader.Add(Reader)
-            'Dim dt As DataTable = Reader.Read(AddressOf Send)
-            'lstReader.Remove(Reader)
-
-            Dim receiver As Receiver = RequestStream("DataTable", Code.XmlSerializeWithZIP(args))
-            receiver.stream = New IO.MemoryStream()
-            Dim reader As New DataTableReader(receiver)
-            Dim dt = reader.Read()
+            Dim reader As New DataTableReader
+            reader.Set(receiver, ProgressAction)
+            Dim dt = reader.Read("DataTable", args)
             Return dt
 
         End Function
 
-        Class DataTableReader
-            WithEvents receiver As Receiver
-            Public Waiter As New Threading.AutoResetEvent(True)
-            Public Progress As Action(Of Integer)
-            Dim dt As DataTable
+        Public Function FarRead(Of T, ResultT)(ByVal Cmd As String, ByVal args As T, Optional ByVal Progress As Progress = Nothing) As ResultT
+            If Not Connected() Then
+                MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
+                Return Nothing
+            End If
 
-            Sub New(ByVal receiver As Receiver)
-                Me.receiver = receiver
+            Dim receiver As StreamReceiver = GetReceiver()
+            Dim r As New Reader(Of T, ResultT)
+            r.Set(receiver, Progress)
+            Return r.Read(Cmd, args)
+        End Function
+
+        Class Reader(Of ArgsT, ResultT)
+            WithEvents receiver As StreamReceiver
+            Public Waiter As New Threading.AutoResetEvent(True)
+            Public Progress As Progress
+
+            Dim result As ResultT
+
+            Public Serialize As Func(Of ArgsT, String) = AddressOf Code.XmlSerializeWithZIP(Of ArgsT)
+            Public Deserialize As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip(Of ResultT)
+
+            Dim Readed As Boolean = False
+
+            Sub New()
+
             End Sub
-            Public Function Read() As DataTable
-                Waiter.Reset()
-                Waiter.WaitOne()
-                Return dt
+
+            Public Sub [Set](ByVal receiver As StreamReceiver, ByVal ProgressAction As Progress)
+                Try
+                    Me.receiver = receiver
+                Catch
+
+                End Try
+                Me.Progress = ProgressAction
+                'If Progress IsNot Nothing AndAlso Progress.CancelHandler IsNot Nothing Then
+                If Progress IsNot Nothing Then
+                    Dim newCancelHandler As New Progress.CancelAction(AddressOf receiver.Cancel)
+                    Progress.CancelHandler = [Delegate].Combine(Progress.CancelHandler, newCancelHandler)
+                End If
+
+            End Sub
+
+            Private ReadSyncLock As String = "ReadSncLock"
+            Public Function Read(ByVal cmd As String, ByVal args As ArgsT) As ResultT
+
+                Readed = False
+                receiver.Request(cmd, Serialize(args))
+
+
+                Do Until Readed
+                    Waiter.Reset()
+                    Waiter.WaitOne(1000, False)
+                Loop
+                Return result
             End Function
 
             Private Sub receiver_Progress(ByVal sender As Object, ByVal percent As Integer) Handles receiver.Progress
-                If Progress IsNot Nothing Then Progress(percent)
+                If Progress IsNot Nothing Then Progress.Report(percent)
             End Sub
 
             Private Sub receiver_Received(ByVal sender As Object, ByVal stream As System.IO.Stream) Handles receiver.Received
-                'Dim bytes(stream.Length - 1) As Byte
+
+
                 Dim bytes() As Byte = CType(stream, IO.MemoryStream).ToArray '     stream.Read(bytes, 0, bytes.Length)
                 Dim text As String = System.Text.Encoding.ASCII.GetString(bytes)
-                dt = Code.XmlDeserializeWithUnzip(Of DataTable)(text)
+                result = Deserialize(text)
+                Readed = True
                 Waiter.Set()
+                If Progress IsNot Nothing Then Progress.Finish()
             End Sub
 
             Private Sub receiver_TransFail(ByVal sender As Object, ByVal Message As String) Handles receiver.TransFail
+
+                Readed = True
                 Waiter.Set()
+
             End Sub
         End Class
 
+        Class DataTableReader
+            Inherits Reader(Of ReadArgs, DataTable)
+        End Class
+
+        Public Overrides Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As Access.SalesInformation
+            Dim args As GetSalesInformationArgs
+            args.StartTime = St
+            args.EndTime = Ed
+            Return FarRead(Of GetSalesInformationArgs, SalesInformation)("GetSalesInformation", args)
+        End Function
+
         Public Overrides Function GetErrorLogFileNames() As String()
-            Dim reader As New Reader(Of String, String())
-            reader.Name = Name
-            reader.DefaultResult = New String() {}
-            reader.Cmd = "GetErrorLogFiles"
-            lstReader.Add(reader)
-            Dim files As String() = reader.Read(AddressOf Send)
-            lstReader.Remove(reader)
-            Return files
+            Return FarRead(Of String, String())("GetErrorLogFiles", "")
         End Function
 
         Public Overrides Function GetCloneBasePath() As String
-            Dim reader As New Reader(Of String, String)
-            reader.Name = Name
-            reader.DefaultResult = ""
-            reader.Cmd = "GetDir"
-            lstReader.Add(reader)
-            Dim result As String = reader.Read(AddressOf Send)
-            lstReader.Remove(reader)
-            Return result
+            Return FarRead(Of String, String)("GetDir", "")
         End Function
 
         Public Overrides Sub DeleteFile(ByVal File As String)
@@ -490,7 +524,6 @@
         Public Overrides Sub DeleteAllLog(Optional ByVal trigger As Boolean = True)
             Send("DeleteAllLog")
         End Sub
-
 
 
         'Public Overrides Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)

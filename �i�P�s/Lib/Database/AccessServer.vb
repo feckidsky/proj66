@@ -63,6 +63,9 @@
                 Case "DeleteLog" : Access.DeleteLog(Code.XmlDeserializeWithUnzip(Of Log)(Data(1)))
                 Case "DeleteAllLog" : Access.DeleteAllLog()
                 Case "DeleteFile" : Access.DeleteFile(Code.XmlDeserializeWithUnzip(Of String)(Data(1)))
+                Case "GetSalesInformation"
+                    Dim args As Access.GetSalesInformationArgs = Code.XmlDeserializeWithUnzip(Of Access.GetSalesInformationArgs)(Data(1))
+                    Client.Send("ResponseSalesInformationArgs", Code.XmlSerializeWithZIP(Access.GetSalesInformation(args.StartTime, args.EndTime)))
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
                     'MsgBox("Server" & msg)
@@ -70,16 +73,22 @@
             End Select
         End Sub
 
-        Private Sub AccessServer_ServerReceiveStreamRequest(ByVal Client As TCPTool.Client, ByVal sender As TCPTool.Client.Sender) Handles Me.ServerReceiveStreamRequest
+        Private Sub AccessServer_ServerReceiveStreamRequest(ByVal Client As TCPTool.Client, ByVal sender As TCPTool.Client.StreamSender) Handles Me.ServerReceiveStreamRequest
             Select Case sender.Cmd
                 Case "DataTable"
                     Dim args As ReadArgs = Code.XmlDeserializeWithUnzip(Of ReadArgs)(sender.Args)
                     Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
-                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
+                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
                     Dim sm As New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(dt)))
                     sender.stream = sm
                     dt.Dispose()
-
+                Case "GetErrorLogFiles"
+                    sender.stream = New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(Access.GetErrorLogFileNames())))
+                Case "GetDir"
+                    sender.stream = New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(Access.GetCloneBasePath())))
+                Case "GetSalesInformation"
+                    Dim args As Access.GetSalesInformationArgs = Code.XmlDeserializeWithUnzip(Of Access.GetSalesInformationArgs)(sender.Args)
+                    sender.stream = New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(Access.GetSalesInformation(args.StartTime, args.EndTime))))
             End Select
         End Sub
 
@@ -91,7 +100,7 @@
                 Case "DataTable"
                     Dim args As ReadArgs = Code.XmlDeserializeWithUnzip(Of ReadArgs)(ArgsSerialize)
                     Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
-                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand)
+                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
                     ResultText = Code.XmlSerializeWithZIP(dt)
                     dt.Dispose()
                     'client.Send("ReadResponse", Guid & "," & Code.SerializeWithZIP(dt))

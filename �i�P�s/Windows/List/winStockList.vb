@@ -26,7 +26,7 @@
 
     Private Sub cbStock_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.SelectedIndexChanged
         access = Client(cbStock.Text)
-        UpdateStockList()
+        BeginUpdateStockList()
     End Sub
 
     Private Sub Config()
@@ -37,7 +37,7 @@
 
         cbStock.Text = access.Name ' = 0
         UpdateTitleText()
-        UpdateStockList()
+        'BeginUpdateStockList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -49,36 +49,52 @@
         MyBase.Show()
         MyBase.BringToFront()
         GoodsFilterText = ""
-        Config()
+        'Config()
         'Filter.SetTextFilter("商品編號", "")
         'cbStock.SelectedIndex = 0 'UpdateStockList()
         'Filter.Filter()
 
     End Sub
 
-    Dim UpdateStockListHandler As New Action(AddressOf UpdateStockList)
+    Dim UpdateStockListHandler As New Action(AddressOf BeginUpdateStockList)
     Dim DT As Data.DataTable = Nothing
-    Public Sub UpdateStockList()
+    Public Sub BeginUpdateStockList()
         If Not Me.Created Then Exit Sub
-        If Me.InvokeRequired Then
-            Me.Invoke(UpdateStockListHandler)
-            Exit Sub
-        End If
-        DT = access.GetStockListWithHistoryPrice()
+        'If Me.InvokeRequired Then
+        '    Me.Invoke(UpdateStockListHandler)
+        '    Exit Sub
+        'End If
 
-        dgItemList.DataSource = DT
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateStockList))
+        dialog.Start("讀取庫存資料")
 
-        If DT Is Nothing OrElse DT.Columns.Count = 0 Then Exit Sub
+    End Sub
+
+    Public Sub UpdateStockList(ByVal Progress As Database.Access.Progress)
+        DT = access.GetStockListWithHistoryPrice(, Progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
+        Progress.Finish()
+    End Sub
+
+    Public Sub UpdateDataTable(ByVal dt As DataTable)
+        dgItemList.DataSource = dt
+
+        If dt Is Nothing OrElse dt.Columns.Count = 0 Then Exit Sub
 
         'dgItemList.Columns("商品編號").Visible = False
 
-        If Filter IsNot Nothing Then Filter.UpdateComboBox()
-        dgItemList.Sort(dgItemList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Try
+            If Filter IsNot Nothing Then Filter.UpdateComboBox()
+            dgItemList.Sort(dgItemList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
     End Sub
 
 
     Private Sub 更新ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        UpdateStockList()
+        BeginUpdateStockList()
     End Sub
 
     Public SelectedRow As DataGridViewRow = Nothing
@@ -130,17 +146,25 @@
     End Sub
 
     Private Sub RemoveRow(ByVal Label As String)
-        If DT Is Nothing Then Exit Sub
-        Dim rows() As DataRow = DT.Select("庫存編號 = '" & Label & "'")
-        For Each r As DataRow In rows
-            DT.Rows.Remove(r)
-        Next
+        Try
+            If DT Is Nothing Then Exit Sub
+            Dim rows() As DataRow = DT.Select("庫存編號 = '" & Label & "'")
+            For Each r As DataRow In rows
+                DT.Rows.Remove(r)
+            Next
+        Catch
+
+        End Try
     End Sub
 
     Private Sub ChangeRow(ByVal arr() As Object)
-        For i As Integer = 0 To dt.Rows.Count - 1
-            If arr(1) = DT.Rows(i)("庫存編號") Then DT.Rows(i).ItemArray = arr
-        Next
+        Try
+            For i As Integer = 0 To DT.Rows.Count - 1
+                If arr(1) = DT.Rows(i)("庫存編號") Then DT.Rows(i).ItemArray = arr
+            Next
+        Catch
+
+        End Try
     End Sub
 
     Private Sub access_ChangedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.ChangedStock

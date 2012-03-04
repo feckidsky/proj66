@@ -13,7 +13,7 @@
     Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Filter = New DataGridViewFilter(dgList)
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
-        UpdateList()
+        BeginUpdateList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -40,8 +40,19 @@
     End Function
 
     Dim dt As DataTable
-    Private Sub UpdateList()
-        dt = access.GetSupplierList()
+    Private Sub BeginUpdateList()
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateList))
+        dialog.Start("讀取供應商資料")
+    End Sub
+
+    Private Sub UpdateList(ByVal progress As Database.Access.Progress)
+        dt = access.GetSupplierList(progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+        progress.Finish()
+    End Sub
+
+    Private Sub UpdateDataTable(ByVal dt As DataTable)
         dgList.DataSource = dt
 
         UpdateTitle("Label", "編號")
@@ -50,8 +61,12 @@
         UpdateTitle("Tel2", "電話2")
         UpdateTitle("Addr", "地址")
         UpdateTitle("Note", "備註")
-        Filter.UpdateComboBox()
-        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Try
+            Filter.UpdateComboBox()
+            dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)

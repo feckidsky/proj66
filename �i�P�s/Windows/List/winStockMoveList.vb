@@ -24,11 +24,11 @@ Public Class winStockMoveList
         MyBase.Show()
         MyBase.BringToFront()
         UpdateTitle()
-        UpdateStockMoveList()
+        BeginUpdateStockMoveList()
     End Sub
 
     Private Sub rToday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rToday.CheckedChanged, r30Day.CheckedChanged, rUserTime.CheckedChanged, dtpStart.ValueChanged, dtpEnd.ValueChanged
-        If Me.Created Then UpdateStockMoveList()
+        If Me.Created Then BeginUpdateStockMoveList()
     End Sub
 
     Dim UpdateTitleHandler As New Action(AddressOf UpdateTitle)
@@ -68,12 +68,35 @@ Public Class winStockMoveList
     End Function
 
     Dim dt As DataTable
-    Public Sub UpdateStockMoveList()
+    Public Sub BeginUpdateStockMoveList()
 
         Dim Period As Period = GetPeriod()
-        dt = access.GetStockMoveList(Period.StartTime, Period.EndTime)
 
 
+        Dim dialog As New ProgressDialog
+        dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateStockMoveList))
+
+        Dim args As UpdateStockMoveListArgs
+        args.period = Period
+        args.Progress = dialog.GetProgress("取得調貨資訊")
+   
+        dialog.Show()
+        dialog.Thread.Start(args)
+    End Sub
+
+    Structure UpdateStockMoveListArgs
+        Dim Progress As Database.Access.Progress
+        Dim period As Period
+    End Structure
+
+
+    Private Sub UpdateStockMoveList(ByVal args As UpdateStockMoveListArgs)
+        dt = access.GetStockMoveList(args.period.StartTime, args.period.EndTime, args.Progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockMoveDataTable), dt)
+        args.Progress.Finish()
+    End Sub
+
+    Private Sub UpdateStockMoveDataTable(ByVal dt As DataTable)
         If dgList.Columns.Count = 0 Then
             For i As Integer = 0 To dt.Columns.Count - 1
                 dgList.Columns.Add(dt.Columns(i).ColumnName, dt.Columns(i).ColumnName)
@@ -93,8 +116,6 @@ Public Class winStockMoveList
             AddRowInfo(arr)
         Next
 
-        'DataGridView1.DataSource = dt
-        'Filter.UpdateComboBox()
     End Sub
 
 

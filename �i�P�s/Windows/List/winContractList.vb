@@ -18,7 +18,7 @@
         Filter.AddNumberFilter("預付額", "佣金", "折扣")
         Filter.AddBoolFilter("有效")
         If FilterEffect Then Filter.SetBoolFilter("有效", True)
-        UpdateList()
+        BeginUpdateList()
     End Sub
 
 
@@ -48,10 +48,27 @@
     End Function
 
     Dim dt As DataTable
-    Private Sub UpdateList()
-        dt = access.GetContractList()
-        dgGoodsList.DataSource = dt
+    Private Sub BeginUpdateList()
 
+        Dim thread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateList))
+        Dim dialog As New ProgressDialog
+        dialog.Thread = thread
+        Dim progress As New Database.Access.Progress(AddressOf dialog.UpdateProgress, "讀取合約清單", AddressOf dialog.Finish)
+        dialog.Show()
+
+        thread.Start(progress)
+
+    End Sub
+
+
+    Private Sub UpdateList(ByVal progress As Database.Access.Progress)
+        dt = access.GetContractList(progress)
+        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
+        progress.Finish()
+    End Sub
+
+    Private Sub UpdateDataGridView(ByVal dt As DataTable)
+        dgGoodsList.DataSource = dt
         UpdateTitle("Label", "編號")
         UpdateTitle("Enable", "有效")
         UpdateTitle("Name", "合約")
@@ -60,8 +77,12 @@
         UpdateTitle("Prepay", "預付額")
         UpdateTitle("Note", "備註")
 
-        If Filter IsNot Nothing Then Filter.UpdateComboBox()
-        dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Try
+            If Filter IsNot Nothing Then Filter.UpdateComboBox()
+            dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
     End Sub
 
     Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
@@ -107,7 +128,7 @@
         If Not CheckAuthority(2) Then Exit Sub
 
         Dim selectedItem As Database.Contract = GetSelectedItem()
-        If selecteditem.IsNull() Then
+        If selectedItem.IsNull() Then
             MsgBox("您必須選擇一個項目")
             Exit Sub
         End If

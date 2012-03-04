@@ -276,28 +276,10 @@
 
         DataGrid.CurrentCell = Nothing
 
-        ' Try
         For i As Integer = 0 To DataGrid.Rows.Count - 1
             FilterRow(DataGrid.Rows(i))
-            'Dim Match As Boolean = True
-            'For Each c As TextFilter In TextFilters
-            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            'Next
-
-            'For Each c As NumberFilter In NumberFilters
-
-            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            'Next
-
-            'For Each c As BoolFilter In BoolFilters
-            '    Match = Match And c.Match(GetCellValue(DataGrid.Rows(i), c.HeaderName))
-            'Next
-
-            'DataGrid.Rows(i).Visible = Match
         Next
-        'Catch
-        '    MsgBox(Err.Description)
-        'End Try
+
     End Sub
 
     Public Sub FilterRow(ByVal row As DataGridViewRow)
@@ -392,18 +374,18 @@
     End Sub
 
     Public Sub UpdateComboBox()
-        ClearComboBoxItem()
 
+        Try
+            ClearComboBoxItem()
+            For Each row As DataGridViewRow In DataGrid.Rows
+                AddComboBoxItem(row)
+            Next
+        Catch
 
-        For Each row As DataGridViewRow In DataGrid.Rows
-            AddComboBoxItem(row)
-            'For Each c As TextFilter In TextFilters
-            '    Dim cb As ToolStripComboBox = c.cms.Items("cbText")
-            '    Dim text As String = GetCellValue(row, c.HeaderName)
-            '    If cb.Items.IndexOf(text) = -1 Then cb.Items.Add(text)
-            'Next
-        Next
+        End Try
         Filter()
+
+
     End Sub
 
     Private Function GetValue(ByVal obj As Object) As String

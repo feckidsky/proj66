@@ -127,15 +127,15 @@ Public Module Program
 
     Public Sub UpdateDatabase()
         If Config.Mode = Connect.Client Then Exit Sub
-        'Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
+        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
         'Database.Access.DeleteTable("Mobile", d)
         'Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
         'Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         'Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         'Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
-        'Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
+        Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
         'Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
-        'd.Close()
+        d.Close()
         'myDatabase.DeleteColumn(Stock.Table, "Price")
         'myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
         'myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
@@ -455,71 +455,138 @@ Public Module Program
     Dim UpdateDataLock As String = "UpdateDataLock"
 
 
+    Private Sub SyncDatabase(ByVal client As Database.AccessClient)
 
-    Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
-        If Config.Mode = Connect.Client Then Exit Sub
+        Dim SyncDialog As New ProgressDialog
+        SyncDialog.AutoClose = False
+        SyncDialog.Title = "同步資料庫"
+        SyncDialog.SubBarVisible = True
+        SyncDialog.Thread = Threading.Thread.CurrentThread
+        Dim totProgress As New Access.Progress(AddressOf SyncDialog.UpdateProgress, "同步資料庫", Nothing, 0, 10)
+        Dim partProgress As New Access.Progress(AddressOf SyncDialog.UpdatePartProgress, "", Nothing)
+        totProgress.SubProgress = partProgress
+        'SyncDialog.CancelHandler = totProgress.CancelHandler
+        Dim SyncDialogShowHandler As New Action(AddressOf SyncDialog.Show)
+
+OpenDialog:
+        Try
+            My.Application.OpenForms(0).Invoke(SyncDialogShowHandler)
+
+        Catch
+            GoTo OpenDialog
+        End Try
+
         SyncLock UpdateDataLock
             Try
-                Dim client As Database.AccessClient = sender
 
-                Dim sDT As DataTable = client.GetGoodsList()
-                Dim myDT As DataTable = myDatabase.GetGoodsList()
+                totProgress.Reset(0, 10)
+                partProgress.Text = "讀取" & client.Name & "商品項目"
+                Dim sDT As DataTable = client.GetGoodsList(totProgress)
 
-                For Each r As DataRow In sDT.Rows
-                    Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeGoods(Goods.GetFrom(r), False)
-                        Case Compare.NoExist : myDatabase.AddGoods(Goods.GetFrom(r), False)
+                totProgress.Reset(10, 15)
+                partProgress.Text = "讀取本機商品項目"
+                Dim myDT As DataTable = myDatabase.GetGoodsList(totProgress)
+
+                totProgress.Reset(15, 20)
+                partProgress.Text = ("同步" & client.Name & "商品項目")
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
+                        Case Compare.MoreNew : myDatabase.ChangeGoods(Goods.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.NoExist : myDatabase.AddGoods(Goods.GetFrom(sDT.Rows(i)), False)
                     End Select
                 Next
 
-                sDT = client.GetPersonnelList
-                myDT = myDatabase.GetPersonnelList
-                For Each r As DataRow In sDT.Rows
-                    Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangePersonnel(Personnel.GetFrom(r), False)
-                        Case Compare.NoExist : myDatabase.AddPersonnel(Personnel.GetFrom(r), False)
+                totProgress.Reset(20, 25)
+                partProgress.Text = "讀取" & client.Name & "員工資料"
+                sDT = client.GetPersonnelList(totProgress)
+                totProgress.Reset(25, 35)
+                partProgress.Text = "讀取本機員工資料"
+                myDT = myDatabase.GetPersonnelList(totProgress)
+
+                totProgress.Reset(35, 40)
+                partProgress.Text = "同步" & client.Name & "員工資料"
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
+                        Case Compare.MoreNew : myDatabase.ChangePersonnel(Personnel.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.NoExist : myDatabase.AddPersonnel(Personnel.GetFrom(sDT.Rows(i)), False)
                     End Select
                 Next
 
-                sDT = client.GetCustomerList
-                myDT = myDatabase.GetCustomerList
-                For Each r As DataRow In sDT.Rows
-                    Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeCustomer(Customer.GetFrom(r), False)
-                        Case Compare.NoExist : myDatabase.AddCustomer(Customer.GetFrom(r), False)
+                totProgress.Reset(40, 45)
+                partProgress.Text = "讀取" & client.Name & " 客戶資料"
+                sDT = client.GetCustomerList(totProgress)
+                totProgress.Reset(45, 50)
+                partProgress.Text = "讀取本機員工資料"
+                myDT = myDatabase.GetCustomerList(totProgress)
+                totProgress.Reset(50, 55)
+                partProgress.Text = "同步" & client.Name & "客戶資料"
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
+                        Case Compare.MoreNew : myDatabase.ChangeCustomer(Customer.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.NoExist : myDatabase.AddCustomer(Customer.GetFrom(sDT.Rows(i)), False)
                     End Select
                 Next
 
-                sDT = client.GetSupplierList
-                myDT = myDatabase.GetSupplierList
-                For Each r As DataRow In sDT.Rows
-                    Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeSupplier(Supplier.GetFrom(r), False)
-                        Case Compare.NoExist : myDatabase.AddSupplier(Supplier.GetFrom(r), False)
+                totProgress.Reset(55, 60)
+                partProgress.Text = "讀取" & client.Name & "供應商資料"
+                sDT = client.GetSupplierList(totProgress)
+                totProgress.Reset(60, 65)
+                partProgress.Text = "讀取本機供應商資料"
+                myDT = myDatabase.GetSupplierList(totProgress)
+                totProgress.Reset(65, 70)
+                partProgress.Text = "同步" & client.Name & "供應商資料"
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
+                        Case Compare.MoreNew : myDatabase.ChangeSupplier(Supplier.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.NoExist : myDatabase.AddSupplier(Supplier.GetFrom(sDT.Rows(i)), False)
                     End Select
                 Next
 
-                sDT = client.GetContractList()
-                myDT = myDatabase.GetContractList()
-                For Each r As DataRow In sDT.Rows
-                    Select Case CompareModify(myDT, r("Label"), GetTime(r("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeContract(Contract.GetFrom(r), False)
-                        Case Compare.NoExist : myDatabase.AddContract(Contract.GetFrom(r), False)
+                totProgress.Reset(70, 75)
+                partProgress.Text = "讀取" & client.Name & "合約項目"
+                sDT = client.GetContractList(totProgress)
+                totProgress.Reset(75, 80)
+                partProgress.Text = "讀取本機合約項目"
+                myDT = myDatabase.GetContractList(totProgress)
+                totProgress.Reset(80, 85)
+                partProgress.Text = "同步" & client.Name & "合約項目"
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
+                        Case Compare.MoreNew : myDatabase.ChangeContract(Contract.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.NoExist : myDatabase.AddContract(Contract.GetFrom(sDT.Rows(i)), False)
                     End Select
                 Next
 
-                sDT = client.GetHistoryPriceList()
-                myDT = myDatabase.GetHistoryPriceList()
-                For Each r As DataRow In sDT.Rows
-                    If CompareHistoryPrice(myDT, r("GoodsLabel"), GetTime(r("Time"))) = Compare.NoExist Then
-                        myDatabase.AddHistoryPrice(HistoryPrice.GetFrom(r), False)
+                totProgress.Reset(85, 90)
+                partProgress.Text = "讀取" & client.Name & "歷史售價"
+                sDT = client.GetHistoryPriceList(totProgress)
+                totProgress.Reset(90, 95)
+                partProgress.Text = "讀取本機歷史售價"
+                myDT = myDatabase.GetHistoryPriceList(totProgress)
+                totProgress.Reset(95, 99)
+                partProgress.Text = "同步" & client.Name & "歷史售價"
+                For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
+                    totProgress.Report((i + 1) / sDT.Rows.Count * 100)
+                    If CompareHistoryPrice(myDT, sDT.Rows(i)("GoodsLabel"), GetTime(sDT.Rows(i)("Time"))) = Compare.NoExist Then
+                        myDatabase.AddHistoryPrice(HistoryPrice.GetFrom(sDT.Rows(i)), False)
                     End If
                 Next
             Catch
 
             End Try
 
+            SyncDialog.Close()
         End SyncLock
+    End Sub
+
+    Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
+        If Config.Mode = Connect.Client Then Exit Sub
+        SyncDatabase(sender)
     End Sub
 
     Public Function GetTime(ByVal obj As Object) As Date

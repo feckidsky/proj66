@@ -2,7 +2,7 @@
 
     Dim access As Database.Access
 
-    WithEvents downloader As TCPTool.Client.Receiver
+    WithEvents downloader As TCPTool.Client.StreamReceiver
 
     Public Overloads Sub ShowDialog(ByVal db As Database.Access)
         access = db
@@ -20,9 +20,10 @@
         SaveFileDialog1.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.Desktop
         SaveFileDialog1.FileName = IO.Path.GetFileName(File)
         If SaveFileDialog1.ShowDialog() <> Windows.Forms.DialogResult.OK Then Exit Sub
+
         downloader = access.Download(File, SaveFileDialog1.FileName)
         DeleteHandler = Nothing
-        DownloadDialog = New ProgressDialog
+        DownloadDialog = New ProgressDialog()
         DownloadDialog.Text = "下載檔案 - " & IO.Path.GetFileName(downloader.destFile)
         DownloadDialog.Show()
 
@@ -37,11 +38,11 @@
                 MsgBox(Err.Description)
             End Try
         End If
-        If DeleteHandler IsNot Nothing Then DeleteHandler(CType(sender, TCPTool.Client.Receiver).sourceFile)
+        If DeleteHandler IsNot Nothing Then DeleteHandler(CType(sender, TCPTool.Client.StreamReceiver).sourceFile)
     End Sub
 
     Private Sub downloader_Progress(ByVal sender As Object, ByVal percent As Integer) Handles downloader.Progress
-        DownloadDialog.UpdateProgress(percent, "下載中...")
+        DownloadDialog.UpdateProgress("下載中...", percent)
     End Sub
 
     Dim DeleteHandler As Action(Of String)

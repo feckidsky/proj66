@@ -33,7 +33,7 @@ Public Class TCPTool
     Event ServerConnectedFail(ByVal Client As Client)
     Event ClientConnectedFail(ByVal Client As Client)
 
-    Event ServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.Sender)
+    Event ServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.StreamSender)
 
     '檔案傳送事件
     Event SendFileRequest(ByVal Client As Client, ByVal IP As String, ByVal FileName As String, ByVal FileSize As Long, ByVal Message As String)
@@ -391,7 +391,7 @@ Public Class TCPTool
         Loop
     End Sub
 
-    Friend Sub OnServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.Sender)
+    Friend Sub OnServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.StreamSender)
         RaiseEvent ServerReceiveStreamRequest(Client, sender)
     End Sub
 
@@ -634,7 +634,7 @@ Public Class TCPTool
         Event ConnectedFail(ByVal Client As Client)
         Event ConnectedSuccess(ByVal Client As Client)
         Event ReceiveSplitMessage(ByVal Client As Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String)
-        Event ReceiveStreamRequest(ByVal Client As Client, ByVal sender As Sender)
+        Event ReceiveStreamRequest(ByVal Client As Client, ByVal sender As StreamSender)
 
 
         Event GetReceive(ByVal ClientClass As Client, ByVal Client As TcpClient, ByVal IP As String, ByVal Port As Integer, ByVal Msg As String)
@@ -757,10 +757,13 @@ Public Class TCPTool
                     ReceiveThread.Start()
                 Catch
                 End Try
-                OnConnectedSuccess()
+
             Catch
                 OnConnectedFail()
+                Exit Sub
             End Try
+
+            OnConnectedSuccess()
         End Sub
 #End Region
 
@@ -1071,12 +1074,12 @@ Public Class TCPTool
             Send("%RequestSetIPAddress%," & e.ToString)
         End Sub
 
-        Public Function Download(ByVal sourceFile As String, ByVal destFile As String) As Receiver
+        Public Function Download(ByVal sourceFile As String, ByVal destFile As String) As StreamReceiver
 
 
             Try
                 Dim fs As IO.FileStream = New IO.FileStream(destFile, IO.FileMode.Create)
-                Dim Receiver As New Receiver(Me, Receiver.GetGuid(), fs)
+                Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid(), fs)
                 lstTransmitter.Add(Receiver)
                 Receiver.Request("Download", sourceFile)
                 Return Receiver
@@ -1087,31 +1090,31 @@ Public Class TCPTool
             'Receiver.RequestData() ' .StartDownload(sourceFile, destFile)
         End Function
 
-        Public Function RequestStream(ByVal cmd As String, ByVal args As String) As Receiver
+        Public Function GetReceiver() As StreamReceiver  'ByVal cmd As String, ByVal args As String) As StreamReceiver
             Dim ms As New IO.MemoryStream
-            Dim receiver As New Receiver(Me, receiver.GetGuid, ms)
-            lstTransmitter.Add(receiver)
-            receiver.Request(cmd, args)
-            Return receiver
+            Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid, ms)
+            lstTransmitter.Add(Receiver)
+            'Receiver.Request(cmd, args)
+            Return Receiver
         End Function
 
         Friend Class TransmitterList
-            Inherits List(Of Transmitter)
+            Inherits List(Of StreamTransmitter)
             Dim ReadLock As String = "ReadLock"
-            Dim ElseRequestHandler As Action(Of Sender)
-            Sub New(ByVal ElseRequest As Action(Of Sender))
+            Dim ElseRequestHandler As Action(Of StreamSender)
+            Sub New(ByVal ElseRequest As Action(Of StreamSender))
                 ElseRequestHandler = ElseRequest
             End Sub
 
 
-            Public Overloads Sub Add(ByVal Item As Transmitter)
+            Public Overloads Sub Add(ByVal Item As StreamTransmitter)
                 SyncLock ReadLock
                     MyBase.Add(Item)
                     Item.parent = Me
                 End SyncLock
             End Sub
 
-            Public Overloads Sub Remove(ByVal item As Transmitter)
+            Public Overloads Sub Remove(ByVal item As StreamTransmitter)
                 SyncLock ReadLock
                     MyBase.Remove(item)
                 End SyncLock
@@ -1119,11 +1122,11 @@ Public Class TCPTool
 
             Public Sub Receive(ByVal Client As Client, ByVal para() As String)
                 Dim Guid As String = para(1)
-                Dim Transmitters As List(Of Transmitter)
+                Dim Transmitters As List(Of StreamTransmitter)
 
                 SyncLock ReadLock
-                    Transmitters = FindAll(Function(i As Transmitter) i.Guid = Guid)
-                    For Each r As Transmitter In Transmitters
+                    Transmitters = FindAll(Function(i As StreamTransmitter) i.Guid = Guid)
+                    For Each r As StreamTransmitter In Transmitters
                         r.Receive(para)
                     Next
                 End SyncLock
@@ -1131,7 +1134,7 @@ Public Class TCPTool
                 If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
                     Select Case para(2)
                         Case "Download"
-                            Dim sender As New Sender(Client, Guid)
+                            Dim Sender As New StreamSender(Client, Guid)
                             Try
                                 Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
                                 Add(sender)
@@ -1142,7 +1145,7 @@ Public Class TCPTool
                             End Try
 
                         Case Else
-                            Dim sender As New Sender(Client, Guid)
+                            Dim Sender As New StreamSender(Client, Guid)
                             Add(sender)
                             sender.Cmd = para(2)
                             sender.Args = para(3)
@@ -1159,7 +1162,7 @@ Public Class TCPTool
             End Sub
         End Class
 
-        Public Sub OnReceiveStreamRequest(ByVal e As Sender)
+        Public Sub OnReceiveStreamRequest(ByVal e As StreamSender)
             RaiseEvent ReceiveStreamRequest(Me, e)
         End Sub
 
@@ -1167,7 +1170,7 @@ Public Class TCPTool
 
 #End Region
 
-        Public MustInherit Class Transmitter
+        Public MustInherit Class StreamTransmitter
             Friend parent As TransmitterList
             Public Guid As String
             Public WithEvents Client As Client
@@ -1202,8 +1205,8 @@ Public Class TCPTool
         End Class
 
 
-        Public Class Sender
-            Inherits Transmitter
+        Public Class StreamSender
+            Inherits StreamTransmitter
             Dim ReadToEnd As Boolean = False
             Dim BufferSize As Integer = 32767
             Public Cmd As String
@@ -1231,7 +1234,11 @@ Public Class TCPTool
                 '    If parent IsNot Nothing Then parent.Remove(Me)
                 'End Try
                 ReadToEnd = False
-                Send("StartSendFile", stream.Length)
+                Try
+                    Send("StartSendFile", stream.Length)
+                Catch
+                    Fail(Err.Description)
+                End Try
             End Sub
 
             Private Sub Upload()
@@ -1310,8 +1317,8 @@ Public Class TCPTool
 
         End Class
 
-        Public Class Receiver
-            Inherits Transmitter
+        Public Class StreamReceiver
+            Inherits StreamTransmitter
             Public TotalSize As Long
             Public destFile As String
             Public sourceFile As String
@@ -1368,7 +1375,11 @@ Public Class TCPTool
                 End If
 
 
-                RaiseEvent Progress(Me, percent)
+                Try
+                    RaiseEvent Progress(Me, percent)
+                Catch
+
+                End Try
                 RequestData()
             End Sub
 
@@ -1389,6 +1400,7 @@ Public Class TCPTool
 
             Public Sub Cancel()
                 Send("Cancel", "")
+                Fail("使用者已取消動作")
             End Sub
 
             Friend Sub OnReceived()
@@ -1423,7 +1435,7 @@ Public Class TCPTool
 
             End Sub
 
-
+           
         End Class
 
 #Region "檔案傳送"
@@ -1547,7 +1559,7 @@ Public Class TCPTool
         Public Shared Sub Dispose(ByVal Client As Client)
             Client.Dispose()
         End Sub
-
+     
 
     End Class
 
