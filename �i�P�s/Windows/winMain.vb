@@ -61,7 +61,7 @@ Public Class winMain
         InitializeComponent()
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
-
+        dgSales.AutoGenerateColumns = False
 
         Filter = New DataGridViewFilter(dgSales)
         Filter.AddTextFilter("單號", "銷售人員", "客戶", "備註", "付款方式", "內容")
@@ -279,6 +279,11 @@ Public Class winMain
         If Not Me.Created Or access Is Nothing Then Exit Sub
         If access.GetType Is GetType(Database.AccessClient) AndAlso Not access.Connected Then dgSales.Rows.Clear()
 
+        If Me.InvokeRequired Then
+            Me.Invoke(New Action(AddressOf UpdateSalesList))
+            Exit Sub
+        End If
+
         If rToday.Checked Then
             StartTime = Today.Date
             EndTime = Today.Date.AddDays(1)
@@ -352,7 +357,7 @@ Public Class winMain
             Exit Sub
         End If
 
-        'Me.Invoke(New Action(AddressOf StopUpdate))
+        Me.Invoke(New Action(AddressOf StopUpdate))
         args.progress.Reset("取得訂單/銷貨單內容", 50, 99)
         For i As Integer = 0 To dt.Rows.Count - 1
             args.progress.Report((i + 1) / dt.Rows.Count * 100)
@@ -360,16 +365,23 @@ Public Class winMain
             'BeginAddRowInfo(arr)
             ShowRowInfo(arr, AddRowHandler)
         Next
-        'Me.Invoke(New Action(AddressOf ResetUpdate))
+        Me.Invoke(New Action(AddressOf ResetUpdate))
         UpdateLogList()
         args.Dialog.Close()
     End Sub
 
     Public Sub StopUpdate()
         dgSales.SuspendLayout()
+        'dgSales.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+        'dgSales.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None
+        'dgSales.Visible = False
+
     End Sub
 
     Public Sub ResetUpdate()
+        'dgSales.Visible = True
+        'dgSales.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells
+        'dgSales.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells
         dgSales.ResumeLayout(False)
     End Sub
 
@@ -558,20 +570,25 @@ Public Class winMain
         '    dtLog = New DataTable() {}
 
         'End If
-
+        If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
         For Each row As DataRow In dtLog.Rows
             If row(0) = arr(0) And row(1) = arr(1) Then
                 Exit Sub
             End If
         Next
 
-        dtLog.Rows.Add(CType(arr, Object()))
-        dgLog.Sort(dgLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Try
+            dtLog.Rows.Add(CType(arr, Object()))
+            dgLog.Sort(dgLog.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+        Catch
+
+        End Try
     End Sub
 
 
     Dim DeleteLogHandler As New Action(Of Log)(AddressOf DeleteLogRow)
     Private Sub DeleteLogRow(ByVal log As Log)
+        If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
         For Each row As DataRow In dtLog.Rows
             If row(0) = log.Date And row(1) = log.Personnel Then
                 dtLog.Rows.Remove(row)
@@ -619,6 +636,7 @@ Public Class winMain
             Exit Sub
         End If
         'dgLog.CurrentCell = Nothing
+        If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
         dtLog.Rows.Clear()
     End Sub
 

@@ -29,6 +29,34 @@
 
     End Sub
 
+    'Private Sub BeginDownload(ByVal Files() As String, ByVal dir As String)
+    '    Dim dialog As New ProgressDialog
+    '    dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf Download))
+    '    Dim args As DownloadArgs
+    '    args.Dir = dir
+    '    args.Files = Files
+    '    args.Progress = dialog.GetProgress("下載檔案")
+    '    dialog.Thread.Start(args)
+    'End Sub
+
+    'Structure DownloadArgs
+    '    Dim Dir As String
+    '    Dim Files() As String
+    '    Dim Progress As Database.Access.Progress
+    'End Structure
+
+    'Private Sub Download(ByVal args As DownloadArgs)
+
+
+    '    For i As Integer = 0 To args.Files.Length - 1
+    '        downloader = access.Download(args.Files(i), args.Dir & "\" & IO.Path.GetFileName(args.Files(i)))
+
+
+    '    Next
+
+
+    'End Sub
+
     Private Sub downloader_Downloaded(ByVal sender As Object, ByVal stream As IO.Stream) Handles downloader.Received
         DownloadDialog.Finish()
         If MsgBox("下載完成，是否要立即開啟", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then

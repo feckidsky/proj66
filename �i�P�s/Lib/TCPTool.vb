@@ -1126,10 +1126,11 @@ Public Class TCPTool
 
                 SyncLock ReadLock
                     Transmitters = FindAll(Function(i As StreamTransmitter) i.Guid = Guid)
-                    For Each r As StreamTransmitter In Transmitters
-                        r.Receive(para)
-                    Next
                 End SyncLock
+                For Each r As StreamTransmitter In Transmitters
+                    r.Receive(para)
+                Next
+
 
                 If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
                     Select Case para(2)
@@ -1137,20 +1138,20 @@ Public Class TCPTool
                             Dim Sender As New StreamSender(Client, Guid)
                             Try
                                 Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
-                                Add(sender)
-                                sender.stream = fs
-                                sender.StartSend()
+                                Add(Sender)
+                                Sender.stream = fs
+                                Sender.StartSend()
                             Catch
-                                sender.Fail(Err.Description)
+                                Sender.Fail(Err.Description)
                             End Try
 
                         Case Else
                             Dim Sender As New StreamSender(Client, Guid)
-                            Add(sender)
-                            sender.Cmd = para(2)
-                            sender.Args = para(3)
-                            ElseRequestHandler(sender)
-                            sender.StartSend()
+                            Add(Sender)
+                            Sender.Cmd = para(2)
+                            Sender.Args = para(3)
+                            ElseRequestHandler(Sender)
+                            Sender.StartSend()
                             'Dim receiver As New Receiver(Client, Guid)
                             'receiver.TotalSize = para(3)
                             'Add(receiver)
@@ -1194,13 +1195,15 @@ Public Class TCPTool
             Public MustOverride Sub Receive(ByVal msg() As String)
 
             Private Sub Client_ConnectedFail(ByVal Client As Client) Handles Client.ConnectedFail
-                If parent IsNot Nothing Then parent.Remove(Me)
+
                 OnTransFail("³s½u¤¤Â_!")
                 Try
                     stream.Close()
                     stream.Dispose()
                 Catch
                 End Try
+
+                If parent IsNot Nothing Then parent.Remove(Me)
             End Sub
         End Class
 
@@ -1293,9 +1296,9 @@ Public Class TCPTool
                     stream.Dispose()
                 Catch
                     Fail(Err.Description)
-                Finally
-                    If parent IsNot Nothing Then parent.Remove(Me)
+
                 End Try
+                If parent IsNot Nothing Then parent.Remove(Me)
             End Sub
 
             Public Sub Fail(ByVal msg As String)
@@ -1393,9 +1396,9 @@ Public Class TCPTool
                     stream.Close()
                     stream.Dispose()
                 Catch
-                Finally
-                    If parent IsNot Nothing Then parent.Remove(Me)
+
                 End Try
+                If parent IsNot Nothing Then parent.Remove(Me)
             End Sub
 
             Public Sub Cancel()

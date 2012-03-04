@@ -64,8 +64,8 @@ Public Class winGoodsList
         'dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
 
         Try
-            'Filter.UpdateComboBox()
-            'dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+            Filter.UpdateComboBox()
+            dgGoodsList.Sort(dgGoodsList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
         Catch
 
         End Try
@@ -196,6 +196,7 @@ Public Class winGoodsList
     Private Sub UpdateHistory()
         If GoodsLoading Then Exit Sub
         Dim goods As Database.Goods = GetSelectedGoods()
+        If goods.IsNull Then Exit Sub
         gbHistory.Text = "歷史售價 - " & goods.Name
         Dim dt As Data.DataTable = access.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
