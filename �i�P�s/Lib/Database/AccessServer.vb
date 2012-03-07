@@ -6,8 +6,8 @@
 
         Public Name As String
 
-        Public Sub Open()
-            ServerOpen(Port)
+        Public Sub Open(ByVal Index As Integer)
+            ServerOpen(Port, Index)
         End Sub
 
         Public Sub Close()

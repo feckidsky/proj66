@@ -16,6 +16,7 @@ Public Module Program
         Dim Mode As Connect
         Dim ServerName As String
         Dim ServerPort As Integer
+        Dim ServerNetIndex As Integer
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
@@ -24,6 +25,7 @@ Public Module Program
                 def.Mode = Connect.Client
                 def.ServerName = My.Computer.Name
                 def.ServerPort = 3600
+                def.ServerNetIndex = 0
                 Return def
             End Get
         End Property
@@ -98,7 +100,7 @@ Public Module Program
             Server.Access = myDatabase
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
-            Server.Open()
+            Server.Open(Config.ServerNetIndex)
         End If
 
 

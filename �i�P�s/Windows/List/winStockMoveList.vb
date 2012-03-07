@@ -133,9 +133,13 @@ Public Class winStockMoveList
         Dim idxAction As Integer = dgList.Columns("狀態").Index
         arr(idxAction) = StockMove.TypeText(arr(idxAction))
         Dim idx As Integer = dgList.Rows.Add(CType(arr, Object()))
-        dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
-        Filter.AddComboBoxItem(dgList.Rows(idx))
-        Filter.FilterRow(dgList.Rows(idx))
+        Try
+            dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
+            Filter.AddComboBoxItem(dgList.Rows(idx))
+            Filter.FilterRow(dgList.Rows(idx))
+        Catch
+
+        End Try
     End Sub
 
     Private Sub UpdateRowInfo(ByVal arr As Object)
@@ -153,8 +157,12 @@ Public Class winStockMoveList
                 For i As Integer = 0 To row.Cells.Count - 1
                     row.Cells(i).Value = arr(i)
                 Next
-                Filter.AddComboBoxItem(row)
-                Filter.FilterRow(row)
+                Try
+                    Filter.AddComboBoxItem(row)
+                    Filter.FilterRow(row)
+                Catch
+
+                End Try
                 Exit Sub
             End If
         Next

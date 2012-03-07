@@ -703,10 +703,12 @@ Public Class winMain
 
         'MsgBox(Join(lst.ToArray, vbCrLf))
         'MsgBox(Join(access.GetErrorLogFileNames(), vbCrLf))
-
+        MsgBox(Join(Array.ConvertAll(TCPTool.GetIPv4s(), AddressOf GetString), vbCrLf))
     End Sub
 
-
+    Public Function GetString(ByVal ip As Net.IPAddress) As String
+        Return ip.ToString
+    End Function
 
 
 

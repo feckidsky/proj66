@@ -311,17 +311,26 @@ Public Class TCPTool
     '===========================================================================================================
     '                                               Server°Ê§@¨ç¦¡
     '===========================================================================================================
-    Public Sub ServerOpen(ByVal Port As Integer)
+    Public Sub ServerOpen(ByVal Port As Integer, Optional ByVal Index As Integer = 0)
         ServerPort = Port
-        Dim localAddr As IPAddress = GetIPv4() ' Dns.GetHostEntry(Dns.GetHostName).AddressList(0) ' Dns.Resolve(My.Computer.Name).AddressList(0)
+        Dim localAddr As IPAddress = GetIPv4(Index) ' Dns.GetHostEntry(Dns.GetHostName).AddressList(0) ' Dns.Resolve(My.Computer.Name).AddressList(0)
         If mServer Is Nothing Then mServer = New TcpListener(localAddr, Port)
         If ListenThread Is Nothing Then ListenThread = New System.Threading.Thread(AddressOf Listen)
         ListenThread.IsBackground = True
         ListenThread.Start()
     End Sub
 
-    Public Function GetIPv4() As IPAddress
-        Return Array.Find(Dns.GetHostEntry(Dns.GetHostName).AddressList, Function(ip As IPAddress) ip.AddressFamily = AddressFamily.InterNetwork)
+    Public Function GetIPv4(ByVal idx As Integer) As IPAddress
+        Try
+            Return GetIPv4s(idx)
+        Catch ex As Exception
+            Return GetIPv4s(0)
+        End Try
+        'Return Array.Find(Dns.GetHostEntry(Dns.GetHostName).AddressList, Function(ip As IPAddress) ip.AddressFamily = AddressFamily.InterNetwork)
+    End Function
+
+    Public Shared Function GetIPv4s() As IPAddress()
+        Return Array.FindAll(Dns.GetHostEntry(Dns.GetHostName).AddressList, Function(ip As IPAddress) ip.AddressFamily = AddressFamily.InterNetwork)
     End Function
 
     Public Sub ServerClose()

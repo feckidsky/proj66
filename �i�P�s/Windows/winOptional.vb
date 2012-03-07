@@ -8,6 +8,7 @@
 
         txtServerName.Text = Config.ServerName
         txtPort.Text = Config.ServerPort
+        txtNetIndex.Text = Config.ServerNetIndex
         UpdateShopList()
 
     End Sub
@@ -49,6 +50,10 @@
         Config.SalesBackColor = btSalesBackColor.BackColor.ToArgb
 
         Config.ServerName = txtServerName.Text
+        Try
+            Config.ServerNetIndex = Integer.Parse(txtNetIndex.Text)
+        Catch
+        End Try
         If Config.Mode = Connect.Server Then
             Server.ChangeName(Config.ServerName)
             myDatabase.Name = Config.ServerName
@@ -65,7 +70,7 @@
             Config.ServerPort = newPort
             Server.Port = Config.ServerPort
             Server.Close()
-            Server.Open()
+            Server.Open(Config.ServerNetIndex)
         End If
 
         Config.Mode = cbMode.SelectedIndex

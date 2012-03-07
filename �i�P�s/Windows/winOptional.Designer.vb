@@ -39,10 +39,11 @@ Partial Class winOptional
         Me.cbMode = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.GroupBox4 = New System.Windows.Forms.GroupBox
-        Me.txtServerName = New System.Windows.Forms.TextBox
+        Me.Label3 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.txtPort = New System.Windows.Forms.TextBox
-        Me.Label3 = New System.Windows.Forms.Label
+        Me.txtServerName = New System.Windows.Forms.TextBox
+        Me.txtNetIndex = New System.Windows.Forms.TextBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.dgShop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -186,6 +187,7 @@ Partial Class winOptional
         '
         'GroupBox4
         '
+        Me.GroupBox4.Controls.Add(Me.txtNetIndex)
         Me.GroupBox4.Controls.Add(Me.Label3)
         Me.GroupBox4.Controls.Add(Me.Label2)
         Me.GroupBox4.Controls.Add(Me.txtPort)
@@ -199,17 +201,19 @@ Partial Class winOptional
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "系統設定"
         '
-        'txtServerName
+        'Label3
         '
-        Me.txtServerName.Location = New System.Drawing.Point(155, 45)
-        Me.txtServerName.Name = "txtServerName"
-        Me.txtServerName.Size = New System.Drawing.Size(100, 22)
-        Me.txtServerName.TabIndex = 7
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(258, 21)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(41, 12)
+        Me.Label3.TabIndex = 8
+        Me.Label3.Text = "通訊埠"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(153, 21)
+        Me.Label2.Location = New System.Drawing.Point(129, 21)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(65, 12)
         Me.Label2.TabIndex = 8
@@ -217,25 +221,30 @@ Partial Class winOptional
         '
         'txtPort
         '
-        Me.txtPort.Location = New System.Drawing.Point(284, 45)
+        Me.txtPort.Location = New System.Drawing.Point(260, 45)
         Me.txtPort.Name = "txtPort"
         Me.txtPort.Size = New System.Drawing.Size(100, 22)
         Me.txtPort.TabIndex = 7
         '
-        'Label3
+        'txtServerName
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(282, 21)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(41, 12)
-        Me.Label3.TabIndex = 8
-        Me.Label3.Text = "通訊埠"
+        Me.txtServerName.Location = New System.Drawing.Point(131, 45)
+        Me.txtServerName.Name = "txtServerName"
+        Me.txtServerName.Size = New System.Drawing.Size(100, 22)
+        Me.txtServerName.TabIndex = 7
+        '
+        'txtNetIndex
+        '
+        Me.txtNetIndex.Location = New System.Drawing.Point(366, 45)
+        Me.txtNetIndex.Name = "txtNetIndex"
+        Me.txtNetIndex.Size = New System.Drawing.Size(34, 22)
+        Me.txtNetIndex.TabIndex = 9
         '
         'winOptional
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(452, 449)
+        Me.ClientSize = New System.Drawing.Size(453, 449)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
@@ -275,4 +284,5 @@ Partial Class winOptional
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents txtPort As System.Windows.Forms.TextBox
     Friend WithEvents txtServerName As System.Windows.Forms.TextBox
+    Friend WithEvents txtNetIndex As System.Windows.Forms.TextBox
 End Class
