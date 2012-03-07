@@ -43,17 +43,17 @@ Public Class ErrorLog
     Private Shared Sub OnErrorOccur(ByVal e As Exception)
         WriteErrorLog(e)
         Dim t As Date = Now
-        For Each f As Form In My.Application.OpenForms
-            Save(f, Dir & "\" & t.ToString("yyyyMMddHHmmss") & f.Name & ".jpg")
-
-        Next
+        SaveScreen(Dir & "\" & t.ToString("yyyyMMddHHmmss") & e.Message & ".jpg")
+        'For Each f As Form In My.Application.OpenForms
+        '    Save(f, Dir & "\" & t.ToString("yyyyMMddHHmmss") & f.Name & ".jpg")
+        'Next
         ErrorDialog.ShowDialog(Dir, GetErrorMessage(e))
         RaiseEvent ErrorOccur()
     End Sub
 
 
     Public Shared Sub Save(ByVal F As Form, ByVal Path As String)
-        Dim myImage As New Bitmap(F.Width, F.Height)
+        Dim myImage As New Bitmap(My.Computer.Screen.Bounds.Size.Width, My.Computer.Screen.Bounds.Height)
         Dim g = Graphics.FromImage(myImage)
         Try
             F.BringToFront()
@@ -61,7 +61,23 @@ Public Class ErrorLog
         Catch ex As Exception
 
         End Try
+
         g.CopyFromScreen(F.Location.X, F.Location.Y, 0, 0, New Size(F.Width, F.Height))
+        Dim dc1 As IntPtr = g.GetHdc()
+        g.ReleaseHdc(dc1)
+        myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
+    End Sub
+
+    Public Shared Sub SaveScreen(ByVal Path As String)
+        Dim size As Size = Screen.PrimaryScreen.Bounds.Size
+        Dim myImage As New Bitmap(size.Width, size.Height)
+        Dim g = Graphics.FromImage(myImage)
+
+        Try
+            g.CopyFromScreen(0, 0, 0, 0, size)
+        Catch
+
+        End Try
         Dim dc1 As IntPtr = g.GetHdc()
         g.ReleaseHdc(dc1)
         myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)

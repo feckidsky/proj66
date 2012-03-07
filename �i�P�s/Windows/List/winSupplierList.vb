@@ -48,7 +48,10 @@
 
     Private Sub UpdateList(ByVal progress As Database.Access.Progress)
         dt = access.GetSupplierList(progress)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+        Catch
+        End Try
         progress.Finish()
     End Sub
 
@@ -153,7 +156,10 @@
 
     Private Sub access_CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.CreatedSupplier
         If Me.InvokeRequired Then
-            Me.Invoke(invCreate, sender, sup)
+            Try
+                Me.Invoke(invCreate, sender, sup)
+            Catch
+            End Try
             Exit Sub
         End If
         dt.Rows.Add(sup.Label, sup.Name, sup.Tel1, sup.Tel2, sup.Note, sup.Addr, sup.Modify)
@@ -161,7 +167,10 @@
 
     Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.ChangedSupplier
         If Me.InvokeRequired Then
-            Me.Invoke(invChange, sender, sup)
+            Try
+                Me.Invoke(invChange, sender, sup)
+            Catch
+            End Try
             Exit Sub
         End If
 
@@ -173,7 +182,10 @@
 
     Private Sub access_DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.DeletedSupplier
         If Me.InvokeRequired Then
-            Me.Invoke(invDelete, sender, sup)
+            Try
+                Me.Invoke(invDelete, sender, sup)
+            Catch
+            End Try
             Exit Sub
         End If
 

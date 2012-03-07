@@ -35,7 +35,10 @@ Public Class winStockMoveList
     Public Sub UpdateTitle()
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateTitleHandler)
+            Try
+                Me.Invoke(UpdateTitleHandler)
+            Catch
+            End Try
             Exit Sub
         End If
 
@@ -55,7 +58,10 @@ Public Class winStockMoveList
     Dim GetPeriodHandler As New DelegateGetPeriod(AddressOf GetPeriod)
     Private Function GetPeriod() As Period
         If Me.InvokeRequired Then
-            Return Me.Invoke(GetPeriodHandler)
+            Try
+                Return Me.Invoke(GetPeriodHandler)
+            Catch
+            End Try
         End If
 
         If r30Day.Checked Then
@@ -92,7 +98,10 @@ Public Class winStockMoveList
 
     Private Sub UpdateStockMoveList(ByVal args As UpdateStockMoveListArgs)
         dt = access.GetStockMoveList(args.period.StartTime, args.period.EndTime, args.Progress)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockMoveDataTable), dt)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockMoveDataTable), dt)
+        Catch
+        End Try
         args.Progress.Finish()
     End Sub
 
@@ -122,17 +131,27 @@ Public Class winStockMoveList
     Dim AddRowInfoHandler As New Action(Of Object())(AddressOf AddRowInfo)
     Dim UpdateRowInfoHandler As New Action(Of Object())(AddressOf UpdateRowInfo)
 
+    Private Sub SetColor(ByVal r As DataGridViewRow, ByVal sm As StockMove.Type)
+
+        r.DefaultCellStyle.BackColor = StockMove.TypeColor(sm)
+    End Sub
 
     Private Sub AddRowInfo(ByVal arr As Object)
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
-            Me.Invoke(AddRowInfoHandler, arr)
+            Try
+                Me.Invoke(AddRowInfoHandler, arr)
+            Catch
+            End Try
             Exit Sub
         End If
 
         Dim idxAction As Integer = dgList.Columns("狀態").Index
+        Dim statu As StockMove.Type = arr(idxAction)
         arr(idxAction) = StockMove.TypeText(arr(idxAction))
         Dim idx As Integer = dgList.Rows.Add(CType(arr, Object()))
+        SetColor(dgList.Rows(idx), statu)
+
         Try
             dgList.Sort(dgList.Columns(0), System.ComponentModel.ListSortDirection.Descending)
             Filter.AddComboBoxItem(dgList.Rows(idx))
@@ -145,17 +164,22 @@ Public Class winStockMoveList
     Private Sub UpdateRowInfo(ByVal arr As Object)
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateRowInfoHandler, arr)
+            Try
+                Me.Invoke(UpdateRowInfoHandler, arr)
+            Catch
+            End Try
             Exit Sub
         End If
         Dim idxAction As Integer = dgList.Columns("狀態").Index
         Dim idxLabel As Integer = dgList.Columns("調貨編號").Index
+        Dim statu As StockMove.Type = arr(idxAction)
         arr(idxAction) = StockMove.TypeText(arr(idxAction))
 
         For Each row As DataGridViewRow In dgList.Rows
             If row.Cells(idxLabel).Value = arr(idxLabel) Then
                 For i As Integer = 0 To row.Cells.Count - 1
                     row.Cells(i).Value = arr(i)
+                    SetColor(row, statu)
                 Next
                 Try
                     Filter.AddComboBoxItem(row)

@@ -60,10 +60,6 @@
     Dim DT As Data.DataTable = Nothing
     Public Sub BeginUpdateStockList()
         If Not Me.Created Then Exit Sub
-        'If Me.InvokeRequired Then
-        '    Me.Invoke(UpdateStockListHandler)
-        '    Exit Sub
-        'End If
 
         Dim dialog As New ProgressDialog
         dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateStockList))
@@ -73,7 +69,10 @@
 
     Public Sub UpdateStockList(ByVal Progress As Database.Access.Progress)
         DT = access.GetStockListWithHistoryPrice(, Progress)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
+        Catch
+        End Try
         Progress.Finish()
     End Sub
 
@@ -172,7 +171,10 @@
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
         Dim arr() As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
-            Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
+            Try
+                Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
+            Catch
+            End Try
         Else
             ChangeRow(arr)
         End If
@@ -180,7 +182,10 @@
 
     Private Sub access_DeletedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.DeletedStock
         If Me.InvokeRequired Then
-            Me.Invoke(New Action(Of String)(AddressOf RemoveRow), stock.Label)
+            Try
+                Me.Invoke(New Action(Of String)(AddressOf RemoveRow), stock.Label)
+            Catch
+            End Try
         Else
             RemoveRow(stock.Label)
         End If
@@ -191,7 +196,10 @@
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
         Dim arr() As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
-            Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
+            Try
+                Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
+            Catch
+            End Try
         Else
             AddRow(arr)
         End If

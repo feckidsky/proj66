@@ -48,7 +48,10 @@ Public Class winGoodsList
 
     Public Sub UpdateGoodsList(ByVal progress As Database.Access.Progress)
         Dim dt As DataTable = access.GetGoodsList(progress)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateGoodsDataTable), dt)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateGoodsDataTable), dt)
+        Catch
+        End Try
         progress.Finish()
     End Sub
 
@@ -162,8 +165,10 @@ Public Class winGoodsList
     Dim invHistoryPrice As New ItemUpdate(AddressOf UpdateHistory)
     Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
         If Me.InvokeRequired Then
-
-            Me.Invoke(invHistoryPrice)
+            Try
+                Me.Invoke(invHistoryPrice)
+            Catch
+            End Try
         Else
             invHistoryPrice()
         End If
@@ -175,7 +180,10 @@ Public Class winGoodsList
     Dim invGoods As New ItemUpdate(AddressOf BeginUpdateGoodsList)
     Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
         If Me.InvokeRequired Then
-            Me.Invoke(invGoods)
+            Try
+                Me.Invoke(invGoods)
+            Catch
+            End Try
         Else
             invGoods()
         End If

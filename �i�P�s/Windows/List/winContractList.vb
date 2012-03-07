@@ -63,7 +63,10 @@
 
     Private Sub UpdateList(ByVal progress As Database.Access.Progress)
         dt = access.GetContractList(progress)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
+        Catch
+        End Try
         progress.Finish()
     End Sub
 
@@ -175,7 +178,10 @@
 
     Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.CreatedContract
         If Me.InvokeRequired Then
-            Me.Invoke(invCreate, sender, item)
+            Try
+                Me.Invoke(invCreate, sender, item)
+            Catch
+            End Try
             Exit Sub
         End If
         dt.Rows.Add(item.ToObjects())
@@ -183,7 +189,10 @@
 
     Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.ChangedContract
         If Me.InvokeRequired Then
-            Me.Invoke(invChange, sender, item)
+            Try
+                Me.Invoke(invChange, sender, item)
+            Catch
+            End Try
             Exit Sub
         End If
 
@@ -195,7 +204,10 @@
 
     Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.DeletedContract
         If Me.InvokeRequired Then
-            Me.Invoke(invDelete, sender, item)
+            Try
+                Me.Invoke(invDelete, sender, item)
+            Catch
+            End Try
             Exit Sub
         End If
 

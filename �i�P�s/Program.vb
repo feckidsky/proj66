@@ -709,9 +709,15 @@ OpenDialog:
     End Sub
 
     Private Sub CurrentAccess_ChangedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.ChangedStockMove
-        If data.Action = StockMove.Type.Sending And data.DestineShop = CurrentAccess.Name Then
-
+        Dim goods As Goods = Nothing
+        If data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
+            Try
+                Goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
+            Catch
+            End Try
+            ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
         End If
+
     End Sub
 
     Public Function GetMain() As Form
@@ -720,12 +726,17 @@ OpenDialog:
     End Function
 
     Private Sub CurrentAccess_CreatedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.CreatedStockMove
+
+        Dim goods As Goods = Nothing
         If data.Action = StockMove.Type.Request And data.SourceShop = CurrentAccess.Name Then
-            Dim goods As Goods = CurrentAccess.GetGoods(data.GoodsLabel)
+            goods = CurrentAccess.GetGoods(data.GoodsLabel)
             ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
-            'Dim action As New Action(Of String)(AddressOf winNotify.Show)
-            'GetMain().Invoke(action, data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
-            'winNotify.Show(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
+        ElseIf data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
+            Try
+                goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
+            Catch
+            End Try
+            ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
         End If
     End Sub
 

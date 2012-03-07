@@ -45,7 +45,10 @@
 
     Public Sub UpdateStockInLog(ByVal progress As Database.Access.Progress)
         dt = access.GetStockLog(StartTime, EndTime)
-        Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockInDataTable), dt)
+        Try
+            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockInDataTable), dt)
+        Catch
+        End Try
         progress.Finish()
     End Sub
 
@@ -150,7 +153,10 @@
         Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray
 
         If Me.InvokeRequired Then
-            Me.Invoke(invCreate, row)
+            Try
+                Me.Invoke(invCreate, row)
+            Catch
+            End Try
         Else
             invCreate.Invoke(row)
         End If
@@ -159,7 +165,10 @@
     Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.ChangedStock
         Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray()
         If Me.InvokeRequired Then
-            Me.Invoke(invChange, row)
+            Try
+                Me.Invoke(invChange, row)
+            Catch
+            End Try
         Else
             invChange.Invoke(row)
         End If
@@ -168,7 +177,10 @@
 
     Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.DeletedStock
         If Me.InvokeRequired Then
-            Me.Invoke(invDelete, sender, item)
+            Try
+                Me.Invoke(invDelete, sender, item)
+            Catch
+            End Try
             Exit Sub
         End If
 

@@ -566,15 +566,16 @@ Public Class winMain
     Dim CreateLogHandler As New Action(Of Object())(AddressOf CreateLogRow)
 
     Private Sub CreateLogRow(ByVal arr As Object)
-        'If dtLog Is Nothing Then
-        '    dtLog = New DataTable() {}
 
-        'End If
         If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
         For Each row As DataRow In dtLog.Rows
-            If row(0) = arr(0) And row(1) = arr(1) Then
+            Try
+                If row(0) = arr(0) And row(1) = arr(1) Then
+                    Exit Sub
+                End If
+            Catch
                 Exit Sub
-            End If
+            End Try
         Next
 
         Try
@@ -590,10 +591,13 @@ Public Class winMain
     Private Sub DeleteLogRow(ByVal log As Log)
         If dtLog Is Nothing OrElse dgLog.Columns.Count = 0 Then Exit Sub
         For Each row As DataRow In dtLog.Rows
-            If row(0) = log.Date And row(1) = log.Personnel Then
-                dtLog.Rows.Remove(row)
-                Exit Sub
-            End If
+            Try
+                If row(0) = log.Date And row(1) = log.Personnel Then
+                    dtLog.Rows.Remove(row)
+                    Exit Sub
+                End If
+            Catch
+            End Try
         Next
     End Sub
 
@@ -694,7 +698,6 @@ Public Class winMain
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
         'Dim a() As Integer = New Integer() {}
         'a(0) = 100
-
         'Dim lst As New List(Of String)
         'For i = 0 To 10
         '    Dim s As System.Guid = System.Guid.NewGuid

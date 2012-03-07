@@ -745,6 +745,8 @@ Namespace Database
             [In] = 4
             Cancel = 5
         End Enum
+
+        Shared TypeColor As Color() = {Color.OrangeRed, Color.White, Color.SkyBlue, Color.Orange, Color.White, Color.LightGray}
         Shared TypeText As String() = {"申請", "調出", "調出(未送達)", "調貨中", "入庫", "取消"}
 
         Shared Function ToColumns() As Column()
