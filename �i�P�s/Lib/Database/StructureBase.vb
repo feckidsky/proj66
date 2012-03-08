@@ -870,6 +870,17 @@ Namespace Database
         Next
     End Sub
 
+        Shared ReadOnly Property Null() As SalesGoods
+            Get
+                Dim item As New SalesGoods
+                item.StockLabel = "Null"
+                Return item
+            End Get
+        End Property
+
+        Public Function IsNull() As Boolean
+            Return StockLabel = "Null"
+        End Function
     End Structure
 
 

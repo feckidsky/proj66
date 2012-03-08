@@ -68,7 +68,7 @@
     End Sub
 
     Public Sub UpdateStockList(ByVal Progress As Database.Access.Progress)
-        DT = access.GetStockListWithHistoryPrice(, Progress)
+        DT = access.GetStockListWithHistoryPrice(, , Progress)
         Try
             Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
         Catch

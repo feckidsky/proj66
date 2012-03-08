@@ -208,7 +208,28 @@ Public Class winSales
 
 
     Private Sub dgSales_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellEndEdit
+        If e.ColumnIndex = cSNumber.Index Then
+            CheckStockNumber(dgSalesList.Rows(e.RowIndex).Cells(cSLabel.Index).Value, dgSalesList.Rows(e.RowIndex))
+        End If
         If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then CalTotalPrice()
+    End Sub
+
+    Private Sub CheckStockNumber(ByVal StockLabel As String, ByVal row As DataGridViewRow)
+        Dim dt As DataTable = access.GetStockListWithHistoryPrice(StockLabel, txtLabel.Text)
+        If dt Is Nothing OrElse dt.Rows.Count <= 0 Then
+            MsgBox("查無庫存資料")
+            Exit Sub
+        End If
+
+        Dim goods As SalesGoods = GetSalesItem(row)
+        If goods.IsNull Then Exit Sub
+
+        Dim StockNumber As Integer = dt.Rows(0).Item("數量")
+        If goods.Number > StockNumber Then
+            MsgBox("[" & row.Cells(cSName.Index).Value & "] 庫存不足 " & vbCrLf & " 庫存量:" & StockNumber, MsgBoxStyle.Exclamation)
+            row.Cells(cSNumber.Index).Value = StockNumber
+        End If
+
     End Sub
 
 
@@ -238,17 +259,22 @@ Public Class winSales
         Dim newGoods As SalesGoods
 
         For Each r As DataGridViewRow In dgSalesList.Rows
-            If r.Cells(cSLabel.Index).Value Is Nothing Then Continue For
-            If r.Cells(cSLabel.Index).Value = "" Then Continue For
-            With newGoods
-                .SalesLabel = txtLabel.Text
-                .StockLabel = r.Cells(cSLabel.Index).Value
-                .SellingPrice = r.Cells(cSSellingPrice.Index).Value
-                .Number = r.Cells(cSNumber.Index).Value
-            End With
-            lstGoods.Add(newGoods)
+            newGoods = GetSalesItem(r)
+            If Not newGoods.IsNull Then lstGoods.Add(newGoods)
         Next
         Return lstGoods.ToArray
+    End Function
+
+    Public Function GetSalesItem(ByVal r As DataGridViewRow) As SalesGoods
+        If r.Cells(cSLabel.Index).Value Is Nothing OrElse r.Cells(cSLabel.Index).Value = "" Then Return SalesGoods.Null
+        Dim newGoods As SalesGoods
+        With newGoods
+            .SalesLabel = txtLabel.Text
+            .StockLabel = r.Cells(cSLabel.Index).Value
+            .SellingPrice = r.Cells(cSSellingPrice.Index).Value
+            .Number = r.Cells(cSNumber.Index).Value
+        End With
+        Return newGoods
     End Function
 
 
@@ -613,5 +639,9 @@ ReadStockList:
 
     Private Sub btOrder2Sales_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder2Sales.Click
         TransToSales()
+    End Sub
+
+    Private Sub dgSalesList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellContentClick
+
     End Sub
 End Class

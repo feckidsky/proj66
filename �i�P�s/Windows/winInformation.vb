@@ -58,6 +58,13 @@
     End Sub
 
     Private Sub winInformation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        If access Is Nothing Then
+            MsgBox("沒有選擇連線主機")
+            Exit Sub
+        ElseIf Not access.Connected Then
+            MsgBox(access.Name & " 未連線")
+            Exit Sub
+        End If
 
         Dim dialog As New ProgressDialog
         dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateSalesInformation))
@@ -122,6 +129,13 @@
 
 
     Private Sub dtpStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtpStart.ValueChanged, dtpEnd.ValueChanged
+        If access Is Nothing Then
+            MsgBox("沒有選擇連線主機")
+            Exit Sub
+        ElseIf Not access.Connected Then
+            MsgBox(access.Name & " 未連線")
+            Exit Sub
+        End If
         BeginUpdateUserDefInfo()
     End Sub
 
