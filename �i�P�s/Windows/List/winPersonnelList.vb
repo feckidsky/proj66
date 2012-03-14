@@ -10,11 +10,15 @@
     WithEvents access As Database.Access '= Program.DB
 
     Private Sub winPersonnelList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+      
+
+        BeginUpdateList()
+    End Sub
+
+    Private Sub winPersonnelList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgList)
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註", "帳號")
         Filter.AddNumberFilter("權限")
-
-        BeginUpdateList()
     End Sub
 
     Public Overloads Sub Show(ByVal DB As Database.Access)
@@ -226,4 +230,6 @@
         Filter.FilterRow(row)
         Filter.AddComboBoxItem(row)
     End Sub
+
+  
 End Class

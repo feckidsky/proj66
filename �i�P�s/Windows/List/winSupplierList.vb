@@ -10,9 +10,13 @@
 
     WithEvents access As Database.Access '= Program.DB
 
-    Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub winSupplierList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgList)
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
+    End Sub
+
+    Private Sub winSupplierList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+ 
         BeginUpdateList()
     End Sub
 
@@ -206,4 +210,6 @@
         Filter.FilterRow(row)
         Filter.AddComboBoxItem(row)
     End Sub
+
+    
 End Class

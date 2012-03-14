@@ -5,13 +5,15 @@
     Dim EndTime As Date
 
     Dim Filter As DataGridViewFilter
-
-    Private Sub winStockInLog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        dtpStart.Value = Today
-        dtpEnd.Value = Today
+    Private Sub winStockInLog_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
+       
         Filter = New DataGridViewFilter(dgStockLog)
         Filter.AddTextFilter("庫存編號", "供應商", "種類", "廠牌", "品名", "備註", "IMEI")
         Filter.AddNumberFilter("進貨價", "定價", "數量")
+    End Sub
+    Private Sub winStockInLog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        dtpStart.Value = Today
+        dtpEnd.Value = Today
         BeginUpdateStockInLog()
     End Sub
 
@@ -163,7 +165,13 @@
     End Sub
 
     Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.ChangedStock
-        Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray()
+        Dim row As Object
+        Try
+            row = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray()
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
         If Me.InvokeRequired Then
             Try
                 Me.Invoke(invChange, row)
@@ -200,4 +208,6 @@
         Filter.FilterRow(row)
         Filter.AddComboBoxItem(row)
     End Sub
+
+  
 End Class

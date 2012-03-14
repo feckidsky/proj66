@@ -12,13 +12,17 @@
 
     Dim FilterEffect As Boolean = False
 
+    Private Sub winContractList_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        BeginUpdateList()
+    End Sub
+
     Private Sub winContractList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgGoodsList)
         Filter.AddTextFilter("編號", "合約", "備註")
         Filter.AddNumberFilter("預付額", "佣金", "折扣")
         Filter.AddBoolFilter("有效")
         If FilterEffect Then Filter.SetBoolFilter("有效", True)
-        BeginUpdateList()
+
     End Sub
 
 

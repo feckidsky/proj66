@@ -9,10 +9,17 @@ Public Class winGoodsList
     Dim work As Mode
 
     WithEvents access As Database.Access '= Program.DB
+    Public Sub New()
 
-    Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ' 此為 Windows Form 設計工具所需的呼叫。
+        InitializeComponent()
+
+        ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         Filter = New DataGridViewFilter(dgGoodsList)
         Filter.AddTextFilter("編號", "品名", "種類", "廠牌", "備註")
+    End Sub
+    Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+      
         BeginUpdateGoodsList()
     End Sub
 
@@ -282,4 +289,6 @@ Public Class winGoodsList
     Private Sub dgHistory_MouseDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles dgHistory.MouseDoubleClick
         EditHistoryPrice()
     End Sub
+
+   
 End Class
