@@ -208,10 +208,21 @@ Public Class winSales
 
 
     Private Sub dgSales_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellEndEdit
+        Dim cell As DataGridViewCell = dgSalesList.Rows(e.RowIndex).Cells(e.ColumnIndex)
+        If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then
+            Dim tmpV As Single
+            If Not Single.TryParse(cell.Value, tmpV) Then
+                cell.Value = 0
+            End If
+        End If
+
         If e.ColumnIndex = cSNumber.Index Then
             CheckStockNumber(dgSalesList.Rows(e.RowIndex).Cells(cSLabel.Index).Value, dgSalesList.Rows(e.RowIndex))
         End If
-        If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then CalTotalPrice()
+        If e.ColumnIndex = cSSellingPrice.Index Or e.ColumnIndex = cSNumber.Index Then
+            CalTotalPrice()
+        End If
+
     End Sub
 
     Private Sub CheckStockNumber(ByVal StockLabel As String, ByVal row As DataGridViewRow)
@@ -489,6 +500,13 @@ Public Class winSales
     End Function
 
     Private Sub dgOrderList_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgOrderList.CellEndEdit
+        Dim cell As DataGridViewCell = dgOrderList.Rows(e.RowIndex).Cells(e.ColumnIndex)
+        If e.ColumnIndex = cOSellingPrice.Index Or e.ColumnIndex = cONumber.Index Then
+            Dim tmpV As Single
+            If Not Single.TryParse(cell.Value, tmpV) Then
+                cell.Value = 0
+            End If
+        End If
         If e.ColumnIndex = cOSellingPrice.Index Or e.ColumnIndex = cONumber.Index Then CalTotalPrice()
     End Sub
 
@@ -641,7 +659,5 @@ ReadStockList:
         TransToSales()
     End Sub
 
-    Private Sub dgSalesList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellContentClick
 
-    End Sub
 End Class

@@ -1369,7 +1369,12 @@ Public Class TCPTool
             End Sub
 
             Private Sub WriteFile(ByVal base64 As String)
-                Dim zipByte() As Byte = Convert.FromBase64String(base64)
+                Dim zipByte() As Byte = New Byte() {}
+                Try
+                    zipByte = Convert.FromBase64String(base64)
+                Catch
+                    Cancel()
+                End Try
                 Dim data() As Byte = Code.Unzip(zipByte)
                 Try
                     stream.Write(data, 0, data.Length)

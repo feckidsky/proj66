@@ -395,7 +395,7 @@
     End Function
 
     Public Function HasSelectedItem() As Boolean
-        Return DataGrid.SelectedRows.Count <> 0 AndAlso DataGrid.SelectedRows(0).Visible
+        Return DataGrid.SelectedRows.Count > 0 AndAlso DataGrid.SelectedRows(0).Visible
     End Function
 
 

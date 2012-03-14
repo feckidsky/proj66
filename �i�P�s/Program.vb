@@ -458,32 +458,36 @@ Public Module Program
 
 
     Private Sub SyncDatabase(ByVal client As Database.AccessClient)
-
-        Dim SyncDialog As New ProgressDialog
-        SyncDialog.AutoClose = False
-        SyncDialog.Title = "同步資料庫"
-        SyncDialog.SubBarVisible = True
-        SyncDialog.Thread = Threading.Thread.CurrentThread
-        Dim totProgress As New Access.Progress(AddressOf SyncDialog.UpdateProgress, "同步資料庫", Nothing, 0, 10)
-        Dim partProgress As New Access.Progress(AddressOf SyncDialog.UpdatePartProgress, "", Nothing)
-        totProgress.SubProgress = partProgress
-        'SyncDialog.CancelHandler = totProgress.CancelHandler
-        Dim SyncDialogShowHandler As New Action(AddressOf SyncDialog.Show)
+        SyncLock UpdateDataLock
+            Dim SyncDialog As New ProgressDialog
+            SyncDialog.AutoClose = False
+            SyncDialog.Title = "同步資料庫"
+            SyncDialog.SubBarVisible = True
+            SyncDialog.Thread = Threading.Thread.CurrentThread
+            Dim totProgress As New Access.Progress(AddressOf SyncDialog.UpdateProgress, "同步資料庫", Nothing, 0, 10)
+            Dim partProgress As New Access.Progress(AddressOf SyncDialog.UpdatePartProgress, "", Nothing)
+            totProgress.SubProgress = partProgress
+            'SyncDialog.CancelHandler = totProgress.CancelHandler
+            Dim SyncDialogShowHandler As New Action(AddressOf SyncDialog.Show)
 
 OpenDialog:
-        Try
-            My.Application.OpenForms(0).Invoke(SyncDialogShowHandler)
+            Try
+                My.Application.OpenForms(0).Invoke(SyncDialogShowHandler)
 
-        Catch
-            GoTo OpenDialog
-        End Try
+            Catch
+                GoTo OpenDialog
+            End Try
 
-        SyncLock UpdateDataLock
+
             Try
 
                 totProgress.Reset(0, 10)
                 partProgress.Text = "讀取" & client.Name & "商品項目"
                 Dim sDT As DataTable = client.GetGoodsList(totProgress)
+
+                Do While sDT Is Nothing
+                    sDT = client.GetGoodsList(totProgress)
+                Loop
 
                 totProgress.Reset(10, 15)
                 partProgress.Text = "讀取本機商品項目"
@@ -502,9 +506,13 @@ OpenDialog:
                 totProgress.Reset(20, 25)
                 partProgress.Text = "讀取" & client.Name & "員工資料"
                 sDT = client.GetPersonnelList(totProgress)
+                Do While sDT Is Nothing
+                    sDT = client.GetPersonnelList(totProgress)
+                Loop
                 totProgress.Reset(25, 35)
                 partProgress.Text = "讀取本機員工資料"
                 myDT = myDatabase.GetPersonnelList(totProgress)
+
 
                 totProgress.Reset(35, 40)
                 partProgress.Text = "同步" & client.Name & "員工資料"
@@ -519,6 +527,9 @@ OpenDialog:
                 totProgress.Reset(40, 45)
                 partProgress.Text = "讀取" & client.Name & " 客戶資料"
                 sDT = client.GetCustomerList(totProgress)
+                Do While sDT Is Nothing
+                    sDT = client.GetCustomerList(totProgress)
+                Loop
                 totProgress.Reset(45, 50)
                 partProgress.Text = "讀取本機員工資料"
                 myDT = myDatabase.GetCustomerList(totProgress)
@@ -535,6 +546,9 @@ OpenDialog:
                 totProgress.Reset(55, 60)
                 partProgress.Text = "讀取" & client.Name & "供應商資料"
                 sDT = client.GetSupplierList(totProgress)
+                Do While sDT Is Nothing
+                    sDT = client.GetSupplierList(totProgress)
+                Loop
                 totProgress.Reset(60, 65)
                 partProgress.Text = "讀取本機供應商資料"
                 myDT = myDatabase.GetSupplierList(totProgress)
@@ -551,6 +565,9 @@ OpenDialog:
                 totProgress.Reset(70, 75)
                 partProgress.Text = "讀取" & client.Name & "合約項目"
                 sDT = client.GetContractList(totProgress)
+                Do While sDT Is Nothing
+                    sDT = client.GetContractList(totProgress)
+                Loop
                 totProgress.Reset(75, 80)
                 partProgress.Text = "讀取本機合約項目"
                 myDT = myDatabase.GetContractList(totProgress)
@@ -567,6 +584,9 @@ OpenDialog:
                 totProgress.Reset(85, 90)
                 partProgress.Text = "讀取" & client.Name & "歷史售價"
                 sDT = client.GetHistoryPriceList(totProgress)
+                Do While sDT Is Nothing
+                    sDT = client.GetContractList(totProgress)
+                Loop
                 totProgress.Reset(90, 95)
                 partProgress.Text = "讀取本機歷史售價"
                 myDT = myDatabase.GetHistoryPriceList(totProgress)
