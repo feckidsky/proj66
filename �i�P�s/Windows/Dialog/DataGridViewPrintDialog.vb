@@ -105,24 +105,56 @@
         Return rows.ToArray()
     End Function
 
+    Public Function GetTotalPage(ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer()
+        Dim lstRowCount As New List(Of Integer)
+        Dim pageSize As Size = e.MarginBounds.Size
+        Dim totPage As Integer = 1
+
+        Dim currentHeight As Integer = 0
+        Dim text As String = ""
+        Dim cntRow As Integer = 0
+        For i As Integer = 0 To DataGrid.Rows.Count - 1
+            '取得行高
+            Dim lineHeight As Integer = GetCellHeight(DataGrid.Rows(i), e) + 5
+
+            If currentHeight + lineHeight > pageSize.Height Then
+                lstRowCount.Add(cntRow)
+                totPage += 1
+                currentHeight = 0
+                cntRow = 1
+            Else
+                cntRow += 1
+                currentHeight += lineHeight
+            End If
+
+        Next
+        lstRowCount.Add(cntRow)
+        Return lstRowCount.ToArray
+    End Function
+
+    Public Function GetCellHeight(ByVal Row As DataGridViewRow, ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer
+        Dim lineHeight As Integer = 0
+        For c As Integer = 0 To Row.Cells.Count - 1
+            Text = Row.Cells(c).Value
+            lineHeight = Math.Max(e.Graphics.MeasureString(Text, printFont).Height, lineHeight)
+        Next
+        Return lineHeight
+    End Function
+
 
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
         Static idxRow As Integer = 0
         Static page As Integer = 1
+        Static totPage As Integer() = New Integer() {}
+
+        If totPage.Length = 0 Then
+            totPage = GetTotalPage(e)
+        End If
 
         Dim g As System.Drawing.Graphics = e.Graphics
 
-        '計算欄位高度
-        Dim RowHeight As Integer = g.MeasureString("國", printFont).Height * 1.5
-
         '指定筆刷顏色
         Dim brush As New Drawing.SolidBrush(Color.Black)
-
-        '計算最大行數
-        Dim PageLine As Integer = e.MarginBounds.Height / RowHeight
-
-        '取得本頁欄位
-        Dim rows As DataGridViewRow() = GetRows(idxRow, PageLine)
 
         '取得欄位名稱
         Dim Columns As String() = GetColumnNames()
@@ -131,15 +163,15 @@
         Dim CellWidth() As Single = Array.ConvertAll(Columns, Function(s As String) g.MeasureString(s, printFont).Width)
 
         '計算欄寬依最大欄位為基準
-        For i As Integer = 0 To rows.Count - 1
-            Dim values() As String = GetValues(rows(i))
+        For i As Integer = 0 To totPage(page - 1) - 1
+            Dim values() As String = GetValues(DataGrid.Rows(i))
             For j As Integer = 0 To values.Length - 1
                 Dim w As Integer = g.MeasureString(values(j), printFont).Width
                 If CellWidth(j) < w Then CellWidth(j) = w
             Next
         Next
 
-        '總欄寬小於版面寬度，依比例放大欄寬
+        '若總欄寬小於版面寬度，依比例放大欄寬
         Dim totCellWidth As Single = CellWidth.Sum() + CellWidth.Count * 3
         If totCellWidth < e.MarginBounds.Width Then
             Dim gain(CellWidth.Count - 1) As Integer
@@ -149,44 +181,57 @@
         End If
 
         '列印標題
-        g.DrawString(Title, printFont, brush, e.MarginBounds.Left + (e.MarginBounds.Width - g.MeasureString(Title, printFont).Width) / 2, e.MarginBounds.Top - RowHeight * 1.5)
+        g.DrawString(Title, printFont, brush, e.MarginBounds.Left + (e.MarginBounds.Width - g.MeasureString(Title, printFont).Width) / 2, e.MarginBounds.Top - g.MeasureString(Title, printFont).Height - 5)
 
         Dim tF As Font = New Font(printFont.FontFamily, 12)
         Dim tS As SizeF = g.MeasureString(Now.ToString, tF)
         g.DrawString(Now.ToString, tF, brush, e.PageBounds.Width - tS.Width - 10, e.PageBounds.Height - tS.Height - 10)
 
-        Dim txtPage As String = (Int((idxRow + 1) / PageLine) + 1) & "/" & (Int(DataGrid.Rows.Count / PageLine) + 1)
+        Dim txtPage As String = page & "/" & totPage.Length
         tS = g.MeasureString(txtPage, tF)
         g.DrawString(txtPage, tF, brush, e.MarginBounds.Left + (e.MarginBounds.Width + tS.Width) / 2, e.PageBounds.Height - tS.Height - 10)
 
         '列印欄位名稱
         Dim cx As Integer = e.MarginBounds.Left
+        Dim cy As Integer = e.MarginBounds.Top
+        Dim TitleLineHeight As Integer = 0
         For i As Integer = 0 To Columns.Length - 1
-            g.DrawString(Columns(i), printFont, brush, cx, e.MarginBounds.Top)
+            TitleLineHeight = Math.Max(TitleLineHeight, g.MeasureString(Columns(i), printFont).Height)
+            g.DrawString(Columns(i), printFont, brush, cx, cy)
             cx += CellWidth(i) + 3
         Next
 
+        Dim pen As New Pen(Color.Black)
+
+        cy += TitleLineHeight + 5
+        g.DrawLine(pen, e.MarginBounds.Left, cy - 5, e.MarginBounds.Right, cy - 5)
+
+
         '印出資料內容
-        For i As Integer = 0 To rows.Count - 1
-            Dim values() As String = GetValues(rows(i))
+        For i As Integer = idxRow To idxRow + totPage(page - 1) - 1
+            Dim values() As String = GetValues(DataGrid.Rows(i))
             Dim x As Integer = e.MarginBounds.Left
             For j As Integer = 0 To values.Length - 1
-                g.DrawString(values(j), printFont, brush, x, e.MarginBounds.Top + (i + 1) * RowHeight)
+                g.DrawString(values(j), printFont, brush, x, cy)
                 x += CellWidth(j) + 3
             Next
+
+            cy += GetCellHeight(DataGrid.Rows(i), e) + 5
+            g.DrawLine(pen, e.MarginBounds.Left, cy - 5, e.MarginBounds.Right, cy - 5)
         Next
 
         '取得最後一列索引值
-        idxRow += rows.Count
+        idxRow += totPage(page - 1)
         page += 1
 
         '判斷是否分頁
-        e.HasMorePages = idxRow < DataGrid.Rows.Count
+        e.HasMorePages = page <= totPage.Length  'idxRow < DataGrid.Rows.Count
 
         '不分頁重置列數索引值
         If Not e.HasMorePages Then
             idxRow = 0
             page = 1
+            totPage = New Integer() {}
         End If
 
 

@@ -6,8 +6,10 @@
 
     Public Overloads Sub ShowDialog(ByVal db As Database.Access)
         access = db
+        Dim lstFile As String() = access.GetErrorLogFileNames()
+        If lstFile Is Nothing Then lstFile = New String() {}
         ListBox1.Items.Clear()
-        ListBox1.Items.AddRange(access.GetErrorLogFileNames())
+        ListBox1.Items.AddRange(lstFile)
         MyBase.ShowDialog()
     End Sub
 

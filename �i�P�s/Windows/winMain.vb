@@ -351,7 +351,12 @@ Public Class winMain
             Exit Sub
         End If
 
-        args.Dialog.Invoke(UpdateColumnHandler, dt)
+        Try
+            Me.Invoke(UpdateColumnHandler, dt)
+        Catch
+
+        End Try
+
         If dt.Rows.Count = 0 Then
             args.Dialog.Close()
             Exit Sub
@@ -495,7 +500,7 @@ Public Class winMain
 
     Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
         Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
-        If dt.Rows.Count = 0 Then Exit Sub
+        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)
     End Sub

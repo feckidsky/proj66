@@ -297,7 +297,11 @@
             Match = Match And c.Match(GetCellValue(row, c.HeaderName))
         Next
 
-        row.Visible = Match
+        Try
+            row.Visible = Match
+        Catch
+
+        End Try
     End Sub
 
     '當使用滑鼠右鍵時，將該行選起來
