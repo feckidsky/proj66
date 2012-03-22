@@ -346,6 +346,7 @@ Public Class winSales
                 .ContractLabel = r.Cells(cCLabel.Index).Value
                 .Discount = r.Cells(cCDiscount.Index).Value
                 .Phone = r.Cells(cCPhone.Index).Value
+                .Commission = r.Cells(cCCommission.Index).Value
             End With
             lst.Add(item)
         Next
@@ -415,7 +416,7 @@ Public Class winSales
         If Work = Mode.Create Then
             access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         Else
-            sales.SalesDate = Now
+            'sales.SalesDate = Now
             access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
         End If
         Me.Close()
@@ -614,7 +615,7 @@ ReadStockList:
         Dim item As Database.Contract = winContractList.SelectEffectDialog(access)
         If item.IsNull() Then Exit Sub
         Dim row As New DataGridViewRow
-        dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Discount, ""})
+        dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Commission, item.Discount, ""})
         CalTotalPrice()
     End Sub
 

@@ -135,7 +135,7 @@ Public Module Program
         'Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
         'Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
         'Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
-        Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
+        'Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
         'Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
         d.Close()
         'myDatabase.DeleteColumn(Stock.Table, "Price")
@@ -145,7 +145,10 @@ Public Module Program
         'myDatabase.AddColumn(Goods.Table, "Modify", Database.DBTypeDate)
         'myDatabase.AddColumn(Contract.Table, "Modify", Database.DBTypeDate)
         'myDatabase.RenameColumn(Sales.Table, "Deposit", "DepositByCash", Database.DBTypeSingle)
-        myDatabase.AddColumn(Sales.Table, "DepositByCard", Database.DBTypeSingle)
+        'myDatabase.AddColumn(Sales.Table, "DepositByCard", Database.DBTypeSingle)
+        myDatabase.AddColumn(SalesContract.Table, "Commission", Database.DBTypeSingle)
+
+
 
     End Sub
 

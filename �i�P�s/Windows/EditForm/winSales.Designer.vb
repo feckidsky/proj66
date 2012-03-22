@@ -36,7 +36,6 @@ Partial Class winSales
         Me.cbPayMode = New System.Windows.Forms.ComboBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label5 = New System.Windows.Forms.Label
-        Me.txtDeposit = New 進銷存.NumberBox
         Me.Label7 = New System.Windows.Forms.Label
         Me.Label8 = New System.Windows.Forms.Label
         Me.txtCustomer = New System.Windows.Forms.TextBox
@@ -78,15 +77,17 @@ Partial Class winSales
         Me.btAddSalesItem = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.dgContract = New System.Windows.Forms.DataGridView
+        Me.btDeleteContract = New System.Windows.Forms.Button
+        Me.btAddContract = New System.Windows.Forms.Button
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txtDepositByCard = New 進銷存.NumberBox
+        Me.txtDeposit = New 進銷存.NumberBox
         Me.cCLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCName = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCPrepay = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cCCommission = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCDiscount = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCPhone = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.btDeleteContract = New System.Windows.Forms.Button
-        Me.btAddContract = New System.Windows.Forms.Button
-        Me.txtDepositByCard = New 進銷存.NumberBox
-        Me.Label2 = New System.Windows.Forms.Label
         Me.GroupBox2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tpOrder.SuspendLayout()
@@ -209,14 +210,6 @@ Partial Class winSales
         Me.Label5.Size = New System.Drawing.Size(68, 12)
         Me.Label5.TabIndex = 44
         Me.Label5.Text = "訂金 =  現金"
-        '
-        'txtDeposit
-        '
-        Me.txtDeposit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDeposit.Location = New System.Drawing.Point(479, 559)
-        Me.txtDeposit.Name = "txtDeposit"
-        Me.txtDeposit.Size = New System.Drawing.Size(74, 22)
-        Me.txtDeposit.TabIndex = 48
         '
         'Label7
         '
@@ -610,44 +603,12 @@ Partial Class winSales
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgContract.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgContract.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgContract.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cCLabel, Me.cCName, Me.cCPrepay, Me.cCDiscount, Me.cCPhone})
+        Me.dgContract.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cCLabel, Me.cCName, Me.cCPrepay, Me.cCCommission, Me.cCDiscount, Me.cCPhone})
         Me.dgContract.Location = New System.Drawing.Point(10, 16)
         Me.dgContract.Name = "dgContract"
         Me.dgContract.RowTemplate.Height = 24
         Me.dgContract.Size = New System.Drawing.Size(648, 77)
         Me.dgContract.TabIndex = 48
-        '
-        'cCLabel
-        '
-        Me.cCLabel.HeaderText = "合約編號"
-        Me.cCLabel.Name = "cCLabel"
-        Me.cCLabel.ReadOnly = True
-        Me.cCLabel.Width = 78
-        '
-        'cCName
-        '
-        Me.cCName.HeaderText = "名稱"
-        Me.cCName.Name = "cCName"
-        Me.cCName.ReadOnly = True
-        Me.cCName.Width = 54
-        '
-        'cCPrepay
-        '
-        Me.cCPrepay.HeaderText = "預付額"
-        Me.cCPrepay.Name = "cCPrepay"
-        Me.cCPrepay.Width = 66
-        '
-        'cCDiscount
-        '
-        Me.cCDiscount.HeaderText = "折扣"
-        Me.cCDiscount.Name = "cCDiscount"
-        Me.cCDiscount.Width = 54
-        '
-        'cCPhone
-        '
-        Me.cCPhone.HeaderText = "門號"
-        Me.cCPhone.Name = "cCPhone"
-        Me.cCPhone.Width = 54
         '
         'btDeleteContract
         '
@@ -669,14 +630,6 @@ Partial Class winSales
         Me.btAddContract.Text = "新增"
         Me.btAddContract.UseVisualStyleBackColor = True
         '
-        'txtDepositByCard
-        '
-        Me.txtDepositByCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDepositByCard.Location = New System.Drawing.Point(596, 559)
-        Me.txtDepositByCard.Name = "txtDepositByCard"
-        Me.txtDepositByCard.Size = New System.Drawing.Size(74, 22)
-        Me.txtDepositByCard.TabIndex = 48
-        '
         'Label2
         '
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -686,6 +639,60 @@ Partial Class winSales
         Me.Label2.Size = New System.Drawing.Size(35, 12)
         Me.Label2.TabIndex = 44
         Me.Label2.Text = "+刷卡"
+        '
+        'txtDepositByCard
+        '
+        Me.txtDepositByCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDepositByCard.Location = New System.Drawing.Point(596, 559)
+        Me.txtDepositByCard.Name = "txtDepositByCard"
+        Me.txtDepositByCard.Size = New System.Drawing.Size(74, 22)
+        Me.txtDepositByCard.TabIndex = 48
+        '
+        'txtDeposit
+        '
+        Me.txtDeposit.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDeposit.Location = New System.Drawing.Point(479, 559)
+        Me.txtDeposit.Name = "txtDeposit"
+        Me.txtDeposit.Size = New System.Drawing.Size(74, 22)
+        Me.txtDeposit.TabIndex = 48
+        '
+        'cCLabel
+        '
+        Me.cCLabel.HeaderText = "合約編號"
+        Me.cCLabel.Name = "cCLabel"
+        Me.cCLabel.ReadOnly = True
+        Me.cCLabel.Width = 78
+        '
+        'cCName
+        '
+        Me.cCName.HeaderText = "名稱"
+        Me.cCName.Name = "cCName"
+        Me.cCName.ReadOnly = True
+        Me.cCName.Width = 54
+        '
+        'cCPrepay
+        '
+        Me.cCPrepay.HeaderText = "預付額"
+        Me.cCPrepay.Name = "cCPrepay"
+        Me.cCPrepay.Width = 66
+        '
+        'cCCommission
+        '
+        Me.cCCommission.HeaderText = "佣金"
+        Me.cCCommission.Name = "cCCommission"
+        Me.cCCommission.Width = 54
+        '
+        'cCDiscount
+        '
+        Me.cCDiscount.HeaderText = "折扣"
+        Me.cCDiscount.Name = "cCDiscount"
+        Me.cCDiscount.Width = 54
+        '
+        'cCPhone
+        '
+        Me.cCPhone.HeaderText = "門號"
+        Me.cCPhone.Name = "cCPhone"
+        Me.cCPhone.Width = 54
         '
         'winSales
         '
@@ -759,11 +766,6 @@ Partial Class winSales
     Friend WithEvents btDeleteContract As System.Windows.Forms.Button
     Friend WithEvents btAddContract As System.Windows.Forms.Button
     Friend WithEvents dgContract As System.Windows.Forms.DataGridView
-    Friend WithEvents cCLabel As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCName As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCPrepay As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCDiscount As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCPhone As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOLabel As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOKind As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOBrand As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -786,4 +788,10 @@ Partial Class winSales
     Friend WithEvents btOrder2Sales As System.Windows.Forms.Button
     Friend WithEvents txtDepositByCard As NumberBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents cCLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCName As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCPrepay As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCCommission As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCDiscount As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCPhone As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class

@@ -888,19 +888,23 @@ Namespace Database
         Shared Table As String = "SalesContract"
         Dim SalesLabel As String
         Dim ContractLabel As String
+        ''' <summary>折扣</summary>
         Dim Discount As Single
         Dim Phone As String
+        ''' <summary>佣金</summary>
+        Dim Commission As Single
         Shared Function ToColumns() As Column()
-            Dim Columns As New List(Of Column)
-            Columns.Add(New Column("SalesLabel", DBTypeLabel))
-            Columns.Add(New Column("ContractLabel", DBTypeLabel))
-            Columns.Add(New Column("Discount", DBTypeSingle))
-            Columns.Add(New Column("Phone", DBTypeTel))
+            Dim Columns As New ColumnList  'List(Of Column)
+            Columns.Add("SalesLabel", DBTypeLabel)
+            Columns.Add("ContractLabel", DBTypeLabel)
+            Columns.Add("Discount", DBTypeSingle)
+            Columns.Add("Phone", DBTypeTel)
+            Columns.Add("Commission", DBTypeSingle)
             Return Columns.ToArray()
         End Function
 
         Function ToObjects() As Object()
-            Return New Object() {SalesLabel, ContractLabel, Discount, Phone}
+            Return New Object() {SalesLabel, ContractLabel, Discount, Phone, Commission}
         End Function
 
         Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesContract
@@ -910,6 +914,7 @@ Namespace Database
             data.ContractLabel = R("ContractLabel")
             data.Discount = R("Discount")
             data.Phone = R("Phone")
+            data.Commission = R("Commission")
             Return data
         End Function
 

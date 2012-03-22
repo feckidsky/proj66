@@ -591,7 +591,7 @@
 
             'Dim condition2 As String = " TypeOfPayment=" & CType(PayType, Integer)
             Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金]", "") & ", Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(-int(-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0))) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
-            " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+            " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(SalesContract.commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
             condition1 & _
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
 
@@ -613,7 +613,7 @@
             'condition1 & _
             '" GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
             Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+ iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金, Sales.Deposit as [訂金-現金], Sum([SellingPrice]*[SalesGoods].[Number])+IIF(IsNull([Price]),0,[Price]) AS 金額, Sum(([SellingPrice]-[cost])*[SalesGoods].[Number])+IIF(IsNull([profit]),0,[Profit])-(金額-訂金)*iif(付款方式=" & Payment.Card & ",0.02,0) - (-int(-iif(IsNull(Sales.DepositByCard),0,Sales.DepositByCard)*0.02)) AS 利潤, Sales.Note AS 備註 " & _
- " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
+ " FROM (((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum( Contract.Prepay)-sum(SalesContract.Discount) as Price, sum(SalesContract.commission)-sum(SalesContract.Discount) as profit  FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label  Group by SalesLabel )  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel " & _
  condition1 & _
  " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
 
@@ -693,7 +693,7 @@
         End Function
 
         Public Function GetContractListBySalesLabel(ByVal SalesLabel As String) As Data.DataTable
-            Dim SQLCommand As String = "SELECT Contract.Label, Contract.Name, Contract.Prepay, SalesContract.Discount, SalesContract.Phone " & _
+            Dim SQLCommand As String = "SELECT Contract.Label, Contract.Name, Contract.Prepay, SalesContract.Commission ,SalesContract.Discount, SalesContract.Phone " & _
             "FROM (SalesContract INNER JOIN Sales ON SalesContract.SalesLabel = Sales.Label) INNER JOIN Contract ON SalesContract.ContractLabel = Contract.Label where SalesLabel='" & SalesLabel & "';"
             Return Read("table", BasePath, SQLCommand)
 
