@@ -150,9 +150,31 @@
         Next
     End Sub
 
+    Private Sub Sleep(ByVal Seconds As Single)
+        Dim st As Date = Now
+        Do While (Now - st).TotalSeconds < Seconds
+            Application.DoEvents()
+        Loop
+
+    End Sub
 
     Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.CreatedStock
-        Dim row As Object = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray
+
+        Dim row As Object = Nothing  '= access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray
+
+        Dim Retry As Integer = 3
+        Do While (row Is Nothing And Retry > 0)
+            Retry -= 1
+            Try
+                row = access.GetStockLog(StartTime, EndTime, item.Label).Rows(0).ItemArray
+            Catch
+                Sleep(1)
+            End Try
+
+        Loop
+
+        '重試三次之後還是讀取不到資料，放棄
+        If row Is Nothing Then Exit Sub
 
         If Me.InvokeRequired Then
             Try

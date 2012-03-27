@@ -76,12 +76,16 @@
         Private Sub AccessServer_ServerReceiveStreamRequest(ByVal Client As TCPTool.Client, ByVal sender As TCPTool.Client.StreamSender) Handles Me.ServerReceiveStreamRequest
             Select Case sender.Cmd
                 Case "DataTable"
-                    Dim args As ReadArgs = Code.XmlDeserializeWithUnzip(Of ReadArgs)(sender.Args)
-                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
-                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
-                    Dim sm As New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(dt)))
-                    sender.stream = sm
-                    dt.Dispose()
+                    Try
+                        Dim args As ReadArgs = Code.XmlDeserializeWithUnzip(Of ReadArgs)(sender.Args)
+                        Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
+                        Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
+                        Dim sm As New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(dt)))
+                        sender.stream = sm
+                        dt.Dispose()
+                    Catch
+                        sender.Fail(Err.Description)
+                    End Try
                 Case "GetErrorLogFiles"
                     sender.stream = New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(Access.GetErrorLogFileNames())))
                 Case "GetDir"

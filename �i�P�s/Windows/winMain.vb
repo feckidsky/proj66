@@ -416,7 +416,13 @@ Public Class winMain
 
     Private Sub AddRow(ByVal arr As Object())
         Me.SuspendLayout()
-        Dim idx As Integer = dgSales.Rows.Add(arr)
+        Dim idx As Integer
+
+        Try
+            idx = dgSales.Rows.Add(arr)
+        Catch
+            Exit Sub
+        End Try
 
         UpdateRowColor(dgSales.Rows(idx))
         dgSales.Sort(dgSales.Columns(0), System.ComponentModel.ListSortDirection.Descending)
