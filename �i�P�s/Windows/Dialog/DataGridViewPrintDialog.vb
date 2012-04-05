@@ -135,7 +135,7 @@
     Public Function GetCellHeight(ByVal Row As DataGridViewRow, ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer
         Dim lineHeight As Integer = 0
         For c As Integer = 0 To Row.Cells.Count - 1
-            Text = Row.Cells(c).Value
+            Text = Row.Cells(c).Value.ToString
             lineHeight = Math.Max(e.Graphics.MeasureString(Text, printFont).Height, lineHeight)
         Next
         Return lineHeight
