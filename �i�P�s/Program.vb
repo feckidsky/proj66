@@ -138,6 +138,14 @@ Public Module Program
         'Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
         'Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
         d.Close()
+        myDatabase.ChangeTypeColumn(Stock.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Personnel.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Sales.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Customer.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Supplier.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Contract.Table, "Note", Database.DBTypeNote)
+        myDatabase.ChangeTypeColumn(Goods.Table, "Note", Database.DBTypeNote)
+
         'myDatabase.DeleteColumn(Stock.Table, "Price")
         'myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
         'myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)
@@ -146,7 +154,7 @@ Public Module Program
         'myDatabase.AddColumn(Contract.Table, "Modify", Database.DBTypeDate)
         'myDatabase.RenameColumn(Sales.Table, "Deposit", "DepositByCash", Database.DBTypeSingle)
         'myDatabase.AddColumn(Sales.Table, "DepositByCard", Database.DBTypeSingle)
-        myDatabase.AddColumn(SalesContract.Table, "Commission", Database.DBTypeSingle)
+        'myDatabase.AddColumn(SalesContract.Table, "Commission", Database.DBTypeSingle)
 
 
 

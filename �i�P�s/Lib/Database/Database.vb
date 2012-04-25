@@ -1138,6 +1138,10 @@
             Dim SqlCommand As String = "ALTER TABLE [" & Table & "] CHANGE [" & ColumnName & "] [" & NewColumnName & "] ;"
             Command(SqlCommand, BasePath)
         End Sub
+        Public Sub ChangeTypeColumn(ByVal Table As String, ByVal ColumnName As String, ByVal Type As String)
+            Dim SqlCommand As String = "ALTER TABLE [" & Table & "] ALTER COLUMN [" & ColumnName & "] " & Type & ";"
+            Command(SqlCommand, BasePath)
+        End Sub
 
 
 
