@@ -826,7 +826,61 @@ Namespace Database
         Cancel = 3
     End Enum
 
+    Public Structure ReturnGoods
+        Shared Table As String = "ReturnGoods"
+        ''' <summary>單號識別碼</summary>
+        Dim ReturnLabel As String
+        Dim SalesLabel As String
 
+        ''' <summary>庫存識別碼</summary>
+        Dim StockLabel As String
+        ''' <summary>退貨金額</summary>
+        Dim ReturnPrice As Single
+        ''' <summary>數量</summary>
+        Dim Number As Integer
+        '''' <summary>退貨日期</summary>
+        'Dim ReturnDate As Date
+
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList ' List(Of Column)
+            Columns.Add("ReturnLabel", DBTypeLabel)
+            Columns.Add("SalesLabel", DBTypeLabel)
+            Columns.Add("StockLabel", DBTypeLabel)
+            Columns.Add("ReturnPrice", DBTypeSingle)
+            Columns.Add("Number", DBTypeInteger)
+            'Columns.Add("ReturnDate", DBTypeDate)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            Return New Object() {ReturnLabel, SalesLabel, StockLabel, ReturnPrice, Number}
+        End Function
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As ReturnGoods
+            Dim R As New MyDataRow(Row)
+            Dim data As ReturnGoods
+            data.ReturnLabel = R("ReturnLabel")
+            data.SalesLabel = R("SalesLabel")
+            data.StockLabel = R("StockLabel")
+            data.ReturnPrice = R("ReturnPrice")
+            data.Number = R("Number")
+            'data.ReturnDate = R("ReturnDate")
+            Return data
+        End Function
+
+        Shared ReadOnly Property Null() As ReturnGoods
+            Get
+                Dim item As New ReturnGoods
+                item.StockLabel = "Null"
+                Return item
+            End Get
+        End Property
+
+        Public Function IsNull() As Boolean
+            Return StockLabel = "Null"
+        End Function
+
+    End Structure
 
     Public Structure SalesGoods
         Shared Table As String = "SalesGoods"
@@ -838,18 +892,21 @@ Namespace Database
         Dim SellingPrice As Single
         ''' <summary>數量</summary>
         Dim Number As Integer
+        '''' <summary>銷貨日期</summary>
+        'Dim SalesDate As Date
 
         Shared Function ToColumns() As Column()
-            Dim Columns As New List(Of Column)
-            Columns.Add(New Column("SalesLabel", DBTypeLabel))
-            Columns.Add(New Column("StockLabel", DBTypeLabel))
-            Columns.Add(New Column("SellingPrice", DBTypeSingle))
-            Columns.Add(New Column("Number", DBTypeInteger))
+            Dim Columns As New ColumnList  'List(Of Column)
+            Columns.Add("SalesLabel", DBTypeLabel)
+            Columns.Add("StockLabel", DBTypeLabel)
+            Columns.Add("SellingPrice", DBTypeSingle)
+            Columns.Add("Number", DBTypeInteger)
+            'Columns.Add("SalesDate", DBTypeDate)
             Return Columns.ToArray
         End Function
 
     Function ToObjects() As Object()
-        Return New Object() {SalesLabel, StockLabel, SellingPrice, Number}
+            Return New Object() {SalesLabel, StockLabel, SellingPrice, Number} ', SalesDate}
     End Function
 
     Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesGoods
@@ -858,7 +915,8 @@ Namespace Database
         data.SalesLabel = R("SalesLabel")
         data.StockLabel = R("StockLabel")
         data.SellingPrice = R("SellingPrice")
-        data.Number = R("Number")
+            data.Number = R("Number")
+            'data.SalesDate = R("SalesDate")
         Return data
     End Function
 
@@ -884,6 +942,45 @@ Namespace Database
     End Structure
 
 
+    Public Structure ReturnContract
+        Shared Table As String = "ReturnContract"
+        Dim SalesLabel As String
+        Dim ContractLabel As String
+        Dim Commission As Single
+        Dim ReturnDate As Date
+
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList
+            Columns.Add("SalesLabel", DBTypeLabel)
+            Columns.Add("ContractLabel", DBTypeLabel)
+            Columns.Add("Commission", DBTypeSingle)
+            Columns.Add("ReturnDate", DBTypeDate)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            Return New Object() {SalesLabel, ContractLabel, Commission, ReturnDate}
+        End Function
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As ReturnContract
+            Dim R As New MyDataRow(Row)
+            Dim data As ReturnContract
+            data.SalesLabel = R("SalesLabel")
+            data.ContractLabel = R("ContractLabel")
+            data.Commission = R("Commission")
+            data.ReturnDate = R("ReturnDate")
+            Return data
+        End Function
+
+        Sub UpdateRow(ByVal r As DataRow)
+            Dim columns() As Column = ToColumns()
+            Dim obj() As Object = ToObjects()
+            For i As Integer = 0 To columns.Count - 1
+                r(columns(i).Name) = obj(i)
+            Next
+        End Sub
+    End Structure
+
     Public Structure SalesContract
         Shared Table As String = "SalesContract"
         Dim SalesLabel As String
@@ -893,6 +990,7 @@ Namespace Database
         Dim Phone As String
         ''' <summary>佣金</summary>
         Dim Commission As Single
+        Dim ReturnDate As Date
         Shared Function ToColumns() As Column()
             Dim Columns As New ColumnList  'List(Of Column)
             Columns.Add("SalesLabel", DBTypeLabel)
@@ -900,11 +998,12 @@ Namespace Database
             Columns.Add("Discount", DBTypeSingle)
             Columns.Add("Phone", DBTypeTel)
             Columns.Add("Commission", DBTypeSingle)
+            Columns.Add("ReturnDate", DBTypeDate)
             Return Columns.ToArray()
         End Function
 
         Function ToObjects() As Object()
-            Return New Object() {SalesLabel, ContractLabel, Discount, Phone, Commission}
+            Return New Object() {SalesLabel, ContractLabel, Discount, Phone, Commission, ReturnDate}
         End Function
 
         Public Shared Function GetFrom(ByVal Row As Data.DataRow) As SalesContract
@@ -915,6 +1014,7 @@ Namespace Database
             data.Discount = R("Discount")
             data.Phone = R("Phone")
             data.Commission = R("Commission")
+            data.ReturnDate = R("ReturnDate")
             Return data
         End Function
 

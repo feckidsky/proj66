@@ -138,8 +138,8 @@
             ServerSend("ChangedPersonnel", Code.XmlSerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales
-            ServerSend("ChangedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+        Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales
+            ServerSend("ChangedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
         End Sub
 
         Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.ChangedStock
@@ -177,8 +177,8 @@
             ServerSend("CreatedPersonnel", Code.XmlSerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales
-            ServerSend("CreatedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, SalesContracts)))
+        Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales
+            ServerSend("CreatedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
         End Sub
 
         Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.CreatedStock

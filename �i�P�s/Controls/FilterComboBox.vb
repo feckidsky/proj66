@@ -49,6 +49,8 @@
     Dim tmpText As String = Text
 
 
+
+
     Private Sub FilterComboBox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.TextChanged
         If disableEvent Then Exit Sub
 
@@ -61,9 +63,12 @@
         disableEvent = True
         'Me.DroppedDown = False
 
+        Dim IsNew As Boolean = Items.Exists(Function(s As String) s <> tmpText)
         MyBase.Items.Clear()
-        If Text <> "" Then
+        If tmpText <> "" Then
             MyBase.Items.AddRange(Items.FindAll(Function(s As String) Strings.InStr(s, Text)).ToArray)
+            If IsNew Then MyBase.Items.Add(tmpText)
+
         Else
             MyBase.Items.AddRange(Items.ToArray)
         End If
@@ -72,7 +77,7 @@
 
         Me.DroppedDown = True
         Me.ResetCursor()
-     
+
         Cursor.Position = tmpPos
         Cursor.Show()
         Me.Text = tmpText
@@ -81,6 +86,7 @@
         Me.SelectionStart = loc
         Me.ResumeLayout(False)
     End Sub
+
 
 
 End Class

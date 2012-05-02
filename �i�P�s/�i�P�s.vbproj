@@ -120,6 +120,12 @@
     <Compile Include="Windows\Dialog\DialogErrorFileList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Dialog\DialogTime.Designer.vb">
+      <DependentUpon>DialogTime.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Dialog\DialogTime.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\EditForm\DialogStockMove.Designer.vb">
       <DependentUpon>DialogStockMove.vb</DependentUpon>
     </Compile>
@@ -160,6 +166,18 @@
       <DependentUpon>ProccessDialog.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\Dialog\ProccessDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\List\winSalesContractList.Designer.vb">
+      <DependentUpon>winSalesContractList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\List\winSalesContractList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\List\winSalesGoodsList.Designer.vb">
+      <DependentUpon>winSalesGoodsList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\List\winSalesGoodsList.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\winNotify.Designer.vb">
@@ -310,6 +328,10 @@
       <DependentUpon>DialogErrorFileList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Dialog\DialogTime.resx">
+      <DependentUpon>DialogTime.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\EditForm\DialogStockMove.resx">
       <DependentUpon>DialogStockMove.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -336,6 +358,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\List\winContractList.resx">
       <DependentUpon>winContractList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\List\winSalesContractList.resx">
+      <DependentUpon>winSalesContractList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\List\winSalesGoodsList.resx">
+      <DependentUpon>winSalesGoodsList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\List\winStockMoveList.resx">

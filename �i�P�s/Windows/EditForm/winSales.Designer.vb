@@ -22,8 +22,10 @@ Partial Class winSales
     '請不要使用程式碼編輯器進行修改。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.Label6 = New System.Windows.Forms.Label
         Me.txtNote = New System.Windows.Forms.TextBox
         Me.Label4 = New System.Windows.Forms.Label
@@ -73,8 +75,24 @@ Partial Class winSales
         Me.cSSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cSNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cSSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cSSalesDate = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.btDeleteSalesItem = New System.Windows.Forms.Button
         Me.btAddSalesItem = New System.Windows.Forms.Button
+        Me.tpReturn = New System.Windows.Forms.TabPage
+        Me.btDelReturnGoods = New System.Windows.Forms.Button
+        Me.btAddReturnGoods = New System.Windows.Forms.Button
+        Me.dgReturnList = New System.Windows.Forms.DataGridView
+        Me.cRGoodsLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRSalesLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRStockLabel = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRKind = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.crBrand = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRName = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRCost = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRSellingPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRReturnPrice = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRNumber = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cRSubTotal = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.dgContract = New System.Windows.Forms.DataGridView
         Me.btDeleteContract = New System.Windows.Forms.Button
@@ -88,12 +106,15 @@ Partial Class winSales
         Me.cCCommission = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCDiscount = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.cCPhone = New System.Windows.Forms.DataGridViewTextBoxColumn
+        Me.cCReturnDate = New System.Windows.Forms.DataGridViewTextBoxColumn
         Me.GroupBox2.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tpOrder.SuspendLayout()
         CType(Me.dgOrderList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tpSales.SuspendLayout()
         CType(Me.dgSalesList, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tpReturn.SuspendLayout()
+        CType(Me.dgReturnList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.dgContract, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -138,9 +159,10 @@ Partial Class winSales
         '
         'txtOrderDate
         '
-        Me.txtOrderDate.Enabled = False
+        Me.txtOrderDate.BackColor = System.Drawing.SystemColors.Window
         Me.txtOrderDate.Location = New System.Drawing.Point(82, 50)
         Me.txtOrderDate.Name = "txtOrderDate"
+        Me.txtOrderDate.ReadOnly = True
         Me.txtOrderDate.Size = New System.Drawing.Size(127, 22)
         Me.txtOrderDate.TabIndex = 25
         '
@@ -269,9 +291,10 @@ Partial Class winSales
         '
         'txtSalesDate
         '
-        Me.txtSalesDate.Enabled = False
+        Me.txtSalesDate.BackColor = System.Drawing.SystemColors.Window
         Me.txtSalesDate.Location = New System.Drawing.Point(342, 50)
         Me.txtSalesDate.Name = "txtSalesDate"
+        Me.txtSalesDate.ReadOnly = True
         Me.txtSalesDate.Size = New System.Drawing.Size(127, 22)
         Me.txtSalesDate.TabIndex = 25
         '
@@ -324,6 +347,7 @@ Partial Class winSales
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tpOrder)
         Me.TabControl1.Controls.Add(Me.tpSales)
+        Me.TabControl1.Controls.Add(Me.tpReturn)
         Me.TabControl1.Location = New System.Drawing.Point(21, 129)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -375,10 +399,10 @@ Partial Class winSales
         Me.dgOrderList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cOLabel, Me.cOKind, Me.cOBrand, Me.cOName, Me.cOCost, Me.cOPrice, Me.cOSellingPrice, Me.cONumber, Me.cOSubTotal})
         Me.dgOrderList.Location = New System.Drawing.Point(6, 9)
         Me.dgOrderList.Name = "dgOrderList"
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White
-        Me.dgOrderList.RowsDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.White
+        Me.dgOrderList.RowsDefaultCellStyle = DataGridViewCellStyle5
         Me.dgOrderList.RowTemplate.Height = 24
-        Me.dgOrderList.Size = New System.Drawing.Size(617, 205)
+        Me.dgOrderList.Size = New System.Drawing.Size(639, 205)
         Me.dgOrderList.TabIndex = 0
         '
         'cOLabel
@@ -458,7 +482,7 @@ Partial Class winSales
         '
         'btOrder2Sales
         '
-        Me.btOrder2Sales.Location = New System.Drawing.Point(21, 209)
+        Me.btOrder2Sales.Location = New System.Drawing.Point(21, 220)
         Me.btOrder2Sales.Name = "btOrder2Sales"
         Me.btOrder2Sales.Size = New System.Drawing.Size(98, 23)
         Me.btOrder2Sales.TabIndex = 51
@@ -474,13 +498,13 @@ Partial Class winSales
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgSalesList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgSalesList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgSalesList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSGoods, Me.cSLabel, Me.cSKind, Me.cSBrand, Me.cSName, Me.cSCost, Me.cSPrice, Me.cSSellingPrice, Me.cSNumber, Me.cSSubTotal})
+        Me.dgSalesList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cSGoods, Me.cSLabel, Me.cSKind, Me.cSBrand, Me.cSName, Me.cSCost, Me.cSPrice, Me.cSSellingPrice, Me.cSNumber, Me.cSSubTotal, Me.cSSalesDate})
         Me.dgSalesList.Location = New System.Drawing.Point(6, 9)
         Me.dgSalesList.Name = "dgSalesList"
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
-        Me.dgSalesList.RowsDefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle7.SelectionForeColor = System.Drawing.Color.White
+        Me.dgSalesList.RowsDefaultCellStyle = DataGridViewCellStyle7
         Me.dgSalesList.RowTemplate.Height = 24
-        Me.dgSalesList.Size = New System.Drawing.Size(630, 194)
+        Me.dgSalesList.Size = New System.Drawing.Size(639, 205)
         Me.dgSalesList.TabIndex = 48
         '
         'cSGoods
@@ -560,10 +584,21 @@ Partial Class winSales
         Me.cSSubTotal.ReadOnly = True
         Me.cSSubTotal.Width = 54
         '
+        'cSSalesDate
+        '
+        DataGridViewCellStyle6.Format = "g"
+        DataGridViewCellStyle6.NullValue = Nothing
+        Me.cSSalesDate.DefaultCellStyle = DataGridViewCellStyle6
+        Me.cSSalesDate.HeaderText = "出貨日"
+        Me.cSSalesDate.Name = "cSSalesDate"
+        Me.cSSalesDate.ReadOnly = True
+        Me.cSSalesDate.Visible = False
+        Me.cSSalesDate.Width = 66
+        '
         'btDeleteSalesItem
         '
         Me.btDeleteSalesItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btDeleteSalesItem.Location = New System.Drawing.Point(552, 209)
+        Me.btDeleteSalesItem.Location = New System.Drawing.Point(552, 220)
         Me.btDeleteSalesItem.Name = "btDeleteSalesItem"
         Me.btDeleteSalesItem.Size = New System.Drawing.Size(75, 23)
         Me.btDeleteSalesItem.TabIndex = 47
@@ -573,12 +608,146 @@ Partial Class winSales
         'btAddSalesItem
         '
         Me.btAddSalesItem.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btAddSalesItem.Location = New System.Drawing.Point(471, 209)
+        Me.btAddSalesItem.Location = New System.Drawing.Point(471, 220)
         Me.btAddSalesItem.Name = "btAddSalesItem"
         Me.btAddSalesItem.Size = New System.Drawing.Size(75, 23)
         Me.btAddSalesItem.TabIndex = 46
         Me.btAddSalesItem.Text = "新增"
         Me.btAddSalesItem.UseVisualStyleBackColor = True
+        '
+        'tpReturn
+        '
+        Me.tpReturn.Controls.Add(Me.btDelReturnGoods)
+        Me.tpReturn.Controls.Add(Me.btAddReturnGoods)
+        Me.tpReturn.Controls.Add(Me.dgReturnList)
+        Me.tpReturn.Location = New System.Drawing.Point(4, 22)
+        Me.tpReturn.Name = "tpReturn"
+        Me.tpReturn.Padding = New System.Windows.Forms.Padding(3)
+        Me.tpReturn.Size = New System.Drawing.Size(660, 249)
+        Me.tpReturn.TabIndex = 2
+        Me.tpReturn.Text = "退貨單"
+        Me.tpReturn.UseVisualStyleBackColor = True
+        '
+        'btDelReturnGoods
+        '
+        Me.btDelReturnGoods.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btDelReturnGoods.Location = New System.Drawing.Point(553, 220)
+        Me.btDelReturnGoods.Name = "btDelReturnGoods"
+        Me.btDelReturnGoods.Size = New System.Drawing.Size(75, 23)
+        Me.btDelReturnGoods.TabIndex = 51
+        Me.btDelReturnGoods.Text = "刪除"
+        Me.btDelReturnGoods.UseVisualStyleBackColor = True
+        '
+        'btAddReturnGoods
+        '
+        Me.btAddReturnGoods.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btAddReturnGoods.Location = New System.Drawing.Point(472, 220)
+        Me.btAddReturnGoods.Name = "btAddReturnGoods"
+        Me.btAddReturnGoods.Size = New System.Drawing.Size(75, 23)
+        Me.btAddReturnGoods.TabIndex = 50
+        Me.btAddReturnGoods.Text = "新增"
+        Me.btAddReturnGoods.UseVisualStyleBackColor = True
+        '
+        'dgReturnList
+        '
+        Me.dgReturnList.AllowUserToAddRows = False
+        Me.dgReturnList.AllowUserToDeleteRows = False
+        Me.dgReturnList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgReturnList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
+        Me.dgReturnList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgReturnList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cRGoodsLabel, Me.cRSalesLabel, Me.cRStockLabel, Me.cRKind, Me.crBrand, Me.cRName, Me.cRCost, Me.cRSellingPrice, Me.cRReturnPrice, Me.cRNumber, Me.cRSubTotal})
+        Me.dgReturnList.Location = New System.Drawing.Point(6, 9)
+        Me.dgReturnList.Name = "dgReturnList"
+        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.White
+        Me.dgReturnList.RowsDefaultCellStyle = DataGridViewCellStyle8
+        Me.dgReturnList.RowTemplate.Height = 24
+        Me.dgReturnList.Size = New System.Drawing.Size(639, 205)
+        Me.dgReturnList.TabIndex = 49
+        '
+        'cRGoodsLabel
+        '
+        Me.cRGoodsLabel.HeaderText = "商品編號"
+        Me.cRGoodsLabel.Name = "cRGoodsLabel"
+        Me.cRGoodsLabel.ReadOnly = True
+        Me.cRGoodsLabel.Visible = False
+        Me.cRGoodsLabel.Width = 78
+        '
+        'cRSalesLabel
+        '
+        Me.cRSalesLabel.HeaderText = "銷貨編號"
+        Me.cRSalesLabel.Name = "cRSalesLabel"
+        Me.cRSalesLabel.ReadOnly = True
+        Me.cRSalesLabel.Width = 78
+        '
+        'cRStockLabel
+        '
+        Me.cRStockLabel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRStockLabel.HeaderText = "庫存編號"
+        Me.cRStockLabel.Name = "cRStockLabel"
+        Me.cRStockLabel.ReadOnly = True
+        Me.cRStockLabel.Width = 78
+        '
+        'cRKind
+        '
+        Me.cRKind.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRKind.HeaderText = "種類"
+        Me.cRKind.Name = "cRKind"
+        Me.cRKind.ReadOnly = True
+        Me.cRKind.Width = 54
+        '
+        'crBrand
+        '
+        Me.crBrand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.crBrand.HeaderText = "廠牌"
+        Me.crBrand.Name = "crBrand"
+        Me.crBrand.ReadOnly = True
+        Me.crBrand.Width = 54
+        '
+        'cRName
+        '
+        Me.cRName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRName.HeaderText = "品名"
+        Me.cRName.Name = "cRName"
+        Me.cRName.ReadOnly = True
+        Me.cRName.Width = 54
+        '
+        'cRCost
+        '
+        Me.cRCost.HeaderText = "進價"
+        Me.cRCost.Name = "cRCost"
+        Me.cRCost.ReadOnly = True
+        Me.cRCost.Width = 54
+        '
+        'cRSellingPrice
+        '
+        Me.cRSellingPrice.HeaderText = "賣價"
+        Me.cRSellingPrice.Name = "cRSellingPrice"
+        Me.cRSellingPrice.ReadOnly = True
+        Me.cRSellingPrice.Width = 54
+        '
+        'cRReturnPrice
+        '
+        Me.cRReturnPrice.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRReturnPrice.HeaderText = "退價"
+        Me.cRReturnPrice.Name = "cRReturnPrice"
+        Me.cRReturnPrice.Width = 54
+        '
+        'cRNumber
+        '
+        Me.cRNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRNumber.HeaderText = "數量"
+        Me.cRNumber.Name = "cRNumber"
+        Me.cRNumber.Width = 54
+        '
+        'cRSubTotal
+        '
+        Me.cRSubTotal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells
+        Me.cRSubTotal.HeaderText = "小計"
+        Me.cRSubTotal.Name = "cRSubTotal"
+        Me.cRSubTotal.ReadOnly = True
+        Me.cRSubTotal.Width = 54
         '
         'GroupBox1
         '
@@ -603,7 +772,7 @@ Partial Class winSales
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgContract.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgContract.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgContract.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cCLabel, Me.cCName, Me.cCPrepay, Me.cCCommission, Me.cCDiscount, Me.cCPhone})
+        Me.dgContract.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.cCLabel, Me.cCName, Me.cCPrepay, Me.cCCommission, Me.cCDiscount, Me.cCPhone, Me.cCReturnDate})
         Me.dgContract.Location = New System.Drawing.Point(10, 16)
         Me.dgContract.Name = "dgContract"
         Me.dgContract.RowTemplate.Height = 24
@@ -674,6 +843,7 @@ Partial Class winSales
         '
         Me.cCPrepay.HeaderText = "預付額"
         Me.cCPrepay.Name = "cCPrepay"
+        Me.cCPrepay.ReadOnly = True
         Me.cCPrepay.Width = 66
         '
         'cCCommission
@@ -693,6 +863,13 @@ Partial Class winSales
         Me.cCPhone.HeaderText = "門號"
         Me.cCPhone.Name = "cCPhone"
         Me.cCPhone.Width = 54
+        '
+        'cCReturnDate
+        '
+        Me.cCReturnDate.HeaderText = "退佣日期"
+        Me.cCReturnDate.Name = "cCReturnDate"
+        Me.cCReturnDate.ReadOnly = True
+        Me.cCReturnDate.Width = 78
         '
         'winSales
         '
@@ -724,6 +901,8 @@ Partial Class winSales
         CType(Me.dgOrderList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tpSales.ResumeLayout(False)
         CType(Me.dgSalesList, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tpReturn.ResumeLayout(False)
+        CType(Me.dgReturnList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox1.ResumeLayout(False)
         CType(Me.dgContract, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -766,6 +945,9 @@ Partial Class winSales
     Friend WithEvents btDeleteContract As System.Windows.Forms.Button
     Friend WithEvents btAddContract As System.Windows.Forms.Button
     Friend WithEvents dgContract As System.Windows.Forms.DataGridView
+    Friend WithEvents btOrder2Sales As System.Windows.Forms.Button
+    Friend WithEvents txtDepositByCard As NumberBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents cOLabel As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOKind As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOBrand As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -775,6 +957,21 @@ Partial Class winSales
     Friend WithEvents cOSellingPrice As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cONumber As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cOSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents tpReturn As System.Windows.Forms.TabPage
+    Friend WithEvents dgReturnList As System.Windows.Forms.DataGridView
+    Friend WithEvents btDelReturnGoods As System.Windows.Forms.Button
+    Friend WithEvents btAddReturnGoods As System.Windows.Forms.Button
+    Friend WithEvents cRGoodsLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRSalesLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRStockLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRKind As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents crBrand As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRName As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRCost As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRSellingPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRReturnPrice As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRNumber As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cRSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSGoods As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSLabel As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSKind As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -785,13 +982,13 @@ Partial Class winSales
     Friend WithEvents cSSellingPrice As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSNumber As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents btOrder2Sales As System.Windows.Forms.Button
-    Friend WithEvents txtDepositByCard As NumberBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents cSSalesDate As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCLabel As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCName As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCPrepay As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCCommission As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCDiscount As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cCPhone As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCReturnDate As System.Windows.Forms.DataGridViewTextBoxColumn
+    'Friend WithEvents cSSalesDate As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class

@@ -41,6 +41,7 @@ Partial Class winMain
         Me.庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.查詢庫存ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.商品項目GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.銷貨清單OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
         Me.進貨記錄ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.調貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -88,6 +89,8 @@ Partial Class winMain
         Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Button1 = New System.Windows.Forms.Button
+        Me.銷售合約ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsSales.SuspendLayout()
@@ -182,7 +185,7 @@ Partial Class winMain
         '
         '庫存ToolStripMenuItem
         '
-        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem, Me.ToolStripSeparator5, Me.進貨記錄ToolStripMenuItem1, Me.調貨ToolStripMenuItem})
+        Me.庫存ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.查詢庫存ToolStripMenuItem, Me.商品項目GToolStripMenuItem, Me.ToolStripSeparator6, Me.銷貨清單OToolStripMenuItem, Me.銷售合約ToolStripMenuItem, Me.ToolStripSeparator5, Me.進貨記錄ToolStripMenuItem1, Me.調貨ToolStripMenuItem})
         Me.庫存ToolStripMenuItem.Name = "庫存ToolStripMenuItem"
         Me.庫存ToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
         Me.庫存ToolStripMenuItem.Text = "庫存(&S)"
@@ -190,30 +193,36 @@ Partial Class winMain
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
         '
         '商品項目GToolStripMenuItem
         '
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
+        '
+        '銷貨清單OToolStripMenuItem
+        '
+        Me.銷貨清單OToolStripMenuItem.Name = "銷貨清單OToolStripMenuItem"
+        Me.銷貨清單OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.銷貨清單OToolStripMenuItem.Text = "銷貨清單(&O)"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(141, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(149, 6)
         '
         '進貨記錄ToolStripMenuItem1
         '
         Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
         Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
         '
         '調貨ToolStripMenuItem
         '
         Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
-        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
+        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.調貨ToolStripMenuItem.Text = "調貨記錄(&M)"
         '
         '銷貨ToolStripMenuItem
@@ -276,6 +285,7 @@ Partial Class winMain
         '
         'cSalesLabel
         '
+        Me.cSalesLabel.FillWeight = 44.50549!
         Me.cSalesLabel.HeaderText = "單號"
         Me.cSalesLabel.Name = "cSalesLabel"
         Me.cSalesLabel.ReadOnly = True
@@ -283,6 +293,7 @@ Partial Class winMain
         '
         'cTime
         '
+        Me.cTime.FillWeight = 66.72977!
         Me.cTime.HeaderText = "時間"
         Me.cTime.Name = "cTime"
         Me.cTime.ReadOnly = True
@@ -290,6 +301,7 @@ Partial Class winMain
         '
         'cPersonnel
         '
+        Me.cPersonnel.FillWeight = 126.108!
         Me.cPersonnel.HeaderText = "銷售人員"
         Me.cPersonnel.Name = "cPersonnel"
         Me.cPersonnel.ReadOnly = True
@@ -297,6 +309,7 @@ Partial Class winMain
         '
         'Customer
         '
+        Me.Customer.FillWeight = 103.4769!
         Me.Customer.HeaderText = "客戶"
         Me.Customer.Name = "Customer"
         Me.Customer.ReadOnly = True
@@ -304,6 +317,7 @@ Partial Class winMain
         '
         'cDposit
         '
+        Me.cDposit.FillWeight = 121.3269!
         Me.cDposit.HeaderText = "訂金"
         Me.cDposit.Name = "cDposit"
         Me.cDposit.ReadOnly = True
@@ -311,6 +325,7 @@ Partial Class winMain
         '
         'cPrice
         '
+        Me.cPrice.FillWeight = 137.8529!
         Me.cPrice.HeaderText = "金額"
         Me.cPrice.Name = "cPrice"
         Me.cPrice.ReadOnly = True
@@ -564,6 +579,17 @@ Partial Class winMain
         Me.Button1.Text = "test"
         Me.Button1.UseVisualStyleBackColor = True
         '
+        '銷售合約ToolStripMenuItem
+        '
+        Me.銷售合約ToolStripMenuItem.Name = "銷售合約ToolStripMenuItem"
+        Me.銷售合約ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.銷售合約ToolStripMenuItem.Text = "銷售合約(&C)"
+        '
+        'ToolStripSeparator6
+        '
+        Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(149, 6)
+        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -657,4 +683,7 @@ Partial Class winMain
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents 錯誤記錄ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents 銷貨清單OToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
+    Friend WithEvents 銷售合約ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

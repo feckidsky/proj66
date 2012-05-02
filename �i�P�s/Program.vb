@@ -129,15 +129,7 @@ Public Module Program
 
     Public Sub UpdateDatabase()
         If Config.Mode = Connect.Client Then Exit Sub
-        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
-        'Database.Access.DeleteTable("Mobile", d)
-        'Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
-        'Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
-        'Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
-        'Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
-        'Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
-        'Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
-        d.Close()
+
         myDatabase.ChangeTypeColumn(Stock.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Personnel.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Sales.Table, "Note", Database.DBTypeNote)
@@ -145,7 +137,28 @@ Public Module Program
         myDatabase.ChangeTypeColumn(Supplier.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Contract.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Goods.Table, "Note", Database.DBTypeNote)
+        'myDatabase.AddColumn(SalesGoods.Table, "SalesDate", Database.DBTypeDate)
+        myDatabase.AddColumn(SalesContract.Table, "ReturnDate", Database.DBTypeDate)
 
+        Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
+
+        '新增退貨表
+        Database.Access.CreateTable(ReturnGoods.Table, ReturnGoods.ToColumns, d)
+        'Database.Access.CreateTable(ReturnContract.Table, ReturnContract.ToColumns, d)
+        '銷貨表補上銷貨日期
+        'Dim SqlCommand As String = "UPDATE SalesGoods SET SalesDate=cdate(  mid(SalesLabel,3,2) +""/"" +mid(SalesLabel,5,2)  + ""/"" + mid(SalesLabel,7,2) ) WHERE IsNull(SalesDate);"
+        'Dim count As Long = Database.Access.Command(SqlCommand, d)
+        'SqlCommand = "UPDATE SalesContract SET SalesDate=cdate(  mid(SalesLabel,3,2) +""/"" +mid(SalesLabel,5,2)  + ""/"" + mid(SalesLabel,7,2) ) WHERE IsNull(SalesDate);"
+        'count = Database.Access.Command(SqlCommand, d)
+        d.Close()
+
+        'Database.Access.DeleteTable("Mobile", d)
+        'Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
+        'Database.Access.CreateTable(SalesContract.Table, SalesContract.ToColumns, d)
+        'Database.Access.CreateTable(OrderGoods.Table, OrderGoods.ToColumns, d)
+        'Database.Access.CreateTable(HistoryPrice.Table, HistoryPrice.ToColumns(), d)
+        'Database.Access.CreateTable(StockMove.Table, StockMove.ToColumns(), d)
+        'Database.Access.CreateTable(Log.Table, Log.ToColumns, d)
         'myDatabase.DeleteColumn(Stock.Table, "Price")
         'myDatabase.AddColumn(Supplier.Table, "Modify", Database.DBTypeDate)
         'myDatabase.AddColumn(Customer.Table, "Modify", Database.DBTypeDate)

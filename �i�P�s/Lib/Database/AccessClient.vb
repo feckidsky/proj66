@@ -490,11 +490,11 @@
             Send("DeleteHistoryPriceList", Label)
         End Sub
 
-        Overrides Sub CreateSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
-            Send("CreateSales", New SalesArgs(sales, GoodsList, OrderList, SalesContracts))
+        Overrides Sub CreateSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract)
+            Send("CreateSales", New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts))
         End Sub
-        Overrides Sub ChangeSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal SalesContracts() As SalesContract)
-            Send("ChangeSales", New SalesArgs(sales, GoodsList, OrderList, SalesContracts))
+        Overrides Sub ChangeSales(ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract)
+            Send("ChangeSales", New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts))
         End Sub
 
         Overrides Sub DeleteSales(ByVal sales As Sales)

@@ -108,6 +108,7 @@ Public Class winSales
 
         ReadSalesList(Sales.Label)
         ReadOrderList(Sales.Label)
+        ReadReturnList(Sales.Label)
         ReadContractList(Sales.Label)
         Work = Mode.Edit
         MyBase.Show()
@@ -118,9 +119,17 @@ Public Class winSales
         Dim dt As Data.DataTable = access.GetGoodsListBySalesLabelWithHistoryPrice(SalesLabel) 'DB.GetGoodsListBySalesLabel(SalesLabel)
 
         For Each r As Data.DataRow In dt.Rows
-            dgSalesList.Rows.Add(r.ItemArray())
+
+            dgSalesList.Rows.Add(New Object() {r("Label"), r("StockLabel"), r("Kind"), r("Brand"), r("Name"), r("Cost"), r("Price"), r("SellingPrice"), r("Number"), Nothing}) ', r("SalesDate")})  'r.ItemArray())
         Next
         'CalSalesTotal()
+    End Sub
+
+    Private Sub ReadReturnList(ByVal SalesLabel As String)
+        Dim dt As DataTable = access.GetReturnListBySalesLabel(SalesLabel)
+        For Each r As Data.DataRow In dt.Rows
+            dgReturnList.Rows.Add(r.ItemArray)
+        Next
     End Sub
 
 
@@ -153,7 +162,7 @@ Public Class winSales
         Next
 
         If row IsNot Nothing Then
-            dgSalesList.Rows.Add(New Object() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, GetSingle(row.Cells("進價").Value), GetSingle(row.Cells("售價").Value), GetSingle(row.Cells("售價").Value), 1})
+            dgSalesList.Rows.Add(New Object() {row.Cells("商品編號").Value, row.Cells("庫存編號").Value, row.Cells("種類").Value, row.Cells("廠牌").Value, row.Cells("品名").Value, GetSingle(row.Cells("進價").Value), GetSingle(row.Cells("售價").Value), GetSingle(row.Cells("售價").Value), 1, Nothing, Now})
         End If
         CalTotalPrice()
     End Sub
@@ -192,12 +201,52 @@ Public Class winSales
         'lbSalesTotal.Text = total
     End Function
 
+    Private Function CalReturnTotal() As Single
+        Dim total As Integer = 0
+        Dim sub_total As Integer = 0
+        For Each row As DataGridViewRow In dgReturnList.Rows
+            sub_total = row.Cells(cRReturnPrice.Index).Value * row.Cells(cRNumber.Index).Value
+            row.Cells(cRSubTotal.Index).Value = sub_total
+            total += sub_total
+        Next
+        Return total
+    End Function
+
+
+
     Private Sub dgSalesList_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellDoubleClick
-        Dim GoodsLabel As String = dgSalesList.Rows(dgSalesList.SelectedCells(0).RowIndex).Cells(cSGoods.Index).Value
+        'Dim GoodsLabel As String = dgSalesList.Rows(dgSalesList.SelectedCells(0).RowIndex).Cells(cSGoods.Index).Value
+        'Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel, access)
+        'If row Is Nothing Then Exit Sub
+
+        'With dgSalesList.Rows(e.RowIndex)
+        '    .Cells(cSLabel.Index).Value = row.Cells("庫存編號").Value
+        '    .Cells(cSKind.Index).Value = row.Cells("種類").Value
+        '    .Cells(cSName.Index).Value = row.Cells("品名").Value
+        '    .Cells(cSBrand.Index).Value = row.Cells("廠牌").Value
+        '    .DefaultCellStyle.BackColor = dgSalesList.DefaultCellStyle.BackColor
+        'End With
+
+
+        SelectSalesItem(e.RowIndex)
+
+
+    End Sub
+
+    Private Sub dgSalesList_CellClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgSalesList.CellClick
+        If e.RowIndex < 0 Or e.ColumnIndex <> cSSalesDate.Index Then Exit Sub
+        DialogTime.Value = dgSalesList.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
+            dgSalesList.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = DialogTime.Value
+        End If
+    End Sub
+
+    Private Sub SelectSalesItem(ByVal RowIndex As Integer)
+        Dim GoodsLabel As String = dgSalesList.Rows(RowIndex).Cells(cSGoods.Index).Value
         Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel, access)
         If row Is Nothing Then Exit Sub
 
-        With dgSalesList.Rows(e.RowIndex)
+        With row ' dgSalesList.Rows(e.RowIndex)
             .Cells(cSLabel.Index).Value = row.Cells("庫存編號").Value
             .Cells(cSKind.Index).Value = row.Cells("種類").Value
             .Cells(cSName.Index).Value = row.Cells("品名").Value
@@ -284,6 +333,7 @@ Public Class winSales
             .StockLabel = r.Cells(cSLabel.Index).Value
             .SellingPrice = r.Cells(cSSellingPrice.Index).Value
             .Number = r.Cells(cSNumber.Index).Value
+            '.SalesDate = r.Cells(cSSalesDate.Index).Value
         End With
         Return newGoods
     End Function
@@ -336,6 +386,21 @@ Public Class winSales
         Return item
     End Function
 
+    Public Function GetReturnList() As ReturnGoods()
+        Dim lst As New List(Of ReturnGoods)
+        Dim item As ReturnGoods
+        For Each r As DataGridViewRow In dgReturnList.Rows
+            'item.ReturnDate = txtSalesDate.Text
+            item.ReturnLabel = txtLabel.Text
+            item.SalesLabel = r.Cells(cRSalesLabel.Index).Value
+            item.ReturnPrice = r.Cells(cRReturnPrice.Index).Value
+            item.StockLabel = r.Cells(cRStockLabel.Index).Value
+            item.Number = r.Cells(cRNumber.Index).Value
+            lst.Add(item)
+        Next
+        Return lst.ToArray()
+    End Function
+
     Public Function GetContractList() As SalesContract()
         Dim lst As New List(Of SalesContract)
         Dim item As SalesContract
@@ -347,6 +412,7 @@ Public Class winSales
                 .Discount = r.Cells(cCDiscount.Index).Value
                 .Phone = r.Cells(cCPhone.Index).Value
                 .Commission = r.Cells(cCCommission.Index).Value
+                .ReturnDate = r.Cells(cCReturnDate.Index).Value
             End With
             lst.Add(item)
         Next
@@ -372,10 +438,10 @@ Public Class winSales
 
         If Work = Mode.Create Then
             '新增銷貨單
-            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetReturnList(), GetContractList())
         Else
             '更新銷貨單
-            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetReturnList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -414,10 +480,10 @@ Public Class winSales
 
 
         If Work = Mode.Create Then
-            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.CreateSales(sales, GetSalseList(), GetOrderList(), GetReturnList(), GetContractList())
         Else
             'sales.SalesDate = Now
-            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetContractList())
+            access.ChangeSales(sales, GetSalseList(), GetOrderList(), GetReturnList(), GetContractList())
         End If
         Me.Close()
     End Sub
@@ -489,7 +555,7 @@ Public Class winSales
         Dim dt As Data.DataTable = access.GetGoodsWithPrice(newGoods.Label)
         Dim row As Data.DataRow = dt.Rows(0)
         If row IsNot Nothing Then
-            dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Cost")), GetSingle(row("Price")), GetSingle(row("Price")), 1})
+            dgOrderList.Rows.Add(New String() {row("Label"), row("Kind"), row("Brand"), row("Name"), GetSingle(row("Cost")), GetSingle(row("Price")), GetSingle(row("Price")), 1, Now})
         End If
         CalTotalPrice()
     End Sub
@@ -525,11 +591,14 @@ Public Class winSales
             GoodsTotal = CalOrderTotal()
         Else
             GoodsTotal = CalSalesTotal()
+
         End If
         Dim contractTotal As ContractTotal = GetContractTotal()
+        Dim returnTotal As Single = CalReturnTotal()
 
         Dim msg As String = ""
         If GoodsTotal > 0 Then msg &= GoodsTotal & "(商品)"
+        If returnTotal > 0 Then msg &= " - " & returnTotal & "(退貨)"
         If contractTotal.Prepay > 0 Then msg &= " + " & contractTotal.Prepay & "(預付額)"
         If contractTotal.Discount > 0 Then msg &= " - " & contractTotal.Discount & "(折扣)"
 
@@ -542,7 +611,7 @@ Public Class winSales
 
 
         'If Deposit > 0 Then msg &= " - " & txtDeposit.Text & "(訂金)"
-        Dim total As Single = GoodsTotal + contractTotal.Prepay - contractTotal.Discount
+        Dim total As Single = GoodsTotal - returnTotal + contractTotal.Prepay - contractTotal.Discount
         lbTotal.Text = "金額:  " & msg & " = " & total
         lbRealTotal.Text = "應付金額:  " & total & " - " & Deposit & "(訂金) = " & (total - Deposit)
 
@@ -615,7 +684,7 @@ ReadStockList:
         Dim item As Database.Contract = winContractList.SelectEffectDialog(access)
         If item.IsNull() Then Exit Sub
         Dim row As New DataGridViewRow
-        dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Commission, item.Discount, ""})
+        dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Commission, item.Discount, "", Nothing})
         CalTotalPrice()
     End Sub
 
@@ -647,18 +716,113 @@ ReadStockList:
         Return result
     End Function
 
+    '修改退佣日期
+    Private Sub dgContract_CellClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellClick
+        If e.RowIndex < 0 Or e.ColumnIndex <> cCReturnDate.Index Then Exit Sub
+        DialogTime.Value = dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
+            dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = DialogTime.Value
+        End If
+    End Sub
+
+    Private Sub dgContract_CellDoubleClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellDoubleClick
+
+        If e.RowIndex < 0 Then Exit Sub
+        Dim row As DataGridViewRow = dgContract.Rows(e.RowIndex)
+
+        Dim item As Database.Contract = winContractList.SelectEffectDialog(access)
+        If item.IsNull() Then Exit Sub
+
+        'Dim row As New DataGridViewRow
+        'dgContract.Rows.Add(New String() {item.Label, item.Name, item.Prepay, item.Commission, item.Discount, "", Now})
+
+        row.Cells(cCLabel.Index).Value = item.Label
+        row.Cells(cCName.Index).Value = item.Name
+        row.Cells(cCPrepay.Index).Value = item.Prepay
+        row.Cells(cCCommission.Index).Value = item.Commission
+        row.Cells(cCDiscount.Index).Value = item.Discount
+
+        CalTotalPrice()
+    End Sub
+
+    '編輯過合約
     Private Sub dgContract_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellEndEdit
         CalTotalPrice()
     End Sub
 
+    '修改訂金
     Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged, txtDepositByCard.TextChanged
         CalTotalPrice()
     End Sub
 
-
+    '訂單轉出銷貨單
     Private Sub btOrder2Sales_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOrder2Sales.Click
         TransToSales()
     End Sub
 
+    '訂單日期/銷貨日期修改
+    Private Sub txtDate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOrderDate.Click, txtSalesDate.Click
+        DialogTime.Value = sender.Text
+        If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
+            sender.Text = DialogTime.Value
+        End If
+    End Sub
 
+
+
+    Private Sub btAddReturnGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddReturnGoods.Click
+        Dim result As DataGridViewRow = winSalesGoodsList.ShowDialog(access)
+        If result Is Nothing Then Exit Sub
+
+        For Each row As DataGridViewRow In dgReturnList.Rows
+            If row.Cells(cRStockLabel.Index).Value = result.Cells("庫存編號").Value Then
+                MsgBox("所選擇的項目已在退貨清單中")
+                Exit Sub
+            End If
+        Next
+
+        With result
+            dgReturnList.Rows.Add(.Cells("商品編號").Value, .Cells("銷貨編號").Value, .Cells("庫存編號").Value, .Cells("種類").Value, .Cells("廠牌").Value, .Cells("品名").Value, .Cells("成本").Value, .Cells("賣價").Value, .Cells("賣價").Value, .Cells("數量").Value)
+        End With
+
+        CalTotalPrice()
+    End Sub
+
+    Private Sub btDelReturnGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDelReturnGoods.Click
+        If dgReturnList.SelectedRows.Count = 0 Then
+            MsgBox("你必須選擇一個項目")
+            Exit Sub
+        End If
+
+        If MsgBox("確定要刪除這個退貨項目？", MsgBoxStyle.Question + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
+
+
+        Dim delSales As New List(Of DataGridViewRow)
+        For i As Integer = 0 To dgReturnList.SelectedRows.Count - 1
+            delSales.Add(dgReturnList.SelectedRows(i))
+        Next
+
+        For i As Integer = 0 To delSales.Count - 1
+            dgReturnList.Rows.Remove(delSales(i))
+        Next
+        CalTotalPrice()
+    End Sub
+
+    Public Function GetReturnGoods(ByVal row As DataGridViewRow) As Database.ReturnGoods
+        Dim item As Database.ReturnGoods
+        item.ReturnLabel = txtLabel.Text
+        item.Number = row.Cells(cRNumber.Index).Value
+        item.ReturnPrice = row.Cells(cRReturnPrice.Index).Value
+        item.SalesLabel = row.Cells(cRSalesLabel.Index).Value
+        item.StockLabel = row.Cells(cRStockLabel.Index).Value
+        Return item
+    End Function
+
+    Private Sub dgReturnList_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgReturnList.CellContentClick
+
+    End Sub
+
+    Private Sub dgReturnList_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgReturnList.CellEndEdit
+        If e.ColumnIndex = cRNumber.Index Or e.ColumnIndex = cRReturnPrice.Index Then CalTotalPrice()
+    End Sub
 End Class

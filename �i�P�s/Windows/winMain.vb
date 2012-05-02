@@ -345,7 +345,8 @@ Public Class winMain
     Dim UpdateColumnHandler As New Action(Of DataTable)(AddressOf UpdateColumn)
     Public Sub UpdateSalesList(ByVal args As UpdateSalesListArgs)
         args.progress.Reset("讀取訂單/銷貨單資料", 0, 50)
-        Dim dt As Data.DataTable = access.GetSalesListWithContract(args.StartTime, args.EndTime, args.ListType, , , args.progress)
+        ' Dim dt As Data.DataTable = access.GetSalesListWithContract(args.StartTime, args.EndTime, args.ListType, , , args.progress)
+        Dim dt As Data.DataTable = access.GetSalesListInfo(args.StartTime, args.EndTime, args.ListType, , , args.progress)
         If dt Is Nothing Then
             args.Dialog.Close()
             Exit Sub
@@ -496,16 +497,16 @@ Public Class winMain
 #Region "訂單/銷貨單 動作"
 
 
-    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
-        Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
+    Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal ReturnList() As Database.ReturnGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
+        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label)
         If dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
     End Sub
 
 
-    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
-        Dim dt As DataTable = access.GetSalesListWithContract(StartTime, EndTime, FormIndex, sales.Label)
+    Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal ReturnList() As Database.ReturnGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
+        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label)
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)
@@ -728,5 +729,13 @@ Public Class winMain
 
     Private Sub 錯誤記錄ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 錯誤記錄ToolStripMenuItem.Click
         DialogErrorFileList.ShowDialog(access)
+    End Sub
+
+    Private Sub 銷貨清單OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨清單OToolStripMenuItem.Click
+        winSalesGoodsList.Show(access)
+    End Sub
+
+    Private Sub 銷售合約ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷售合約ToolStripMenuItem.Click
+        winSalesContractList.Show(access)
     End Sub
 End Class
