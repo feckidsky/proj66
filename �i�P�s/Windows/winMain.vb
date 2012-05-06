@@ -503,7 +503,7 @@ Public Class winMain
 
 
     Private Sub access_CreatedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal ReturnList() As Database.ReturnGoods, ByVal SalesContracts() As SalesContract) Handles m_access.CreatedSales
-        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label)
+        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label, True)
         If dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, AddRowHandler)
@@ -511,7 +511,7 @@ Public Class winMain
 
 
     Private Sub access_ChangedSales(ByVal sender As Object, ByVal sales As Database.Sales, ByVal GoodsList() As Database.SalesGoods, ByVal OrderList() As Database.OrderGoods, ByVal ReturnList() As Database.ReturnGoods, ByVal SalesContracts() As SalesContract) Handles m_access.ChangedSales
-        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label)
+        Dim dt As DataTable = access.GetSalesListInfo(StartTime, EndTime, FormIndex, sales.Label, True)
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
         Dim arr As String() = (Array.ConvertAll(dt.Rows(0).ItemArray, Function(o As Object) o.ToString))
         ShowRowInfo(arr, UpdateRowHandler)

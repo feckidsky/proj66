@@ -43,9 +43,12 @@
         Dim ed As Date = IIf(ckTime.Checked, dtpEnd.Value.Date.AddDays(1).AddSeconds(-1), Nothing)
         'Dim table As DataTable = access.GetSalesGoodsLis(st, ed, cnd, cnd, cnd, cnd, cnd, cnd, cnd, cnd, 101)
         Dim table As DataTable = access.GetSalesGoodsLis(st, ed, cnd, 101)
-        If table.Rows.Count = 101 Then
+        If table.Rows.Count > 100 Then
             lbResult.Text = "查詢筆數超出100筆，目前僅顯示100筆，若找不到資料請縮小篩選範圍"
-            table.Rows.RemoveAt(100)
+            Dim lst As Integer = table.Rows.Count - 1
+            For i As Integer = lst To 100 Step -1
+                table.Rows.RemoveAt(i)
+            Next
         Else
             lbResult.Text = "符合條件的筆數有 " & table.Rows.Count & " 筆"
         End If

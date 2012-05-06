@@ -76,8 +76,8 @@ Public Class winSales
         Dim sales As Sales = GetNewSales()
         txtLabel.Text = sales.Label
         txtOrderDate.Text = sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
-        txtDepositCharge.Text = 0.02
-        txtPayCharge.Text = 0.02
+        txtDepositCharge.Text = 2
+        txtPayCharge.Text = 2
         Work = Mode.Create
         tpOrder.BackColor = ToColor(Config.OrderBackcolor)
         tpSales.BackColor = ToColor(Config.SalesBackColor)
@@ -449,8 +449,13 @@ Public Class winSales
     End Function
 
     Private Function GetDate(ByVal obj As Object) As Date
-        If obj Is DBNull.Value Then Return Nothing
-        Return obj
+        'If obj Is DBNull.Value Then Return Nothing
+        'Return obj
+        Try
+            Return obj
+        Catch ex As Exception
+            Return Nothing
+        End Try
     End Function
 
 
@@ -801,11 +806,19 @@ ReadStockList:
 
     '訂單日期/銷貨日期修改
     Private Sub txtDate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOrderDate.Click, txtSalesDate.Click
-        DialogTime.Value = sender.Text
+        DialogTime.Value = GetDate(sender.text) 'CType(sender.Text, Date)
         If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
             sender.Text = DialogTime.Value.ToString("yyyy/MM/dd HH:mm:ss")
         End If
     End Sub
+
+    Private Function GetDate(ByVal text As String) As Date
+        Try
+            Return text
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
 
 
 
