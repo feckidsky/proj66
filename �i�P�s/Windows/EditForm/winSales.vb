@@ -76,17 +76,38 @@ Public Class winSales
         Dim sales As Sales = GetNewSales()
         txtLabel.Text = sales.Label
         txtOrderDate.Text = sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
+        txtDepositCharge.Text = 0.02
+        txtPayCharge.Text = 0.02
         Work = Mode.Create
         tpOrder.BackColor = ToColor(Config.OrderBackcolor)
         tpSales.BackColor = ToColor(Config.SalesBackColor)
         MyBase.Show()
     End Sub
 
+    ReadOnly Property SalesLabel() As String
+        Get
+            Return Strings.Trim(txtLabel.Text)
+        End Get
+    End Property
 
-    Public Sub Open(ByVal Label As String, ByVal DB As Database.Access)
-        access = DB
-        Dim sales As Sales = access.GetSales(Label)
-        Open(sales, DB)
+    Public Shared Sub Open(ByVal Label As String, ByVal DB As Database.Access)
+        'access = DB
+        'Dim sales As Sales = access.GetSales(Label)
+
+        For Each f As Windows.Forms.Form In My.Application.OpenForms
+            If f.GetType Is GetType(winSales) Then
+                Dim w As winSales = f
+                If w.SalesLabel = Strings.Trim(Label) And w.access Is DB Then
+                    f.Show()
+                    f.BringToFront()
+                    Exit Sub
+                End If
+            End If
+        Next
+
+        Dim sales As Sales = DB.GetSales(Label)
+        Dim win As New winSales
+        win.Open(sales, DB)
     End Sub
 
 
@@ -94,10 +115,14 @@ Public Class winSales
         access = DB
         txtLabel.Text = Sales.Label
         txtOrderDate.Text = Sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
-        txtSalesDate.Text = IIf(Sales.SalesDate = New Date(2001, 1, 1, 0, 0, 0), "", Sales.SalesDate.ToString("yyyy/MM/dd HH:mm:ss"))
+        txtSalesDate.Text = IIf(Sales.SalesDate = New Date(2001, 1, 1, 0, 0, 0) Or Sales.SalesDate = Nothing, "", Sales.SalesDate.ToString("yyyy/MM/dd HH:mm:ss"))
         txtNote.Text = Sales.Note
         txtDeposit.Text = Sales.DepositByCash
         txtDepositByCard.Text = Sales.DepositByCard
+        txtPayByCard.Text = Sales.PayByCard
+        txtPayByCash.Text = Sales.PayByCash
+        txtDepositCharge.Text = Sales.DepositCardCharge * 100
+        txtPayCharge.Text = Sales.PayCardCharge * 100
         cbPayMode.SelectedIndex = Sales.TypeOfPayment
 
         Personnel = DB.GetPersonnelByLabel(Sales.PersonnelLabel)
@@ -304,6 +329,10 @@ Public Class winSales
             If .TypeOfPayment = Payment.Deposit Then .SalesDate = Nothing
             .DepositByCash = Val(txtDeposit.Text)
             .DepositByCard = Val(txtDepositByCard.Text)
+            .PayByCash = Val(txtPayByCash.Text)
+            .PayByCard = Val(txtPayByCard.Text)
+            .PayCardCharge = Val(txtPayCharge.Text) / 100
+            .DepositCardCharge = Val(txtDepositCharge.Text) / 100
             .Note = txtNote.Text
             .CustomerLabel = Customer.Label
             .PersonnelLabel = Personnel.Label
@@ -412,11 +441,16 @@ Public Class winSales
                 .Discount = r.Cells(cCDiscount.Index).Value
                 .Phone = r.Cells(cCPhone.Index).Value
                 .Commission = r.Cells(cCCommission.Index).Value
-                .ReturnDate = r.Cells(cCReturnDate.Index).Value
+                .ReturnDate = GetDate(r.Cells(cCReturnDate.Index).Value)
             End With
             lst.Add(item)
         Next
         Return lst.ToArray()
+    End Function
+
+    Private Function GetDate(ByVal obj As Object) As Date
+        If obj Is DBNull.Value Then Return Nothing
+        Return obj
     End Function
 
 
@@ -462,10 +496,10 @@ Public Class winSales
         End If
 
         Dim sales As Sales = GetSalesInfo()
-        If sales.TypeOfPayment = Payment.Deposit Then
-            MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
-            Exit Sub
-        End If
+        'If sales.TypeOfPayment = Payment.Deposit Then
+        '    MsgBox("尚未選擇付款方式", MsgBoxStyle.Exclamation)
+        '    Exit Sub
+        'End If
 
         If sales.TypeOfPayment = Payment.Cancel And dgSalesList.RowCount > 0 Then
             If MsgBox("此單已有銷貨項目，退訂將會刪除這些項目，您確定要儲存？", MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
@@ -535,9 +569,9 @@ Public Class winSales
 
 
     Private Sub cbPayMode_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbPayMode.SelectedIndexChanged
-        Me.BackColor = IIf(cbPayMode.SelectedIndex = 2, ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+        Me.BackColor = IIf(cbPayMode.SelectedIndex = Payment.Cancel, Color.Yellow, IIf(cbPayMode.SelectedIndex = 2, ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor)))
         btOrder.Enabled = cbPayMode.SelectedIndex = Payment.Deposit
-        btSales.Enabled = cbPayMode.SelectedIndex <> Payment.Deposit
+        btSales.Enabled = cbPayMode.SelectedIndex = Payment.Finish Or cbPayMode.SelectedIndex = Payment.Cancel
     End Sub
 
     Private Sub btAddOrderItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btAddOrderItem.Click
@@ -716,12 +750,17 @@ ReadStockList:
         Return result
     End Function
 
+    Private Function GetDbDate(ByVal t As Date) As Object
+        If t = Nothing Then Return DBNull.Value
+        Return t
+    End Function
+
     '修改退佣日期
     Private Sub dgContract_CellClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellClick
         If e.RowIndex < 0 Or e.ColumnIndex <> cCReturnDate.Index Then Exit Sub
-        DialogTime.Value = dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        DialogTime.Value = GetDate(dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value)
         If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
-            dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = DialogTime.Value
+            dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = GetDbDate(DialogTime.Value)
         End If
     End Sub
 
@@ -751,7 +790,7 @@ ReadStockList:
     End Sub
 
     '修改訂金
-    Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged, txtDepositByCard.TextChanged
+    Private Sub txtDeposit_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDeposit.TextChanged, txtDepositByCard.TextChanged, txtPayByCash.TextChanged, txtPayByCard.TextChanged, txtPayCharge.TextChanged, txtDepositCharge.TextChanged
         CalTotalPrice()
     End Sub
 
@@ -764,7 +803,7 @@ ReadStockList:
     Private Sub txtDate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtOrderDate.Click, txtSalesDate.Click
         DialogTime.Value = sender.Text
         If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
-            sender.Text = DialogTime.Value
+            sender.Text = DialogTime.Value.ToString("yyyy/MM/dd HH:mm:ss")
         End If
     End Sub
 
@@ -789,7 +828,7 @@ ReadStockList:
     End Sub
 
     Private Sub btDelReturnGoods_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btDelReturnGoods.Click
-        If dgReturnList.SelectedRows.Count = 0 Then
+        If dgReturnList.SelectedCells.Count = 0 Then
             MsgBox("你必須選擇一個項目")
             Exit Sub
         End If
@@ -797,14 +836,17 @@ ReadStockList:
         If MsgBox("確定要刪除這個退貨項目？", MsgBoxStyle.Question + MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then Exit Sub
 
 
-        Dim delSales As New List(Of DataGridViewRow)
-        For i As Integer = 0 To dgReturnList.SelectedRows.Count - 1
-            delSales.Add(dgReturnList.SelectedRows(i))
-        Next
+        Dim idx As Integer = dgReturnList.SelectedCells.Item(0).RowIndex
+        If (idx < dgReturnList.Rows.Count) Then dgReturnList.Rows.RemoveAt(idx)
 
-        For i As Integer = 0 To delSales.Count - 1
-            dgReturnList.Rows.Remove(delSales(i))
-        Next
+        'Dim delSales As New List(Of DataGridViewRow)
+        'For i As Integer = 0 To dgReturnList.SelectedRows.Count - 1
+        '    delSales.Add(dgReturnList.SelectedRows(i))
+        'Next
+
+        'For i As Integer = 0 To delSales.Count - 1
+        '    dgReturnList.Rows.Remove(delSales(i))
+        'Next
         CalTotalPrice()
     End Sub
 
@@ -825,4 +867,5 @@ ReadStockList:
     Private Sub dgReturnList_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgReturnList.CellEndEdit
         If e.ColumnIndex = cRNumber.Index Or e.ColumnIndex = cRReturnPrice.Index Then CalTotalPrice()
     End Sub
+
 End Class

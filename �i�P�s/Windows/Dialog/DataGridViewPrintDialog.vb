@@ -20,7 +20,7 @@
         ckList.Items.Clear()
         Me.Title = Title
         For Each c As DataGridViewColumn In DataGrid.Columns
-            ckList.Items.Add(c.HeaderText, True)
+            ckList.Items.Add(c.HeaderText, c.Visible)
         Next
         MyBase.ShowDialog()
 

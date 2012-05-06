@@ -81,6 +81,7 @@ Public Module Program
     Public WithEvents CurrentAccess As Access
 
     Public SystemTitle As String = "進銷存管理系統"
+    Public DatabaseVerson As String = "010200"
 
     <Extension()> _
     Public Sub DefaultTextBoxImeMode(ByVal Form As Form)
@@ -126,9 +127,8 @@ Public Module Program
         End Try
     End Sub
 
-
-    Public Sub UpdateDatabase()
-        If Config.Mode = Connect.Client Then Exit Sub
+    Private Sub UpdateDatabaseFirst()
+        myDatabase.Command("UPDATE Personnel SET [Note]= 'DbVerson=" & DatabaseVerson & "' WHERE Label='Administrator' AND ([Note]='' OR IsNull([Note]))")
 
         myDatabase.ChangeTypeColumn(Stock.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Personnel.Table, "Note", Database.DBTypeNote)
@@ -137,20 +137,56 @@ Public Module Program
         myDatabase.ChangeTypeColumn(Supplier.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Contract.Table, "Note", Database.DBTypeNote)
         myDatabase.ChangeTypeColumn(Goods.Table, "Note", Database.DBTypeNote)
-        'myDatabase.AddColumn(SalesGoods.Table, "SalesDate", Database.DBTypeDate)
         myDatabase.AddColumn(SalesContract.Table, "ReturnDate", Database.DBTypeDate)
 
         Dim d As OleDb.OleDbConnection = Database.Access.ConnectBase(myDatabase.BasePath)
-
         '新增退貨表
         Database.Access.CreateTable(ReturnGoods.Table, ReturnGoods.ToColumns, d)
+        '新增暫存銷貨表
+        Database.Access.CreateTable("tmpSales", Sales.ToColumns, d)
+        d.Close()
+
+        Dim SalesColumnsText As String = Join(Array.ConvertAll(Sales.ToColumns, Function(c As Column) "[" & c.Name & "]"), ",")
+        Dim newSAles As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Label, Customer.Label, Sales.Deposit, Sales.DepositByCard, 0.02 AS Expr1, Sum(IIf(IsNull([SalesGoods].[SalesLabel]) Or [Sales].[TypeOfPayment]<>0,0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]) Or [Sales].[TypeOfPayment]<>0,0,[Price])-[Deposit] AS 現金, Sum(IIf(IsNull([SalesGoods].[SalesLabel]) Or [Sales].[TypeOfPayment]<>1,0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]) Or [Sales].[TypeOfPayment]<>1,0,[Price])-[DepositByCard] AS 刷卡, 0.02 AS Expr2, IIf([Sales].[TypeOfPayment]=0,1,Sales.TypeOfPayment) AS 付款方式, Sales.Note AS 備註 " & _
+        " FROM (((((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum(Contract.Prepay)-sum(SalesContract.Discount) AS Price, sum(SalesContract.commission)-sum(SalesContract.Discount) AS profit FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label GROUP BY SalesLabel)  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel) LEFT JOIN ReturnGoods ON Sales.Label = ReturnGoods.ReturnLabel) LEFT JOIN Stock AS Stock_1 ON ReturnGoods.StockLabel = Stock_1.Label " & _
+        " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Label, Customer.Label, Sales.Deposit, Sales.DepositByCard, 0.02, 0.02, [Sales].[TypeOfPayment], Sales.Note, ContractInfo.Price, ContractInfo.profit"
+        myDatabase.Command("INSERT INTO tmpSales (" & SalesColumnsText & ") " & newSAles)
+
+        myDatabase.Command("DROP TABLE Sales")
+
+        d = Database.Access.ConnectBase(myDatabase.BasePath)
+        Access.CreateTable(Sales.Table, Sales.ToColumns, d)
+        d.Close()
+
+        myDatabase.Command("INSERT INTO Sales (" & SalesColumnsText & ") SELECT " & SalesColumnsText & " FROM tmpSales")
+        myDatabase.Command("DROP TABLE tmpSales")
+        Access.RepairAccess(myDatabase.BasePath)
+    End Sub
+
+    Public Sub UpdateDatabase()
+        If Config.Mode = Connect.Client Then Exit Sub
+        Dim info As Access.DbInfo = myDatabase.ReadDbInfo
+        If info.IsNull Then UpdateDatabaseFirst()
+        
+
+
+        'myDatabase.AddColumn(Sales.Table, "DepositCardCharge", DBTypeSingle)
+        'myDatabase.AddColumn(Sales.Table, "PayByCash", DBTypeSingle)
+        'myDatabase.AddColumn(Sales.Table, "PayByCard", DBTypeSingle)
+        'myDatabase.AddColumn(Sales.Table, "PayCardCharge", DBTypeSingle)
+
+
         'Database.Access.CreateTable(ReturnContract.Table, ReturnContract.ToColumns, d)
         '銷貨表補上銷貨日期
         'Dim SqlCommand As String = "UPDATE SalesGoods SET SalesDate=cdate(  mid(SalesLabel,3,2) +""/"" +mid(SalesLabel,5,2)  + ""/"" + mid(SalesLabel,7,2) ) WHERE IsNull(SalesDate);"
         'Dim count As Long = Database.Access.Command(SqlCommand, d)
         'SqlCommand = "UPDATE SalesContract SET SalesDate=cdate(  mid(SalesLabel,3,2) +""/"" +mid(SalesLabel,5,2)  + ""/"" + mid(SalesLabel,7,2) ) WHERE IsNull(SalesDate);"
         'count = Database.Access.Command(SqlCommand, d)
-        d.Close()
+
+
+        'myDatabase.Command("UPDATE Sales SET DepositCardCharge=0.02 WHERE IsNull(DepositCardCharge);")
+        'myDatabase.Command("UPDATE Sales SET PayCardCharge=0.02 WHERE IsNull(DepositCardCharge);")
+
 
         'Database.Access.DeleteTable("Mobile", d)
         'Database.Access.CreateTable(Contract.Table, Contract.ToColumns, d)
@@ -240,6 +276,8 @@ Public Module Program
         Dim data As Sales = Nothing
         data.Label = "SA" & Now.ToString("yyMMddHHmmss")
         data.OrderDate = Now
+        data.PayCardCharge = 0.02
+        data.DepositCardCharge = 0.02
         Return data
     End Function
 

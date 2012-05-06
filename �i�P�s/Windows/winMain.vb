@@ -114,6 +114,9 @@ Public Class winMain
         Dim row As DataGridViewRow = dgSales.SelectedRows(0)
 
         Dim SalesLabel As String = row.Cells("單號").Value
+
+        'Dim win As New winSales
+        'win.Open(SalesLabel, m_access)
         winSales.Open(SalesLabel, access)
 
     End Sub
@@ -204,7 +207,9 @@ Public Class winMain
     End Sub
 
     Private Sub 銷貨AToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨AToolStripMenuItem.Click, 銷貨ToolStripMenuItem.Click
-        winSales.Create(access)
+        Dim win As New winSales
+        win.Create(access)
+        'winSales.Create(access)
     End Sub
 
     Private Sub 修改CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 修改CToolStripMenuItem.Click
@@ -346,7 +351,7 @@ Public Class winMain
     Public Sub UpdateSalesList(ByVal args As UpdateSalesListArgs)
         args.progress.Reset("讀取訂單/銷貨單資料", 0, 50)
         ' Dim dt As Data.DataTable = access.GetSalesListWithContract(args.StartTime, args.EndTime, args.ListType, , , args.progress)
-        Dim dt As Data.DataTable = access.GetSalesListInfo(args.StartTime, args.EndTime, args.ListType, , , args.progress)
+        Dim dt As Data.DataTable = access.GetSalesListInfo(args.StartTime, args.EndTime, args.ListType, , True, args.progress)
         If dt Is Nothing Then
             args.Dialog.Close()
             Exit Sub
@@ -403,7 +408,7 @@ Public Class winMain
             row.DefaultCellStyle.BackColor = Color.Yellow
             'row.InheritedStyle.BackColor = Color.Yellow
         Else
-            row.DefaultCellStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
+            row.DefaultCellStyle.BackColor = IIf(row.Cells("付款方式").Value = Database.Sales.PaymentDescribe(Database.Payment.Deposit), ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
             'row.InheritedStyle.BackColor = IIf(row.Cells("付款方式").Value = "訂金", ToColor(Config.OrderBackcolor), ToColor(Config.SalesBackColor))
         End If
 
@@ -731,11 +736,12 @@ Public Class winMain
         DialogErrorFileList.ShowDialog(access)
     End Sub
 
-    Private Sub 銷貨清單OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨清單OToolStripMenuItem.Click
+    Private Sub 銷貨清單OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨清單OToolStripMenuItem.Click, 銷貨清單OToolStripMenuItem1.Click
         winSalesGoodsList.Show(access)
     End Sub
 
-    Private Sub 銷售合約ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷售合約ToolStripMenuItem.Click
+    Private Sub 銷售合約ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷售合約ToolStripMenuItem.Click, 銷售合約CToolStripMenuItem.Click
         winSalesContractList.Show(access)
     End Sub
+
 End Class

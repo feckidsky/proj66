@@ -562,6 +562,7 @@
             Order = 0
             Sales = 1
             Both = 2
+            OrderWithoutType = 3
         End Enum
 
         '讀取銷貨單
@@ -599,7 +600,7 @@
             Dim condition1 As String
 
             Select Case ListType
-                Case GetSalesListType.Order
+                Case GetSalesListType.Order, GetSalesListType.OrderWithoutType
                     condition1 = " WHERE ( " & OrderTime & cnd & LabelCnd & ") "
                 Case GetSalesListType.Sales
                     condition1 = " WHERE ( " & SalesTime & cnd & LabelCnd & ") "
@@ -635,7 +636,7 @@
             Dim condition1 As String
 
             Select Case ListType
-                Case GetSalesListType.Order
+                Case GetSalesListType.Order, GetSalesListType.OrderWithoutType
                     condition1 = " WHERE ( " & OrderTime & cnd & LabelCnd & ") "
                 Case GetSalesListType.Sales
                     condition1 = " WHERE ( " & SalesTime & cnd & LabelCnd & ") "
@@ -644,10 +645,10 @@
             End Select
 
 
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+IIf(IsNull(Sales.DepositByCard),0,Sales.DepositByCard) AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金]", "") & ", Sum(IIf(IsNull([SalesGoods].[SalesLabel]),0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]),0,[Price]) AS 金額, Sum(IIf(IsNull([ReturnGoods].[ReturnLabel]),0,[ReturnGoods].[ReturnPrice]*[ReturnGoods].[Number])) AS 退款, -Sum(IIf(IsNull([ReturnLabel]),0,([ReturnGoods].[ReturnPrice]-[Stock_1].[Cost])*[returngoods].[number])) AS 退款利潤, Sum(IIf(IsNull([salesgoods].[SalesLabel]),0,([SellingPrice]-[stock].[cost])*[SalesGoods].[Number]))+[退款利潤]+IIf(IsNull([profit]),0,[Profit])-(-Int(-([金額]-[訂金]-[退款])*IIf([付款方式]=" & Payment.Card & ",0.02,0)))-(-Int(-IIf(IsNull([Sales].[DepositByCard]),0,[Sales].[DepositByCard])*0.02)) AS 利潤, Sales.Note AS 備註 " & _
-            " FROM (((((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum(Contract.Prepay)-sum(SalesContract.Discount) AS Price, sum(SalesContract.commission)-sum(SalesContract.Discount) AS profit FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label GROUP BY SalesLabel)  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel) LEFT JOIN ReturnGoods ON Sales.Label = ReturnGoods.ReturnLabel) LEFT JOIN Stock AS Stock_1 ON ReturnGoods.StockLabel = Stock_1.Label " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+Sales.DepositByCard AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金], Sales.DepositByCard as [訂金-刷卡], Sales.PayByCash as [付款-現金], Sales.PayByCard as [付款-刷卡]", "") & ", Sum(IIf(IsNull([SalesGoods].[SalesLabel]),0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]),0,[Price]) AS 金額, Sum(IIf(IsNull([ReturnGoods].[ReturnLabel]),0,[ReturnGoods].[ReturnPrice]*[ReturnGoods].[Number])) AS 退款, -Sum(IIf(IsNull([ReturnLabel]),0,([ReturnGoods].[ReturnPrice]-[Stock_1].[Cost])*[returngoods].[number])) AS 退款利潤, Sales.Deposit+Sales.DepositByCard+Sales.PayByCash+Sales.PayByCard+退款 -Sum(IIf(IsNull([salesgoods].[SalesLabel]),0,[stock].[cost]*[SalesGoods].[Number]))+[退款利潤]+IIf(IsNull([profit]),0,[Profit]-ContractInfo.Prepay)-(-Int(-(Sales.PayByCard*Sales.PayCardCharge)))-(-Int(-[Sales].[DepositByCard])*Sales.DepositCardCharge) AS 利潤, Sales.Note AS 備註 " & _
+            " FROM (((((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum(Contract.Prepay)-sum(SalesContract.Discount) AS Price, sum(SalesContract.commission)-sum(SalesContract.Discount) AS profit , sum( Contract.Prepay) as Prepay FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label GROUP BY SalesLabel)  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel) LEFT JOIN ReturnGoods ON Sales.Label = ReturnGoods.ReturnLabel) LEFT JOIN Stock AS Stock_1 ON ReturnGoods.StockLabel = Stock_1.Label " & _
             condition1 & _
-            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.Note, ContractInfo.Price, ContractInfo.profit;"
+            " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.DepositCardCharge , Sales.PayByCash, Sales.PayByCard, Sales.PayCardCharge , Sales.Note, ContractInfo.Price, ContractInfo.profit, ContractInfo.Prepay;"
 
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand, Progress)
@@ -673,6 +674,12 @@
 
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT
+        End Function
+
+        Public Function GetReturnContractTotalPrice(ByVal St As Date, ByVal Ed As Date) As DataTable
+            Dim SqlCommand As String = "SELECT Sum(Commission) as ReturnCommission FROM SalesContract WHERE ReturnDate BETWEEN " & St.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & Ed.ToString("#yyyy/MM/dd HH:mm:ss#")
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            Return dt
         End Function
 
         '取得銷貨單資訊
@@ -707,6 +714,14 @@
             Return DT
         End Function
 
+        Public Function GetReturnGoods(ByVal SalesLabel As String) As DataTable
+            Dim SqlCommand As String = "SELECT ReturnGoods.ReturnLabel, Goods.Name, ReturnGoods.Number " & _
+            " FROM ReturnGoods LEFT JOIN (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) ON ReturnGoods.StockLabel = Stock.Label " & _
+            " WHERE ReturnGoods.ReturnLabel='" & SalesLabel & "'"
+            Dim dt As DataTable = Read("table", BasePath, SqlCommand)
+            Return dt
+        End Function
+
         Public Function GetReturnListBySalesLabel(ByVal SalesLabel As String) As Data.DataTable
             Dim SqlCommand As String = "SELECT Stock.GoodsLabel, ReturnGoods.SalesLabel, ReturnGoods.StockLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Cost, SalesGoods.SellingPrice, ReturnGoods.ReturnPrice, ReturnGoods.Number " & _
             " FROM ((ReturnGoods LEFT JOIN Stock ON ReturnGoods.StockLabel = Stock.Label) LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) INNER JOIN SalesGoods ON (SalesGoods.StockLabel = ReturnGoods.StockLabel) AND (ReturnGoods.SalesLabel = SalesGoods.SalesLabel) " & _
@@ -734,8 +749,17 @@
 
             If dt IsNot Nothing Then
                 For Each r As DataRow In dt.Rows
-                    lst.Add(r("Name") & " x " & r("Number"))
+                    lst.Add(Strings.Trim(r("Name")) & " x " & r("Number"))
                 Next
+            End If
+
+            dt = GetReturnGoods(Label)
+
+            If dt IsNot Nothing Then
+                For Each r As DataRow In dt.Rows
+                    lst.Add("[退] " & Strings.Trim(r("Name")) & " x " & r("Number"))
+                Next
+
             End If
 
             If lst.Count = 0 Then Return ""
@@ -744,7 +768,7 @@
         End Function
 
         Public Function GetSalesContractList(ByVal StartTime As Date, ByVal EndTme As Date) As DataTable
-            Dim SQLCommand As String = "SELECT Sales.SalesDate, SalesContract.SalesLabel, SalesContract.ContractLabel, SalesContract.Discount, SalesContract.Phone, SalesContract.Commission, Contract.Name, Contract.Note, SalesContract.ReturnDate " & _
+            Dim SQLCommand As String = "SELECT  SalesContract.SalesLabel, Sales.SalesDate, SalesContract.ContractLabel, SalesContract.Discount, SalesContract.Phone, SalesContract.Commission, Contract.Name, Contract.Note, SalesContract.ReturnDate " & _
             " FROM (SalesContract LEFT JOIN Sales ON SalesContract.SalesLabel = Sales.Label) LEFT JOIN Contract ON SalesContract.ContractLabel = Contract.Label " & _
             " WHERE Sales.SalesDate Between " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTme.ToString("#yyyy/MM/dd HH:mm:ss#") & " ORDER BY Sales.SalesDate DESC;"
             Return Read("table", BasePath, SQLCommand)
@@ -848,41 +872,53 @@
 
         Public Overridable Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As SalesInformation
 
-            Dim dt As DataTable = GetOrderListWithContract(St, Ed)
+            'Dim dt As DataTable = GetOrderListWithContract(St, Ed)
+            Dim dt As DataTable = GetSalesListInfo(St, Ed, GetSalesListType.OrderWithoutType, , True)
             Dim DepositByCash As Single = 0
             Dim DepositByCard As Single = 0
             For Each row As DataRow In dt.Rows
                 DepositByCash += GetSingle(row.Item("訂金-現金"))
-                DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
+                'DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
+                DepositByCard += GetSingle(row.Item("訂金-刷卡"))
             Next
 
             dt = GetSalesListInfo(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
 
             Dim Cash As Single = 0
-            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
-                Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            Dim Card As Single = 0
+            'For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Finish))
+            For Each row As DataRow In dt.Select("付款方式<>" & Val(Database.Payment.Deposit))
+                'Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+                Cash += GetSingle(row.Item("付款-現金"))
+                Card += GetSingle(row.Item("付款-刷卡"))
             Next
 
-            Dim Card As Single = 0
-            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
-                Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-            Next
+            'Dim Card As Single = 0
+            'For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
+            '    Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            'Next
 
             Dim cancel As Single = 0
-            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
-                cancel += GetSingle(row.Item("訂金"))
-            Next
+            'For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
+            '    cancel += GetSingle(row.Item("訂金"))
+            'Next
 
 
             Dim Profit As Single = 0
             Dim SalesVolume As Single = 0
-            For Each row As DataRow In dt.Rows
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Finish))
                 Profit += GetSingle(row.Item("利潤"))
                 SalesVolume += GetSingle(row.Item("金額"))
             Next
 
-            Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
+            dt = GetReturnContractTotalPrice(St, Ed)
+            Dim ReturnCommission As Single = GetSingle(dt.Rows(0).Item("ReturnCommission"))
+
+
+            Return New SalesInformation(SalesVolume, Profit - ReturnCommission, Cash + DepositByCash - cancel, Card + DepositByCard)
         End Function
+
+
         'Public Overridable Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As SalesInformation
 
         '    Dim dt As DataTable = GetOrderListWithContract(St, Ed)
@@ -1305,6 +1341,59 @@
             Command(SqlCommand, BasePath)
         End Sub
 
+        Public Sub Command(ByVal SqlCommand As String)
+            Command(SqlCommand, BasePath)
+        End Sub
+
+        Public Structure DbInfo
+            Dim DbVerson As Integer
+            Public Shared Function Null()
+                Dim res As DbInfo
+                res.DbVerson = 0
+                Return res
+            End Function
+
+            Public Function IsNull() As Boolean
+                Return DbVerson = 0
+            End Function
+        End Structure
+
+        Public Function ReadDbInfo() As DbInfo
+            Dim dt As DataTable = Read(Personnel.Table, BasePath, "SELECT Note FROM Personnel WHRER Label='Administrator'")
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return DbInfo.Null
+            Dim text As String = dt.Rows(0).Item("Note")
+            Dim args As DbArgs() = Array.ConvertAll(Split(text, ","), AddressOf ToFindArgs)
+            Dim info As DbInfo
+            info.DbVerson = Find(args, "DbVerson")
+            Return info
+        End Function
+
+        Private Structure DbArgs
+            Dim Label As String
+            Dim Para As String
+        End Structure
+
+        Private Function Find(ByVal args() As DbArgs, ByVal Label As String) As String
+            Dim arg As DbArgs = Array.Find(args, Function(a As DbArgs) a.Label = Label)
+            Try
+                Return arg.Para
+            Catch
+                Return ""
+            End Try
+        End Function
+
+        Private Function ToFindArgs(ByVal text As String) As DbArgs
+            Dim str() As String = Split(text, "=")
+            Dim result As New DbArgs
+            result.Label = str(0)
+            Try
+                result.Para = str(1)
+            Catch
+                result.Label = ""
+            End Try
+            Return result
+        End Function
+
 
 
         Private Shared Function GetSqlColumnChangePart(ByVal Label() As String, ByVal value() As Object) As String
@@ -1324,6 +1413,7 @@
             ElseIf obj Is Nothing OrElse obj.GetType() Is GetType(String) Then
                 Return "'" & obj.ToString & "'"
             ElseIf obj.GetType Is GetType(Date) Then
+                If obj = Nothing Then Return "null"
                 Return CType(obj, Date).ToString("#yyyy/MM/dd HH:mm:ss#")
             Else
                 Return obj.ToString
@@ -1340,20 +1430,20 @@
         'End Sub
 
 
-        Delegate Function Conv(Of T)(ByVal d As Data.DataRow) As T
+        'Delegate Function Conv(Of T)(ByVal d As Data.DataRow) As T
 
-        Public Function Read(Of T)(ByVal Table As String, ByVal C As Conv(Of T)) As T()
-            Dim DT As Data.DataTable = Read(Supplier.Table, BasePath, GetSqlSelect(Table))
+        'Public Function Read(Of T)(ByVal Table As String, ByVal C As Conv(Of T)) As T()
+        '    Dim DT As Data.DataTable = Read(Supplier.Table, BasePath, GetSqlSelect(Table))
 
-            Dim lstData As New List(Of T)
+        '    Dim lstData As New List(Of T)
 
 
-            If DT Is Nothing Then Return lstData.ToArray
-            For i As Integer = 0 To DT.Rows.Count - 1
-                lstData.Add(C(DT.Rows(i)))
-            Next
-            Return lstData.ToArray
-        End Function
+        '    If DT Is Nothing Then Return lstData.ToArray
+        '    For i As Integer = 0 To DT.Rows.Count - 1
+        '        lstData.Add(C(DT.Rows(i)))
+        '    Next
+        '    Return lstData.ToArray
+        'End Function
 
 
         ''' <summary>新增供應商</summary>

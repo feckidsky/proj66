@@ -818,13 +818,7 @@ Namespace Database
 
 
 
-    ''' <summary>付款方式</summary>
-    Public Enum Payment
-        Cash = 0
-        Card = 1
-        Deposit = 2
-        Cancel = 3
-    End Enum
+
 
     Public Structure ReturnGoods
         Shared Table As String = "ReturnGoods"
@@ -1070,6 +1064,17 @@ Namespace Database
         End Function
     End Structure
 
+
+    ''' <summary>付款方式</summary>
+    Public Enum Payment
+        Cash = 0
+        Card = 1
+        Finish = 1
+        Deposit = 2
+        Cancel = 3
+    End Enum
+
+
     ''' <summary>銷貨</summary>
     Public Structure Sales
         Shared Table As String = "Sales"
@@ -1087,12 +1092,16 @@ Namespace Database
         Dim DepositByCash As Single
         ''' <summary>訂金-刷卡</summary>
         Dim DepositByCard As Single
+        Dim DepositCardCharge As Single
+        Dim PayByCash As Single
+        Dim PayByCard As Single
+        Dim PayCardCharge As Single
         ''' <summary>付款方式</summary>
         Dim TypeOfPayment As Payment
         ''' <summary>備註</summary>
         Dim Note As String
 
-        Public Shared PaymentDescribe As String() = New String() {"現金", "刷卡", "訂金", "退訂"}
+        Public Shared PaymentDescribe As String() = New String() {"未設定", "銷貨", "訂單", "退訂"}
 
         Public Function GetPayment() As String
             Return PaymentDescribe(TypeOfPayment)
@@ -1106,14 +1115,19 @@ Namespace Database
             Columns.Add("CustomerLabel", DBTypeLabel)
             Columns.Add("PersonnelLabel", DBTypeLabel)
             Columns.Add("Deposit", DBTypeSingle)
+            Columns.Add("DepositByCard", DBTypeSingle)
+            Columns.Add("DepositCardCharge", DBTypeSingle)
+            Columns.Add("PayByCash", DBTypeSingle)
+            Columns.Add("PayByCard", DBTypeSingle)
+            Columns.Add("PayCardCharge", DBTypeSingle)
             Columns.Add("TypeOfPayment", DBTypeInteger)
             Columns.Add("Note", DBTypeNote)
-            Columns.Add("DepositByCard", DBTypeSingle)
+
             Return Columns.ToArray
         End Function
 
         Function ToObjects() As Object()
-            Return New Object() {Label, OrderDate, SalesDate, CustomerLabel, PersonnelLabel, DepositByCash, CType(TypeOfPayment, Int16), Note, DepositByCard}
+            Return New Object() {Label, OrderDate, SalesDate, CustomerLabel, PersonnelLabel, DepositByCash, DepositByCard, DepositCardCharge, PayByCash, PayByCard, PayCardCharge, CType(TypeOfPayment, Int16), Note}
         End Function
 
         Sub UpdateRow(ByVal r As DataRow)
@@ -1134,8 +1148,12 @@ Namespace Database
             data.CustomerLabel = R("CustomerLabel")
             data.PersonnelLabel = R("PersonnelLabel")
             data.DepositByCash = R("Deposit")
-            data.DepositByCard = R("DePositByCard")
+            data.DepositByCard = R("DepositByCard")
             data.TypeOfPayment = R("TypeOfPayment")
+            data.PayByCash = R("PayByCash")
+            data.PayByCard = R("PayByCard")
+            data.PayCardCharge = R("PayCardCharge")
+            data.DepositCardCharge = R("DepositCardCharge")
             data.Note = R("Note")
             Return data
         End Function
