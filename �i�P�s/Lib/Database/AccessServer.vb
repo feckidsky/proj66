@@ -197,7 +197,7 @@
             ServerSend("DeletedAllLog")
         End Sub
         Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
-            Server.ServerSend("DeletedContract", Code.XmlSerializeWithZIP(con))
+            ServerSend("DeletedContract", Code.XmlSerializeWithZIP(con))
         End Sub
 
         Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer

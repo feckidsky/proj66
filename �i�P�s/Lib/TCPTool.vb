@@ -6,18 +6,18 @@ Public Class TCPTool
     '訊息編碼
     Dim mEncode As Client.Encoding
 
-    Dim mServer As TcpListener
+    'Dim mServer As TcpListener
     Dim ServerPort As Integer
     Dim mClient As TcpClient
     Dim UDP As UdpClient
 
     Public ClientbyClient As Client
 
-    Dim ServerClientList As New List(Of Client)
+    'Dim ServerClientList As New List(Of Client)
     Dim ClientList As New List(Of Client)
     Dim CountClient As Integer = -1
 
-    Dim ListenThread As System.Threading.Thread
+    'Dim ListenThread As System.Threading.Thread
 
     Public Shared OutputErrorFile As Boolean = False
     Public Shared ErrorFilePath As String = IO.Directory.GetCurrentDirectory & "\TCPError.txt"
@@ -307,17 +307,107 @@ Public Class TCPTool
     End Class
 #End Region
 
+    Public Class Server
+        Inherits TcpListener
+        Dim ListenThread As Threading.Thread
+        Dim encoding As Client.Encoding = Client.Encoding.UTF8
+        Public Clients As New List(Of Client)
+        Event ReceiveClient(ByVal sender As Object, ByVal Client As Client)
+
+        Sub New(ByVal addr As IPAddress, ByVal port As Integer, ByVal encoding As Client.Encoding)
+            MyBase.New(addr, port)
+            Me.encoding = encoding
+        End Sub
+
+        Public Sub BeginListen()
+            If ListenThread Is Nothing Then ListenThread = New System.Threading.Thread(AddressOf Listen)
+            ListenThread.IsBackground = True
+            ListenThread.Start()
+        End Sub
+
+        Public Sub Listen()
+            Try
+                Start()
+            Catch
+                OutputError("開新 Listen")
+                MsgBox(Err.Description)
+            End Try
+
+            Threading.Thread.Sleep(3000)
+
+            Do
+                Dim GetClient As New TcpClient
+                Try
+                    '監聽連線
+                    GetClient = AcceptTcpClient()
+                    '取得連線資訊
+                    'ClientInfo = CType(GetClient.Client.RemoteEndPoint, IPEndPoint)
+                    'IP = ClientInfo.Address.ToString
+                Catch
+                    OutputError("Server 監聽")
+                    'MsgBox(Err.Description & " Listen")
+                    Exit Sub
+                End Try
+
+                '建立Client元件
+                Dim cClient As New Client(GetClient, encoding)
+                Clients.Add(cClient)
+                RaiseEvent ReceiveClient(Me, cClient)
+            Loop
+        End Sub
+
+        Public Sub Close()
+
+            Try : ListenThread.Abort() : Catch : End Try
+            Try : Me.Stop() : Catch : End Try
+            ListenThread = Nothing
+
+            Clients.ForEach(AddressOf Client.Close)
+            Clients.Clear()
+        End Sub
+
+        Public Sub Send(ByVal Msg As String)
+            For Each Client As Client In Clients
+                Try
+                    Client.Send(Msg)
+                Catch
+                End Try
+            Next
+        End Sub
+
+
+        Public Sub Send(ByVal CMD As String, ByVal Para As String)
+            For Each Client As Client In Clients
+                Try
+                    Client.Send(CMD, Para)
+                Catch
+                End Try
+            Next
+        End Sub
+    End Class
+
+    Dim ServerList As New List(Of Server)
+
 #Region "Server 動作函式"
     '===========================================================================================================
     '                                               Server動作函式
     '===========================================================================================================
     Public Sub ServerOpen(ByVal Port As Integer, Optional ByVal Index As Integer = 0)
         ServerPort = Port
-        Dim localAddr As IPAddress = GetIPv4(Index) ' Dns.GetHostEntry(Dns.GetHostName).AddressList(0) ' Dns.Resolve(My.Computer.Name).AddressList(0)
-        If mServer Is Nothing Then mServer = New TcpListener(localAddr, Port)
-        If ListenThread Is Nothing Then ListenThread = New System.Threading.Thread(AddressOf Listen)
-        ListenThread.IsBackground = True
-        ListenThread.Start()
+        'Dim localAddr As IPAddress = GetIPv4(Index) ' Dns.GetHostEntry(Dns.GetHostName).AddressList(0) ' Dns.Resolve(My.Computer.Name).AddressList(0)
+        'If mServer Is Nothing Then mServer = New TcpListener(localAddr, Port)
+        'If ListenThread Is Nothing Then ListenThread = New System.Threading.Thread(AddressOf Listen)
+        'ListenThread.IsBackground = True
+        'ListenThread.Start()
+
+        Dim Addrs As IPAddress() = GetIPv4s()
+        For Each addr As IPAddress In Addrs
+            Dim newServer As New Server(addr, Port, mEncode)
+            AddHandler newServer.ReceiveClient, AddressOf OnReceiveConnected
+            ServerList.Add(newServer)
+            newServer.BeginListen()
+        Next
+
     End Sub
 
     Public Function GetIPv4(ByVal idx As Integer) As IPAddress
@@ -334,70 +424,91 @@ Public Class TCPTool
     End Function
 
     Public Sub ServerClose()
+        For Each ser As Server In ServerList
+            ser.Close()
+        Next
+        ServerList.Clear()
+        'Try : ListenThread.Abort() : Catch : End Try
+        'Try : mServer.Stop() : Catch : End Try
+        'ListenThread = Nothing
+        'mServer = Nothing
 
-        Try : ListenThread.Abort() : Catch : End Try
-        Try : mServer.Stop() : Catch : End Try
-        ListenThread = Nothing
-        mServer = Nothing
-
-        ServerClientList.ForEach(AddressOf CloseClient)
-        ServerClientList.Clear()
+        'ServerClientList.ForEach(AddressOf CloseClient)
+        'ServerClientList.Clear()
     End Sub
 
-    Private Sub CloseClient(ByVal Client As TCPTool.Client)
-        Try
-            Client.Close()
-        Catch
-            OutputError("主動關閉 Client")
-        End Try
-    End Sub
+    'Public Sub CloseClient(ByVal Client As TCPTool.Client)
+    '    Try
+    '        Client.Close()
+    '    Catch
+    '        OutputError("主動關閉 Client")
+    '    End Try
+    'End Sub
 
 
-    Private Sub Listen()
+    'Private Sub Listen()
 
-        'Dim ClientInfo As IPEndPoint
-        'Dim IP As String
-        Try
-            mServer.Start()
-        Catch
-            OutputError("開新 Listen")
-            MsgBox(Err.Description)
-        End Try
+    '    'Dim ClientInfo As IPEndPoint
+    '    'Dim IP As String
+    '    Try
+    '        mServer.Start()
+    '    Catch
+    '        OutputError("開新 Listen")
+    '        MsgBox(Err.Description)
+    '    End Try
 
-        Threading.Thread.Sleep(3000)
+    '    Threading.Thread.Sleep(3000)
 
-        Do
-            Dim GetClient As New TcpClient
-            Try
-                '監聽連線
-                GetClient = mServer.AcceptTcpClient
-                '取得連線資訊
-                'ClientInfo = CType(GetClient.Client.RemoteEndPoint, IPEndPoint)
-                'IP = ClientInfo.Address.ToString
-            Catch
-                OutputError("Server 監聽")
-                'MsgBox(Err.Description & " Listen")
-                Exit Sub
-            End Try
+    '    Do
+    '        Dim GetClient As New TcpClient
+    '        Try
+    '            '監聽連線
+    '            GetClient = mServer.AcceptTcpClient
+    '            '取得連線資訊
+    '            'ClientInfo = CType(GetClient.Client.RemoteEndPoint, IPEndPoint)
+    '            'IP = ClientInfo.Address.ToString
+    '        Catch
+    '            OutputError("Server 監聽")
+    '            'MsgBox(Err.Description & " Listen")
+    '            Exit Sub
+    '        End Try
 
-            '建立Client元件
-            Dim cClient As New Client(GetClient, mEncode)
-            '事件委派指定
-            AddHandler cClient.GetReceive, AddressOf SReceive
-            AddHandler cClient.ConnectedFail, AddressOf SConnectedFail
-            AddHandler cClient.ReceiveProgressChanged, AddressOf ReceiveProgressChanged_Trigger
-            AddHandler cClient.ReceiveProgressFinished, AddressOf ReceiveProgressFinished_Trigger
-            AddHandler cClient.SendFileRequest, AddressOf SendFileRequest_Trigger
-            AddHandler cClient.SendProgressChanged, AddressOf SendProgressChanged_Trigger
-            AddHandler cClient.SendProgressFinished, AddressOf SendProgressFinished_Trigger
-            AddHandler cClient.SetIPAddressFinish, AddressOf OnServerSetIPAddressFinish
-            AddHandler cClient.ReceiveStreamRequest, AddressOf OnServerReceiveStreamRequest
-            '記錄元件
-            ServerClientList.Add(cClient)
+    '        '建立Client元件
+    '        Dim cClient As New Client(GetClient, mEncode)
+    '        '事件委派指定
+    '        AddHandler cClient.GetReceive, AddressOf SReceive
+    '        AddHandler cClient.ConnectedFail, AddressOf SConnectedFail
+    '        AddHandler cClient.ReceiveProgressChanged, AddressOf ReceiveProgressChanged_Trigger
+    '        AddHandler cClient.ReceiveProgressFinished, AddressOf ReceiveProgressFinished_Trigger
+    '        AddHandler cClient.SendFileRequest, AddressOf SendFileRequest_Trigger
+    '        AddHandler cClient.SendProgressChanged, AddressOf SendProgressChanged_Trigger
+    '        AddHandler cClient.SendProgressFinished, AddressOf SendProgressFinished_Trigger
+    '        AddHandler cClient.SetIPAddressFinish, AddressOf OnServerSetIPAddressFinish
+    '        AddHandler cClient.ReceiveStreamRequest, AddressOf OnServerReceiveStreamRequest
+    '        '記錄元件
+    '        ServerClientList.Add(cClient)
 
-            '連線事件觸發
-            RaiseEvent ReceiveConnected(Me, cClient)
-        Loop
+    '        '連線事件觸發
+    '        RaiseEvent ReceiveConnected(Me, cClient)
+    '    Loop
+    'End Sub
+
+    Friend Sub OnReceiveConnected(ByVal sender As Object, ByVal cClient As Client)
+        '事件委派指定
+        AddHandler cClient.GetReceive, AddressOf SReceive
+        AddHandler cClient.ConnectedFail, AddressOf SConnectedFail
+        AddHandler cClient.ReceiveProgressChanged, AddressOf ReceiveProgressChanged_Trigger
+        AddHandler cClient.ReceiveProgressFinished, AddressOf ReceiveProgressFinished_Trigger
+        AddHandler cClient.SendFileRequest, AddressOf SendFileRequest_Trigger
+        AddHandler cClient.SendProgressChanged, AddressOf SendProgressChanged_Trigger
+        AddHandler cClient.SendProgressFinished, AddressOf SendProgressFinished_Trigger
+        AddHandler cClient.SetIPAddressFinish, AddressOf OnServerSetIPAddressFinish
+        AddHandler cClient.ReceiveStreamRequest, AddressOf OnServerReceiveStreamRequest
+        '記錄元件
+        'ServerClientList.Add(cClient)
+
+        '連線事件觸發
+        RaiseEvent ReceiveConnected(Me, cClient)
     End Sub
 
     Friend Sub OnServerReceiveStreamRequest(ByVal Client As Client, ByVal sender As Client.StreamSender)
@@ -419,36 +530,41 @@ Public Class TCPTool
 
     Private Sub SConnectedFail(ByVal Client As Client)
         RaiseEvent ServerConnectedFail(Client)
-        ServerClientList.Remove(Client)
+        'ServerClientList.Remove(Client)
+        If Client.Server IsNot Nothing Then Client.Server.Clients.Remove(Client)
     End Sub
 
-    Public Function ServerSend(ByVal newClient As Client, ByVal Msg As String) As Boolean ', Optional ByVal Level As Client.Level = Client.Level.Low) As Boolean
-        Return newClient.Send(Msg) ', Level)
-    End Function
+    'Public Function ServerSend(ByVal newClient As Client, ByVal Msg As String) As Boolean ', Optional ByVal Level As Client.Level = Client.Level.Low) As Boolean
+    '    Return newClient.Send(Msg) ', Level)
+    'End Function
 
 
     Public Sub ServerSend(ByVal Msg As String)
-
-        Dim lstClient() As Client = ServerClientList.ToArray
-        Dim i As Long
-        For i = 0 To lstClient.Length - 1
-            Try
-                lstClient(i).Send(Msg)
-            Catch
-            End Try
+        For Each ser As Server In ServerList
+            ser.Send(Msg)
         Next
+        'Dim lstClient() As Client = ServerClientList.ToArray
+        'Dim i As Long
+        'For i = 0 To lstClient.Length - 1
+        '    Try
+        '        lstClient(i).Send(Msg)
+        '    Catch
+        '    End Try
+        'Next
     End Sub
 
     Public Sub ServerSend(ByVal CMD As String, ByVal Para As String)
-
-        Dim lstClient() As Client = ServerClientList.ToArray
-        Dim i As Long
-        For i = 0 To lstClient.Length - 1
-            Try
-                lstClient(i).Send(CMD, Para)
-            Catch
-            End Try
+        For Each ser As Server In ServerList
+            ser.Send(CMD, Para)
         Next
+        'Dim lstClient() As Client = ServerClientList.ToArray
+        'Dim i As Long
+        'For i = 0 To lstClient.Length - 1
+        '    Try
+        '        lstClient(i).Send(CMD, Para)
+        '    Catch
+        '    End Try
+        'Next
     End Sub
 
 #End Region
@@ -597,6 +713,7 @@ Public Class TCPTool
     '                                               客戶端管理元件
     '===========================================================================================================
     Public Class Client
+        Public Server As Server
         Public State As Mode = Mode.Run
         Public IP As String
         Public Port As Integer
@@ -784,6 +901,11 @@ Public Class TCPTool
                 TcpClient.Close()
             End If
         End Sub
+
+        Public Shared Sub Close(ByVal Client As Client)
+            Client.Close()
+        End Sub
+
 
         Public Function Connected() As Boolean
             Return TcpClient IsNot Nothing AndAlso TcpClient.Connected
@@ -1452,7 +1574,7 @@ Public Class TCPTool
 
             End Sub
 
-           
+
         End Class
 
 #Region "檔案傳送"
@@ -1576,7 +1698,7 @@ Public Class TCPTool
         Public Shared Sub Dispose(ByVal Client As Client)
             Client.Dispose()
         End Sub
-     
+
 
     End Class
 
