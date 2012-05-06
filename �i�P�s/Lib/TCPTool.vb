@@ -312,11 +312,13 @@ Public Class TCPTool
         Dim ListenThread As Threading.Thread
         Dim encoding As Client.Encoding = Client.Encoding.UTF8
         Public Clients As New List(Of Client)
+        Public Addr As IPAddress
         Event ReceiveClient(ByVal sender As Object, ByVal Client As Client)
 
         Sub New(ByVal addr As IPAddress, ByVal port As Integer, ByVal encoding As Client.Encoding)
             MyBase.New(addr, port)
             Me.encoding = encoding
+            Me.Addr = addr
         End Sub
 
         Public Sub BeginListen()
@@ -388,6 +390,7 @@ Public Class TCPTool
 
     Dim ServerList As New List(Of Server)
 
+    Public ListenCheckThread As Threading.Thread
 #Region "Server 動作函式"
     '===========================================================================================================
     '                                               Server動作函式
@@ -400,14 +403,27 @@ Public Class TCPTool
         'ListenThread.IsBackground = True
         'ListenThread.Start()
 
-        Dim Addrs As IPAddress() = GetIPv4s()
-        For Each addr As IPAddress In Addrs
-            Dim newServer As New Server(addr, Port, mEncode)
-            AddHandler newServer.ReceiveClient, AddressOf OnReceiveConnected
-            ServerList.Add(newServer)
-            newServer.BeginListen()
-        Next
+        If ListenCheckThread Is Nothing OrElse Not ListenCheckThread.IsAlive Then ListenCheckThread = New Threading.Thread(AddressOf ListenCheck)
+        ListenCheckThread.IsBackground = True
+        ListenCheckThread.Start()
 
+
+    End Sub
+
+    Private Sub ListenCheck()
+        Do
+            Dim Addrs As IPAddress() = GetIPv4s()
+            For Each addr As IPAddress In Addrs
+                Dim addr1 As IPAddress = addr
+                If Not ServerList.Exists(Function(s As Server) IPAddress.Equals(s.Addr, addr1)) Then
+                    Dim newServer As New Server(addr, ServerPort, mEncode)
+                    AddHandler newServer.ReceiveClient, AddressOf OnReceiveConnected
+                    ServerList.Add(newServer)
+                    newServer.BeginListen()
+                End If
+            Next
+            Threading.Thread.Sleep(1000)
+        Loop
     End Sub
 
     Public Function GetIPv4(ByVal idx As Integer) As IPAddress
@@ -424,6 +440,11 @@ Public Class TCPTool
     End Function
 
     Public Sub ServerClose()
+        Try
+            ListenCheckThread.Abort()
+        Catch
+        End Try
+
         For Each ser As Server In ServerList
             ser.Close()
         Next

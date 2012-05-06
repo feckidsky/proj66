@@ -35,7 +35,7 @@ Public Class winMain
         End If
         If access IsNot Nothing Then
             Dim connectState As String = IIf(access.GetType Is GetType(Database.AccessClient) And Not access.Connected, "斷線", "已連線")
-            Me.Text = SystemTitle & " - v1.0.2 - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
+            Me.Text = SystemTitle & " - v1.0.3 - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
         End If
         Button1.Visible = CurrentUser.ID = "Designer"
         錯誤記錄ToolStripMenuItem.Visible = CurrentUser.ID = "Designer"

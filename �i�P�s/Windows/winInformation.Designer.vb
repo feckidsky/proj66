@@ -29,48 +29,49 @@ Partial Class winInformation
         Me.Label4 = New System.Windows.Forms.Label
         Me.lbYesterdayCash = New System.Windows.Forms.Label
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.lbYesterdayCard = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.lbUserCard = New System.Windows.Forms.Label
         Me.lbUserCash = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.lbUserProfit = New System.Windows.Forms.Label
         Me.dtpEnd = New System.Windows.Forms.DateTimePicker
         Me.lbUserSales = New System.Windows.Forms.Label
         Me.dtpStart = New System.Windows.Forms.DateTimePicker
+        Me.Label12 = New System.Windows.Forms.Label
         Me.Label25 = New System.Windows.Forms.Label
         Me.Label24 = New System.Windows.Forms.Label
         Me.Label23 = New System.Windows.Forms.Label
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.lbTodayCard = New System.Windows.Forms.Label
         Me.lbTodayCash = New System.Windows.Forms.Label
         Me.lbTodayProfit = New System.Windows.Forms.Label
         Me.lbTodaySales = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
         Me.Label8 = New System.Windows.Forms.Label
         Me.Label9 = New System.Windows.Forms.Label
         Me.Label10 = New System.Windows.Forms.Label
         Me.GroupBox4 = New System.Windows.Forms.GroupBox
+        Me.lbLastMonthCard = New System.Windows.Forms.Label
         Me.lbLastMonthCash = New System.Windows.Forms.Label
         Me.lbLastMonthProfit = New System.Windows.Forms.Label
         Me.lbLastMonthSales = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
         Me.Label14 = New System.Windows.Forms.Label
         Me.Label15 = New System.Windows.Forms.Label
         Me.Label16 = New System.Windows.Forms.Label
         Me.GroupBox5 = New System.Windows.Forms.GroupBox
+        Me.lbTheMonthCard = New System.Windows.Forms.Label
         Me.lbTheMonthCash = New System.Windows.Forms.Label
         Me.lbTheMonthProfit = New System.Windows.Forms.Label
         Me.lbTheMonthSales = New System.Windows.Forms.Label
+        Me.Label11 = New System.Windows.Forms.Label
         Me.Label20 = New System.Windows.Forms.Label
         Me.Label21 = New System.Windows.Forms.Label
         Me.Label22 = New System.Windows.Forms.Label
         Me.btClose = New System.Windows.Forms.Button
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.lbYesterdayCard = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.lbTodayCard = New System.Windows.Forms.Label
-        Me.Label7 = New System.Windows.Forms.Label
-        Me.lbLastMonthCard = New System.Windows.Forms.Label
-        Me.Label11 = New System.Windows.Forms.Label
-        Me.lbTheMonthCard = New System.Windows.Forms.Label
-        Me.Label12 = New System.Windows.Forms.Label
-        Me.lbUserCard = New System.Windows.Forms.Label
+        Me.Button1 = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -152,6 +153,25 @@ Partial Class winInformation
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "昨日資訊"
         '
+        'lbYesterdayCard
+        '
+        Me.lbYesterdayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbYesterdayCard.Location = New System.Drawing.Point(77, 94)
+        Me.lbYesterdayCard.Name = "lbYesterdayCard"
+        Me.lbYesterdayCard.Size = New System.Drawing.Size(70, 12)
+        Me.lbYesterdayCard.TabIndex = 1
+        Me.lbYesterdayCard.Text = "0"
+        Me.lbYesterdayCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(24, 97)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(32, 12)
+        Me.Label5.TabIndex = 0
+        Me.Label5.Text = "刷卡:"
+        '
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.lbUserCard)
@@ -171,6 +191,16 @@ Partial Class winInformation
         Me.GroupBox2.TabIndex = 4
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "指定時間"
+        '
+        'lbUserCard
+        '
+        Me.lbUserCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbUserCard.Location = New System.Drawing.Point(290, 84)
+        Me.lbUserCard.Name = "lbUserCard"
+        Me.lbUserCard.Size = New System.Drawing.Size(70, 12)
+        Me.lbUserCard.TabIndex = 1
+        Me.lbUserCard.Text = "0"
+        Me.lbUserCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lbUserCash
         '
@@ -223,6 +253,15 @@ Partial Class winInformation
         Me.dtpStart.Size = New System.Drawing.Size(139, 22)
         Me.dtpStart.TabIndex = 1
         '
+        'Label12
+        '
+        Me.Label12.AutoSize = True
+        Me.Label12.Location = New System.Drawing.Point(210, 84)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(32, 12)
+        Me.Label12.TabIndex = 0
+        Me.Label12.Text = "刷卡:"
+        '
         'Label25
         '
         Me.Label25.AutoSize = True
@@ -267,6 +306,16 @@ Partial Class winInformation
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "今日資訊"
         '
+        'lbTodayCard
+        '
+        Me.lbTodayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbTodayCard.Location = New System.Drawing.Point(78, 97)
+        Me.lbTodayCard.Name = "lbTodayCard"
+        Me.lbTodayCard.Size = New System.Drawing.Size(70, 12)
+        Me.lbTodayCard.TabIndex = 1
+        Me.lbTodayCard.Text = "0"
+        Me.lbTodayCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
         'lbTodayCash
         '
         Me.lbTodayCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -296,6 +345,15 @@ Partial Class winInformation
         Me.lbTodaySales.TabIndex = 1
         Me.lbTodaySales.Text = "0"
         Me.lbTodaySales.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(24, 97)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(32, 12)
+        Me.Label6.TabIndex = 0
+        Me.Label6.Text = "刷卡:"
         '
         'Label8
         '
@@ -341,6 +399,16 @@ Partial Class winInformation
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "上月資訊"
         '
+        'lbLastMonthCard
+        '
+        Me.lbLastMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbLastMonthCard.Location = New System.Drawing.Point(77, 99)
+        Me.lbLastMonthCard.Name = "lbLastMonthCard"
+        Me.lbLastMonthCard.Size = New System.Drawing.Size(70, 12)
+        Me.lbLastMonthCard.TabIndex = 1
+        Me.lbLastMonthCard.Text = "0"
+        Me.lbLastMonthCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
         'lbLastMonthCash
         '
         Me.lbLastMonthCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -370,6 +438,15 @@ Partial Class winInformation
         Me.lbLastMonthSales.TabIndex = 1
         Me.lbLastMonthSales.Text = "0"
         Me.lbLastMonthSales.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(24, 99)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(32, 12)
+        Me.Label7.TabIndex = 0
+        Me.Label7.Text = "刷卡:"
         '
         'Label14
         '
@@ -415,6 +492,16 @@ Partial Class winInformation
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "本月資訊"
         '
+        'lbTheMonthCard
+        '
+        Me.lbTheMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbTheMonthCard.Location = New System.Drawing.Point(78, 99)
+        Me.lbTheMonthCard.Name = "lbTheMonthCard"
+        Me.lbTheMonthCard.Size = New System.Drawing.Size(70, 12)
+        Me.lbTheMonthCard.TabIndex = 1
+        Me.lbTheMonthCard.Text = "0"
+        Me.lbTheMonthCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
         'lbTheMonthCash
         '
         Me.lbTheMonthCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -444,6 +531,15 @@ Partial Class winInformation
         Me.lbTheMonthSales.TabIndex = 1
         Me.lbTheMonthSales.Text = "0"
         Me.lbTheMonthSales.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Location = New System.Drawing.Point(24, 99)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(32, 12)
+        Me.Label11.TabIndex = 0
+        Me.Label11.Text = "刷卡:"
         '
         'Label20
         '
@@ -481,106 +577,22 @@ Partial Class winInformation
         Me.btClose.Text = "關閉"
         Me.btClose.UseVisualStyleBackColor = True
         '
-        'Label5
+        'Button1
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(24, 97)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(32, 12)
-        Me.Label5.TabIndex = 0
-        Me.Label5.Text = "刷卡:"
-        '
-        'lbYesterdayCard
-        '
-        Me.lbYesterdayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbYesterdayCard.Location = New System.Drawing.Point(77, 94)
-        Me.lbYesterdayCard.Name = "lbYesterdayCard"
-        Me.lbYesterdayCard.Size = New System.Drawing.Size(70, 12)
-        Me.lbYesterdayCard.TabIndex = 1
-        Me.lbYesterdayCard.Text = "0"
-        Me.lbYesterdayCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(24, 97)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(32, 12)
-        Me.Label6.TabIndex = 0
-        Me.Label6.Text = "刷卡:"
-        '
-        'lbTodayCard
-        '
-        Me.lbTodayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTodayCard.Location = New System.Drawing.Point(78, 97)
-        Me.lbTodayCard.Name = "lbTodayCard"
-        Me.lbTodayCard.Size = New System.Drawing.Size(70, 12)
-        Me.lbTodayCard.TabIndex = 1
-        Me.lbTodayCard.Text = "0"
-        Me.lbTodayCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(24, 99)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(32, 12)
-        Me.Label7.TabIndex = 0
-        Me.Label7.Text = "刷卡:"
-        '
-        'lbLastMonthCard
-        '
-        Me.lbLastMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbLastMonthCard.Location = New System.Drawing.Point(77, 99)
-        Me.lbLastMonthCard.Name = "lbLastMonthCard"
-        Me.lbLastMonthCard.Size = New System.Drawing.Size(70, 12)
-        Me.lbLastMonthCard.TabIndex = 1
-        Me.lbLastMonthCard.Text = "0"
-        Me.lbLastMonthCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(24, 99)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(32, 12)
-        Me.Label11.TabIndex = 0
-        Me.Label11.Text = "刷卡:"
-        '
-        'lbTheMonthCard
-        '
-        Me.lbTheMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTheMonthCard.Location = New System.Drawing.Point(78, 99)
-        Me.lbTheMonthCard.Name = "lbTheMonthCard"
-        Me.lbTheMonthCard.Size = New System.Drawing.Size(70, 12)
-        Me.lbTheMonthCard.TabIndex = 1
-        Me.lbTheMonthCard.Text = "0"
-        Me.lbTheMonthCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'Label12
-        '
-        Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(210, 84)
-        Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(32, 12)
-        Me.Label12.TabIndex = 0
-        Me.Label12.Text = "刷卡:"
-        '
-        'lbUserCard
-        '
-        Me.lbUserCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbUserCard.Location = New System.Drawing.Point(290, 84)
-        Me.lbUserCard.Name = "lbUserCard"
-        Me.lbUserCard.Size = New System.Drawing.Size(70, 12)
-        Me.lbUserCard.TabIndex = 1
-        Me.lbUserCard.Text = "0"
-        Me.lbUserCard.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.Button1.Location = New System.Drawing.Point(12, 399)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 6
+        Me.Button1.Text = "舊版算法"
+        Me.Button1.UseVisualStyleBackColor = True
+        Me.Button1.Visible = False
         '
         'winInformation
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(422, 434)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.btClose)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox5)
@@ -652,4 +664,5 @@ Partial Class winInformation
     Friend WithEvents Label11 As System.Windows.Forms.Label
     Friend WithEvents lbUserCard As System.Windows.Forms.Label
     Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class

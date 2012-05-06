@@ -2,6 +2,8 @@
 
     Dim access As Database.Access
 
+ 
+
     Structure Info
         Dim Sales As Single
         Dim Profit As Single
@@ -12,8 +14,14 @@
         End Sub
     End Structure
 
-    Public Overloads Sub ShowDialog(ByVal DB As Database.Access)
+    Public Overloads Sub ShowDialog(ByVal DB As Database.Access, Optional ByVal old As Boolean = False)
         access = DB
+        If old Then
+            getInfo = AddressOf DB.OldGetSalesInformation
+        Else
+            getInfo = AddressOf DB.GetSalesInformation
+        End If
+
         MyBase.ShowDialog()
     End Sub
     Dim infoYesterday As Database.Access.SalesInformation
@@ -69,33 +77,38 @@
         Dim dialog As New ProgressDialog
         dialog.Thread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf UpdateSalesInformation))
         dialog.Start("讀取銷售資訊")
-     
+
     End Sub
+
+
+
+
+    Dim getInfo As Func(Of Date, Date, Database.Access.SalesInformation)
 
     Public Sub UpdateSalesInformation(ByVal progress As Database.Access.Progress)
 
         progress.Report("讀取昨日資訊", 15)
-        infoYesterday = access.GetSalesInformation(Today.AddDays(-1), Today.AddSeconds(-1))
+        infoYesterday = getInfo(Today.AddDays(-1), Today.AddSeconds(-1))
         Me.Invoke(New Action(AddressOf UpdateYesterday))
 
         progress.Report("讀取今日資訊", 30)
-        infoToday = access.GetSalesInformation(Today, Today.AddDays(1).AddSeconds(-1))
+        infoToday = getInfo(Today, Today.AddDays(1).AddSeconds(-1))
         Me.Invoke(New Action(AddressOf UpdateToday))
 
         progress.Report("讀取上個資訊", 45)
         Dim LastMonth As Date = New Date(Now.AddMonths(-1).Year, Now.AddMonths(-1).Month, 1)
-        infoLastMonth = access.GetSalesInformation(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
+        infoLastMonth = getInfo(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
         Me.Invoke(New Action(AddressOf UpdateLastMonth))
 
         progress.Report("讀取本月資訊", 60)
         Dim Month As Date = New Date(Now.Year, Now.Month, 1)
-        infoMonth = access.GetSalesInformation(Month, Month.AddMonths(1).AddSeconds(-1))
+        infoMonth = getInfo(Month, Month.AddMonths(1).AddSeconds(-1))
         Me.Invoke(New Action(AddressOf UpdateTheMonth))
 
         progress.Report("讀取自訂日期資訊", 75)
         Dim st As Date = Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
         Dim ed As Date = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
-        infoUser = access.GetSalesInformation(st, ed.AddDays(1).AddSeconds(-1))
+        infoUser = getInfo(st, ed.AddDays(1).AddSeconds(-1))
         Me.Invoke(New Action(AddressOf UpdateUserInfo))
         progress.Finish()
     End Sub
@@ -141,5 +154,10 @@
 
     Private Sub btClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btClose.Click
         Me.Close()
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Dim win As New winInformation
+        win.ShowDialog(access, old:=True)
     End Sub
 End Class

@@ -645,7 +645,7 @@
             End Select
 
 
-            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+Sales.DepositByCard AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金], Sales.DepositByCard as [訂金-刷卡], Sales.PayByCash as [付款-現金], Sales.PayByCard as [付款-刷卡]", "") & ", Sum(IIf(IsNull([SalesGoods].[SalesLabel]),0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]),0,[Price]) AS 金額, Sum(IIf(IsNull([ReturnGoods].[ReturnLabel]),0,[ReturnGoods].[ReturnPrice]*[ReturnGoods].[Number])) AS 退款, -Sum(IIf(IsNull([ReturnLabel]),0,([ReturnGoods].[ReturnPrice]-[Stock_1].[Cost])*[returngoods].[number])) AS 退款利潤, Sales.Deposit+Sales.DepositByCard+Sales.PayByCash+Sales.PayByCard+退款 -Sum(IIf(IsNull([salesgoods].[SalesLabel]),0,[stock].[cost]*[SalesGoods].[Number]))+[退款利潤]+IIf(IsNull([profit]),0,[Profit]-ContractInfo.Prepay)-(-Int(-(Sales.PayByCard*Sales.PayCardCharge)))-(-Int(-[Sales].[DepositByCard])*Sales.DepositCardCharge) AS 利潤, Sales.Note AS 備註 " & _
+            Dim SQLCommand As String = "SELECT Sales.Label AS 單號, Sales.OrderDate AS 訂單時間, Sales.SalesDate AS 銷貨時間, Personnel.Name AS 銷售人員, Customer.Name AS 客戶, Sales.TypeOfPayment AS 付款方式, Sales.Deposit+Sales.DepositByCard AS 訂金" & IIf(WithDepositByCash, ",Sales.Deposit as [訂金-現金], Sales.DepositByCard as [訂金-刷卡], Sales.PayByCash as [付款-現金], Sales.PayByCard as [付款-刷卡]", "") & ", Sum(IIf(IsNull([SalesGoods].[SalesLabel]),0,[SellingPrice]*[SalesGoods].[Number]))+IIf(IsNull([Price]),0,[Price]) AS 金額, Sum(IIf(IsNull([ReturnGoods].[ReturnLabel]),0,[ReturnGoods].[ReturnPrice]*[ReturnGoods].[Number])) AS 退款, -Sum(IIf(IsNull([ReturnLabel]),0,([ReturnGoods].[ReturnPrice]-[Stock_1].[Cost])*[returngoods].[number])) AS 退款利潤, Sales.Deposit+Sales.DepositByCard+Sales.PayByCash+Sales.PayByCard+退款 -Sum(IIf(IsNull([salesgoods].[SalesLabel]),0,[stock].[cost]*[SalesGoods].[Number]))+[退款利潤]+IIf(IsNull([profit]),0,[Profit]-ContractInfo.Price)-(-Int(-(Sales.PayByCard*Sales.PayCardCharge)))-(-Int(-[Sales].[DepositByCard])*Sales.DepositCardCharge) AS 利潤, Sales.Note AS 備註 " & _
             " FROM (((((Sales LEFT JOIN (SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) ON Sales.Label = SalesGoods.SalesLabel) LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) LEFT JOIN (SELECT SalesLabel, sum(Contract.Prepay)-sum(SalesContract.Discount) AS Price, sum(SalesContract.commission)-sum(SalesContract.Discount) AS profit , sum( Contract.Prepay) as Prepay FROM SalesContract LEFT JOIN Contract ON SalesContract.ContractLabel=Contract.Label GROUP BY SalesLabel)  AS ContractInfo ON Sales.Label = ContractInfo.SalesLabel) LEFT JOIN ReturnGoods ON Sales.Label = ReturnGoods.ReturnLabel) LEFT JOIN Stock AS Stock_1 ON ReturnGoods.StockLabel = Stock_1.Label " & _
             condition1 & _
             " GROUP BY Sales.Label, Sales.OrderDate, Sales.SalesDate, Personnel.Name, Customer.Name, Sales.TypeOfPayment, Sales.Deposit, Sales.DepositByCard, Sales.DepositCardCharge , Sales.PayByCash, Sales.PayByCard, Sales.PayCardCharge , Sales.Note, ContractInfo.Price, ContractInfo.profit, ContractInfo.Prepay;"
@@ -919,43 +919,43 @@
         End Function
 
 
-        'Public Overridable Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As SalesInformation
+        Public Overridable Function OldGetSalesInformation(ByVal St As Date, ByVal Ed As Date) As SalesInformation
 
-        '    Dim dt As DataTable = GetOrderListWithContract(St, Ed)
-        '    Dim DepositByCash As Single = 0
-        '    Dim DepositByCard As Single = 0
-        '    For Each row As DataRow In dt.Rows
-        '        DepositByCash += GetSingle(row.Item("訂金-現金"))
-        '        DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
-        '    Next
+            Dim dt As DataTable = GetOrderListWithContract(St, Ed)
+            Dim DepositByCash As Single = 0
+            Dim DepositByCard As Single = 0
+            For Each row As DataRow In dt.Rows
+                DepositByCash += GetSingle(row.Item("訂金-現金"))
+                DepositByCard += GetSingle(row.Item("訂金")) - GetSingle(row.Item("訂金-現金"))
+            Next
 
-        '    dt = GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
+            dt = GetSalesListWithContract(St, Ed, Database.Access.GetSalesListType.Sales, , WithDepositByCash:=True)
 
-        '    Dim Cash As Single = 0
-        '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
-        '        Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-        '    Next
+            Dim Cash As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cash))
+                Cash += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            Next
 
-        '    Dim Card As Single = 0
-        '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
-        '        Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
-        '    Next
+            Dim Card As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Card))
+                Card += GetSingle(row.Item("金額")) - GetSingle(row.Item("訂金"))
+            Next
 
-        '    Dim cancel As Single = 0
-        '    For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
-        '        cancel += GetSingle(row.Item("訂金"))
-        '    Next
+            Dim cancel As Single = 0
+            For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Cancel))
+                cancel += GetSingle(row.Item("訂金"))
+            Next
 
 
-        '    Dim Profit As Single = 0
-        '    Dim SalesVolume As Single = 0
-        '    For Each row As DataRow In dt.Rows
-        '        Profit += GetSingle(row.Item("利潤"))
-        '        SalesVolume += GetSingle(row.Item("金額"))
-        '    Next
+            Dim Profit As Single = 0
+            Dim SalesVolume As Single = 0
+            For Each row As DataRow In dt.Rows
+                Profit += GetSingle(row.Item("利潤"))
+                SalesVolume += GetSingle(row.Item("金額"))
+            Next
 
-        '    Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
-        'End Function
+            Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
+        End Function
 
         Public Function GetSingle(ByVal obj As Object) As Single
             If obj Is DBNull.Value Then Return 0
