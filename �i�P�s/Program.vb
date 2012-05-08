@@ -17,6 +17,9 @@ Public Module Program
         Dim ServerName As String
         Dim ServerPort As Integer
         Dim ServerNetIndex As Integer
+        Dim BackupDir As String
+        Dim EmailBackupEnable As Boolean
+        Dim DirBackupEnable As Boolean
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
@@ -26,6 +29,9 @@ Public Module Program
                 def.ServerName = My.Computer.Name
                 def.ServerPort = 3600
                 def.ServerNetIndex = 0
+                def.BackupDir = My.Application.Info.DirectoryPath & "\Data\Backup\"
+                def.EmailBackupEnable = False
+                def.DirBackupEnable = False
                 Return def
             End Get
         End Property
@@ -60,6 +66,34 @@ Public Module Program
 
     End Structure
 
+    Public Structure MailInformation
+        Dim Server As String
+        Dim Port As Integer
+        Dim ID As String
+        Dim Password As String
+        Dim From As String
+        Dim [To] As String
+
+        Sub New(ByVal server As String, ByVal port As Integer, ByVal id As String, ByVal password As String, ByVal form As String, ByVal [to] As String)
+            Me.Server = server : Me.Port = port : Me.ID = id : Me.Password = password : Me.From = form : Me.To = [to]
+        End Sub
+        Shared ReadOnly Property [Default]() As MailInformation
+            Get
+                ' , "feckidsky", "yqtaa3883", "title", "content", "就是我<feckidsky@gmail.com>", "kid.sky@yahoo.com.tw", files.ToArray))
+                Return New MailInformation("smtp.gmail.com", 587, "", "", "", "")
+            End Get
+        End Property
+
+        Public Shared Function Load(ByVal path As String) As MailInformation
+            Return Code.LoadXml(path, [Default], Code.ZipMode.ZIP)
+        End Function
+
+        Public Sub Save(ByVal path As String)
+            Code.SaveXml(Me, path, Code.ZipMode.ZIP)
+        End Sub
+
+    End Structure
+
 
 #End Region
 
@@ -70,11 +104,13 @@ Public Module Program
 
 
     Public Config As SystemOptional
+    Public MailInfo As MailInformation
     Public ConfigPath As String = My.Application.Info.DirectoryPath & "\Config.xml"
     Public ClientPath As String = My.Application.Info.DirectoryPath & "\Client.xml"
     Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
     Public StockMoveVisiblePath As String = My.Application.Info.DirectoryPath & "\StockVisible.xml"
     Public LoginInfoPath As String = My.Application.Info.DirectoryPath & "\Login.xml"
+    Public MailInfoPath As String = My.Application.Info.DirectoryPath & "Mail.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
     Public LoginSetting As LoginInfo
@@ -112,6 +148,7 @@ Public Module Program
         Client.StartConnect()
 
         LoginSetting = LoginInfo.Load(LoginInfoPath)
+        MailInfo = MailInformation.Load(MailInfoPath)
 
         'LogOut(False)
         'Dim admin As Personnel = DB.GetPersonnelByID("Administrator")
@@ -167,7 +204,7 @@ Public Module Program
         If Config.Mode = Connect.Client Then Exit Sub
         Dim info As Access.DbInfo = myDatabase.ReadDbInfo
         If info.IsNull Then UpdateDatabaseFirst()
-        
+
 
 
         'myDatabase.AddColumn(Sales.Table, "DepositCardCharge", DBTypeSingle)
@@ -794,7 +831,7 @@ OpenDialog:
         Dim goods As Goods = Nothing
         If data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
             Try
-                Goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
+                goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
             Catch
             End Try
             ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)

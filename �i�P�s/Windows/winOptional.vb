@@ -9,7 +9,16 @@
         txtServerName.Text = Config.ServerName
         txtPort.Text = Config.ServerPort
         txtNetIndex.Text = Config.ServerNetIndex
+        txtBackupDir.Text = Config.BackupDir
         UpdateShopList()
+
+
+        txtMailServer.Text = MailInfo.Server
+        txtMailPort.Text = MailInfo.Port
+        txtMailReceiverAddr.Text = MailInfo.To
+        txtMailSenderAddr.Text = MailInfo.From
+        txtMailID.Text = MailInfo.ID
+        txtMailPassword.Text = MailInfo.Password
 
     End Sub
 
@@ -46,6 +55,7 @@
     Private Sub btOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btOK.Click
         Dim ModeChanged As Boolean = Config.Mode <> cbMode.SelectedIndex
 
+        Config.BackupDir = txtBackupDir.Text
         Config.OrderBackcolor = btOrderBackColor.BackColor.ToArgb
         Config.SalesBackColor = btSalesBackColor.BackColor.ToArgb
 
@@ -59,6 +69,8 @@
             myDatabase.Name = Config.ServerName
         End If
 
+        MailInfo = New MailInformation(txtMailServer.Text, txtMailPort.Text, txtMailID.Text, txtMailPassword.Text, txtMailSenderAddr.Text, txtMailReceiverAddr.Text)
+        MailInfo.Save(MailInfoPath)
 
         Dim newPort As Integer
         If Not Integer.TryParse(txtPort.Text, newPort) Then
@@ -131,5 +143,17 @@
 
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         Me.DefaultTextBoxImeMode()
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Me.FolderBrowserDialog1.SelectedPath = txtBackupDir.Text
+        If FolderBrowserDialog1.ShowDialog = Windows.Forms.DialogResult.OK Then
+            txtBackupDir.Text = FolderBrowserDialog1.SelectedPath
+        End If
+    End Sub
+
+    Private Sub btUseGmail_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUseGmail.Click
+        txtMailServer.Text = "smtp.gmail.com"
+        txtMailPort.Text = 587
     End Sub
 End Class

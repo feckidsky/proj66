@@ -67,6 +67,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
@@ -104,9 +105,16 @@
     <Compile Include="Lib\Database\Database.vb" />
     <Compile Include="Lib\ErrorLog.vb" />
     <Compile Include="Lib\Database\AccessClient.vb" />
+    <Compile Include="Lib\Mail.vb" />
     <Compile Include="Lib\TCPTool.vb" />
     <Compile Include="Controls\NumberBox.vb">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Windows\Dialog\BackupDialog.Designer.vb">
+      <DependentUpon>BackupDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Dialog\BackupDialog.vb">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\Dialog\DataGridViewPrintDialog.Designer.vb">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
@@ -320,6 +328,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Windows\Dialog\BackupDialog.resx">
+      <DependentUpon>BackupDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Dialog\DataGridViewPrintDialog.resx">
       <DependentUpon>DataGridViewPrintDialog.vb</DependentUpon>
       <SubType>Designer</SubType>

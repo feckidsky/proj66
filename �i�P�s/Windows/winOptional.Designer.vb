@@ -39,23 +39,42 @@ Partial Class winOptional
         Me.cbMode = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.GroupBox4 = New System.Windows.Forms.GroupBox
+        Me.txtNetIndex = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.txtPort = New System.Windows.Forms.TextBox
         Me.txtServerName = New System.Windows.Forms.TextBox
-        Me.txtNetIndex = New System.Windows.Forms.TextBox
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox
+        Me.Button1 = New System.Windows.Forms.Button
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.Label10 = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.txtMailReceiverAddr = New System.Windows.Forms.TextBox
+        Me.txtMailPassword = New System.Windows.Forms.TextBox
+        Me.txtMailID = New System.Windows.Forms.TextBox
+        Me.txtMailSenderAddr = New System.Windows.Forms.TextBox
+        Me.txtBackupDir = New System.Windows.Forms.TextBox
+        Me.txtMailServer = New System.Windows.Forms.TextBox
+        Me.FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog
+        Me.txtMailPort = New 進銷存.NumberBox
+        Me.btUseGmail = New System.Windows.Forms.Button
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.dgShop, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.btSalesBackColor)
         Me.GroupBox1.Controls.Add(Me.btOrderBackColor)
-        Me.GroupBox1.Location = New System.Drawing.Point(18, 313)
+        Me.GroupBox1.Location = New System.Drawing.Point(450, 200)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(176, 88)
         Me.GroupBox1.TabIndex = 0
@@ -82,7 +101,7 @@ Partial Class winOptional
         '
         'btOK
         '
-        Me.btOK.Location = New System.Drawing.Point(328, 417)
+        Me.btOK.Location = New System.Drawing.Point(741, 300)
         Me.btOK.Name = "btOK"
         Me.btOK.Size = New System.Drawing.Size(75, 23)
         Me.btOK.TabIndex = 1
@@ -91,7 +110,7 @@ Partial Class winOptional
         '
         'btCancel
         '
-        Me.btCancel.Location = New System.Drawing.Point(245, 417)
+        Me.btCancel.Location = New System.Drawing.Point(658, 300)
         Me.btCancel.Name = "btCancel"
         Me.btCancel.Size = New System.Drawing.Size(75, 23)
         Me.btCancel.TabIndex = 1
@@ -159,7 +178,7 @@ Partial Class winOptional
         '
         Me.GroupBox3.Controls.Add(Me.btMdbUpdate)
         Me.GroupBox3.Controls.Add(Me.btRepairMDB)
-        Me.GroupBox3.Location = New System.Drawing.Point(225, 313)
+        Me.GroupBox3.Location = New System.Drawing.Point(638, 200)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(178, 88)
         Me.GroupBox3.TabIndex = 4
@@ -201,6 +220,13 @@ Partial Class winOptional
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "系統設定"
         '
+        'txtNetIndex
+        '
+        Me.txtNetIndex.Location = New System.Drawing.Point(366, 45)
+        Me.txtNetIndex.Name = "txtNetIndex"
+        Me.txtNetIndex.Size = New System.Drawing.Size(34, 22)
+        Me.txtNetIndex.TabIndex = 9
+        '
         'Label3
         '
         Me.Label3.AutoSize = True
@@ -233,18 +259,168 @@ Partial Class winOptional
         Me.txtServerName.Size = New System.Drawing.Size(100, 22)
         Me.txtServerName.TabIndex = 7
         '
-        'txtNetIndex
+        'GroupBox5
         '
-        Me.txtNetIndex.Location = New System.Drawing.Point(366, 45)
-        Me.txtNetIndex.Name = "txtNetIndex"
-        Me.txtNetIndex.Size = New System.Drawing.Size(34, 22)
-        Me.txtNetIndex.TabIndex = 9
+        Me.GroupBox5.Controls.Add(Me.btUseGmail)
+        Me.GroupBox5.Controls.Add(Me.Button1)
+        Me.GroupBox5.Controls.Add(Me.Label8)
+        Me.GroupBox5.Controls.Add(Me.Label10)
+        Me.GroupBox5.Controls.Add(Me.Label5)
+        Me.GroupBox5.Controls.Add(Me.Label7)
+        Me.GroupBox5.Controls.Add(Me.Label6)
+        Me.GroupBox5.Controls.Add(Me.Label9)
+        Me.GroupBox5.Controls.Add(Me.Label4)
+        Me.GroupBox5.Controls.Add(Me.txtMailPort)
+        Me.GroupBox5.Controls.Add(Me.txtMailReceiverAddr)
+        Me.GroupBox5.Controls.Add(Me.txtMailPassword)
+        Me.GroupBox5.Controls.Add(Me.txtMailID)
+        Me.GroupBox5.Controls.Add(Me.txtMailSenderAddr)
+        Me.GroupBox5.Controls.Add(Me.txtBackupDir)
+        Me.GroupBox5.Controls.Add(Me.txtMailServer)
+        Me.GroupBox5.Location = New System.Drawing.Point(445, 12)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(371, 182)
+        Me.GroupBox5.TabIndex = 8
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "備份"
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(282, 121)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 2
+        Me.Button1.Text = "選擇"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(16, 132)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(53, 12)
+        Me.Label8.TabIndex = 1
+        Me.Label8.Text = "備份路徑"
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Location = New System.Drawing.Point(194, 53)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(29, 12)
+        Me.Label10.TabIndex = 1
+        Me.Label10.Text = "密碼"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(194, 22)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(41, 12)
+        Me.Label5.TabIndex = 1
+        Me.Label5.Text = "通訊埠"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(194, 85)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(41, 12)
+        Me.Label7.TabIndex = 1
+        Me.Label7.Text = "收件者"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(18, 85)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(41, 12)
+        Me.Label6.TabIndex = 1
+        Me.Label6.Text = "發送者"
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Location = New System.Drawing.Point(18, 52)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(29, 12)
+        Me.Label9.TabIndex = 1
+        Me.Label9.Text = "帳號"
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(18, 21)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(41, 12)
+        Me.Label4.TabIndex = 1
+        Me.Label4.Text = "伺服器"
+        '
+        'txtMailReceiverAddr
+        '
+        Me.txtMailReceiverAddr.Location = New System.Drawing.Point(241, 82)
+        Me.txtMailReceiverAddr.Name = "txtMailReceiverAddr"
+        Me.txtMailReceiverAddr.Size = New System.Drawing.Size(116, 22)
+        Me.txtMailReceiverAddr.TabIndex = 0
+        '
+        'txtMailPassword
+        '
+        Me.txtMailPassword.Location = New System.Drawing.Point(241, 50)
+        Me.txtMailPassword.Name = "txtMailPassword"
+        Me.txtMailPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
+        Me.txtMailPassword.Size = New System.Drawing.Size(116, 22)
+        Me.txtMailPassword.TabIndex = 0
+        '
+        'txtMailID
+        '
+        Me.txtMailID.Location = New System.Drawing.Point(65, 50)
+        Me.txtMailID.Name = "txtMailID"
+        Me.txtMailID.Size = New System.Drawing.Size(116, 22)
+        Me.txtMailID.TabIndex = 0
+        '
+        'txtMailSenderAddr
+        '
+        Me.txtMailSenderAddr.Location = New System.Drawing.Point(65, 82)
+        Me.txtMailSenderAddr.Name = "txtMailSenderAddr"
+        Me.txtMailSenderAddr.Size = New System.Drawing.Size(116, 22)
+        Me.txtMailSenderAddr.TabIndex = 0
+        '
+        'txtBackupDir
+        '
+        Me.txtBackupDir.Location = New System.Drawing.Point(16, 147)
+        Me.txtBackupDir.Name = "txtBackupDir"
+        Me.txtBackupDir.Size = New System.Drawing.Size(341, 22)
+        Me.txtBackupDir.TabIndex = 0
+        '
+        'txtMailServer
+        '
+        Me.txtMailServer.Location = New System.Drawing.Point(65, 18)
+        Me.txtMailServer.Name = "txtMailServer"
+        Me.txtMailServer.Size = New System.Drawing.Size(116, 22)
+        Me.txtMailServer.TabIndex = 0
+        '
+        'txtMailPort
+        '
+        Me.txtMailPort.Location = New System.Drawing.Point(241, 18)
+        Me.txtMailPort.Name = "txtMailPort"
+        Me.txtMailPort.Size = New System.Drawing.Size(43, 22)
+        Me.txtMailPort.TabIndex = 0
+        '
+        'btUseGmail
+        '
+        Me.btUseGmail.Location = New System.Drawing.Point(290, 17)
+        Me.btUseGmail.Name = "btUseGmail"
+        Me.btUseGmail.Size = New System.Drawing.Size(75, 23)
+        Me.btUseGmail.TabIndex = 3
+        Me.btUseGmail.Text = "使用Gmail"
+        Me.btUseGmail.UseVisualStyleBackColor = True
         '
         'winOptional
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(453, 449)
+        Me.ClientSize = New System.Drawing.Size(828, 335)
+        Me.Controls.Add(Me.GroupBox5)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
@@ -260,6 +436,8 @@ Partial Class winOptional
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -285,4 +463,22 @@ Partial Class winOptional
     Friend WithEvents txtPort As System.Windows.Forms.TextBox
     Friend WithEvents txtServerName As System.Windows.Forms.TextBox
     Friend WithEvents txtNetIndex As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents txtMailServer As System.Windows.Forms.TextBox
+    Friend WithEvents txtMailPort As NumberBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents txtMailSenderAddr As System.Windows.Forms.TextBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents txtMailReceiverAddr As System.Windows.Forms.TextBox
+    Friend WithEvents FolderBrowserDialog1 As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents txtBackupDir As System.Windows.Forms.TextBox
+    Friend WithEvents Label10 As System.Windows.Forms.Label
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents txtMailID As System.Windows.Forms.TextBox
+    Friend WithEvents txtMailPassword As System.Windows.Forms.TextBox
+    Friend WithEvents btUseGmail As System.Windows.Forms.Button
 End Class

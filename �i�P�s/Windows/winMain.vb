@@ -19,6 +19,10 @@ Public Class winMain
         End Set
     End Property
 
+    Private Sub winMain_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
+        備份BToolStripMenuItem.Visible = Config.Mode = Connect.Server
+    End Sub
+
 
     Private Sub winMain_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         UpdateTitle()
@@ -744,4 +748,7 @@ Public Class winMain
         winSalesContractList.Show(access)
     End Sub
 
+    Private Sub 備份BToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 備份BToolStripMenuItem.Click
+        BackupDialog.Show()
+    End Sub
 End Class

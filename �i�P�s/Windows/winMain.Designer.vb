@@ -31,6 +31,7 @@ Partial Class winMain
         Me.登出OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.修改密碼PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
+        Me.備份BToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.關閉CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.其他資訊ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.供應商ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -116,7 +117,7 @@ Partial Class winMain
         '
         '系統SToolStripMenuItem
         '
-        Me.系統SToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem, Me.登出OToolStripMenuItem, Me.修改密碼PToolStripMenuItem, Me.ToolStripSeparator2, Me.關閉CToolStripMenuItem})
+        Me.系統SToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.登入IToolStripMenuItem, Me.登出OToolStripMenuItem, Me.修改密碼PToolStripMenuItem, Me.ToolStripSeparator2, Me.備份BToolStripMenuItem, Me.關閉CToolStripMenuItem})
         Me.系統SToolStripMenuItem.Name = "系統SToolStripMenuItem"
         Me.系統SToolStripMenuItem.Size = New System.Drawing.Size(60, 24)
         Me.系統SToolStripMenuItem.Text = "帳號(&A)"
@@ -124,30 +125,36 @@ Partial Class winMain
         '登入IToolStripMenuItem
         '
         Me.登入IToolStripMenuItem.Name = "登入IToolStripMenuItem"
-        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
+        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.登入IToolStripMenuItem.Text = "登入(&I)"
         '
         '登出OToolStripMenuItem
         '
         Me.登出OToolStripMenuItem.Name = "登出OToolStripMenuItem"
-        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
+        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.登出OToolStripMenuItem.Text = "登出(&O)"
         '
         '修改密碼PToolStripMenuItem
         '
         Me.修改密碼PToolStripMenuItem.Name = "修改密碼PToolStripMenuItem"
-        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
+        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.修改密碼PToolStripMenuItem.Text = "修改密碼(&P)"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(136, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(149, 6)
+        '
+        '備份BToolStripMenuItem
+        '
+        Me.備份BToolStripMenuItem.Name = "備份BToolStripMenuItem"
+        Me.備份BToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.備份BToolStripMenuItem.Text = "備份/還原(&B)"
         '
         '關閉CToolStripMenuItem
         '
         Me.關閉CToolStripMenuItem.Name = "關閉CToolStripMenuItem"
-        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(139, 22)
+        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.關閉CToolStripMenuItem.Text = "關閉(&Q)"
         '
         '其他資訊ToolStripMenuItem
@@ -252,13 +259,13 @@ Partial Class winMain
         '銷貨清單OToolStripMenuItem1
         '
         Me.銷貨清單OToolStripMenuItem1.Name = "銷貨清單OToolStripMenuItem1"
-        Me.銷貨清單OToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+        Me.銷貨清單OToolStripMenuItem1.Size = New System.Drawing.Size(142, 22)
         Me.銷貨清單OToolStripMenuItem1.Text = "銷貨清單(&O)"
         '
         '銷售合約CToolStripMenuItem
         '
         Me.銷售合約CToolStripMenuItem.Name = "銷售合約CToolStripMenuItem"
-        Me.銷售合約CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.銷售合約CToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
         Me.銷售合約CToolStripMenuItem.Text = "銷售合約(&C)"
         '
         '銷貨ToolStripMenuItem
@@ -714,4 +721,5 @@ Partial Class winMain
     Friend WithEvents 銷售SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 銷貨清單OToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 銷售合約CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 備份BToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class
