@@ -737,7 +737,7 @@
 
             If dt IsNot Nothing Then
                 For Each r As DataRow In dt.Rows
-                    lst.Add(r("Name"))
+                    lst.Add(r("Name").ToString)
                 Next
             End If
 
@@ -749,7 +749,7 @@
 
             If dt IsNot Nothing Then
                 For Each r As DataRow In dt.Rows
-                    lst.Add(Strings.Trim(r("Name")) & " x " & r("Number"))
+                    lst.Add(Strings.Trim(r("Name").ToString) & " x " & r("Number"))
                 Next
             End If
 
@@ -757,7 +757,7 @@
 
             If dt IsNot Nothing Then
                 For Each r As DataRow In dt.Rows
-                    lst.Add("[退] " & Strings.Trim(r("Name")) & " x " & r("Number"))
+                    lst.Add("[退] " & Strings.Trim(r("Name").ToString) & " x " & r("Number").ToString)
                 Next
 
             End If
