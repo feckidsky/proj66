@@ -115,8 +115,14 @@
 
     Private Sub btMdbUpdate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btMdbUpdate.Click
         If Config.Mode = Connect.Server Then
-            UpdateDatabase()
-            MsgBox("更新完成")
+            Dim changed As Boolean = UpdateDatabase()
+            If changed Then
+                MsgBox("更新完成!")
+            Else
+                MsgBox("資料庫不需要更新!")
+            End If
+
+
         Else
             MsgBox("Client無此功能")
         End If

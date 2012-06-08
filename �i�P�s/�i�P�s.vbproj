@@ -101,6 +101,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Lib\Database\AccessServer.vb" />
+    <Compile Include="Lib\Database\UpdateBatabase.vb" />
     <Compile Include="Lib\DataGridViewFilter.vb" />
     <Compile Include="Lib\Database\Database.vb" />
     <Compile Include="Lib\ErrorLog.vb" />

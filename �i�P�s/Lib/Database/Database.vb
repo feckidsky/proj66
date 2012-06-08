@@ -243,7 +243,7 @@
         End Function
 
         Public Function GetHistoryPriceList(Optional ByVal progress As Progress = Nothing) As DataTable
-            Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & ";"
+            Dim SqlCommand As String = "SELECT * FROM " & HistoryPrice.Table & " WHERE GoodsLabel<>"""";"
             Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
@@ -1359,7 +1359,7 @@
         End Structure
 
         Public Function ReadDbInfo() As DbInfo
-            Dim dt As DataTable = Read(Personnel.Table, BasePath, "SELECT Note FROM Personnel WHRER Label='Administrator'")
+            Dim dt As DataTable = Read(Personnel.Table, BasePath, "SELECT Note FROM Personnel WHERE Label='Administrator'")
             If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return DbInfo.Null
             Dim text As String = dt.Rows(0).Item("Note")
             Dim args As DbArgs() = Array.ConvertAll(Split(text, ","), AddressOf ToFindArgs)

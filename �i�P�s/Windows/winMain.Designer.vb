@@ -125,36 +125,36 @@ Partial Class winMain
         '登入IToolStripMenuItem
         '
         Me.登入IToolStripMenuItem.Name = "登入IToolStripMenuItem"
-        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登入IToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.登入IToolStripMenuItem.Text = "登入(&I)"
         '
         '登出OToolStripMenuItem
         '
         Me.登出OToolStripMenuItem.Name = "登出OToolStripMenuItem"
-        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.登出OToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.登出OToolStripMenuItem.Text = "登出(&O)"
         '
         '修改密碼PToolStripMenuItem
         '
         Me.修改密碼PToolStripMenuItem.Name = "修改密碼PToolStripMenuItem"
-        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.修改密碼PToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.修改密碼PToolStripMenuItem.Text = "修改密碼(&P)"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(149, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(141, 6)
         '
         '備份BToolStripMenuItem
         '
         Me.備份BToolStripMenuItem.Name = "備份BToolStripMenuItem"
-        Me.備份BToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.備份BToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.備份BToolStripMenuItem.Text = "備份/還原(&B)"
         '
         '關閉CToolStripMenuItem
         '
         Me.關閉CToolStripMenuItem.Name = "關閉CToolStripMenuItem"
-        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.關閉CToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.關閉CToolStripMenuItem.Text = "關閉(&Q)"
         '
         '其他資訊ToolStripMenuItem
@@ -323,7 +323,7 @@ Partial Class winMain
         Me.dgSales.RowTemplate.Height = 24
         Me.dgSales.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgSales.ShowCellToolTips = False
-        Me.dgSales.Size = New System.Drawing.Size(885, 406)
+        Me.dgSales.Size = New System.Drawing.Size(885, 428)
         Me.dgSales.TabIndex = 1
         '
         'cSalesLabel
@@ -563,9 +563,9 @@ Partial Class winMain
         Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox3.Controls.Add(Me.dgLog)
-        Me.GroupBox3.Location = New System.Drawing.Point(13, 494)
+        Me.GroupBox3.Location = New System.Drawing.Point(13, 516)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(890, 156)
+        Me.GroupBox3.Size = New System.Drawing.Size(890, 143)
         Me.GroupBox3.TabIndex = 5
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "事件記錄"
@@ -592,7 +592,7 @@ Partial Class winMain
         Me.dgLog.ReadOnly = True
         Me.dgLog.RowTemplate.Height = 24
         Me.dgLog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgLog.Size = New System.Drawing.Size(872, 129)
+        Me.dgLog.Size = New System.Drawing.Size(872, 116)
         Me.dgLog.TabIndex = 0
         '
         'cmsLog
@@ -626,7 +626,7 @@ Partial Class winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(909, 662)
+        Me.ClientSize = New System.Drawing.Size(909, 684)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.dgSales)
