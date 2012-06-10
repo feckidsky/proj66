@@ -11,6 +11,7 @@ Public Module UpdateBatabase
     Dim UpdateDataLock As String = "UpdateDataLock"
     Public Sub SyncDatabase(ByVal client As Database.AccessClient)
         SyncLock UpdateDataLock
+            If Not client.Connected Then Exit Sub
             Dim SyncDialog As New ProgressDialog
             SyncDialog.AutoClose = False
             SyncDialog.Title = "同步資料庫"
@@ -22,10 +23,21 @@ Public Module UpdateBatabase
             'SyncDialog.CancelHandler = totProgress.CancelHandler
             Dim SyncDialogShowHandler As New Action(AddressOf SyncDialog.Show)
 
+
+            Dim main As winMain = My.Application.OpenForms("winMain")
+
+            While main Is Nothing
+                main = My.Application.OpenForms("winMain")
+            End While
+            main.SyncThread = Threading.Thread.CurrentThread
+            totProgress.ProgressCallback = [Delegate].Combine(totProgress.ProgressCallback, main.SyncMainReportHandler)
+            partProgress.ProgressCallback = [Delegate].Combine(partProgress.ProgressCallback, main.SyncSubReportHandler)
+            'totProgress.FinishCallback = [Delegate].Combine(totProgress.FinishCallback, main.SyncFinishSyncHandler)
+            main.SyncStartSyncHandler.Invoke()
 OpenDialog:
             Try
-                My.Application.OpenForms(0).Invoke(SyncDialogShowHandler)
-
+                '停用進度顯示視窗
+                'My.Application.OpenForms(0).Invoke(SyncDialogShowHandler)
             Catch
                 GoTo OpenDialog
             End Try
@@ -153,7 +165,7 @@ OpenDialog:
             Catch
 
             End Try
-
+            main.SyncFinishSyncHandler()
             SyncDialog.Close()
         End SyncLock
     End Sub

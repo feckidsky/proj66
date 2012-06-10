@@ -43,7 +43,9 @@ Public Class ErrorLog
     Private Shared Sub OnErrorOccur(ByVal e As Exception)
         WriteErrorLog(e)
         Dim t As Date = Now
-        SaveScreen(Dir & "\" & t.ToString("yyyyMMddHHmmss") & e.Message & ".jpg")
+        If Not SaveScreen(Dir & "\" & t.ToString("yyyyMMddHHmmss") & e.Message & ".jpg") Then
+            SaveScreen(Dir & "\" & t.ToString("yyyyMMddHHmmss") & "(無法作為路徑名稱的錯誤)" & ".jpg")
+        End If
         'For Each f As Form In My.Application.OpenForms
         '    Save(f, Dir & "\" & t.ToString("yyyyMMddHHmmss") & f.Name & ".jpg")
         'Next
@@ -52,23 +54,23 @@ Public Class ErrorLog
     End Sub
 
 
-    Public Shared Sub Save(ByVal F As Form, ByVal Path As String)
-        Dim myImage As New Bitmap(My.Computer.Screen.Bounds.Size.Width, My.Computer.Screen.Bounds.Height)
-        Dim g = Graphics.FromImage(myImage)
-        Try
-            F.BringToFront()
-            'F.TopMost = True
-        Catch ex As Exception
+    'Public Shared Sub Save(ByVal F As Form, ByVal Path As String)
+    '    Dim myImage As New Bitmap(My.Computer.Screen.Bounds.Size.Width, My.Computer.Screen.Bounds.Height)
+    '    Dim g = Graphics.FromImage(myImage)
+    '    Try
+    '        F.BringToFront()
+    '        'F.TopMost = True
+    '    Catch ex As Exception
 
-        End Try
+    '    End Try
 
-        g.CopyFromScreen(F.Location.X, F.Location.Y, 0, 0, New Size(F.Width, F.Height))
-        Dim dc1 As IntPtr = g.GetHdc()
-        g.ReleaseHdc(dc1)
-        myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
-    End Sub
+    '    g.CopyFromScreen(F.Location.X, F.Location.Y, 0, 0, New Size(F.Width, F.Height))
+    '    Dim dc1 As IntPtr = g.GetHdc()
+    '    g.ReleaseHdc(dc1)
+    '    myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
+    'End Sub
 
-    Public Shared Sub SaveScreen(ByVal Path As String)
+    Public Shared Function SaveScreen(ByVal Path As String) As Boolean
         Dim size As Size = Screen.PrimaryScreen.Bounds.Size
         Dim myImage As New Bitmap(size.Width, size.Height)
         Dim g = Graphics.FromImage(myImage)
@@ -80,8 +82,13 @@ Public Class ErrorLog
         End Try
         Dim dc1 As IntPtr = g.GetHdc()
         g.ReleaseHdc(dc1)
-        myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
-    End Sub
+        Try
+            myImage.Save(Path, Drawing.Imaging.ImageFormat.Jpeg)
+            Return True
+        Catch
+            Return False
+        End Try
+    End Function
 
 
 

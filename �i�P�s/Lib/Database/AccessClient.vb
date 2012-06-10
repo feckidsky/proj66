@@ -191,7 +191,7 @@
                 Catch ex As Exception
 
                 End Try
-                MsgBox(Name & "已經斷線!", MsgBoxStyle.Exclamation)
+                BeginMsgBox(Name & "已經斷線!", MsgBoxStyle.Exclamation)
             End Sub
         End Class
 
@@ -226,7 +226,7 @@
 
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
             If Not Connected() Then
-                MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
+                BeginMsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return New DataTable
             End If
 
@@ -247,7 +247,7 @@
 
         Public Function FarRead(Of T, ResultT)(ByVal Cmd As String, ByVal args As T, Optional ByVal Progress As Progress = Nothing) As ResultT
             If Not Connected() Then
-                MsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
+                BeginMsgBox(Name & "尚未連線!", MsgBoxStyle.Exclamation)
                 Return Nothing
             End If
 
@@ -282,6 +282,7 @@
                 Me.Progress = ProgressAction
                 'If Progress IsNot Nothing AndAlso Progress.CancelHandler IsNot Nothing Then
                 If Progress IsNot Nothing Then
+                    Progress.Report(0)
                     Dim newCancelHandler As New Progress.CancelAction(AddressOf receiver.Cancel)
                     Progress.CancelHandler = [Delegate].Combine(Progress.CancelHandler, newCancelHandler)
                 End If

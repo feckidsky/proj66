@@ -880,8 +880,8 @@ Public Class TCPTool
         End Sub
 
         Friend Sub OnConnectedSuccess()
-            RaiseEvent ConnectedSuccess(Me)
             GetIPAddress()
+            RaiseEvent ConnectedSuccess(Me)
         End Sub
 
         Public Sub BeginConnect()
@@ -1301,7 +1301,7 @@ Public Class TCPTool
                             Dim Sender As New StreamSender(Client, Guid)
                             Add(Sender)
                             Sender.Cmd = para(2)
-                            Sender.Args = para(3)
+                            Try : Sender.Args = para(3) : Catch : End Try
                             ElseRequestHandler(Sender)
                             Sender.StartSend()
                             'Dim receiver As New Receiver(Client, Guid)
@@ -1531,7 +1531,10 @@ Public Class TCPTool
                 If TotalSize = 0 Then
                     percent = 0
                 Else
-                    percent = stream.Position / TotalSize * 100
+                    Try
+                        percent = stream.Position / TotalSize * 100
+                    Catch
+                    End Try
                 End If
 
 

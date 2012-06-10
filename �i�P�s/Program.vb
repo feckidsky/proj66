@@ -97,6 +97,7 @@ Public Module Program
 
 #End Region
 
+    Public ProgramVersion As String = "v1.0.5"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public Server As New Database.AccessServer
@@ -299,13 +300,17 @@ Public Module Program
             Dim compressedzipStream As IO.Compression.GZipStream = New IO.Compression.GZipStream(ms, IO.Compression.CompressionMode.Decompress, True)
 
             Dim buff(4095) As Byte
-            Dim read As Long = compressedzipStream.Read(buff, 0, buff.Length)
+            Dim read As Long '= compressedzipStream.Read(buff, 0, buff.Length)
             Dim output As New IO.MemoryStream()
-            output.Write(buff, 0, read)
-            Do While (read > 0)
-                read = compressedzipStream.Read(buff, 0, buff.Length)
-                output.Write(buff, 0, read)
-            Loop
+            'output.Write(buff, 0, read)
+            Do
+                Try
+                    read = compressedzipStream.Read(buff, 0, buff.Length)
+                    output.Write(buff, 0, read)
+                Catch
+                    Return New Byte() {}
+                End Try
+            Loop While (read > 0)
 
             ms.Dispose()
             compressedzipStream.Close()
@@ -479,7 +484,10 @@ Public Module Program
 
     Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
         If Config.Mode = Connect.Client Then Exit Sub
-        SyncDatabase(sender)
+        Dim SyncThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf SyncDatabase))
+        SyncThread.IsBackground = True
+        SyncThread.Start(sender)
+        'SyncDatabase(sender)
     End Sub
 
     Public Function GetTime(ByVal obj As Object) As Date

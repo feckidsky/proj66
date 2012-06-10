@@ -95,6 +95,14 @@ Partial Class winMain
         Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Button1 = New System.Windows.Forms.Button
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
+        Me.txtDataCount = New System.Windows.Forms.ToolStripStatusLabel
+        Me.lbSyncTitle = New System.Windows.Forms.ToolStripStatusLabel
+        Me.progSync = New System.Windows.Forms.ToolStripProgressBar
+        Me.btSyncCancel = New System.Windows.Forms.ToolStripStatusLabel
+        Me.lbSyncInfo = New System.Windows.Forms.ToolStripStatusLabel
+        Me.lbLoadSales = New System.Windows.Forms.ToolStripStatusLabel
+        Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsSales.SuspendLayout()
@@ -104,6 +112,7 @@ Partial Class winMain
         Me.GroupBox3.SuspendLayout()
         CType(Me.dgLog, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsLog.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -323,7 +332,7 @@ Partial Class winMain
         Me.dgSales.RowTemplate.Height = 24
         Me.dgSales.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.dgSales.ShowCellToolTips = False
-        Me.dgSales.Size = New System.Drawing.Size(885, 428)
+        Me.dgSales.Size = New System.Drawing.Size(885, 432)
         Me.dgSales.TabIndex = 1
         '
         'cSalesLabel
@@ -563,9 +572,9 @@ Partial Class winMain
         Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox3.Controls.Add(Me.dgLog)
-        Me.GroupBox3.Location = New System.Drawing.Point(13, 516)
+        Me.GroupBox3.Location = New System.Drawing.Point(12, 520)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(890, 143)
+        Me.GroupBox3.Size = New System.Drawing.Size(890, 153)
         Me.GroupBox3.TabIndex = 5
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "事件記錄"
@@ -592,7 +601,7 @@ Partial Class winMain
         Me.dgLog.ReadOnly = True
         Me.dgLog.RowTemplate.Height = 24
         Me.dgLog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgLog.Size = New System.Drawing.Size(872, 116)
+        Me.dgLog.Size = New System.Drawing.Size(872, 126)
         Me.dgLog.TabIndex = 0
         '
         'cmsLog
@@ -622,11 +631,73 @@ Partial Class winMain
         Me.Button1.Text = "test"
         Me.Button1.UseVisualStyleBackColor = True
         '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.txtDataCount, Me.lbSyncTitle, Me.progSync, Me.btSyncCancel, Me.lbSyncInfo, Me.lbLoadSales, Me.ToolStripProgressBar1})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 676)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(909, 25)
+        Me.StatusStrip1.TabIndex = 7
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'txtDataCount
+        '
+        Me.txtDataCount.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right
+        Me.txtDataCount.Name = "txtDataCount"
+        Me.txtDataCount.Size = New System.Drawing.Size(60, 20)
+        Me.txtDataCount.Text = "資料筆數"
+        '
+        'lbSyncTitle
+        '
+        Me.lbSyncTitle.Name = "lbSyncTitle"
+        Me.lbSyncTitle.Size = New System.Drawing.Size(56, 20)
+        Me.lbSyncTitle.Text = "資料同步"
+        Me.lbSyncTitle.Visible = False
+        '
+        'progSync
+        '
+        Me.progSync.Name = "progSync"
+        Me.progSync.Size = New System.Drawing.Size(200, 19)
+        Me.progSync.Visible = False
+        '
+        'btSyncCancel
+        '
+        Me.btSyncCancel.BorderSides = CType((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left Or System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) _
+                    Or System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) _
+                    Or System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom), System.Windows.Forms.ToolStripStatusLabelBorderSides)
+        Me.btSyncCancel.BorderStyle = System.Windows.Forms.Border3DStyle.Raised
+        Me.btSyncCancel.Name = "btSyncCancel"
+        Me.btSyncCancel.Size = New System.Drawing.Size(36, 20)
+        Me.btSyncCancel.Text = "取消"
+        Me.btSyncCancel.Visible = False
+        '
+        'lbSyncInfo
+        '
+        Me.lbSyncInfo.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right
+        Me.lbSyncInfo.Name = "lbSyncInfo"
+        Me.lbSyncInfo.Size = New System.Drawing.Size(60, 20)
+        Me.lbSyncInfo.Text = "同步資訊"
+        Me.lbSyncInfo.Visible = False
+        '
+        'lbLoadSales
+        '
+        Me.lbLoadSales.Name = "lbLoadSales"
+        Me.lbLoadSales.Size = New System.Drawing.Size(56, 20)
+        Me.lbLoadSales.Text = "讀取進度"
+        Me.lbLoadSales.Visible = False
+        '
+        'ToolStripProgressBar1
+        '
+        Me.ToolStripProgressBar1.Name = "ToolStripProgressBar1"
+        Me.ToolStripProgressBar1.Size = New System.Drawing.Size(100, 19)
+        Me.ToolStripProgressBar1.Visible = False
+        '
         'winMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(909, 684)
+        Me.ClientSize = New System.Drawing.Size(909, 701)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.dgSales)
@@ -636,6 +707,7 @@ Partial Class winMain
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "winMain"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "進銷存管理系統"
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
@@ -648,6 +720,8 @@ Partial Class winMain
         Me.GroupBox3.ResumeLayout(False)
         CType(Me.dgLog, System.ComponentModel.ISupportInitialize).EndInit()
         Me.cmsLog.ResumeLayout(False)
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -722,4 +796,12 @@ Partial Class winMain
     Friend WithEvents 銷貨清單OToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 銷售合約CToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents 備份BToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
+    Friend WithEvents txtDataCount As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents lbSyncTitle As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents progSync As System.Windows.Forms.ToolStripProgressBar
+    Friend WithEvents lbSyncInfo As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents btSyncCancel As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents lbLoadSales As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents ToolStripProgressBar1 As System.Windows.Forms.ToolStripProgressBar
 End Class

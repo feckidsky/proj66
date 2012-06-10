@@ -215,13 +215,17 @@ Public Class winGoodsList
         gbHistory.Text = "歷史售價 - " & goods.Name
         Dim dt As Data.DataTable = access.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
+        If dt Is Nothing Then Exit Sub
         Try
             dgHistory.Columns(0).Visible = False
         Catch
         End Try
-        dgHistory.Columns("Time").HeaderText = "時間"
-        dgHistory.Columns("Cost").HeaderText = "進貨價"
-        dgHistory.Columns("Price").HeaderText = "建議售價"
+        Try
+            dgHistory.Columns("Time").HeaderText = "時間"
+            dgHistory.Columns("Cost").HeaderText = "進貨價"
+            dgHistory.Columns("Price").HeaderText = "建議售價"
+        Catch
+        End Try
     End Sub
 
 

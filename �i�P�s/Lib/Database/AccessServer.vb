@@ -106,7 +106,8 @@
                     Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
                     Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
                     ResultText = Code.XmlSerializeWithZIP(dt)
-                    dt.Dispose()
+                    If dt IsNot Nothing Then dt.Dispose()
+
                     'client.Send("ReadResponse", Guid & "," & Code.SerializeWithZIP(dt))
                 Case "GetErrorLogFiles"
                     ResultText = Code.XmlSerializeWithZIP(Access.GetErrorLogFileNames())

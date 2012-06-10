@@ -39,7 +39,7 @@ Public Class winMain
         End If
         If access IsNot Nothing Then
             Dim connectState As String = IIf(access.GetType Is GetType(Database.AccessClient) And Not access.Connected, "斷線", "已連線")
-            Me.Text = SystemTitle & " - v1.0.4 - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
+            Me.Text = SystemTitle & " - " & ProgramVersion & " - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
         End If
         Button1.Visible = CurrentUser.ID = "Designer"
         錯誤記錄ToolStripMenuItem.Visible = CurrentUser.ID = "Designer"
@@ -339,6 +339,11 @@ Public Class winMain
         End If
 
         dgSales.Rows.Clear()
+        If dt Is Nothing Then
+            txtDataCount.Text = "查詢資料時發生錯誤!" ' dt.Rows.Count
+        Else
+            txtDataCount.Text = "資料筆數:" & dt.Rows.Count
+        End If
 
         If Not IO.File.Exists(SalesVisiblePath) Then
             If dgSales.Columns("單號") Is Nothing Then Exit Sub
@@ -750,5 +755,63 @@ Public Class winMain
 
     Private Sub 備份BToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 備份BToolStripMenuItem.Click
         BackupDialog.Show()
+    End Sub
+
+#Region "資料庫同步進度顯示"
+    Public SyncMainReportHandler As New Access.Progress.ProgressAction(AddressOf SyncMainReport)
+    Public SyncSubReportHandler As New Access.Progress.ProgressAction(AddressOf SyncSubReport)
+    Public SyncStartSyncHandler As New Action(AddressOf SyncStart)
+    Public SyncFinishSyncHandler As New Action(AddressOf SyncFinish)
+    Public SyncThread As Threading.Thread
+
+    Private Sub SyncStart()
+        If Me.InvokeRequired Then
+            Me.Invoke(SyncStartSyncHandler)
+            Exit Sub
+        End If
+        lbSyncTitle.Visible = True
+        lbSyncInfo.Visible = True
+        progSync.Visible = True
+        btSyncCancel.Visible = True
+    End Sub
+
+    Private Sub SyncFinish()
+        If Me.InvokeRequired Then
+            Me.Invoke(SyncFinishSyncHandler)
+            Exit Sub
+        End If
+        lbSyncTitle.Visible = False
+        lbSyncInfo.Visible = False
+        progSync.Visible = False
+        btSyncCancel.Visible = False
+    End Sub
+
+    Private Sub SyncMainReport(ByVal msg As String, ByVal percent As Integer)
+        If Me.InvokeRequired Then
+            Me.Invoke(SyncMainReportHandler, msg, percent)
+            Exit Sub
+        End If
+
+        progSync.Value = percent
+        lbSyncTitle.Text = msg
+    End Sub
+
+    Private Sub SyncSubReport(ByVal msg As String, ByVal percent As Integer)
+        If Me.InvokeRequired Then
+            Me.Invoke(SyncSubReportHandler, msg, percent)
+            Exit Sub
+        End If
+        lbSyncInfo.Text = msg & " - " & percent & "%"
+    End Sub
+#End Region
+
+
+    Private Sub btSyncCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSyncCancel.Click
+        Try
+            SyncThread.Abort()
+            SyncFinish()
+        Catch ex As Exception
+
+        End Try
     End Sub
 End Class

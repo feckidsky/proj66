@@ -267,6 +267,7 @@ Public Class winSales
     End Sub
 
     Private Sub SelectSalesItem(ByVal RowIndex As Integer)
+        If RowIndex = -1 Or RowIndex >= dgSalesList.Rows.Count Then Exit Sub
         Dim GoodsLabel As String = dgSalesList.Rows(RowIndex).Cells(cSGoods.Index).Value
         Dim row As DataGridViewRow = winStockList.SelectStock(GoodsLabel, access)
         If row Is Nothing Then Exit Sub

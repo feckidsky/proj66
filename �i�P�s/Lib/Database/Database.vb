@@ -1,5 +1,30 @@
 ﻿Namespace Database
 
+    Public Module Library
+
+        Structure MsgBoxArgs
+            Dim text As Object
+            Dim style As MsgBoxStyle
+            Dim title As Object
+        End Structure
+
+        Public Sub BeginMsgBox(ByVal text As Object, Optional ByVal style As MsgBoxStyle = MsgBoxStyle.OkOnly, Optional ByVal title As Object = Nothing)
+            Dim e As MsgBoxArgs
+            e.text = text
+            e.style = style
+            e.title = title
+            Dim thread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf MsgBoxWithArgs))
+            thread.Start(e)
+        End Sub
+
+        Public Sub MsgBoxWithArgs(ByVal e As MsgBoxArgs)
+            MsgBox(e.text, e.style, e.title)
+        End Sub
+
+
+    End Module
+
+
     Public Structure Column
         Dim Name As String
         Dim Type As String
@@ -103,6 +128,18 @@
             Public CancelHandler As CancelAction
             Public Delegate Sub CancelAction()
 
+            Public Percent As Integer
+
+            'Property Message() As String
+            '    Get
+            '        Return mText
+            '    End Get
+            '    Set(ByVal value As String)
+            '        mText = value
+            '        Report(mText, Percent)
+            '    End Set
+            'End Property
+
 
             Sub New(ByVal ProgressCallback As ProgressAction, ByVal Text As String, ByVal FinishAction As Action, Optional ByVal StartPercent As Integer = 0, Optional ByVal EndPercent As Integer = 100)
                 Me.ProgressCallback = ProgressCallback
@@ -146,11 +183,13 @@
             End Function
 
             Public Sub Report(ByVal Message As String, ByVal percent As Integer)
+                Me.Percent = percent
                 ProgressCallback(Text & IIf(Text = "", "", ":") & Message, GetPercent(percent))
                 If SubProgress IsNot Nothing Then SubProgress.Report(Message, percent)
             End Sub
 
             Public Sub Report(ByVal Percent As Integer)
+                Me.Percent = Percent
                 ProgressCallback(Text, GetPercent(Percent))
                 If SubProgress IsNot Nothing Then SubProgress.Report(Percent)
             End Sub
@@ -749,7 +788,7 @@
 
             If dt IsNot Nothing Then
                 For Each r As DataRow In dt.Rows
-                    lst.Add(Strings.Trim(r("Name").ToString) & " x " & r("Number"))
+                    lst.Add(Strings.Trim(r("Name").ToString) & " x " & r("Number").ToString)
                 Next
             End If
 

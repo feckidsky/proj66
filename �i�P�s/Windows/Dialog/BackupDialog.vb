@@ -53,6 +53,22 @@ Public Class BackupDialog
             Exit Sub
         End If
 
+        ' 檢查路徑是否可使用
+        If ckDir.Checked Then
+            If txtDir.Text = "" Then
+                lbStatu.Text = "路徑不能是空字串"
+                Exit Sub
+            Else
+                Try
+                    Dim dir As String = IO.Path.GetDirectoryName(txtDir.Text)
+                    If Not IO.Directory.Exists(dir) Then IO.Directory.CreateDirectory(dir)
+                Catch
+                    lbStatu.Text = Err.Description
+                    Exit Sub
+                End Try
+            End If
+        End If
+
         ProgressBar1.Visible = True
         btBackup.Enabled = False
 
