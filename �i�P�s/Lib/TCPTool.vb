@@ -413,6 +413,7 @@ Public Class TCPTool
     Private Sub ListenCheck()
         Do
             Dim Addrs As IPAddress() = GetIPv4s()
+
             For Each addr As IPAddress In Addrs
                 Dim addr1 As IPAddress = addr
                 If Not ServerList.Exists(Function(s As Server) IPAddress.Equals(s.Addr, addr1)) Then
@@ -436,7 +437,11 @@ Public Class TCPTool
     End Function
 
     Public Shared Function GetIPv4s() As IPAddress()
-        Return Array.FindAll(Dns.GetHostEntry(Dns.GetHostName).AddressList, Function(ip As IPAddress) ip.AddressFamily = AddressFamily.InterNetwork)
+        Try
+            Return Array.FindAll(Dns.GetHostEntry(Dns.GetHostName).AddressList, Function(ip As IPAddress) ip.AddressFamily = AddressFamily.InterNetwork)
+        Catch
+            Return New IPAddress() {}
+        End Try
     End Function
 
     Public Sub ServerClose()
@@ -744,9 +749,9 @@ Public Class TCPTool
         Dim ReceiveThread As System.Threading.Thread
         Public IPAddress As IPConfig
 
-        Private SendMessage As String = ""
-        Private TempSendMessage As String = ""
-        Private TempHighSendMessage As String = ""
+        'Private SendMessage As String = ""
+        'Private TempSendMessage As String = ""
+        'Private TempHighSendMessage As String = ""
 
         Private SendLock As String = "SendMessageLock"
 
@@ -954,7 +959,7 @@ Public Class TCPTool
         End Function
 
 #Region "傳送資料"
-        Public Function Send(ByVal CMD As String, ByVal Para As String)
+        Public Function Send(ByVal CMD As String, ByVal Para As String) As Boolean
             Return Send(CMD & "," & Para)
         End Function
 
@@ -966,19 +971,8 @@ Public Class TCPTool
             Dim Success As Boolean = True
 
             SyncLock SendLock
-                If SendMessage = "" Then
-                    SendMessage = newMsg
-                    Success = mSend(SendMessage)
-                Else
-                    Select Case SendLevel
-                        Case Level.Low : TempSendMessage = TempSendMessage.Insert(TempSendMessage.Length, newMsg)
-                        Case Level.High : TempHighSendMessage = TempHighSendMessage.Insert(TempHighSendMessage.Length, newMsg)
-                    End Select
-                End If
-
+                Success = mSend(newMsg)
             End SyncLock
-
-
             Try
                 Success = Success AndAlso TcpClient.Connected
             Catch
@@ -994,11 +988,9 @@ Public Class TCPTool
             Dim Cmd() As Byte = MyEncoding.GetBytes(Text) ' System.Text.Encoding.Unicode.GetBytes(Text)
             Dim Success As Boolean = True
             Try
-                TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
+                TcpClient.GetStream.Write(Cmd, 0, Cmd.Length)
+                'TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
             Catch
-                TempHighSendMessage = ""
-                TempSendMessage = ""
-                SendMessage = ""
                 Success = False
                 TCPTool.OutputError("傳送訊息: " & Text)
             End Try
@@ -1006,20 +998,6 @@ Public Class TCPTool
         End Function
 
         Private Sub mSended(ByVal Result As System.IAsyncResult)
-            SyncLock SendLock
-                If TempHighSendMessage <> "" Then
-                    SendMessage = TempHighSendMessage
-                    TempHighSendMessage = ""
-                    mSend(SendMessage)
-                ElseIf TempSendMessage <> "" Then
-                    SendMessage = TempSendMessage
-                    TempSendMessage = ""
-                    mSend(SendMessage)
-                Else
-                    SendMessage = ""
-                End If
-
-            End SyncLock
 
         End Sub
 #End Region
@@ -1097,9 +1075,13 @@ Public Class TCPTool
 
                             '觸發接收事件
                             Dim ReceiveThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf ReceiveEvent))
+
+Client_ReceiveThreadStart:
                             Try
                                 ReceiveThread.Start(Msg)
                             Catch
+                                Threading.Thread.Sleep(1000)
+                                GoTo Client_ReceiveThreadStart
                             End Try
                             locEnd = 0
                             locSt = 0
@@ -1335,9 +1317,9 @@ Public Class TCPTool
                 Return Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
             End Function
 
-            Public Sub Send(ByVal cmd As String, ByVal Args As String)
-                Client.Send("%FileTransmitter%," & Guid & "," & cmd, Args)
-            End Sub
+            Public Function Send(ByVal cmd As String, ByVal Args As String) As Boolean
+                Return Client.Send("%FileTransmitter%," & Guid & "," & cmd, Args)
+            End Function
 
             Friend Overridable Sub OnTransFail(ByVal Message As String)
                 RaiseEvent TransFail(Me, Message)
@@ -1363,7 +1345,7 @@ Public Class TCPTool
         Public Class StreamSender
             Inherits StreamTransmitter
             Dim ReadToEnd As Boolean = False
-            Dim BufferSize As Integer = 32767
+            Dim BufferSize As Integer = 4096 '32767
             Public Cmd As String
             Public Args As String
 
@@ -1394,30 +1376,40 @@ Public Class TCPTool
                 Catch
                     Fail(Err.Description)
                 End Try
+
+                Dim index As Integer = 0
+                While Upload(index)
+                    index += 1
+                End While
+
             End Sub
 
-            Private Sub Upload()
+            Dim data(BufferSize - 1) As Byte
+            Private Function Upload(ByVal index As Long) As Boolean
                 If ReadToEnd Then
                     stream.Close()
                     Send("EndSendFile", "")
                     If parent IsNot Nothing Then parent.Remove(Me)
-                    Exit Sub
+                    Return False
                 End If
 
-                Dim data(BufferSize - 1) As Byte
+                ReDim data(BufferSize - 1)
 
                 Try
                     If stream.Length - stream.Position < BufferSize Then  '如果剩下位傳送的位元組不到BufferSize
                         System.Array.Resize(data, stream.Length - stream.Position)
                     End If
                 Catch
-
+                    Fail(Err.Description)
+                    Return False
                 End Try
 
                 Try
                     ReadToEnd = stream.Length - stream.Position <= BufferSize
                 Catch
                     ReadToEnd = True
+                    Fail(Err.Description)
+                    Return False
                 End Try
 
                 Try
@@ -1426,12 +1418,15 @@ Public Class TCPTool
                     OnTransFail(Err.Description)
                     Fail(Err.Description)
                     If parent IsNot Nothing Then parent.Remove(Me)
+                    Return False
                 End Try
 
 
                 Dim zipByte As Byte() = Code.Zip(data)
                 Dim base64 As String = Convert.ToBase64String(zipByte)
-                Send("SendFileData", base64)
+                If Not Send("SendFileData", base64 & "," & index.ToString) Then
+                    Return False
+                End If
 
 
                 'Try
@@ -1439,7 +1434,13 @@ Public Class TCPTool
                 'Catch
                 '    ReadToEnd = True
                 'End Try
+                Return True
+            End Function
 
+            Private Sub UploadAgain(ByVal index As Long)
+                Dim zipByte As Byte() = Code.Zip(data)
+                Dim base64 As String = Convert.ToBase64String(zipByte)
+                Send("SendFileData", base64 & "," & index.ToString)
             End Sub
 
             Private Sub ReceiveCancel()
@@ -1463,7 +1464,14 @@ Public Class TCPTool
 
                 Select Case cmd
                     Case "RequestData"
-                        Upload()
+                        'Dim index As Long = -1
+                        'If msg(3) <> "" Then index = msg(3)
+                        'If msg.Length > 4 Then BufferSize = msg(4)
+                        'Upload(index)
+                    Case "RequestDataAgain"
+                        'Dim index As Long = msg(3)
+                        'UploadAgain(index)
+
                     Case "Cancel"
                         ReceiveCancel()
                 End Select
@@ -1477,7 +1485,7 @@ Public Class TCPTool
             Public TotalSize As Long
             Public destFile As String
             Public sourceFile As String
-
+            Public PartIndex As Integer = 0
             Event Progress(ByVal sender As Object, ByVal percent As Integer)
             Event Received(ByVal sender As Object, ByVal stream As IO.Stream)
 
@@ -1508,7 +1516,7 @@ Public Class TCPTool
                 '    Send("Cancel", "")
                 '    If parent IsNot Nothing Then parent.Remove(Me)
                 'End Try
-                RequestData()
+                RequestData(0)
             End Sub
 
             Private Sub WriteFile(ByVal base64 As String)
@@ -1543,11 +1551,39 @@ Public Class TCPTool
                 Catch
 
                 End Try
-                RequestData()
+                RequestData(PartIndex + 1)
             End Sub
 
-            Public Sub RequestData()
-                Send("RequestData", "")
+            Public Sub RequestDataAgain()
+                Send("RequestDataAgain", PartIndex)
+            End Sub
+
+            Public Sub RequestData(ByVal idx As Long)
+                PartIndex = idx
+                Send("RequestData", idx.ToString & "," & 4096)
+
+                'If WaitResponseThread IsNot Nothing AndAlso WaitResponseThread.IsAlive Then
+                '    Try
+                '        WaitResponseThread.Abort()
+                '    Catch ex As Exception
+
+                '    End Try
+                'End If
+
+                'WaitResponseThread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf WaitResponse))
+                'WaitResponseThread.IsBackground = True
+                'WaitResponseThread.Start(idx)
+            End Sub
+
+            Dim WaitResponseThread As Threading.Thread
+            Private Sub WaitResponse(ByVal index As Long)
+                Do
+                    Threading.Thread.Sleep(10000)
+                    If index = PartIndex Then
+                        RequestDataAgain()
+
+                    End If
+                Loop Until PartIndex > index
             End Sub
 
             Private Sub CloseFile()
@@ -1587,9 +1623,12 @@ Public Class TCPTool
                 Dim args As String = msg(3)
                 Select Case cmd
                     Case "StartSendFile"
+
                         StartReceiveFile(args)
                     Case "SendFileData"
-                        WriteFile(args)
+                        Dim index As Integer = -1
+                        If msg.Length >= 5 Then index = msg(4)
+                        If index = PartIndex OrElse index = -1 Then WriteFile(args)
                     Case "EndSendFile"
                         CloseFile()
                     Case "SendFail"

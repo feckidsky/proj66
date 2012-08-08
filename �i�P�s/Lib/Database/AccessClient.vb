@@ -7,14 +7,21 @@
 
     
 #Region "AccessClientMenage"
+    ''' <summary>
+    ''' AccessClient連線類別管理元件
+    ''' </summary>
     Public Class AccessClientMenage
 
+        ''' <summary>Client列表</summary>
         Public Client() As Access
-
+        ''' <summary>斷線事件-在主動斷線前觸發</summary>
         Event BeforeDisconnect(ByVal sender As Object, ByVal client As AccessClient)
+        ''' <summary>連線事件-在主動連線前觸發</summary>
         Event BeforeConnect(ByVal sender As Object, ByVal Client As AccessClient)
-
+        ''' <summary>執行緒鎖定Key</summary>
         Dim SaveLock As String = "SaveLock"
+
+        ''' <summary>儲存Client清單資訊</summary>
         Public Sub Save(ByVal Path As String)
             SyncLock SaveLock
                 Dim lstInfo As New List(Of ClientInfo)
@@ -28,6 +35,7 @@
             End SyncLock
         End Sub
 
+        ''' <summary>讀取Client清單資訊</summary>
         Public Shared Function Load(ByVal Path As String) As AccessClient()
             Dim lstInfo As ClientInfo() = Code.LoadXml(Path, New ClientInfo() {New ClientInfo("xx店", "192.168.1.132", 3600)})
 
@@ -45,6 +53,7 @@
             Return lstClient.ToArray
         End Function
 
+        ''' <summary>開始連線，啟動所有Client的連線，並在連線之前觸發BeforeConnect事件。</summary>
         Public Sub StartConnect()
 
             For i As Integer = 0 To Client.Length - 1
@@ -57,6 +66,7 @@
 
         End Sub
 
+        ''' <summary>結束連線，關閉所有Client連線，在關閉之前將觸發BeforeDisconnect事件。</summary>
         Public Sub EndConnect()
 
             For i As Integer = 0 To Client.Length - 1
@@ -83,7 +93,7 @@
 
         Default Public ReadOnly Property Item(ByVal Index As Integer) As Access
             Get
-                If Index < Client.Length - 1 Then Return Nothing
+                If Index > Client.Length - 1 Then Return Nothing
                 Return Client(Index)
             End Get
 
@@ -309,7 +319,6 @@
 
             Private Sub receiver_Received(ByVal sender As Object, ByVal stream As System.IO.Stream) Handles receiver.Received
 
-
                 Dim bytes() As Byte = CType(stream, IO.MemoryStream).ToArray '     stream.Read(bytes, 0, bytes.Length)
                 Dim text As String = System.Text.Encoding.ASCII.GetString(bytes)
                 result = Deserialize(text)
@@ -411,6 +420,12 @@
                 Case "CreatedStockMove" : OnCreatedStockMove(Repair(Of StockMove)(args))
                 Case "ChangedStockMove" : OnChangedStockMove(Repair(Of StockMove)(args))
                 Case "DeletedStockMove" : OnDeletedStockMove(Repair(Of StockMove)(args))
+                Case "CreatedAgendm" : OnCreatedAgendum(Repair(Of Agendum)(args))
+                Case "ChangedAgendum" : OnChangedAgendum(Repair(Of Agendum)(args))
+                Case "DeletedAgendum" : OnDeletedAgendum(Repair(Of Agendum)(args))
+                Case "CreatedBulletin" : OnCreatedBulletin(Repair(Of Bulletin)(args))
+                Case "ChangedBulletin" : OnChangedBulletin(Repair(Of Bulletin)(args))
+                Case "DeletedBulletin" : OnDeletedBulletin(Repair(Of Bulletin)(args))
                 Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
                 Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
                 Case "DeletedAllLog" : OnDeletedAllLog()
@@ -512,6 +527,29 @@
 
         Public Overrides Sub DeleteStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
             Send("DeleteStockMove", data)
+        End Sub
+
+        Public Overrides Sub AddAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            Send("CreateAgendum", data)
+        End Sub
+
+        Public Overrides Sub ChangeAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            Send("ChangeAgendum", data)
+        End Sub
+        Public Overrides Sub DeleteAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            Send("DeleteAgendum", data)
+        End Sub
+
+        Public Overrides Sub AddBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            Send("CreateBulletin", data)
+        End Sub
+
+        Public Overrides Sub ChangeBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            Send("ChangeBulletin", data)
+        End Sub
+
+        Public Overrides Sub DeleteBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            Send("DeleteBulletin", data)
         End Sub
 
         Public Overrides Sub AddLog(ByVal data As Log, Optional ByVal trigger As Boolean = True)

@@ -25,7 +25,7 @@
     End Sub
 
     Private Sub cbStock_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbStock.SelectedIndexChanged
-        access = Client(cbStock.Text)
+        access = ClientManager(cbStock.Text)
         BeginUpdateStockList()
     End Sub
 
@@ -33,7 +33,7 @@
         Filter.SetTextFilter("商品編號", GoodsFilterText)
         cbStock.Items.Clear()
         'cbStock.Items.Add("本機庫存")
-        cbStock.Items.AddRange(Client.GetNameList())
+        cbStock.Items.AddRange(ClientManager.GetNameList())
 
         cbStock.Text = access.Name ' = 0
         UpdateTitleText()
@@ -280,7 +280,7 @@
         stock.Label = dgItemList.SelectedRows(0).Cells("庫存編號").Value
 
         Dim Count As Integer = access.GetSalesListByStockLabel(stock.Label).Rows.Count
-        For Each c As Database.Access In Client.Client
+        For Each c As Database.Access In ClientManager.Client
             If c.Connected Then Count += c.GetSalesListByStockLabel(stock.Label).Rows.Count
         Next
 

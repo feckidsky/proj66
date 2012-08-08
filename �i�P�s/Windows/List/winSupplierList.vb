@@ -126,7 +126,7 @@
 
 
         Dim count As Integer = access.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
-        For Each c As Database.Access In Client.Client
+        For Each c As Database.Access In ClientManager.Client
             If c.Connected Then count += c.GetStockLogBySupplierLabel(SelectedSupplier.Label).Rows.Count
         Next
 

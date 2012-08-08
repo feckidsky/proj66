@@ -331,8 +331,8 @@ Public Class winStockMoveList
         result.SourceLabel = Strings.RTrim(row.Cells("來源").Value)
         result.DestineLabel = Strings.RTrim(row.Cells("目地").Value)
 
-        result.Source = Client(result.SourceLabel)
-        result.Destine = Client(result.DestineLabel)
+        result.Source = ClientManager(result.SourceLabel)
+        result.Destine = ClientManager(result.DestineLabel)
 
         If result.Source Is Nothing Then
             result.Message = result.SourceLabel & "未設定連線"

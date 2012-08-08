@@ -8,7 +8,9 @@
             Dim title As Object
         End Structure
 
+        Public BeginMsgBoxEnable As Boolean = False
         Public Sub BeginMsgBox(ByVal text As Object, Optional ByVal style As MsgBoxStyle = MsgBoxStyle.OkOnly, Optional ByVal title As Object = Nothing)
+            If Not BeginMsgBoxEnable Then Exit Sub
             Dim e As MsgBoxArgs
             e.text = text
             e.style = style
@@ -75,6 +77,14 @@
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
 
+        Public Shared Dir As String
+        Public BasePath As String
+        Public MsgPath As String
+        'Public SalesPath As String
+        Public Shared Password As String = "36363636"
+
+        Shared DBWriteLock As String = " DBWriteLock"
+
         Public User As Personnel = Personnel.Guest
 
         Event Account_Logout(ByVal sender As Object, ByVal result As LoginResult)
@@ -113,6 +123,12 @@
         Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
         Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice)
 
+        Event CreatedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin)
+        Event ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin)
+        Event DeletedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin)
+        Event CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
+        Event ChangedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
+        Event DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
 #Region "Progress"
         Public Class Progress
             Public Delegate Sub ProgressAction(ByVal Message As String, ByVal Percent As Integer)
@@ -202,7 +218,13 @@
             Me.Name = Name
             Dir = My.Application.Info.DirectoryPath & "\data"
             BasePath = Dir & "\base.mdb"
-            SalesPath = Dir & "\sales.mdb"
+            MsgPath = Dir & "\bulletin.mdb"
+            ' SalesPath = Dir & "\sales.mdb"
+        End Sub
+
+        Public Sub CheckDatabaseExist()
+            If Not IO.File.Exists(BasePath) Then CreateBaseFile(BasePath)
+            If Not IO.File.Exists(MsgPath) Then CreateBulletinFile(MsgPath)
         End Sub
 
         Public Overloads Function Connected() As Boolean
@@ -328,6 +350,13 @@
             If dt.Rows.Count = 0 Then Return Customer.Null()
             Return Customer.GetFrom(dt.Rows(0))
         End Function
+
+        Public Function GetAgendumList(ByVal WithFinished As Boolean, ByVal MaxCount As Integer, Optional ByVal progress As Progress = Nothing) As Data.DataTable
+            Dim SqlCommand As String = "SELECT TOP " & MaxCount & " * FROM " & Agendum.Table & IIf(WithFinished, "", " WHERE Finished=true") & " ORDER BY [modify] DESC ;"
+            Return Read("table", MsgPath, SqlCommand, progress)
+        End Function
+
+
 
 
         Public Overridable Function GetErrorLogFileNames() As String()
@@ -1100,15 +1129,10 @@
 
         'Public Class File
 
-        Public Shared Dir As String
-        Public BasePath As String
-        Public SalesPath As String
-        Public Shared Password As String = "36363636"
 
-        Shared DBWriteLock As String = " DBWriteLock"
 
 #Region "Connect - Access連線"
-        ''' <summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
+        ''' <summary>連線base資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
         ''' <param name="FilePath">檔案路徑</param>
         Public Shared Function ConnectBase(ByVal FilePath As String) As OleDb.OleDbConnection
             Dim Dir As String = Left(FilePath, FilePath.LastIndexOf("\"))
@@ -1116,12 +1140,33 @@
             If Not IO.Directory.Exists(Dir) Then IO.Directory.CreateDirectory(Dir)
 
             If Not IO.File.Exists(FilePath) Then
-                Return CreateFileBase(FilePath)
+                Return CreateBaseFile(FilePath)
             Else
                 Return Open(FilePath)
             End If
 
         End Function
+
+        ''' <summary>連線bulletin資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
+        Public Shared Function ConnectBulletin(ByVal path As String) As OleDb.OleDbConnection
+            Dim dir As String = IO.Path.GetDirectoryName(path)
+            If Not IO.Directory.Exists(dir) Then IO.Directory.CreateDirectory(dir)
+            If Not IO.File.Exists(path) Then
+                Return CreateBulletinFile(path)
+            Else
+                Return Open(path)
+            End If
+        End Function
+
+        Public Shared Function CreateBulletinFile(ByVal FilePath As String) As OleDb.OleDbConnection
+            CreateAccessFile(FilePath)
+            Dim DBControl As OleDb.OleDbConnection = Open(FilePath)
+            CreateTable(Agendum.Table, Agendum.ToColumns, DBControl)
+            CreateTable(Bulletin.Table, Bulletin.ToColumns, DBControl)
+            Return DBControl
+        End Function
+
+
 
         '''' <summary>連線資料庫，回傳所連接資料庫元件，若檔案不存在則新增該檔案</summary>
         '''' <param name="FilePath">檔案路徑</param>
@@ -1160,7 +1205,7 @@
 
         ''' <summary>新增Access檔案，同時加入索引，回傳所連接的資料庫元件</summary>
         ''' <param name="FilePath">檔案路徑</param>
-        Private Shared Function CreateFileBase(ByVal FilePath As String) As OleDb.OleDbConnection
+        Private Shared Function CreateBaseFile(ByVal FilePath As String) As OleDb.OleDbConnection
             CreateAccessFile(FilePath)
             Dim DBControl As OleDb.OleDbConnection = Open(FilePath)
             CreateTable(Supplier.Table, Supplier.ToColumns, DBControl)
@@ -1256,7 +1301,7 @@
         Public Overridable Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
             Dim Count As Long
             SyncLock Lock
-                Dim DBControl As OleDb.OleDbConnection = ConnectBase(File)
+                Dim DBControl As OleDb.OleDbConnection = Open(File) 'ConnectBase(File)
                 Count = Command(SqlCommand, DBControl)
                 Close(DBControl)
             End SyncLock
@@ -1462,6 +1507,10 @@
 
         Public Sub AddBase(ByVal data As Object)
             Command(GetSqlInsert(data), BasePath)
+        End Sub
+
+        Public Sub AddBulletin(ByVal data As Object)
+            Command(GetSqlInsert(data), MsgPath)
         End Sub
 
         'Public Shared Sub AddSales(ByVal data As Object)
@@ -1680,6 +1729,40 @@
             OnCreatedStock(data)
         End Sub
 
+        Public Overridable Sub AddAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            AddBulletin(data)
+            AddLog(Now, "新增待辦事項:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnCreatedAgendum(data)
+        End Sub
+        Public Overridable Sub AddBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            AddBulletin(data)
+            AddLog(Now, "新增公告:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnCreatedBulletin(data)
+        End Sub
+
+        Public Overridable Sub ChangeAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            Command(data.GetUpdateSqlCommand(), MsgPath)
+            AddLog(Now, "修改待辦事項:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnChangedAgendum(data)
+        End Sub
+
+        Public Overridable Sub ChangeBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            Command(data.GetUpdateSqlCommand(), MsgPath)
+            AddLog(Now, "修改公告:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnChangedBulletin(data)
+        End Sub
+
+        Public Overridable Sub DeleteAgendum(ByVal data As Agendum, Optional ByVal trigger As Boolean = True)
+            Command(GetSqlDelete(Agendum.Table, "Label", data.Label), MsgPath)
+            AddLog(Now, "刪除待辦事項:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnDeletedAgendum(data)
+        End Sub
+
+        Public Overridable Sub DeleteBulletin(ByVal data As Bulletin, Optional ByVal trigger As Boolean = True)
+            Command(GetSqlDelete(Bulletin.Table, "Label", data.Label), MsgPath)
+            AddLog(Now, "刪除公告:[" & data.Kind & "]" & data.Message)
+            If trigger Then OnDeletedBulletin(data)
+        End Sub
 
         Public Sub AddLog(ByVal Time As Date, ByVal Message As String)
             AddLog(New Log(User.Label, Time, Strings.Left(Message, 40)))
@@ -1795,6 +1878,28 @@
         Friend Sub OnDeletedHistoryPriceList(ByVal hp As HistoryPrice)
             RaiseEvent DeletedHistoryPriceList(Me, hp)
         End Sub
+
+        Friend Sub OnCreatedBulletin(ByVal bulletin As Bulletin)
+            RaiseEvent CreatedBulletin(Me, bulletin)
+        End Sub
+        Friend Sub OnChangedBulletin(ByVal bulletin As Bulletin)
+            RaiseEvent ChangedBulletin(Me, bulletin)
+        End Sub
+        Friend Sub OnDeletedBulletin(ByVal bulletin As Bulletin)
+            RaiseEvent DeletedBulletin(Me, bulletin)
+        End Sub
+
+        Friend Sub OnCreatedAgendum(ByVal Agendum As Agendum)
+            RaiseEvent CreatedAgendum(Me, Agendum)
+        End Sub
+        Friend Sub OnChangedAgendum(ByVal Agendum As Agendum)
+            RaiseEvent ChangedAgendum(Me, Agendum)
+        End Sub
+        Friend Sub OnDeletedAgendum(ByVal Agendum As Agendum)
+            RaiseEvent DeletedAgendum(Me, Agendum)
+        End Sub
+
+
 
         Structure RepairAccessResult
             Dim Success As Boolean

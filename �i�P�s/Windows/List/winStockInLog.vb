@@ -112,7 +112,7 @@
         stock.Label = dgStockLog.SelectedRows(0).Cells(0).Value
 
         Dim Count As Integer = access.GetSalesListByStockLabel(stock.Label).Rows.Count
-        For Each c As Database.Access In Client.Client
+        For Each c As Database.Access In ClientManager.Client
             If c.Connected Then Count += c.GetSalesListByStockLabel(stock.Label).Rows.Count
         Next
 

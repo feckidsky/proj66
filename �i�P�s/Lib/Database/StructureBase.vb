@@ -1214,5 +1214,105 @@ Namespace Database
     '    End Function
     'End Structure
 #End Region
+
+    Public Structure Bulletin
+        Shared Table = "Bulletin"
+        Dim Label As String
+        Dim StartDate As Date
+        Dim EndDate As Date
+        Dim Kind As String
+        Dim Message As String
+        Dim Modify As Date
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList
+            Columns.Add("Label", DBTypeLabel)
+            Columns.Add("StartDate", DBTypeDate)
+            Columns.Add("EndDate", DBTypeDate)
+            Columns.Add("Kind", DBTypeLabel)
+            Columns.Add("Message", DBTypeNote)
+            Columns.Add("Modify", DBTypeDate)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            Return New Object() {Label, StartDate, EndDate, Kind, Message, Modify}
+        End Function
+
+        Sub UpdateRow(ByVal r As DataRow)
+            Dim columns() As Column = ToColumns()
+            Dim obj() As Object = ToObjects()
+            For i As Integer = 0 To columns.Count - 1
+                r(columns(i).Name) = obj(i)
+            Next
+        End Sub
+
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Bulletin
+            Dim R As New MyDataRow(Row)
+            Dim data As Bulletin
+            data.Label = R("Label")
+            Date.TryParse(R("StartDate"), data.StartDate)
+            Date.TryParse(R("EndDate"), data.EndDate)
+            data.Kind = R("Kind")
+            data.Message = R("Message")
+            data.Modify = R("Modify")
+            Return data
+        End Function
+
+        Public Function GetUpdateSqlCommand() As String
+            Dim Column As String() = New String() {"StratDate", "EndDate", "Kind", "Message", "Modify"}
+            Dim Value As Object() = New Object() {StartDate, EndDate, Kind, Message, Modify}
+            Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+        End Function
+    End Structure
+
+    Public Structure Agendum
+        Shared Table = "Agendum"
+        Dim Label As String
+        Dim Kind As String
+        Dim Message As String
+        Dim Finished As Boolean
+        Dim Modify As Date
+
+        Shared Function ToColumns() As Column()
+            Dim Columns As New ColumnList
+            Columns.Add("Label", DBTypeLabel)
+            Columns.Add("Kind", DBTypeLabel)
+            Columns.Add("Message", DBTypeNote)
+            Columns.Add("Finished", DBTypeBoolean)
+            Columns.Add("Modify", DBTypeDate)
+            Return Columns.ToArray
+        End Function
+
+        Function ToObjects() As Object()
+            Return New Object() {Label, Kind, Message, Finished, Modify}
+        End Function
+
+        Sub UpdateRow(ByVal r As DataRow)
+            Dim columns() As Column = ToColumns()
+            Dim obj() As Object = ToObjects()
+            For i As Integer = 0 To columns.Count - 1
+                r(columns(i).Name) = obj(i)
+            Next
+        End Sub
+
+        Public Shared Function GetFrom(ByVal Row As Data.DataRow) As Agendum
+            Dim R As New MyDataRow(Row)
+            Dim data As Agendum
+            data.Label = R("Label")
+            data.Kind = R("Kind")
+            data.Message = R("Message")
+            data.Finished = R("Finished")
+            data.Modify = R("Modify")
+            Return data
+        End Function
+
+        Public Function GetUpdateSqlCommand() As String
+            Dim Column As String() = New String() {"Kind", "Message", "Finished", "Modify"}
+            Dim Value As Object() = New Object() {Kind, Message, Finished}
+            Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
+        End Function
+    End Structure
+
     'End Module
 End Namespace

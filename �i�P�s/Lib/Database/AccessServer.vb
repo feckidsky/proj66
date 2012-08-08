@@ -59,6 +59,12 @@
                 Case "CreateStockMove" : Access.AddStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
                 Case "ChangeStockMove" : Access.ChangeStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
                 Case "DeleteStockMove" : Access.DeleteStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
+                Case "CreateAgendum" : Access.AddAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
+                Case "ChangeAgendum" : Access.ChangeAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
+                Case "DeleteAgendum" : Access.DeleteAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
+                Case "CreateBulletin" : Access.AddBulletin(Code.XmlDeserializeWithUnzip(Of Bulletin)(Data(1)))
+                Case "ChangeBulletin" : Access.ChangeBulletin(Code.XmlDeserializeWithUnzip(Of Bulletin)(Data(1)))
+                Case "DeleteBulletin" : Access.DeleteBulletin(Code.XmlDeserializeWithUnzip(Of Bulletin)(Data(1)))
                 Case "CreateLog" : Access.AddLog(Code.XmlDeserializeWithUnzip(Of Log)(Data(1)))
                 Case "DeleteLog" : Access.DeleteLog(Code.XmlDeserializeWithUnzip(Of Log)(Data(1)))
                 Case "DeleteAllLog" : Access.DeleteAllLog()
@@ -119,6 +125,14 @@
             client.Send("ReaderResponse", Guid & "," & ResultText)
         End Sub
 
+        Private Sub Access_ChangedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.ChangedAgendum
+            ServerSend("ChangedAgendm", Code.XmlSerializeWithZIP(Agendum))
+        End Sub
+
+        Private Sub Access_ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.ChangedBulletin
+            ServerSend("ChangedBulletin", Code.XmlSerializeWithZIP(bulletin))
+        End Sub
+
         Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract
             ServerSend("ChangedContract", Code.XmlSerializeWithZIP(con))
         End Sub
@@ -153,6 +167,14 @@
 
         Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier
             ServerSend("ChangedSupplier", Code.XmlSerializeWithZIP(sup))
+        End Sub
+
+        Private Sub Access_CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.CreatedAgendum
+            ServerSend("CreatedAgendum", Code.XmlSerializeWithZIP(Agendum))
+        End Sub
+
+        Private Sub Access_CreatedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.CreatedBulletin
+            ServerSend("CreatedBulletin", Code.XmlSerializeWithZIP(bulletin))
         End Sub
         Private Sub Access_CreatedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.CreatedContract
             ServerSend("CreatedContract", Code.XmlSerializeWithZIP(con))
@@ -194,8 +216,16 @@
             ServerSend("CreatedSupplier", Code.XmlSerializeWithZIP(sup))
         End Sub
 
+        Private Sub Access_DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.DeletedAgendum
+            ServerSend("DeletedAgendum", Code.XmlSerializeWithZIP(Agendum))
+        End Sub
+
         Private Sub Access_DeletedAllLog(ByVal sender As Object) Handles Access.DeletedAllLog
             ServerSend("DeletedAllLog")
+        End Sub
+
+        Private Sub Access_DeletedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.DeletedBulletin
+            ServerSend("DeletedBulletin", Code.XmlSerializeWithZIP(bulletin))
         End Sub
         Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
             ServerSend("DeletedContract", Code.XmlSerializeWithZIP(con))

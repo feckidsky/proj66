@@ -214,6 +214,11 @@ OpenDialog:
         myDatabase.Command("DELETE FROM HistoryPrice WHERE GoodsLabel='';")
     End Sub
 
+    Public Sub UpdateDatabase010201()
+        myDatabase.Command("UPDATE Personnel SET [Note]= 'DbVerson=010202' WHERE Label='Administrator' AND ([Note]='DbVerson=010201')")
+        If Not IO.File.Exists(myDatabase.MsgPath) Then Access.CreateBulletinFile(myDatabase.MsgPath)
+    End Sub
+
     Public Function UpdateDatabase() As Boolean
         If Config.Mode = Connect.Client Then Return False
         Dim info As Access.DbInfo = myDatabase.ReadDbInfo
@@ -228,7 +233,8 @@ OpenDialog:
 
 
         If info.IsNull Then UpdateDatabaseFirst()
-        If info.DbVerson = 10200 Then UpdateDatabase010200()
+        If info.DbVerson <= 10200 Then UpdateDatabase010200()
+        'If info.DbVerson <= 10201 Then UpdateDatabase010201()
 
         '壓縮/修復資料庫
         If changed Then Access.RepairAccess(myDatabase.BasePath)

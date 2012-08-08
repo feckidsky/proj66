@@ -97,11 +97,11 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.5"
+    Public ProgramVersion As String = "v1.0.6 bate"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public Server As New Database.AccessServer
-    Public WithEvents Client As New Database.AccessClientMenage()
+    Public WithEvents ClientManager As New Database.AccessClientMenage()
 
 
     Public Config As SystemOptional
@@ -139,14 +139,15 @@ Public Module Program
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
             Server.Open(Config.ServerNetIndex)
+            myDatabase.CheckDatabaseExist()
         End If
 
 
         Dim lstClient As New List(Of Database.Access)
         If Config.Mode = Connect.Server Then lstClient.Add(myDatabase)
         lstClient.AddRange(Database.AccessClientMenage.Load(ClientPath))
-        Client.Client = lstClient.ToArray()
-        Client.StartConnect()
+        ClientManager.Client = lstClient.ToArray()
+        ClientManager.StartConnect()
 
         LoginSetting = LoginInfo.Load(LoginInfoPath)
         MailInfo = MailInformation.Load(MailInfoPath)
@@ -160,14 +161,14 @@ Public Module Program
 
     Public Sub FinishProgram()
 
-        Client.EndConnect()
+        ClientManager.EndConnect()
         Try
             Server.Close()
         Catch
         End Try
     End Sub
 
-    
+
 
     Public Sub ConfigLoad()
         Config = Code.LoadXml(Of SystemOptional)(ConfigPath, SystemOptional.DefaultConfig)
@@ -191,8 +192,6 @@ Public Module Program
             Return False
         End If
     End Function
-
-
 
     Public Function GetNewSupplier() As Supplier
         Dim data As Supplier = Nothing
@@ -413,7 +412,7 @@ Public Module Program
 #End Region
 
     WithEvents ccc As Database.AccessClient
-    Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeConnect
+    Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles ClientManager.BeforeConnect
 
         With client
             AddHandler .Account_LogIn, AddressOf ccc_Account_LogIn
@@ -447,7 +446,7 @@ Public Module Program
 
     End Sub
 
-    Private Sub Client_BeforeDisconnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles Client.BeforeDisconnect
+    Private Sub Client_BeforeDisconnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles ClientManager.BeforeDisconnect
 
         With client
             RemoveHandler .Account_LogIn, AddressOf ccc_Account_LogIn
@@ -480,14 +479,20 @@ Public Module Program
 
     End Sub
 
-    
+
 
     Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
         If Config.Mode = Connect.Client Then Exit Sub
         Dim SyncThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf SyncDatabase))
         SyncThread.IsBackground = True
         SyncThread.Start(sender)
+
         'SyncDatabase(sender)
+
+        If My.Application.OpenForms.Count = 0 Then Exit Sub
+        Dim main As winMain = My.Application.OpenForms("winMain")
+
+        If main IsNot Nothing Then main.UpdateCbClientList()
     End Sub
 
     Public Function GetTime(ByVal obj As Object) As Date
@@ -600,7 +605,7 @@ Public Module Program
     End Sub
 
     Private Sub ccc_ReceiveServerName(ByVal sender As Object, ByVal Name As String) Handles ccc.ReceiveServerName
-        Client.Save(ClientPath)
+        ClientManager.Save(ClientPath)
     End Sub
 
     Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles myDatabase.Account_Logout, myDatabase.Account_LogIn
@@ -612,7 +617,7 @@ Public Module Program
         Dim goods As Goods = Nothing
         If data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
             Try
-                goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
+                goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
             Catch
             End Try
             ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
@@ -633,7 +638,7 @@ Public Module Program
             ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
         ElseIf data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
             Try
-                goods = Client(data.SourceShop).GetGoods(data.GoodsLabel)
+                goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
             Catch
             End Try
             ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)

@@ -73,17 +73,17 @@ Public Class winMain
         dgSales.DefaultCellStyle.WrapMode = DataGridViewTriState.True
 
         cbClient.Items.Clear()
-        cbClient.Items.AddRange(Client.GetNameList())
+        cbClient.Items.AddRange(ClientManager.GetNameList())
         'If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
         cbForm.SelectedIndex = 2
 
         '自動登入
         If LoginSetting.AutoLog Then
-            Dim db As Access = Client(LoginSetting.Shop)
+            Dim db As Access = ClientManager(LoginSetting.Shop)
             If db IsNot Nothing Then
                 Me.access = db
                 db.LogIn(LoginSetting.ID, LoginSetting.Password, True)
-                cbClient.SelectedIndex = Array.FindIndex(Of Access)(Client.Client, Function(a As Access) db.Name = a.Name)
+                cbClient.SelectedIndex = Array.FindIndex(Of Access)(ClientManager.Client, Function(a As Access) db.Name = a.Name)
             End If
         Else '沒有預設登入的資料庫，選擇第一個Client當預設值
             If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
@@ -96,7 +96,7 @@ Public Class winMain
     End Sub
 
     Private Sub cbClient_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.SelectedIndexChanged
-        access = Client(cbClient.Text)
+        access = ClientManager(cbClient.Text)
 
     End Sub
 
@@ -143,7 +143,7 @@ Public Class winMain
     End Sub
 
     Private Sub 登出OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登出OToolStripMenuItem.Click, 登出OToolStripMenuItem1.Click
-        access.LogOut()
+        If access IsNot Nothing Then access.LogOut()
     End Sub
 
 
@@ -166,6 +166,7 @@ Public Class winMain
     Private Sub 選項OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 選項OToolStripMenuItem.Click
         winOptional.ShowDialog()
         UpdateListColor()
+        UpdateCbClientList()
     End Sub
 
     Private Sub 合約CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 合約CToolStripMenuItem.Click
@@ -813,5 +814,40 @@ Public Class winMain
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub cbClient_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbClient.Click
+
+    End Sub
+
+    Dim UpdateCbClinetListHandler As New Action(AddressOf UpdateCbClientList)
+    Dim UpdateCbClientLock As String = "UpdateCbClientLock"
+    Public Sub UpdateCbClientList()
+        If Me.InvokeRequired Then
+            Me.Invoke(UpdateCbClinetListHandler)
+            Exit Sub
+        End If
+
+        SyncLock UpdateCbClientLock
+            For i As Integer = cbClient.Items.Count - 1 To ClientManager.Client.Length Step -1
+                cbClient.Items.RemoveAt(i)
+            Next
+
+            For i As Integer = cbClient.Items.Count To ClientManager.Client.Length - 1
+                cbClient.Items.Add(ClientManager(i).Name)
+            Next
+
+            For i As Integer = 0 To cbClient.Items.Count - 1
+                If cbClient.Items(i) <> ClientManager(i).Name Then
+                    cbClient.Items(i) = ClientManager(i).Name
+                End If
+            Next
+        End SyncLock
+        'cbClient.Items.Clear()
+        'cbClient.Items.AddRange(ClientManager.GetNameList())
+    End Sub
+
+    Private Sub 待辦事項ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 待辦事項ToolStripMenuItem.Click
+        winAgendum.Show(access)
     End Sub
 End Class

@@ -24,7 +24,7 @@
 
     Private Sub UpdateShopList()
         dgShop.Rows.Clear()
-        For Each c As Database.Access In Client.Client
+        For Each c As Database.Access In ClientManager.Client
             If c.GetType() Is GetType(Database.AccessClient) Then
                 Dim cc As Database.Access = c
                 dgShop.Rows.Add(cc.Name, cc.IP, cc.Port)
@@ -89,13 +89,13 @@
         ConfigSave()
 
 
-        Client.EndConnect()
+        ClientManager.EndConnect()
         Dim lstClient As New List(Of Database.Access)
         If Config.Mode = Connect.Server Then lstClient.Add(myDatabase)
         lstClient.AddRange(GetShopList())
-        Client.Client = lstClient.ToArray()
-        Client.StartConnect()
-        Client.Save(ClientPath)
+        ClientManager.Client = lstClient.ToArray()
+        ClientManager.StartConnect()
+        ClientManager.Save(ClientPath)
 
 
         If ModeChanged Then

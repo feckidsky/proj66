@@ -55,6 +55,9 @@ Partial Class winMain
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.結算ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.列印PToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.訊息ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.公佈欄ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.待辦事項ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.cbClient = New System.Windows.Forms.ToolStripComboBox
         Me.錯誤記錄ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.dgSales = New System.Windows.Forms.DataGridView
@@ -77,6 +80,7 @@ Partial Class winMain
         Me.rToday = New System.Windows.Forms.RadioButton
         Me.rUserTime = New System.Windows.Forms.RadioButton
         Me.r30Day = New System.Windows.Forms.RadioButton
+        Me.Button1 = New System.Windows.Forms.Button
         Me.NotifyIcon1 = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.cmsSystem = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.登入IToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
@@ -94,7 +98,6 @@ Partial Class winMain
         Me.cmsLog = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.全部刪除ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.Button1 = New System.Windows.Forms.Button
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip
         Me.txtDataCount = New System.Windows.Forms.ToolStripStatusLabel
         Me.lbSyncTitle = New System.Windows.Forms.ToolStripStatusLabel
@@ -117,7 +120,7 @@ Partial Class winMain
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.合約CToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷售SToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.選項OToolStripMenuItem, Me.結算ToolStripMenuItem, Me.列印PToolStripMenuItem, Me.cbClient, Me.錯誤記錄ToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.系統SToolStripMenuItem, Me.其他資訊ToolStripMenuItem, Me.合約CToolStripMenuItem, Me.庫存ToolStripMenuItem, Me.銷售SToolStripMenuItem, Me.銷貨ToolStripMenuItem, Me.選項OToolStripMenuItem, Me.結算ToolStripMenuItem, Me.列印PToolStripMenuItem, Me.訊息ToolStripMenuItem, Me.cbClient, Me.錯誤記錄ToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(909, 28)
@@ -301,6 +304,26 @@ Partial Class winMain
         Me.列印PToolStripMenuItem.Size = New System.Drawing.Size(59, 24)
         Me.列印PToolStripMenuItem.Text = "列印(&P)"
         '
+        '訊息ToolStripMenuItem
+        '
+        Me.訊息ToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.公佈欄ToolStripMenuItem, Me.待辦事項ToolStripMenuItem})
+        Me.訊息ToolStripMenuItem.Name = "訊息ToolStripMenuItem"
+        Me.訊息ToolStripMenuItem.Size = New System.Drawing.Size(64, 24)
+        Me.訊息ToolStripMenuItem.Text = "訊息(&M)"
+        Me.訊息ToolStripMenuItem.Visible = False
+        '
+        '公佈欄ToolStripMenuItem
+        '
+        Me.公佈欄ToolStripMenuItem.Name = "公佈欄ToolStripMenuItem"
+        Me.公佈欄ToolStripMenuItem.Size = New System.Drawing.Size(140, 22)
+        Me.公佈欄ToolStripMenuItem.Text = "公佈欄(&P)"
+        '
+        '待辦事項ToolStripMenuItem
+        '
+        Me.待辦事項ToolStripMenuItem.Name = "待辦事項ToolStripMenuItem"
+        Me.待辦事項ToolStripMenuItem.Size = New System.Drawing.Size(140, 22)
+        Me.待辦事項ToolStripMenuItem.Text = "待辦事項(&A)"
+        '
         'cbClient
         '
         Me.cbClient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
@@ -428,6 +451,7 @@ Partial Class winMain
         Me.GroupBox1.Controls.Add(Me.rToday)
         Me.GroupBox1.Controls.Add(Me.rUserTime)
         Me.GroupBox1.Controls.Add(Me.r30Day)
+        Me.GroupBox1.Controls.Add(Me.Button1)
         Me.GroupBox1.Location = New System.Drawing.Point(222, 30)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(675, 46)
@@ -489,6 +513,15 @@ Partial Class winMain
         Me.r30Day.TabIndex = 0
         Me.r30Day.Text = "兩天內"
         Me.r30Day.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(555, 13)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 6
+        Me.Button1.Text = "test"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'NotifyIcon1
         '
@@ -622,15 +655,6 @@ Partial Class winMain
         Me.全部刪除ToolStripMenuItem.Size = New System.Drawing.Size(124, 22)
         Me.全部刪除ToolStripMenuItem.Text = "全部刪除"
         '
-        'Button1
-        '
-        Me.Button1.Location = New System.Drawing.Point(764, 5)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(75, 23)
-        Me.Button1.TabIndex = 6
-        Me.Button1.Text = "test"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.txtDataCount, Me.lbSyncTitle, Me.progSync, Me.btSyncCancel, Me.lbSyncInfo, Me.lbLoadSales, Me.ToolStripProgressBar1})
@@ -701,7 +725,6 @@ Partial Class winMain
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.dgSales)
-        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.GroupBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -804,4 +827,7 @@ Partial Class winMain
     Friend WithEvents btSyncCancel As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents lbLoadSales As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents ToolStripProgressBar1 As System.Windows.Forms.ToolStripProgressBar
+    Friend WithEvents 訊息ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 公佈欄ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 待辦事項ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

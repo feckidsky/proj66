@@ -21,7 +21,7 @@ Public Class DialogStockMove
         txtName.Text = Goods.Name
 
         cbDestine.Items.Clear()
-        cbDestine.Items.AddRange(Client.GetNameList())
+        cbDestine.Items.AddRange(ClientManager.GetNameList())
         If DestineShop IsNot Nothing Then
             cbDestine.Text = DestineShop.Name
         Else
@@ -48,7 +48,7 @@ Public Class DialogStockMove
     End Sub
 
     Private Sub cbDestine_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbDestine.SelectedIndexChanged
-        DestineShop = Client(cbDestine.Text)
+        DestineShop = ClientManager(cbDestine.Text)
         btOK.Enabled = DestineShop IsNot Nothing
     End Sub
 

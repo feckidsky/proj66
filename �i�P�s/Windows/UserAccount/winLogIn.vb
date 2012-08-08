@@ -22,7 +22,7 @@ Public Class winLogIn
         If Not txtID.Enabled Then txtPassword.Focus()
 
         cbShop.Items.Clear()
-        cbShop.Items.AddRange(Client.GetNameList())
+        cbShop.Items.AddRange(ClientManager.GetNameList())
 
         cbShop.Enabled = Config.Mode = Connect.Client
         'cbShop.Text = access.Name
@@ -51,7 +51,7 @@ Public Class winLogIn
 
     Private Sub btLogin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btLogin.Click
 
-        Dim db As Access = Client(cbShop.Text)
+        Dim db As Access = ClientManager(cbShop.Text)
 
         If db Is Nothing Then
             MsgBox("您所選擇的店名不存在")

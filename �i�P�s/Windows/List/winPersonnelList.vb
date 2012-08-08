@@ -142,7 +142,7 @@
 
 
         Dim count As Integer = access.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
-        For Each c As Database.Access In Client.Client
+        For Each c As Database.Access In ClientManager.Client
             If c.Connected Then count += c.GetSalesListByPersonnel(SelectedItem.Label).Rows.Count
         Next
         If count > 0 Then
