@@ -119,7 +119,7 @@ Public Class BackupDialog
     Dim SendCompletedHander As New Action(Of Object, System.ComponentModel.AsyncCompletedEventArgs)(AddressOf MailSender_SendCompleted)
     Private Sub MailSender_SendCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.AsyncCompletedEventArgs) Handles MailSender.SendCompleted
         If Me.InvokeRequired Then
-            Me.Invoke(SendCompletedHander, sender, e)
+            If Not Me.IsDisposed Then Me.Invoke(SendCompletedHander, sender, e)
             Exit Sub
         End If
 

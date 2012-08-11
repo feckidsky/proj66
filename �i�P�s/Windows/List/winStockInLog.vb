@@ -48,7 +48,7 @@
     Public Sub UpdateStockInLog(ByVal progress As Database.Access.Progress)
         dt = access.GetStockLog(StartTime, EndTime)
         Try
-            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockInDataTable), dt)
+            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateStockInDataTable), dt)
         Catch
         End Try
         progress.Finish()
@@ -178,7 +178,7 @@
 
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invCreate, row)
+                If Not Me.IsDisposed Then Me.Invoke(invCreate, row)
             Catch
             End Try
         Else
@@ -196,7 +196,7 @@
 
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invChange, row)
+                If Not Me.IsDisposed Then Me.Invoke(invChange, row)
             Catch
             End Try
         Else
@@ -208,7 +208,7 @@
     Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Stock) Handles access.DeletedStock
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invDelete, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, item)
             Catch
             End Try
             Exit Sub

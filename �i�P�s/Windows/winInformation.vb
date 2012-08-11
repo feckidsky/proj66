@@ -138,7 +138,7 @@
         Dim ed As Date = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
         infoUser = access.GetSalesInformation(dtpStart.Value.Date, dtpEnd.Value.Date.AddDays(1).AddSeconds(-1))
 
-        Me.Invoke(New Action(AddressOf UpdateUserInfo))
+        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateUserInfo))
         progress.Finish()
     End Sub
 

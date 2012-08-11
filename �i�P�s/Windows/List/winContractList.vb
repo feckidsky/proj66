@@ -47,8 +47,10 @@
     End Function
 
     Public Function SelectEffectDialog(ByVal DB As Database.Access) As Database.Contract
-        FilterEffect = True
-        Return SelectDialog(DB)
+        Dim dialog As New winContractList
+
+        dialog.FilterEffect = True
+        Return dialog.SelectDialog(DB)
     End Function
 
     Dim dt As DataTable
@@ -68,7 +70,7 @@
     Private Sub UpdateList(ByVal progress As Database.Access.Progress)
         dt = access.GetContractList(progress)
         Try
-            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
+            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
         Catch
         End Try
         progress.Finish()
@@ -183,7 +185,7 @@
     Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.CreatedContract
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invCreate, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invCreate, sender, item)
             Catch
             End Try
             Exit Sub
@@ -194,7 +196,7 @@
     Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.ChangedContract
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invChange, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invChange, sender, item)
             Catch
             End Try
             Exit Sub
@@ -209,7 +211,7 @@
     Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.DeletedContract
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invDelete, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, item)
             Catch
             End Try
             Exit Sub

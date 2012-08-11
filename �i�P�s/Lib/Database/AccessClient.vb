@@ -88,7 +88,12 @@
         'End Function
 
         Public Function GetNameList() As String()
-            Return Array.ConvertAll(Client, Function(c As Access) c.Name)
+            Dim names As New List(Of String)
+            For i As Integer = 0 To Client.Length - 1
+                names.Add(Client(i).Name)
+            Next
+            Return names.ToArray
+            'Return Array.ConvertAll(Client, Function(c As Access) c.Name)
         End Function
 
         Default Public ReadOnly Property Item(ByVal Index As Integer) As Access

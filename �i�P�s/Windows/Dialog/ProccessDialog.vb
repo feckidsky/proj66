@@ -48,7 +48,7 @@
         Try
             If Me.InvokeRequired Then
 
-                Me.Invoke(updateProgressHandler, msg, percent)
+                If Not Me.IsDisposed Then Me.Invoke(updateProgressHandler, msg, percent)
 
                 Exit Sub
             End If
@@ -66,7 +66,7 @@
         Try
             If Me.IsDisposed Then Exit Sub
             If Me.InvokeRequired Then
-                Me.Invoke(FinishHandler)
+                If Not Me.IsDisposed Then Me.Invoke(FinishHandler)
                 Exit Sub
             End If
 
@@ -80,7 +80,7 @@
 
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(New Action(Of String, Integer)(AddressOf UpdatePartProgress), msg, percent)
+                If Not Me.IsDisposed Then Me.Invoke(New Action(Of String, Integer)(AddressOf UpdatePartProgress), msg, percent)
             Catch
             End Try
             Exit Sub
@@ -108,7 +108,7 @@
     Public Overloads Sub Close()
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(CloseHandler)
+                If Not Me.IsDisposed Then Me.Invoke(CloseHandler)
             Catch
             End Try
             Exit Sub
@@ -120,7 +120,7 @@
     Public Overloads Sub Show()
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(ShowHandler)
+                If Not Me.IsDisposed Then Me.Invoke(ShowHandler)
             Catch
             End Try
             Exit Sub

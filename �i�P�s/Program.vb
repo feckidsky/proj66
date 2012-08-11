@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.6 bate"
+    Public ProgramVersion As String = "v1.0.6"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public Server As New Database.AccessServer

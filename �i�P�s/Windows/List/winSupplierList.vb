@@ -53,7 +53,7 @@
     Private Sub UpdateList(ByVal progress As Database.Access.Progress)
         dt = access.GetSupplierList(progress)
         Try
-            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
         Catch
         End Try
         progress.Finish()
@@ -161,7 +161,7 @@
     Private Sub access_CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.CreatedSupplier
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invCreate, sender, sup)
+                If Not Me.IsDisposed Then Me.Invoke(invCreate, sender, sup)
             Catch
             End Try
             Exit Sub
@@ -172,7 +172,7 @@
     Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.ChangedSupplier
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invChange, sender, sup)
+                If Not Me.IsDisposed Then Me.Invoke(invChange, sender, sup)
             Catch
             End Try
             Exit Sub
@@ -187,7 +187,7 @@
     Private Sub access_DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.DeletedSupplier
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invDelete, sender, sup)
+                If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, sup)
             Catch
             End Try
             Exit Sub

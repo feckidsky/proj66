@@ -36,7 +36,7 @@ Public Class winStockMoveList
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(UpdateTitleHandler)
+                If Not Me.IsDisposed Then Me.Invoke(UpdateTitleHandler)
             Catch
             End Try
             Exit Sub
@@ -140,7 +140,7 @@ Public Class winStockMoveList
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(AddRowInfoHandler, arr)
+                If Not Me.IsDisposed Then Me.Invoke(AddRowInfoHandler, arr)
             Catch
             End Try
             Exit Sub
@@ -165,7 +165,7 @@ Public Class winStockMoveList
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(UpdateRowInfoHandler, arr)
+                If Not Me.IsDisposed Then Me.Invoke(UpdateRowInfoHandler, arr)
             Catch
             End Try
             Exit Sub

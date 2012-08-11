@@ -159,7 +159,7 @@ Public Class winStockIn
 
         If Me.InvokeRequired Then
             Dim handler As New Action(Of Stock)(AddressOf ReturnDialogResult)
-            Me.Invoke(handler, stock)
+            If Not Me.IsDisposed Then Me.Invoke(handler, stock)
         Else
             ReturnDialogResult(stock)
         End If

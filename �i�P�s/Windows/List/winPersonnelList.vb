@@ -55,7 +55,7 @@
     Public Sub UpdateList(ByVal progress As Database.Access.Progress)
         dt = access.GetPersonnelList(progress)
         Try
-            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
+            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
         Catch
         End Try
         progress.Finish()
@@ -180,7 +180,7 @@
     Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.CreatedPersonnel
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invCreate, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invCreate, sender, item)
             Catch
             End Try
             Exit Sub
@@ -193,7 +193,7 @@
     Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.ChangedPersonnel
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invChange, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invChange, sender, item)
             Catch
             End Try
             Exit Sub
@@ -208,7 +208,7 @@
     Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Personnel) Handles access.DeletedPersonnel
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(invDelete, sender, item)
+                If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, item)
             Catch
             End Try
             Exit Sub

@@ -491,7 +491,7 @@
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
 
             Dim data As New Stock
-            If DT.Rows.Count > 0 Then data = Stock.GetFrom(DT.Rows(0))
+            If DT IsNot Nothing AndAlso DT.Rows.Count > 0 Then data = Stock.GetFrom(DT.Rows(0))
             Return data
         End Function
 

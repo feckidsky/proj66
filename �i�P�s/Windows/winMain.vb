@@ -34,7 +34,7 @@ Public Class winMain
     Private Sub UpdateTitle()
         If Not Me.Created Then Exit Sub
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateTitleHandler)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateTitleHandler)
             Exit Sub
         End If
         If access IsNot Nothing Then
@@ -74,6 +74,7 @@ Public Class winMain
 
         cbClient.Items.Clear()
         cbClient.Items.AddRange(ClientManager.GetNameList())
+        cbClient_UpdateState()
         'If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
         cbForm.SelectedIndex = 2
 
@@ -95,9 +96,22 @@ Public Class winMain
         If Me.Created Then UpdateSalesList()
     End Sub
 
-    Private Sub cbClient_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.SelectedIndexChanged
-        access = ClientManager(cbClient.Text)
+    Private Sub cbClient_DropDown(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.DropDown
+        cbClient_UpdateState()
+    End Sub
 
+    Private Sub cbClient_UpdateState()
+        For i As Integer = 0 To cbClient.Items.Count - 1
+            Dim client As Access = ClientManager(i)
+            cbClient.Items(i) = client.Name & " - " & IIf(client.Connected, "已連線", "斷線")
+        Next
+    End Sub
+
+
+    Private Sub cbClient_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cbClient.SelectedIndexChanged
+        'access = ClientManager(cbClient.Text)
+
+        access = ClientManager(cbClient.SelectedIndex)
     End Sub
 
 
@@ -290,7 +304,7 @@ Public Class winMain
         If access.GetType Is GetType(Database.AccessClient) AndAlso Not access.Connected Then dgSales.Rows.Clear()
 
         If Me.InvokeRequired Then
-            Me.Invoke(New Action(AddressOf UpdateSalesList))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateSalesList))
             Exit Sub
         End If
 
@@ -368,7 +382,7 @@ Public Class winMain
         End If
 
         Try
-            Me.Invoke(UpdateColumnHandler, dt)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateColumnHandler, dt)
         Catch
 
         End Try
@@ -378,7 +392,7 @@ Public Class winMain
             Exit Sub
         End If
 
-        Me.Invoke(New Action(AddressOf StopUpdate))
+        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf StopUpdate))
         args.progress.Reset("取得訂單/銷貨單內容", 50, 99)
         For i As Integer = 0 To dt.Rows.Count - 1
             args.progress.Report((i + 1) / dt.Rows.Count * 100)
@@ -386,7 +400,7 @@ Public Class winMain
             'BeginAddRowInfo(arr)
             ShowRowInfo(arr, AddRowHandler)
         Next
-        Me.Invoke(New Action(AddressOf ResetUpdate))
+        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf ResetUpdate))
         UpdateLogList()
         args.Dialog.Close()
     End Sub
@@ -502,7 +516,7 @@ Public Class winMain
         Dim args As Object = lst.ToArray()
         '新增/修改顯示清單
         If Me.InvokeRequired Then
-            Me.Invoke(Handler, args)
+            If Not Me.IsDisposed Then Me.Invoke(Handler, args)
         Else
             Handler.Invoke(args)
         End If
@@ -530,7 +544,7 @@ Public Class winMain
     Private Sub access_DeletedSales(ByVal sender As Object, ByVal sales As Database.Sales) Handles m_access.DeletedSales
         'UpdateSalesList()
         If Me.InvokeRequired Then
-            Me.Invoke(DeleteRowHandler, sales)
+            If Not Me.IsDisposed Then Me.Invoke(DeleteRowHandler, sales)
         Else
             DeleteRowHandler.Invoke(sales)
         End If
@@ -558,8 +572,8 @@ Public Class winMain
     Dim UpdateSalesListHandler As New Action(AddressOf UpdateSalesList)
     Private Sub access_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles m_access.ConnectedSuccess
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateTitleHandler)
-            Me.Invoke(UpdateSalesListHandler)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateTitleHandler)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateSalesListHandler)
             Exit Sub
         End If
         If LoginSetting.AutoLog And m_access.User.IsGuest() Then access.LogIn(LoginSetting.ID, LoginSetting.Password)
@@ -574,7 +588,7 @@ Public Class winMain
         If Not Me.Created Or access Is Nothing Then Exit Sub
 
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateLogListHandler)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateLogListHandler)
             Exit Sub
         End If
 
@@ -643,7 +657,7 @@ Public Class winMain
         If arr(0) < StartTime Or EndTime < arr(0) Then Exit Sub
 
         If Me.InvokeRequired Then
-            Me.Invoke(CreateLogHandler, arr)
+            If Not Me.IsDisposed Then Me.Invoke(CreateLogHandler, arr)
         Else
             CreateLogHandler(arr)
         End If
@@ -653,7 +667,7 @@ Public Class winMain
     Private Sub m_access_DeletedLog(ByVal sender As Object, ByVal log As Database.Log) Handles m_access.DeletedLog
         'Dim row As Object = CType(sender, Access).GetLogRow(log.Date, log.Personnel).ItemArray()
         If Me.InvokeRequired Then
-            Me.Invoke(DeleteLogHandler, log)
+            If Not Me.IsDisposed Then Me.Invoke(DeleteLogHandler, log)
         Else
             DeleteLogHandler(log)
         End If
@@ -663,7 +677,7 @@ Public Class winMain
     Dim DeleteAllLogHandler As New Action(Of Object)(AddressOf m_access_DeletedAllLog)
     Private Sub m_access_DeletedAllLog(ByVal sender As Object) Handles m_access.DeletedAllLog
         If Me.InvokeRequired Then
-            Me.Invoke(DeleteAllLogHandler, sender)
+            If Not Me.IsDisposed Then Me.Invoke(DeleteAllLogHandler, sender)
             Exit Sub
         End If
         'dgLog.CurrentCell = Nothing
@@ -767,7 +781,7 @@ Public Class winMain
 
     Private Sub SyncStart()
         If Me.InvokeRequired Then
-            Me.Invoke(SyncStartSyncHandler)
+            If Not Me.IsDisposed Then Me.Invoke(SyncStartSyncHandler)
             Exit Sub
         End If
         lbSyncTitle.Visible = True
@@ -778,7 +792,7 @@ Public Class winMain
 
     Private Sub SyncFinish()
         If Me.InvokeRequired Then
-            Me.Invoke(SyncFinishSyncHandler)
+            If Not Me.IsDisposed Then Me.Invoke(SyncFinishSyncHandler)
             Exit Sub
         End If
         lbSyncTitle.Visible = False
@@ -789,7 +803,7 @@ Public Class winMain
 
     Private Sub SyncMainReport(ByVal msg As String, ByVal percent As Integer)
         If Me.InvokeRequired Then
-            Me.Invoke(SyncMainReportHandler, msg, percent)
+            If Not Me.IsDisposed Then Me.Invoke(SyncMainReportHandler, msg, percent)
             Exit Sub
         End If
 
@@ -799,7 +813,7 @@ Public Class winMain
 
     Private Sub SyncSubReport(ByVal msg As String, ByVal percent As Integer)
         If Me.InvokeRequired Then
-            Me.Invoke(SyncSubReportHandler, msg, percent)
+            If Not Me.IsDisposed Then Me.Invoke(SyncSubReportHandler, msg, percent)
             Exit Sub
         End If
         lbSyncInfo.Text = msg & " - " & percent & "%"
@@ -816,15 +830,11 @@ Public Class winMain
         End Try
     End Sub
 
-    Private Sub cbClient_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbClient.Click
-
-    End Sub
-
     Dim UpdateCbClinetListHandler As New Action(AddressOf UpdateCbClientList)
     Dim UpdateCbClientLock As String = "UpdateCbClientLock"
     Public Sub UpdateCbClientList()
         If Me.InvokeRequired Then
-            Me.Invoke(UpdateCbClinetListHandler)
+            If Not Me.IsDisposed Then Me.Invoke(UpdateCbClinetListHandler)
             Exit Sub
         End If
 
@@ -843,6 +853,7 @@ Public Class winMain
                 End If
             Next
         End SyncLock
+        cbClient_UpdateState()
         'cbClient.Items.Clear()
         'cbClient.Items.AddRange(ClientManager.GetNameList())
     End Sub
@@ -850,4 +861,10 @@ Public Class winMain
     Private Sub 待辦事項ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 待辦事項ToolStripMenuItem.Click
         winAgendum.Show(access)
     End Sub
+
+    Private Sub cbClient_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbClient.Click
+
+    End Sub
+
+
 End Class

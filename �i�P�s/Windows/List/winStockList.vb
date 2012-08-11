@@ -70,7 +70,7 @@
     Public Sub UpdateStockList(ByVal Progress As Database.Access.Progress)
         DT = access.GetStockListWithHistoryPrice(, , Progress)
         Try
-            Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
+            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
         Catch
         End Try
         Progress.Finish()
@@ -141,7 +141,7 @@
     End Sub
 
     Private Sub AddRow(ByVal arr() As Object)
-        DT.Rows.Add(arr)
+        If DT IsNot Nothing Then DT.Rows.Add(arr)
     End Sub
 
     Private Sub RemoveRow(ByVal Label As String)
@@ -172,7 +172,7 @@
         Dim arr() As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
+                If Not Me.IsDisposed Then Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
             Catch
             End Try
         Else
@@ -183,7 +183,7 @@
     Private Sub access_DeletedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.DeletedStock
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(New Action(Of String)(AddressOf RemoveRow), stock.Label)
+                If Not Me.IsDisposed Then Me.Invoke(New Action(Of String)(AddressOf RemoveRow), stock.Label)
             Catch
             End Try
         Else
@@ -197,7 +197,7 @@
         Dim arr() As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
             Try
-                Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
+                If Not Me.IsDisposed Then Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
             Catch
             End Try
         Else
