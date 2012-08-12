@@ -100,7 +100,7 @@ Public Module Program
     Public ProgramVersion As String = "v1.0.6"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
-    Public Server As New Database.AccessServer
+    Public WithEvents Server As New Database.AccessServer
     Public WithEvents ClientManager As New Database.AccessClientMenage()
 
 
@@ -116,6 +116,8 @@ Public Module Program
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
     Public LoginSetting As LoginInfo
     Public WithEvents CurrentAccess As Access
+    Public ErrorList As New List(Of String)
+
 
     Public SystemTitle As String = "進銷存管理系統"
 
@@ -138,7 +140,9 @@ Public Module Program
             Server.Access = myDatabase
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
+            Server.Version = ProgramVersion
             Server.Open(Config.ServerNetIndex)
+            myDatabase.Version = ProgramVersion
             myDatabase.CheckDatabaseExist()
         End If
 
@@ -441,7 +445,7 @@ Public Module Program
             AddHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
             AddHandler .ConnectedSuccess, AddressOf ConnectSuccess
             AddHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
-
+            AddHandler .ErrorMessage, AddressOf ccc_ErrorMessage
         End With
 
     End Sub
@@ -475,6 +479,7 @@ Public Module Program
             RemoveHandler .DeletedHistoryPriceList, AddressOf DeletedHistoryPriceList
             RemoveHandler .ConnectedSuccess, AddressOf ConnectSuccess
             RemoveHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
+            RemoveHandler .ErrorMessage, AddressOf ccc_ErrorMessage
         End With
 
     End Sub
@@ -526,6 +531,10 @@ Public Module Program
         Next
         Return Compare.NoExist
     End Function
+
+    Private Sub ccc_ErrorMessage(ByVal client As TCPTool.Client, ByVal Message As String) Handles ccc.ErrorMessage
+        ErrorList.Add("[" & CType(client, Access).Name & "]" & Message)
+    End Sub
 
     Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.ChangedContract
         If Config.Mode = Connect.Server Then myDatabase.ChangeContract(con, False)
@@ -655,4 +664,8 @@ Public Module Program
         winNotify.Show(msg)
     End Sub
 
+
+    Private Sub Server_ErrorMessage(ByVal sender As TCPTool, ByVal ErrorMessage As String) Handles Server.ErrorMessage
+        ErrorList.Add("[Server]" & ErrorMessage)
+    End Sub
 End Module

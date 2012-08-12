@@ -1,13 +1,18 @@
 ﻿Public Class winAgendum
     WithEvents access As Database.Access
-    Dim Filter As DataGridViewFilter
 
-    Private Sub winAgendum_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
-        Filter = New DataGridViewFilter(dgItem)
-        Filter.AddTextFilter("編號", "種類", "內容")
-        Filter.AddBoolFilter("已完成")
-
+    Private Sub winAgendum_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        For Each box As AgendumBox In Panel1.Controls
+            If box.Changed Then
+                If box.Mode = AgendumBox.Type.Create Then
+                    access.AddAgendum(box.Data)
+                ElseIf box.Mode = AgendumBox.Type.Edit Then
+                    access.ChangeAgendum(box.Data)
+                End If
+            End If
+        Next
     End Sub
+
 
     Private Sub winAgendum_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         BeginUpdateList()
@@ -31,20 +36,66 @@
     End Sub
 
     Public Sub UpdateDataGridView(ByVal dt As DataTable)
-        dgItem.DataSource = dt
-        UpdateTitle("Label", "編號")
-        UpdateTitle("Kind", "種類")
-        UpdateTitle("Message", "內容")
-        UpdateTitle("Modify", "最後修改時間")
-        UpdateTitle("Finished", "已完成")
+        Panel1.Controls.Clear()
+        For i As Integer = 0 To dt.Rows.Count - 1
+            AddAgendum(Database.Agendum.GetFrom(dt.Rows(i)))
+            'Dim box As New AgendumBox
+            'box.Data =
+            'box.Anchor = AnchorStyles.Top + AnchorStyles.Left + Right
+            'box.Top = box.Height * i + 2
+            'box.Mode = AgendumBox.Type.Edit
+            'box.Tag = i
+            'Panel1.Controls.Add(box)
+        Next
 
-        If Filter IsNot Nothing Then Filter.UpdateComboBox()
     End Sub
 
-    Private Sub UpdateTitle(ByVal Label As String, ByVal Text As String)
-        dgItem.Columns(Label).HeaderText = Text
+    Public Sub AddNewAgendum()
+        Dim box As New AgendumBox
+        box.Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
+        box.Top = box.Height * Panel1.Controls.Count + 2
+        box.Mode = AgendumBox.Type.Create
+        box.Tag = Panel1.Controls.Count
+        box.Width = Panel1.Width - 4
+        Panel1.Controls.Add(box)
     End Sub
 
+    Public Sub AddAgendum(ByVal data As Database.Agendum)
+        Dim box As New AgendumBox
+        box.Anchor = AnchorStyles.Top + AnchorStyles.Left + AnchorStyles.Right
+        box.Data = data
+        box.Top = box.Height * Panel1.Controls.Count + 2
+        box.Mode = AgendumBox.Type.Edit
+        box.Tag = Panel1.Controls.Count
+        box.Width = Panel1.Width - 4
+        Panel1.Controls.Add(box)
+    End Sub
+
+    Public Sub ChangeAgendum(ByVal data As Database.Agendum)
+        For i As Integer = 0 To Panel1.Controls.Count - 1
+            If data.Label = CType(Panel1.Controls(i), AgendumBox).Data.Label Then
+                CType(Panel1.Controls(i), AgendumBox).Data = data
+            End If
+        Next
+    End Sub
+
+    Public Sub DeleteAgendum(ByVal data As Database.Agendum)
+        For i As Integer = 0 To Panel1.Controls.Count - 1
+            If data.Label = CType(Panel1.Controls(i), AgendumBox).Data.Label Then
+                CType(Panel1.Controls(i), AgendumBox).Data = data
+                Panel1.Controls.RemoveAt(i)
+                Relocation()
+
+                Exit Sub
+            End If
+        Next
+    End Sub
+
+    Public Sub Relocation()
+        For i As Integer = 0 To Panel1.Controls.Count - 1
+            Panel1.Controls(i).Top = Panel1.Controls(i).Height * i + 2
+        Next
+    End Sub
 
     Dim Finished As Boolean
     Dim MaxCount As Integer
@@ -60,15 +111,27 @@
     End Sub
 
     Private Sub access_ChangedAgendum(ByVal sender As Object, ByVal Agendum As Database.Agendum) Handles access.ChangedAgendum
-
+        If Me.IsDisposed Then Exit Sub
+        If Me.InvokeRequired Then
+            Dim inv As New Action(Of Database.Agendum)(AddressOf ChangeAgendum)
+            Me.Invoke(inv, Agendum)
+        End If
     End Sub
 
     Private Sub access_CreatedAgendum(ByVal sender As Object, ByVal Agendum As Database.Agendum) Handles access.CreatedAgendum
-
+        If Me.IsDisposed Then Exit Sub
+        If Me.InvokeRequired Then
+            Dim inv As New Action(Of Database.Agendum)(AddressOf AddAgendum)
+            Me.Invoke(inv, Agendum)
+        End If
     End Sub
 
     Private Sub access_DeletedAgendum(ByVal sender As Object, ByVal Agendum As Database.Agendum) Handles access.DeletedAgendum
-
+        If Me.IsDisposed Then Exit Sub
+        If Me.InvokeRequired Then
+            Dim inv As New Action(Of Database.Agendum)(AddressOf DeleteAgendum)
+            Me.Invoke(inv, Agendum)
+        End If
     End Sub
 
 
@@ -76,5 +139,7 @@
         BeginUpdateList()
     End Sub
 
-
+    Private Sub 新增CToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 新增CToolStripMenuItem.Click
+        AddNewAgendum()
+    End Sub
 End Class

@@ -22,6 +22,8 @@ Public Class TCPTool
     Public Shared OutputErrorFile As Boolean = False
     Public Shared ErrorFilePath As String = IO.Directory.GetCurrentDirectory & "\TCPError.txt"
 
+    Event ErrorMessage(ByVal sender As TCPTool, ByVal ErrorMessage As String)
+
     Event ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As Client)
     Event RequestConnected(ByVal Sender As TCPTool, ByVal Client As Client)
     Event SetIPAddressFinish(ByVal Sender As TCPTool, ByVal Client As Client)
@@ -54,6 +56,11 @@ Public Class TCPTool
         Dim Message As String
     End Structure
 
+    Friend Overridable Sub OnErrorMessage(ByVal ErrorMessage As String)
+        RaiseEvent ErrorMessage(Me, ErrorMessage)
+    End Sub
+
+
     Public Shared Sub OutputError(Optional ByVal Text As String = "")
         If Not OutputErrorFile Then Exit Sub
         Dim FileNumber As Integer = FreeFile()
@@ -66,6 +73,7 @@ Public Class TCPTool
             'End SyncLock
         Catch
         End Try
+
     End Sub
 
     Public Sub New(Optional ByVal Encode As Client.Encoding = Client.Encoding.Unicode)
@@ -332,6 +340,7 @@ Public Class TCPTool
                 Start()
             Catch
                 OutputError("開新 Listen")
+
                 MsgBox(Err.Description)
             End Try
 
@@ -787,7 +796,7 @@ Public Class TCPTool
         Event ConnectedSuccess(ByVal Client As Client)
         Event ReceiveSplitMessage(ByVal Client As Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String)
         Event ReceiveStreamRequest(ByVal Client As Client, ByVal sender As StreamSender)
-
+        Event ErrorMessage(ByVal client As Client, ByVal Message As String)
 
         Event GetReceive(ByVal ClientClass As Client, ByVal Client As TcpClient, ByVal IP As String, ByVal Port As Integer, ByVal Msg As String)
 
@@ -879,15 +888,16 @@ Public Class TCPTool
             Try : ReceiveThread.Abort() : Catch : End Try
         End Sub
 
-        Friend Sub OnConnectedFail()
+        Friend Overridable Sub OnConnectedFail()
             If AutoConnect Then BeginConnect()
             RaiseEvent ConnectedFail(Me)
         End Sub
 
-        Friend Sub OnConnectedSuccess()
+        Friend Overridable Sub OnConnectedSuccess()
             GetIPAddress()
             RaiseEvent ConnectedSuccess(Me)
         End Sub
+
 
         Public Sub BeginConnect()
             'If ConnectThread IsNot Nothing AndAlso ConnectThread.IsAlive Then Exit Sub
@@ -937,6 +947,10 @@ Public Class TCPTool
             Return TcpClient IsNot Nothing AndAlso TcpClient.Connected
         End Function
 
+        Friend Overridable Sub OnErrorMessage(ByVal Message As String)
+            RaiseEvent ErrorMessage(Me, Message)
+        End Sub
+
         Public Shared Function GetSystemEncoding(ByVal Encode As Encoding) As System.Text.Encoding
             Select Case Encode
                 Case Encoding.AscII : Return System.Text.Encoding.ASCII
@@ -971,14 +985,16 @@ Public Class TCPTool
             Dim Success As Boolean = True
 
             SyncLock SendLock
+                LastCheckConnectStateTime = Now
                 Success = mSend(newMsg)
             End SyncLock
-            Try
-                Success = Success AndAlso TcpClient.Connected
-            Catch
-                Success = False
-                TCPTool.OutputError("傳送訊息: " & Msg)
-            End Try
+            'Try
+            '    Success = Success AndAlso TcpClient.Connected
+            'Catch
+            '    Success = False
+            '    TCPTool.OutputError("傳送訊息: " & Msg)
+            '    OnErrorMessage("傳息發送失敗：" & Msg)
+            'End Try
 
             Return Success
 
@@ -993,6 +1009,7 @@ Public Class TCPTool
             Catch
                 Success = False
                 TCPTool.OutputError("傳送訊息: " & Text)
+                OnErrorMessage("傳息發送失敗：" & Text)
             End Try
             Return Success
         End Function
@@ -1003,6 +1020,7 @@ Public Class TCPTool
 #End Region
 
 #Region "接收資料"
+        Dim LastCheckConnectStateTime As Date = Now
         Public Sub Receive()
             Dim tmpIP As String = ""
             Dim Msg As String = ""
@@ -1021,12 +1039,12 @@ Public Class TCPTool
             Dim Stream As NetworkStream = TcpClient.GetStream()
             Dim cntByte As Int32
 
-            Dim LastCheckConnectStateTime As Date = Now
+            'Dim LastCheckConnectStateTime As Date = Now
             Try
                 Do
                     If (Now - LastCheckConnectStateTime).Seconds > 5 Then
                         Send("%CheckConnectState%")
-                        LastCheckConnectStateTime = Now
+
                     End If
 
                     If Stream.DataAvailable Then
@@ -1096,12 +1114,14 @@ Client_ReceiveThreadStart:
                 Loop
             Catch
                 TCPTool.OutputError(System.Threading.Thread.CurrentThread.Name & " 處理接收訊息: " & GetString)
+                OnErrorMessage("Client.Receive:" & Err.Description)
             End Try
 
             Try
                 TcpClient.Close()
             Catch
                 TCPTool.OutputError("Server關閉錯誤連線")
+                OnErrorMessage("Client.Receive:" & Err.Description)
             End Try
             OnConnectedFail()
         End Sub
@@ -1171,6 +1191,9 @@ Client_ReceiveThreadStart:
 
                     Case "%FileTransmitter%"
                         lstTransmitter.Receive(Me, MsgPart)
+
+                    Case "%FileTransmiterStart%"
+                        lstTransmitter.Start(Me, MsgPart)
                 End Select
 
                 Exit Sub
@@ -1218,6 +1241,7 @@ Client_ReceiveThreadStart:
                 Receiver.Request("Download", sourceFile)
                 Return Receiver
             Catch ex As Exception
+                OnErrorMessage("ClientDownload:" & ex.Message)
                 Return Nothing
             End Try
 
@@ -1236,8 +1260,9 @@ Client_ReceiveThreadStart:
             Inherits List(Of StreamTransmitter)
             Dim ReadLock As String = "ReadLock"
             Dim ElseRequestHandler As Action(Of StreamSender)
-            Sub New(ByVal ElseRequest As Action(Of StreamSender))
-                ElseRequestHandler = ElseRequest
+            Dim Client As Client
+            Sub New(ByVal ElseRequest As Action(Of StreamSender), ByVal Client As Client)
+                ElseRequestHandler = ElseRequest : Me.Client = Client
             End Sub
 
 
@@ -1254,6 +1279,31 @@ Client_ReceiveThreadStart:
                 End SyncLock
             End Sub
 
+            Public Sub Start(ByVal Client As Client, ByVal para() As String)
+                Dim Guid As String = para(1)
+                Select Case para(2)
+                    Case "Download"
+                        Dim Sender As New StreamSender(Client, Guid)
+                        Try
+                            Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
+                            Add(Sender)
+                            Sender.stream = fs
+                            Sender.StartSend()
+                        Catch
+                            Sender.Fail(Err.Description)
+                            Client.OnErrorMessage("Client.TransmitterList.Start" & Err.Description)
+                        End Try
+
+                    Case Else
+                        Dim Sender As New StreamSender(Client, Guid)
+                        Add(Sender)
+                        Sender.Cmd = para(2)
+                        Try : Sender.Args = para(3) : Catch : End Try
+                        ElseRequestHandler(Sender)
+                        Sender.StartSend()
+                End Select
+            End Sub
+
             Public Sub Receive(ByVal Client As Client, ByVal para() As String)
                 Dim Guid As String = para(1)
                 Dim Transmitters As List(Of StreamTransmitter)
@@ -1266,33 +1316,33 @@ Client_ReceiveThreadStart:
                 Next
 
 
-                If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
-                    Select Case para(2)
-                        Case "Download"
-                            Dim Sender As New StreamSender(Client, Guid)
-                            Try
-                                Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
-                                Add(Sender)
-                                Sender.stream = fs
-                                Sender.StartSend()
-                            Catch
-                                Sender.Fail(Err.Description)
-                            End Try
+                'If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
+                '    Select Case para(2)
+                '        Case "Download"
+                '            Dim Sender As New StreamSender(Client, Guid)
+                '            Try
+                '                Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
+                '                Add(Sender)
+                '                Sender.stream = fs
+                '                Sender.StartSend()
+                '            Catch
+                '                Sender.Fail(Err.Description)
+                '            End Try
 
-                        Case Else
-                            Dim Sender As New StreamSender(Client, Guid)
-                            Add(Sender)
-                            Sender.Cmd = para(2)
-                            Try : Sender.Args = para(3) : Catch : End Try
-                            ElseRequestHandler(Sender)
-                            Sender.StartSend()
-                            'Dim receiver As New Receiver(Client, Guid)
-                            'receiver.TotalSize = para(3)
-                            'Add(receiver)
-                            'receiver.RequestData()
-                    End Select
+                '        Case Else
+                '            Dim Sender As New StreamSender(Client, Guid)
+                '            Add(Sender)
+                '            Sender.Cmd = para(2)
+                '            Try : Sender.Args = para(3) : Catch : End Try
+                '            ElseRequestHandler(Sender)
+                '            Sender.StartSend()
+                '            'Dim receiver As New Receiver(Client, Guid)
+                '            'receiver.TotalSize = para(3)
+                '            'Add(receiver)
+                '            'receiver.RequestData()
+                '    End Select
 
-                End If
+                'End If
 
             End Sub
         End Class
@@ -1301,7 +1351,7 @@ Client_ReceiveThreadStart:
             RaiseEvent ReceiveStreamRequest(Me, e)
         End Sub
 
-        Friend lstTransmitter As New TransmitterList(AddressOf OnReceiveStreamRequest)
+        Friend lstTransmitter As New TransmitterList(AddressOf OnReceiveStreamRequest, Me)
 
 #End Region
 
@@ -1315,6 +1365,10 @@ Client_ReceiveThreadStart:
 
             Public Shared Function GetGuid() As String
                 Return Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+            End Function
+
+            Public Function SendRequest(ByVal cmd As String, ByVal Args As String) As Boolean
+                Return Client.Send("%FileTransmiterStart%," & Guid & "," & cmd, Args)
             End Function
 
             Public Function Send(ByVal cmd As String, ByVal Args As String) As Boolean
@@ -1348,7 +1402,6 @@ Client_ReceiveThreadStart:
             Dim BufferSize As Integer = 4096 '32767
             Public Cmd As String
             Public Args As String
-
             Sub New(ByVal Client As Client, ByVal Guid As String)
                 Me.Client = Client
                 Me.Guid = Guid
@@ -1375,6 +1428,7 @@ Client_ReceiveThreadStart:
                     Send("StartSendFile", stream.Length)
                 Catch
                     Fail(Err.Description)
+                    Client.OnErrorMessage("StreamSender.StartSend:" & Err.Description)
                 End Try
 
                 Dim index As Integer = 0
@@ -1401,6 +1455,7 @@ Client_ReceiveThreadStart:
                     End If
                 Catch
                     Fail(Err.Description)
+                    Client.OnErrorMessage("StreamSender.Upload:" & Err.Description)
                     Return False
                 End Try
 
@@ -1409,6 +1464,7 @@ Client_ReceiveThreadStart:
                 Catch
                     ReadToEnd = True
                     Fail(Err.Description)
+                    Client.OnErrorMessage("StreamSender.Upload:" & Err.Description)
                     Return False
                 End Try
 
@@ -1417,6 +1473,7 @@ Client_ReceiveThreadStart:
                 Catch
                     OnTransFail(Err.Description)
                     Fail(Err.Description)
+                    Client.OnErrorMessage("StreamSender.Upload:" & Err.Description)
                     If parent IsNot Nothing Then parent.Remove(Me)
                     Return False
                 End Try
@@ -1498,7 +1555,8 @@ Client_ReceiveThreadStart:
             End Sub
 
             Public Sub Request(ByVal cmd As String, ByVal Args As String)
-                Send(cmd, Args)
+                Send(cmd, Args) '將被SendRequest取代的啟動方法，為了相容性暫時保留
+                SendRequest(cmd, Args)
             End Sub
             'Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
             '    Me.destFile = destFile
@@ -1516,7 +1574,7 @@ Client_ReceiveThreadStart:
                 '    Send("Cancel", "")
                 '    If parent IsNot Nothing Then parent.Remove(Me)
                 'End Try
-                RequestData(0)
+                'RequestData(0)
             End Sub
 
             Private Sub WriteFile(ByVal base64 As String)
@@ -1529,6 +1587,7 @@ Client_ReceiveThreadStart:
                 Dim data() As Byte = Code.Unzip(zipByte)
                 Try
                     stream.Write(data, 0, data.Length)
+                    If stream.Length = TotalSize Then CloseFile()
                 Catch
                     OnTransFail(Err.Description)
                     Cancel()
@@ -1551,7 +1610,7 @@ Client_ReceiveThreadStart:
                 Catch
 
                 End Try
-                RequestData(PartIndex + 1)
+                'RequestData(PartIndex + 1)
             End Sub
 
             Public Sub RequestDataAgain()
@@ -1626,9 +1685,10 @@ Client_ReceiveThreadStart:
 
                         StartReceiveFile(args)
                     Case "SendFileData"
-                        Dim index As Integer = -1
-                        If msg.Length >= 5 Then index = msg(4)
-                        If index = PartIndex OrElse index = -1 Then WriteFile(args)
+                        'Dim index As Integer = -1
+                        'If msg.Length >= 5 Then index = msg(4)
+                        'If index = PartIndex OrElse index = -1 Then WriteFile(args)
+                        WriteFile(args)
                     Case "EndSendFile"
                         CloseFile()
                     Case "SendFail"

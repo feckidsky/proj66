@@ -9,9 +9,13 @@ Public Module UpdateBatabase
 
 #Region "同步資料庫"
     Dim UpdateDataLock As String = "UpdateDataLock"
+    Public syncClient As AccessClient = Nothing
     Public Sub SyncDatabase(ByVal client As Database.AccessClient)
+        If client.SyncWorking Then Exit Sub
         SyncLock UpdateDataLock
             If Not client.Connected Then Exit Sub
+            syncClient = client
+            client.SyncWorking = True
             Dim SyncDialog As New ProgressDialog
             SyncDialog.AutoClose = False
             SyncDialog.Title = "同步資料庫"
@@ -167,6 +171,7 @@ OpenDialog:
             End Try
             main.SyncFinishSyncHandler()
             SyncDialog.Close()
+            client.SyncWorking = False
         End SyncLock
     End Sub
 #End Region

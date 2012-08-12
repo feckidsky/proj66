@@ -825,6 +825,7 @@ Public Class winMain
         Try
             SyncThread.Abort()
             SyncFinish()
+            syncClient.SyncWorking = False
         Catch ex As Exception
 
         End Try

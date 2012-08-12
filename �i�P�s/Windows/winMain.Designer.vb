@@ -24,7 +24,7 @@ Partial Class winMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -310,13 +310,13 @@ Partial Class winMain
         Me.訊息ToolStripMenuItem.Name = "訊息ToolStripMenuItem"
         Me.訊息ToolStripMenuItem.Size = New System.Drawing.Size(64, 24)
         Me.訊息ToolStripMenuItem.Text = "訊息(&M)"
-        Me.訊息ToolStripMenuItem.Visible = False
         '
         '公佈欄ToolStripMenuItem
         '
         Me.公佈欄ToolStripMenuItem.Name = "公佈欄ToolStripMenuItem"
-        Me.公佈欄ToolStripMenuItem.Size = New System.Drawing.Size(140, 22)
+        Me.公佈欄ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.公佈欄ToolStripMenuItem.Text = "公佈欄(&P)"
+        Me.公佈欄ToolStripMenuItem.Visible = False
         '
         '待辦事項ToolStripMenuItem
         '
@@ -621,14 +621,14 @@ Partial Class winMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgLog.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
-        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgLog.Location = New System.Drawing.Point(6, 21)
         Me.dgLog.Name = "dgLog"
         Me.dgLog.ReadOnly = True

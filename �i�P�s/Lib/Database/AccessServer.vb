@@ -3,8 +3,10 @@
         Inherits TCPTool
         Public WithEvents Access As Access
         Public Port As Integer = 3600
-
+        Public Version As String = "none"
         Public Name As String
+
+
 
         Public Sub Open(ByVal Index As Integer)
             ServerOpen(Port, Index)
@@ -26,6 +28,7 @@
 
         Private Sub Server_ServerReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ServerReceiveSplitMessage
             Select Case Data(0)
+
                 Case "ReaderRequest"
                     Dim guid As String = Data(1)
                     Dim Cmd As String = Data(2)
@@ -72,9 +75,12 @@
                 Case "GetSalesInformation"
                     Dim args As Access.GetSalesInformationArgs = Code.XmlDeserializeWithUnzip(Of Access.GetSalesInformationArgs)(Data(1))
                     Client.Send("ResponseSalesInformationArgs", Code.XmlSerializeWithZIP(Access.GetSalesInformation(args.StartTime, args.EndTime)))
+                Case "GetServerVersion"
+                    Client.Send("ServerVersion", Code.XmlSerializeWithZIP(Version))
                 Case Else
                     Dim msg As String = "不支援的指令:" & Data(0)
                     'MsgBox("Server" & msg)
+                    OnErrorMessage("AccessServer.ServerReceiveSplitMessage:" & msg)
                     Client.Send("MsgBox", Code.XmlSerializeWithZIP(msg))
             End Select
         End Sub

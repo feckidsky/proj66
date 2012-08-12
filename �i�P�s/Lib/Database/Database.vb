@@ -76,7 +76,7 @@
         Inherits TCPTool.Client
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
-
+        Public Version As String = "none"
         Public Shared Dir As String
         Public BasePath As String
         Public MsgPath As String
@@ -352,7 +352,7 @@
         End Function
 
         Public Function GetAgendumList(ByVal WithFinished As Boolean, ByVal MaxCount As Integer, Optional ByVal progress As Progress = Nothing) As Data.DataTable
-            Dim SqlCommand As String = "SELECT TOP " & MaxCount & " * FROM " & Agendum.Table & IIf(WithFinished, "", " WHERE Finished=true") & " ORDER BY [modify] DESC ;"
+            Dim SqlCommand As String = "SELECT TOP " & MaxCount & " * FROM " & Agendum.Table & IIf(WithFinished, "", " WHERE Finished=false") & " ORDER BY [modify] DESC ;"
             Return Read("table", MsgPath, SqlCommand, progress)
         End Function
 

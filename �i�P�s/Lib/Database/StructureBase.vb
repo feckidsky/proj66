@@ -1277,7 +1277,7 @@ Namespace Database
         Shared Function ToColumns() As Column()
             Dim Columns As New ColumnList
             Columns.Add("Label", DBTypeLabel)
-            Columns.Add("Kind", DBTypeLabel)
+            Columns.Add("Kind", DBTypeNote)
             Columns.Add("Message", DBTypeNote)
             Columns.Add("Finished", DBTypeBoolean)
             Columns.Add("Modify", DBTypeDate)
@@ -1309,7 +1309,7 @@ Namespace Database
 
         Public Function GetUpdateSqlCommand() As String
             Dim Column As String() = New String() {"Kind", "Message", "Finished", "Modify"}
-            Dim Value As Object() = New Object() {Kind, Message, Finished}
+            Dim Value As Object() = New Object() {Kind, Message, Finished, Modify}
             Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
         End Function
     End Structure

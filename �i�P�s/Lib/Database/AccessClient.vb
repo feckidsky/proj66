@@ -120,7 +120,7 @@
 
     Public Class AccessClient
         Inherits Access
-
+        Public SyncWorking As Boolean = False
         Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
 
         Sub New()
@@ -304,7 +304,7 @@
 
             End Sub
 
-            Private ReadSyncLock As String = "ReadSncLock"
+            Private ReadSyncLock As String = "ReadSyncLock"
             Public Function Read(ByVal cmd As String, ByVal args As ArgsT) As ResultT
 
                 Readed = False
@@ -434,10 +434,17 @@
                 Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
                 Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
                 Case "DeletedAllLog" : OnDeletedAllLog()
-                Case "MsgBox" : MsgBox(Code.XmlDeserializeWithUnzip(Of String)(args))
+                Case "ServerVersion" : Version = Repair(Of String)(args)
+                Case "MsgBox" : OnErrorMessage(Code.XmlDeserializeWithUnzip(Of String)(args)) 'MsgBox(Code.XmlDeserializeWithUnzip(Of String)(args))
                 Case Else
-                    MsgBox("Client:不明指令:" & vbCrLf & Data(0))
+                    'MsgBox("Client:不明指令:" & vbCrLf & Data(0))
+                    OnErrorMessage("Client:不明指令:" & vbCrLf & Data(0))
             End Select
+        End Sub
+
+        Friend Overrides Sub OnConnectedSuccess()
+            MyBase.OnConnectedSuccess()
+            Send("GetServerVersion")
         End Sub
 
         Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
