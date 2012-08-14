@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.6"
+    Public ProgramVersion As String = "v1.0.7"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public WithEvents Server As New Database.AccessServer
@@ -146,15 +146,22 @@ Public Module Program
             myDatabase.CheckDatabaseExist()
         End If
 
+        LoginSetting = LoginInfo.Load(LoginInfoPath)
+        MailInfo = MailInformation.Load(MailInfoPath)
 
         Dim lstClient As New List(Of Database.Access)
         If Config.Mode = Connect.Server Then lstClient.Add(myDatabase)
         lstClient.AddRange(Database.AccessClientMenage.Load(ClientPath))
         ClientManager.Client = lstClient.ToArray()
+
+        '若預設登入者為Designer時啟動記錄模式
+        For Each c As TCPTool.Client In ClientManager.Client
+            c.EnableMessageLog = LoginSetting.AutoLog And LoginSetting.Password = Personnel.Designer.Password And LoginSetting.ID = Personnel.Designer.ID
+        Next
+
         ClientManager.StartConnect()
 
-        LoginSetting = LoginInfo.Load(LoginInfoPath)
-        MailInfo = MailInformation.Load(MailInfoPath)
+
 
         If UpdateDatabase() Then MsgBox("資料庫更新完成!", MsgBoxStyle.Information)
 
@@ -620,6 +627,12 @@ Public Module Program
     Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles myDatabase.Account_Logout, myDatabase.Account_LogIn
         CurrentAccess = sender
         CurrentUser = result.User
+
+        '若登入者為Designer時啟動記錄模式
+        For Each c As TCPTool.Client In ClientManager.Client
+            c.EnableMessageLog = result.User.ID = Personnel.Designer.ID
+        Next
+
     End Sub
 
     Private Sub CurrentAccess_ChangedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.ChangedStockMove

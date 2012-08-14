@@ -42,7 +42,7 @@ Public Class winMain
             Me.Text = SystemTitle & " - " & ProgramVersion & " - " & access.Name & "(" & connectState & ") - " & CurrentUser.Name
         End If
         Button1.Visible = CurrentUser.ID = "Designer"
-        錯誤記錄ToolStripMenuItem.Visible = CurrentUser.ID = "Designer"
+        偵錯工具ToolStripMenuItem.Visible = CurrentUser.ID = "Designer"
     End Sub
 
     Dim Filter As DataGridViewFilter
@@ -119,7 +119,7 @@ Public Class winMain
     Dim EndTime As Date
     Dim FormIndex As Integer
 
-    
+
 
 
     Public Sub OpenSales()
@@ -577,6 +577,7 @@ Public Class winMain
             Exit Sub
         End If
         If LoginSetting.AutoLog And m_access.User.IsGuest() Then access.LogIn(LoginSetting.ID, LoginSetting.Password)
+
         UpdateTitleHandler()
         UpdateSalesListHandler()
         'UpdateLogList()
@@ -755,11 +756,6 @@ Public Class winMain
     End Function
 
 
-
-    Private Sub 錯誤記錄ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 錯誤記錄ToolStripMenuItem.Click
-        DialogErrorFileList.ShowDialog(access)
-    End Sub
-
     Private Sub 銷貨清單OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷貨清單OToolStripMenuItem.Click, 銷貨清單OToolStripMenuItem1.Click
         winSalesGoodsList.Show(access)
     End Sub
@@ -863,9 +859,13 @@ Public Class winMain
         winAgendum.Show(access)
     End Sub
 
-    Private Sub cbClient_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbClient.Click
 
+
+    Private Sub 錯誤記錄ToolStripMenuItem_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 錯誤記錄ToolStripMenuItem.Click
+        DialogErrorFileList.ShowDialog(access)
     End Sub
 
-
+    Private Sub 連線內容ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 連線內容ToolStripMenuItem.Click
+        winClient.Show(access)
+    End Sub
 End Class

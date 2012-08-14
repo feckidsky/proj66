@@ -195,6 +195,12 @@
     <Compile Include="Windows\List\winSalesGoodsList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\UserAccount\winClient.Designer.vb">
+      <DependentUpon>winClient.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\UserAccount\winClient.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\winAgendum.Designer.vb">
       <DependentUpon>winAgendum.vb</DependentUpon>
     </Compile>
@@ -415,6 +421,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\List\winGoodsList.resx">
       <DependentUpon>winGoodsList.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\UserAccount\winClient.resx">
+      <DependentUpon>winClient.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\UserAccount\winLogIn.resx">

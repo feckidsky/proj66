@@ -764,6 +764,25 @@ Public Class TCPTool
 
         Private SendLock As String = "SendMessageLock"
 
+        Public Enum SR
+            Send = 0
+            Receive = 1
+        End Enum
+
+        Public Structure MessageLog
+            Dim Message As String
+            Dim SR As SR
+            Dim Time As Date
+            Sub New(ByVal msg As String, ByVal sr As SR, ByVal time As Date)
+                Me.Message = msg : Me.SR = sr : Me.Time = time
+            End Sub
+        End Structure
+
+
+        Public EnableMessageLog As Boolean = False
+        Public MessageLogList As New List(Of MessageLog)
+
+
 
         Private Sending As Boolean = False
 
@@ -799,7 +818,8 @@ Public Class TCPTool
         Event ErrorMessage(ByVal client As Client, ByVal Message As String)
 
         Event GetReceive(ByVal ClientClass As Client, ByVal Client As TcpClient, ByVal IP As String, ByVal Port As Integer, ByVal Msg As String)
-
+        Event ReceivedWithInsideCommand(ByVal ClientClass As Client, ByVal Client As TcpClient, ByVal IP As String, ByVal Port As Integer, ByVal Msg As String)
+        Event LogMessage(ByVal client As Client, ByVal e As MessageLog)
         Public MyEncoding As System.Text.Encoding
 
         'Public Structure ReceiveStreamRequestArgs
@@ -987,6 +1007,7 @@ Public Class TCPTool
             SyncLock SendLock
                 LastCheckConnectStateTime = Now
                 Success = mSend(newMsg)
+                OnLogMessage(New MessageLog(Msg, SR.Send, Now))
             End SyncLock
             'Try
             '    Success = Success AndAlso TcpClient.Connected
@@ -1000,11 +1021,18 @@ Public Class TCPTool
 
         End Function
 
+        Friend Sub OnLogMessage(ByVal e As MessageLog)
+            If EnableMessageLog Then MessageLogList.Add(e)
+            RaiseEvent LogMessage(Me, e)
+        End Sub
+
         Private Function mSend(ByVal Text As String) As Boolean
             Dim Cmd() As Byte = MyEncoding.GetBytes(Text) ' System.Text.Encoding.Unicode.GetBytes(Text)
             Dim Success As Boolean = True
             Try
+
                 TcpClient.GetStream.Write(Cmd, 0, Cmd.Length)
+
                 'TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
             Catch
                 Success = False
@@ -1195,10 +1223,11 @@ Client_ReceiveThreadStart:
                     Case "%FileTransmiterStart%"
                         lstTransmitter.Start(Me, MsgPart)
                 End Select
-
+                OnLogMessage(New MessageLog(mMsg, SR.Receive, Now))
+                RaiseEvent ReceivedWithInsideCommand(Me, TcpClient, IP, Port, mMsg)
                 Exit Sub
             End If
-
+            OnLogMessage(New MessageLog(mMsg, SR.Receive, Now))
             RaiseEvent ReceiveSplitMessage(Me, IP, Port, MsgPart)
             RaiseEvent GetReceive(Me, TcpClient, IP, Port, mMsg)
         End Sub
@@ -1545,6 +1574,7 @@ Client_ReceiveThreadStart:
             Public PartIndex As Integer = 0
             Event Progress(ByVal sender As Object, ByVal percent As Integer)
             Event Received(ByVal sender As Object, ByVal stream As IO.Stream)
+            Dim GotSize As Boolean = False
 
 
             Sub New(ByVal Client As Client, ByVal Guid As String, Optional ByVal stream As IO.Stream = Nothing)
@@ -1555,7 +1585,7 @@ Client_ReceiveThreadStart:
             End Sub
 
             Public Sub Request(ByVal cmd As String, ByVal Args As String)
-                Send(cmd, Args) '將被SendRequest取代的啟動方法，為了相容性暫時保留
+                'Send(cmd, Args) '將被SendRequest取代的啟動方法，為了相容性暫時保留
                 SendRequest(cmd, Args)
             End Sub
             'Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
@@ -1575,6 +1605,8 @@ Client_ReceiveThreadStart:
                 '    If parent IsNot Nothing Then parent.Remove(Me)
                 'End Try
                 'RequestData(0)
+                PartIndex = 0
+                GotSize = True
             End Sub
 
             Private Sub WriteFile(ByVal base64 As String)
@@ -1582,13 +1614,15 @@ Client_ReceiveThreadStart:
                 Try
                     zipByte = Convert.FromBase64String(base64)
                 Catch
+                    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
                     Cancel()
                 End Try
                 Dim data() As Byte = Code.Unzip(zipByte)
                 Try
                     stream.Write(data, 0, data.Length)
-                    If stream.Length = TotalSize Then CloseFile()
+                    'If stream.Length = TotalSize Then CloseFile()
                 Catch
+                    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
                     OnTransFail(Err.Description)
                     Cancel()
                     If parent IsNot Nothing Then parent.Remove(Me)
@@ -1601,49 +1635,32 @@ Client_ReceiveThreadStart:
                     Try
                         percent = stream.Position / TotalSize * 100
                     Catch
+                        Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
                     End Try
                 End If
 
-
+                Try
+                    If stream.Length = TotalSize Then CloseFile()
+                Catch
+                    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
+                End Try
                 Try
                     RaiseEvent Progress(Me, percent)
                 Catch
-
+                    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
                 End Try
+
+                PartIndex += 1
+
+
                 'RequestData(PartIndex + 1)
             End Sub
 
-            Public Sub RequestDataAgain()
-                Send("RequestDataAgain", PartIndex)
-            End Sub
 
-            Public Sub RequestData(ByVal idx As Long)
-                PartIndex = idx
-                Send("RequestData", idx.ToString & "," & 4096)
-
-                'If WaitResponseThread IsNot Nothing AndAlso WaitResponseThread.IsAlive Then
-                '    Try
-                '        WaitResponseThread.Abort()
-                '    Catch ex As Exception
-
-                '    End Try
-                'End If
-
-                'WaitResponseThread = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf WaitResponse))
-                'WaitResponseThread.IsBackground = True
-                'WaitResponseThread.Start(idx)
-            End Sub
-
-            Dim WaitResponseThread As Threading.Thread
-            Private Sub WaitResponse(ByVal index As Long)
-                Do
-                    Threading.Thread.Sleep(10000)
-                    If index = PartIndex Then
-                        RequestDataAgain()
-
-                    End If
-                Loop Until PartIndex > index
-            End Sub
+            'Public Sub RequestData(ByVal idx As Long)
+            '    PartIndex = idx
+            '    Send("RequestData", idx.ToString & "," & 4096)
+            'End Sub
 
             Private Sub CloseFile()
                 OnReceived()
@@ -1676,6 +1693,25 @@ Client_ReceiveThreadStart:
                 OnTransFail(Message)
             End Sub
 
+            Structure Data
+                Dim Index As Integer
+                Dim Data As String
+            End Structure
+
+            Public BuffData As New List(Of Data)
+
+            Private Sub CheckBuff()
+                Dim idxBuff As Integer
+                Do
+                    idxBuff = BuffData.FindIndex(Function(dt As Data) dt.Index = PartIndex)
+                    If idxBuff <> -1 Then
+                        WriteFile(BuffData(idxBuff).Data)
+                        BuffData.RemoveAt(idxBuff)
+                    End If
+
+                Loop While idxBuff <> -1
+            End Sub
+
 
             Public Overrides Sub Receive(ByVal msg() As String)
                 Dim cmd As String = msg(2)
@@ -1684,13 +1720,30 @@ Client_ReceiveThreadStart:
                     Case "StartSendFile"
 
                         StartReceiveFile(args)
+                        CheckBuff()
                     Case "SendFileData"
-                        'Dim index As Integer = -1
-                        'If msg.Length >= 5 Then index = msg(4)
-                        'If index = PartIndex OrElse index = -1 Then WriteFile(args)
-                        WriteFile(args)
+                        Dim index As Integer = -1
+
+
+                        Try
+                            If msg.Length >= 5 Then index = msg(4)
+                        Catch
+                            Fail(args)
+                        End Try
+
+                        If index = PartIndex OrElse Not GotSize Then
+                            WriteFile(args)
+                            CheckBuff()
+                        Else
+                            Dim tmpData As Data
+                            tmpData.Index = index
+                            tmpData.Data = args
+                            BuffData.Add(tmpData)
+                        End If
+
+                        'WriteFile(args)
                     Case "EndSendFile"
-                        CloseFile()
+                        'CloseFile()
                     Case "SendFail"
                         Fail(args)
                 End Select
