@@ -383,7 +383,7 @@
         Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As StreamReceiver
 
             If Me.GetType Is GetType(Access) Then
-                Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid())
+                Dim Receiver As New StreamReceiver(Me)
                 Try
                     IO.File.Copy(sourcePath, DestPath, True)
                     Return Receiver

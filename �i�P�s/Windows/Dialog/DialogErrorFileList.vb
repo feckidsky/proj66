@@ -4,6 +4,15 @@
 
     WithEvents downloader As TCPTool.Client.StreamReceiver
 
+    Public Overloads Sub Show(ByVal db As Database.Access)
+        access = db
+        Dim lstFile As String() = access.GetErrorLogFileNames()
+        If lstFile Is Nothing Then lstFile = New String() {}
+        ListBox1.Items.Clear()
+        ListBox1.Items.AddRange(lstFile)
+        MyBase.Show()
+    End Sub
+
     Public Overloads Sub ShowDialog(ByVal db As Database.Access)
         access = db
         Dim lstFile As String() = access.GetErrorLogFileNames()

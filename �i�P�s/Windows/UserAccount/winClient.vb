@@ -47,25 +47,39 @@
         receiveCount = 0
         SendCount = 0
         txtReceive.Clear()
+        Dim s As New System.Text.StringBuilder()
         For i As Integer = 0 To access.MessageLogList.Count - 1
             msg = access.MessageLogList(i)
-            AddReceive(access.MessageLogList(i))
+            'AddReceive(access.MessageLogList(i))
+            s.AppendLine(GetDisplayMsg(access.MessageLogList(i)))
+            If access.MessageLogList(i).SR = TCPTool.Client.SR.Send Then
+                SendCount += 1
+            Else
+                receiveCount += 1
+            End If
         Next
+        txtReceive.AppendText(s.ToString)
+        Label1.Text = "接收:" & receiveCount & "  傳送:" & SendCount
     End Sub
 
+    'Public Function GetDisplayText()
+
+
     Private Sub AddReceive(ByVal e As TCPTool.Client.MessageLog)
-        If ckShowCheckMessage.Checked OrElse e.Message <> "%CheckConnectState%" Then txtReceive.AppendText(GetDisplayMsg(e) & vbCrLf)
+        'If ckShowCheckMessage.Checked OrElse e.Message <> "%CheckConnectState%" Then txtReceive.AppendText(GetDisplayMsg(e) & vbCrLf)
+        Dim msg As String = GetDisplayMsg(e)
+        If msg <> "" Then txtReceive.AppendText(msg & vbCrLf)
         If e.SR = TCPTool.Client.SR.Send Then
             SendCount += 1
         Else
             receiveCount += 1
         End If
-
-
         Label1.Text = "接收:" & receiveCount & "  傳送:" & SendCount
     End Sub
 
     Public Function GetDisplayMsg(ByVal e As TCPTool.Client.MessageLog) As String
+        'If ckShowCheckMessage.Checked OrElse e.Message = "%CheckConnectState%" Then
+        If Not ckShowCheckMessage.Checked And e.Message = "%CheckConnectState%" Then Return ""
         Dim strTime As String = IIf(e.SR = TCPTool.Client.SR.Send, "s", "r") & "[" & e.Time.ToString("HH:mm:ss") & "." & e.Time.Millisecond.ToString("000") & "] "
         If ckSimpleMsg.Checked Then
             Dim lst As String() = Split(e.Message, ",")

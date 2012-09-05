@@ -105,8 +105,46 @@
                 Case "GetSalesInformation"
                     Dim args As Access.GetSalesInformationArgs = Code.XmlDeserializeWithUnzip(Of Access.GetSalesInformationArgs)(sender.Args)
                     sender.stream = New IO.MemoryStream(System.Text.Encoding.ASCII.GetBytes(Code.XmlSerializeWithZIP(Access.GetSalesInformation(args.StartTime, args.EndTime))))
+
+                Case "AccessReader"
+                    Dim args As ReadArgs = Code.XmlDeserializeWithUnzip(Of ReadArgs)(sender.Args)
+                    Dim lstFile As String() = Array.ConvertAll(args.FileList, Function(f As String) Access.Dir & "\" & IO.Path.GetFileName(f))
+                    Dim dt As DataTable = Access.Read(args.Table, lstFile, args.SqlCommand, Nothing)
+                    Dim dtSender As New AccessSender(Client, sender.Guid, dt)
+                    Client.lstTransmitter.Add(dtSender)
+                    dtSender.StartSend()
             End Select
         End Sub
+
+        Class AccessSender
+            Inherits Access.StreamSender
+            Public DataTable As DataTable
+
+            Sub New(ByVal client As Client, ByVal guid As String, ByVal DataTable As DataTable)
+                MyBase.New(client, guid)
+                Me.DataTable = DataTable
+            End Sub
+
+            Public Shadows Sub StartSend()
+                If DataTable Is Nothing Then
+                    Fail("查無資料")
+                    Exit Sub
+                End If
+
+                Dim dt As DataTable = DataTable.Clone
+                Send("DataTableStructure", DataTable.Rows.Count & "," & Code.XmlSerializeWithZIP(dt))
+                For i As Integer = 0 To DataTable.Rows.Count - 1
+                    'Send("Row", i & "," & Code.Zip(Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, Function(s As Object) Strings.Trim(s)), ",")))
+                    Send("Row", i & "," & Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, AddressOf Code.ToBase64), ":"))
+                Next
+
+            End Sub
+
+            Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
+                MyBase.Receive(cmd, msg)
+            End Sub
+
+        End Class
 
         Private Sub ReaderRequest(ByVal client As TCPTool.Client, ByVal Guid As String, ByVal Cmd As String, ByVal ArgsSerialize As String)
 

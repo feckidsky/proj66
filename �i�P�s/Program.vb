@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.7"
+    Public ProgramVersion As String = "v1.0.8"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public WithEvents Server As New Database.AccessServer
@@ -131,7 +131,33 @@ Public Module Program
         End With
     End Sub
 
+    Function GetBase64(ByVal s As String) As String
+        Dim data As Byte() = System.Text.Encoding.UTF8.GetBytes(s)
+        Return Convert.ToBase64String(data)
+    End Function
+
+    Function Sum(ByVal n() As Integer) As Integer
+        Dim s As Integer = 0
+        For i As Integer = 0 To n.Length - 1
+            s += n(i)
+        Next
+        Return s
+    End Function
+
     Public Sub InitialProgram()
+
+        'Dim t As String = "G120128180923       ,9103-R              ,手機        ,SAMSUNG   ,,2012/3/16 下午 08:38:06"
+        'Dim tt() As String = Split(t, ",")
+
+        ''Dim tZip As String() = Array.ConvertAll(tt, AddressOf Code.Zip)
+
+        'Dim base64() As String = Array.ConvertAll(tt, AddressOf Code.ToBase64)
+        'Dim jBase64 As String = Code.ToBase64(Join(base64, ","))
+
+        ''Dim tLen() As Integer = Array.ConvertAll(tt, Function(s As String) s.Length)
+        'Dim bLen() As Integer = Array.ConvertAll(base64, Function(s As String) s.Length)
+        ''Dim zLen() As Integer = Array.ConvertAll(tZip, Function(s As String) s.Length)
+
 
         ConfigLoad()
 
@@ -272,6 +298,18 @@ Public Module Program
 
 #Region "Code - 序列化 / 壓縮"
     Public Class Code
+
+
+        Public Shared Function ToBase64(ByVal s As String) As String
+            Dim data As Byte() = System.Text.Encoding.UTF8.GetBytes(s)
+            Return Convert.ToBase64String(data)
+        End Function
+
+        Public Shared Function FromBase64(ByVal s As String) As String
+            Dim data As Byte() = Convert.FromBase64String(s)
+            Return System.Text.Encoding.UTF8.GetString(data)
+        End Function
+
         Public Shared Function Zip(ByVal Text As String, Optional ByVal ZipCount As Int16 = 1) As String
             If Text = "" Then Return ""
             If ZipCount > 0 Then

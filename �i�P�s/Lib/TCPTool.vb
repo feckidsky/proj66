@@ -999,8 +999,7 @@ Public Class TCPTool
 
 
 
-        Public Function Send(ByVal Msg As String) As Boolean ', Optional ByVal SendLevel As Level = Level.Low) As Boolean
-            Dim SendLevel As Level = Level.Low
+        Public Function Send(ByVal Msg As String) As Boolean
             Dim newMsg As String = "[/" & Msg & "/]"
             Dim Success As Boolean = True
 
@@ -1009,13 +1008,6 @@ Public Class TCPTool
                 Success = mSend(newMsg)
                 OnLogMessage(New MessageLog(Msg, SR.Send, Now))
             End SyncLock
-            'Try
-            '    Success = Success AndAlso TcpClient.Connected
-            'Catch
-            '    Success = False
-            '    TCPTool.OutputError("傳送訊息: " & Msg)
-            '    OnErrorMessage("傳息發送失敗：" & Msg)
-            'End Try
 
             Return Success
 
@@ -1031,7 +1023,18 @@ Public Class TCPTool
             Dim Success As Boolean = True
             Try
 
-                TcpClient.GetStream.Write(Cmd, 0, Cmd.Length)
+                '取得資料流
+                Dim stream As NetworkStream = TcpClient.GetStream()
+
+                '等待可寫入狀態
+                Dim waitCount As Integer = 3
+                Do Until (stream.CanWrite Or waitCount = 0)
+                    Threading.Thread.Sleep(1000)
+                    waitCount -= 1
+                Loop
+
+                '發送訊息
+                stream.Write(Cmd, 0, Cmd.Length)
 
                 'TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
             Catch
@@ -1265,7 +1268,7 @@ Client_ReceiveThreadStart:
 
             Try
                 Dim fs As IO.FileStream = New IO.FileStream(destFile, IO.FileMode.Create)
-                Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid(), fs)
+                Dim Receiver As New StreamReceiver(Me, fs)
                 lstTransmitter.Add(Receiver)
                 Receiver.Request("Download", sourceFile)
                 Return Receiver
@@ -1277,13 +1280,12 @@ Client_ReceiveThreadStart:
             'Receiver.RequestData() ' .StartDownload(sourceFile, destFile)
         End Function
 
-        Public Function GetReceiver() As StreamReceiver  'ByVal cmd As String, ByVal args As String) As StreamReceiver
-            Dim ms As New IO.MemoryStream
-            Dim Receiver As New StreamReceiver(Me, StreamTransmitter.GetGuid, ms)
-            lstTransmitter.Add(Receiver)
-            'Receiver.Request(cmd, args)
-            Return Receiver
-        End Function
+        'Public Function GetReceiver() As StreamReceiver  'ByVal cmd As String, ByVal args As String) As StreamReceiver
+        '    Dim ms As New IO.MemoryStream
+        '    Dim Receiver As New StreamReceiver(Me, ms)
+        '    lstTransmitter.Add(Receiver)
+        '    Return Receiver
+        'End Function
 
         Friend Class TransmitterList
             Inherits List(Of StreamTransmitter)
@@ -1317,6 +1319,7 @@ Client_ReceiveThreadStart:
                             Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
                             Add(Sender)
                             Sender.stream = fs
+
                             Sender.StartSend()
                         Catch
                             Sender.Fail(Err.Description)
@@ -1325,11 +1328,15 @@ Client_ReceiveThreadStart:
 
                     Case Else
                         Dim Sender As New StreamSender(Client, Guid)
-                        Add(Sender)
+
                         Sender.Cmd = para(2)
-                        Try : Sender.Args = para(3) : Catch : End Try
+                        If para.Length > 3 Then Sender.Args = para(3)
+                        If para.Length > 4 Then Sender.BufferSize = para(4)
                         ElseRequestHandler(Sender)
-                        Sender.StartSend()
+                        If Sender.stream IsNot Nothing Then
+                            Add(Sender)
+                            Sender.StartSend()
+                        End If
                 End Select
             End Sub
 
@@ -1340,41 +1347,17 @@ Client_ReceiveThreadStart:
                 SyncLock ReadLock
                     Transmitters = FindAll(Function(i As StreamTransmitter) i.Guid = Guid)
                 End SyncLock
-                For Each r As StreamTransmitter In Transmitters
-                    r.Receive(para)
-                Next
-
-
-                'If Transmitters Is Nothing OrElse Transmitters.Count = 0 Then
-                '    Select Case para(2)
-                '        Case "Download"
-                '            Dim Sender As New StreamSender(Client, Guid)
-                '            Try
-                '                Dim fs As New IO.FileStream(para(3), IO.FileMode.Open, IO.FileAccess.Read)
-                '                Add(Sender)
-                '                Sender.stream = fs
-                '                Sender.StartSend()
-                '            Catch
-                '                Sender.Fail(Err.Description)
-                '            End Try
-
-                '        Case Else
-                '            Dim Sender As New StreamSender(Client, Guid)
-                '            Add(Sender)
-                '            Sender.Cmd = para(2)
-                '            Try : Sender.Args = para(3) : Catch : End Try
-                '            ElseRequestHandler(Sender)
-                '            Sender.StartSend()
-                '            'Dim receiver As New Receiver(Client, Guid)
-                '            'receiver.TotalSize = para(3)
-                '            'Add(receiver)
-                '            'receiver.RequestData()
-                '    End Select
-
-                'End If
-
+                If Transmitters.Count > 0 Then
+                    Dim newPara(para.Length - 3 - 1) As String
+                    Array.ConstrainedCopy(para, 3, newPara, 0, para.Length - 3)
+                    For Each r As StreamTransmitter In Transmitters
+                        r.Receive(para(2), newPara)
+                    Next
+                End If
             End Sub
         End Class
+
+
 
         Public Sub OnReceiveStreamRequest(ByVal e As StreamSender)
             RaiseEvent ReceiveStreamRequest(Me, e)
@@ -1388,11 +1371,10 @@ Client_ReceiveThreadStart:
             Friend parent As TransmitterList
             Public Guid As String
             Public WithEvents Client As Client
-            'Friend fs As IO.FileStream
             Friend stream As IO.Stream
             Event TransFail(ByVal sender As Object, ByVal Message As String)
 
-            Public Shared Function GetGuid() As String
+            Public Shared Function GetNewGuid() As String
                 Return Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
             End Function
 
@@ -1409,7 +1391,7 @@ Client_ReceiveThreadStart:
             End Sub
 
 
-            Public MustOverride Sub Receive(ByVal msg() As String)
+            Public MustOverride Sub Receive(ByVal Cmd As String, ByVal Para() As String)
 
             Private Sub Client_ConnectedFail(ByVal Client As Client) Handles Client.ConnectedFail
 
@@ -1428,30 +1410,17 @@ Client_ReceiveThreadStart:
         Public Class StreamSender
             Inherits StreamTransmitter
             Dim ReadToEnd As Boolean = False
-            Dim BufferSize As Integer = 4096 '32767
+            Public BufferSize As Integer = 4096 '32767
             Public Cmd As String
             Public Args As String
             Sub New(ByVal Client As Client, ByVal Guid As String)
                 Me.Client = Client
                 Me.Guid = Guid
-                'Me.stream = stream
+
             End Sub
 
-            'Public Sub WriteString(ByVal text As String)
-            '    stream = New IO.MemoryStream()
-            '    Dim sw As New IO.StreamWriter(stream)
-            '    sw.Write(text)
-            '    sw.Dispose()
-            'End Sub
-
             Public Sub StartSend()
-                'Try
-                '    Me.stream = stream ' New IO.FileStream(Path, IO.FileMode.Open, IO.FileAccess.Read)
-                'Catch
-                '    OnTransFail(Err.Description)
-                '    Send("Fail", Err.Description)
-                '    If parent IsNot Nothing Then parent.Remove(Me)
-                'End Try
+
                 ReadToEnd = False
                 Try
                     Send("StartSendFile", stream.Length)
@@ -1544,8 +1513,8 @@ Client_ReceiveThreadStart:
                 Send("Fail", msg)
             End Sub
 
-            Public Overrides Sub Receive(ByVal msg() As String)
-                Dim cmd As String = msg(2)
+            Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
+                'Dim cmd As String = msg(2)
                 'Dim args As String = msg(3)
 
                 Select Case cmd
@@ -1577,16 +1546,18 @@ Client_ReceiveThreadStart:
             Dim GotSize As Boolean = False
 
 
-            Sub New(ByVal Client As Client, ByVal Guid As String, Optional ByVal stream As IO.Stream = Nothing)
+            Sub New(ByVal Client As Client, Optional ByVal stream As IO.Stream = Nothing)
                 Me.Client = Client
-                Me.Guid = Guid 'Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+                'Me.Guid = Guid 'Convert.ToBase64String(System.Guid.NewGuid.ToByteArray)
+                Me.Guid = GetNewGuid()
                 If stream Is Nothing Then stream = New IO.MemoryStream
                 Me.stream = stream
+
+                Client.lstTransmitter.Add(Me)
             End Sub
 
             Public Sub Request(ByVal cmd As String, ByVal Args As String)
-                'Send(cmd, Args) '將被SendRequest取代的啟動方法，為了相容性暫時保留
-                SendRequest(cmd, Args)
+                SendRequest(cmd, Args & "," & 255)
             End Sub
             'Public Sub StartDownload(ByVal sourceFile As String, ByVal destFile As String)
             '    Me.destFile = destFile
@@ -1644,11 +1615,12 @@ Client_ReceiveThreadStart:
                 Catch
                     Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
                 End Try
-                Try
-                    RaiseEvent Progress(Me, percent)
-                Catch
-                    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
-                End Try
+
+                'Try
+                OnProgress(percent)
+                'Catch
+                '    Client.OnErrorMessage("Client.StreamReceiver:" & Err.Description)
+                'End Try
 
                 PartIndex += 1
 
@@ -1691,6 +1663,7 @@ Client_ReceiveThreadStart:
                     If parent IsNot Nothing Then parent.Remove(Me)
                 End Try
                 OnTransFail(Message)
+                Client.OnErrorMessage(Message)
             End Sub
 
             Structure Data
@@ -1713,9 +1686,9 @@ Client_ReceiveThreadStart:
             End Sub
 
 
-            Public Overrides Sub Receive(ByVal msg() As String)
-                Dim cmd As String = msg(2)
-                Dim args As String = msg(3)
+            Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
+                'Dim cmd As String = msg(2)
+                Dim args As String = msg(0)
                 Select Case cmd
                     Case "StartSendFile"
 
@@ -1724,9 +1697,8 @@ Client_ReceiveThreadStart:
                     Case "SendFileData"
                         Dim index As Integer = -1
 
-
                         Try
-                            If msg.Length >= 5 Then index = msg(4)
+                            index = msg(1)
                         Catch
                             Fail(args)
                         End Try
@@ -1745,11 +1717,14 @@ Client_ReceiveThreadStart:
                     Case "EndSendFile"
                         'CloseFile()
                     Case "SendFail"
-                        Fail(args)
+                        Fail("Server:" & args)
                 End Select
 
             End Sub
 
+            Overridable Sub OnProgress(ByVal percent As Integer)
+                RaiseEvent Progress(Me, percent)
+            End Sub
 
         End Class
 

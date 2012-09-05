@@ -862,7 +862,7 @@ Public Class winMain
 
 
     Private Sub 錯誤記錄ToolStripMenuItem_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 錯誤記錄ToolStripMenuItem.Click
-        DialogErrorFileList.ShowDialog(access)
+        DialogErrorFileList.Show(access)
     End Sub
 
     Private Sub 連線內容ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 連線內容ToolStripMenuItem.Click

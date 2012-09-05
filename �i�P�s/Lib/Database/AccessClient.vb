@@ -210,34 +210,6 @@
             End Sub
         End Class
 
-        'Class Reader(Of T, ResultT)
-        '    Inherits ReaderBase
-        '    Public Args As T
-        '    Public Result As ResultT
-        '    Public DefaultResult As ResultT
-        '    Public DeserializeFun As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip
-
-        '    Public Function Read(ByVal SendHandler As Action(Of String, String, String)) As ResultT
-        '        Waiter.Reset()
-        '        SendHandler("ReaderRequest", Guid & "," & Cmd, Code.XmlSerializeWithZIP(Args))
-        '        Waiter.WaitOne()
-        '        'If Not Waiter.WaitOne(TimeOut, False) Then
-        '        '    Result = DefaultResult
-        '        '    MsgBox(Name & "沒有回應!", MsgBoxStyle.Exclamation)
-        '        'End If
-
-        '        Return Result
-        '    End Function
-
-        '    Public Overrides Function Receive(ByVal Guid As String, ByVal SerializeData As String) As Boolean
-        '        'If Me.Guid <> Guid Then Return False
-        '        Result = DeserializeFun(SerializeData) 'Repair(Of ResultT)(SerializeData)
-        '        Waiter.Set()
-        '        Return True
-        '    End Function
-        'End Class
-
-
 
         Public Overrides Function Read(ByVal Table As String, ByVal FileList() As String, ByVal SQLCommand() As String, Optional ByVal ProgressAction As Progress = Nothing) As Data.DataTable
             If Not Connected() Then
@@ -251,13 +223,17 @@
             args.SqlCommand = SQLCommand
 
 
-            Dim receiver As StreamReceiver = GetReceiver()
+            Dim dt As DataTable
+            If Version = "v1.0.7" Then
+                Dim reader = New DataTableReader(Me)
+                dt = reader.Read(args, ProgressAction)
+            Else
+                Dim reader = New AccessReader(Me)
+                dt = reader.Read(args, ProgressAction)
+            End If
 
-            Dim reader As New DataTableReader
-            reader.Set(receiver, ProgressAction)
-            Dim dt = reader.Read("DataTable", args)
+
             Return dt
-
         End Function
 
         Public Function FarRead(Of T, ResultT)(ByVal Cmd As String, ByVal args As T, Optional ByVal Progress As Progress = Nothing) As ResultT
@@ -266,49 +242,49 @@
                 Return Nothing
             End If
 
-            Dim receiver As StreamReceiver = GetReceiver()
-            Dim r As New Reader(Of T, ResultT)
-            r.Set(receiver, Progress)
-            Return r.Read(Cmd, args)
+            Dim r As New Reader(Of T, ResultT)(Me)
+            Return r.Read(Cmd, args, Progress)
         End Function
 
         Class Reader(Of ArgsT, ResultT)
-            WithEvents receiver As StreamReceiver
+            Inherits StreamReceiver
             Public Waiter As New Threading.AutoResetEvent(True)
-            Public Progress As Progress
 
-            Dim result As ResultT
+            Public Progresser As Progress
 
-            Public Serialize As Func(Of ArgsT, String) = AddressOf Code.XmlSerializeWithZIP(Of ArgsT)
-            Public Deserialize As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip(Of ResultT)
+            Public result As ResultT
 
-            Dim Readed As Boolean = False
+            'Public Serialize As Func(Of ArgsT, String) = AddressOf Code.XmlSerializeWithZIP(Of ArgsT)
+            'Public Deserialize As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip(Of ResultT)
 
-            Sub New()
+            Public Readed As Boolean = False
 
+            Sub New(ByVal client As TCPTool.Client)
+                MyBase.New(client)
             End Sub
 
-            Public Sub [Set](ByVal receiver As StreamReceiver, ByVal ProgressAction As Progress)
-                Try
-                    Me.receiver = receiver
-                Catch
+            Friend Overridable Function Serialize(ByVal args As ArgsT) As String  'As Func(Of ArgsT, String) = AddressOf Code.XmlSerializeWithZIP(Of ArgsT)
+                Return Code.XmlSerializeWithZIP(Of ArgsT)(args)
+            End Function
 
-                End Try
-                Me.Progress = ProgressAction
-                'If Progress IsNot Nothing AndAlso Progress.CancelHandler IsNot Nothing Then
-                If Progress IsNot Nothing Then
-                    Progress.Report(0)
-                    Dim newCancelHandler As New Progress.CancelAction(AddressOf receiver.Cancel)
-                    Progress.CancelHandler = [Delegate].Combine(Progress.CancelHandler, newCancelHandler)
-                End If
+            Friend Overridable Function Deserialize(ByVal Str As String) As ResultT  'As Func(Of String, ResultT) = AddressOf Code.XmlDeserializeWithUnzip(Of ResultT)
+                Return Code.XmlDeserializeWithUnzip(Of ResultT)(Str)
+            End Function
 
-            End Sub
 
             Private ReadSyncLock As String = "ReadSyncLock"
-            Public Function Read(ByVal cmd As String, ByVal args As ArgsT) As ResultT
+            Public Overridable Function Read(ByVal cmd As String, ByVal args As ArgsT, ByVal Progresser As Progress) As ResultT
+
+                '設定進度回報元件
+                Me.Progresser = Progresser
+                If Progresser IsNot Nothing Then
+                    Progresser.Report(0)
+                    Dim newCancelHandler As New Progress.CancelAction(AddressOf Cancel)
+                    Progresser.CancelHandler = [Delegate].Combine(Progresser.CancelHandler, newCancelHandler)
+                End If
 
                 Readed = False
-                receiver.Request(cmd, Serialize(args))
+                Request(cmd, Serialize(args))
 
 
                 Do Until Readed
@@ -318,30 +294,135 @@
                 Return result
             End Function
 
-            Private Sub receiver_Progress(ByVal sender As Object, ByVal percent As Integer) Handles receiver.Progress
-                If Progress IsNot Nothing Then Progress.Report(percent)
+            Private Sub Reader_Progress(ByVal sender As Object, ByVal percent As Integer) Handles Me.Progress
+                If Progresser IsNot Nothing Then Progresser.Report(percent)
             End Sub
 
-            Private Sub receiver_Received(ByVal sender As Object, ByVal stream As System.IO.Stream) Handles receiver.Received
-
+            Private Sub Reader_Received(ByVal sender As Object, ByVal stream As System.IO.Stream) Handles Me.Received
                 Dim bytes() As Byte = CType(stream, IO.MemoryStream).ToArray '     stream.Read(bytes, 0, bytes.Length)
                 Dim text As String = System.Text.Encoding.ASCII.GetString(bytes)
                 result = Deserialize(text)
                 Readed = True
                 Waiter.Set()
-                If Progress IsNot Nothing Then Progress.Finish()
+                If Progresser IsNot Nothing Then Progresser.Finish()
             End Sub
 
-            Private Sub receiver_TransFail(ByVal sender As Object, ByVal Message As String) Handles receiver.TransFail
-
+            Private Sub Reader_TransFail(ByVal sender As Object, ByVal Message As String) Handles Me.TransFail
                 Readed = True
                 Waiter.Set()
-
+                If Progresser IsNot Nothing Then Progresser.Finish()
             End Sub
         End Class
 
-        Class DataTableReader
+        Public Class DataTableReader
             Inherits Reader(Of ReadArgs, DataTable)
+
+
+            Sub New(ByVal client As TCPTool.Client)
+                MyBase.New(client)
+            End Sub
+
+            Public Overloads Function Read(ByVal args As ReadArgs, ByVal Progresser As Access.Progress) As System.Data.DataTable
+                Return MyBase.Read("DataTable", args, Progresser)
+            End Function
+
+
+
+        End Class
+
+        Public Class AccessReader
+            Inherits Reader(Of ReadArgs, DataTable)
+
+            Dim DataTable As DataTable
+            Dim TotalRowsCount As Integer = 0
+
+            Sub New(ByVal client As TCPTool.Client)
+                MyBase.New(client)
+            End Sub
+
+            Public Overloads Function Read(ByVal args As ReadArgs, ByVal Progresser As Access.Progress) As System.Data.DataTable
+                Return MyBase.Read("AccessReader", args, Progresser)
+            End Function
+
+            Structure ReceiveData
+                Dim cmd As String
+                Dim msg() As String
+            End Structure
+
+            Dim ReceiveBuffLock As String = "ReceiveBuffLock"
+            Dim ReceiveBuff As New List(Of ReceiveData)
+
+            Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
+                Select Case cmd
+                    Case "DataTableStructure"
+                        TotalRowsCount = msg(0)
+                        DataTable = Code.XmlDeserializeWithUnzip(Of DataTable)(msg(1))
+                        Report("取得資料表結構", 1)
+                        If TotalRowsCount = 0 Then Finish()
+                        ProccessReceiveBuff()
+                    Case "Row"
+
+                        If DataTable IsNot Nothing Then
+                            AddRow(cmd, msg)
+                            ProccessReceiveBuff()
+                        Else
+                            Dim data As ReceiveData
+                            data.cmd = cmd
+                            data.msg = msg
+                            SyncLock ReceiveBuffLock
+                                ReceiveBuff.Add(data)
+                            End SyncLock
+                        End If
+
+                End Select
+
+                MyBase.Receive(cmd, msg)
+            End Sub
+
+            Public Sub ProccessReceiveBuff()
+                If DataTable Is Nothing Then Exit Sub
+                SyncLock ReceiveBuffLock
+                    For i As Integer = 0 To ReceiveBuff.Count - 1
+                        Dim data As ReceiveData = ReceiveBuff(i)
+                        AddRow(data.cmd, data.msg)
+                    Next
+                    ReceiveBuff.Clear()
+                End SyncLock
+            End Sub
+
+            Private AddRowLock As String = "AddRowLock"
+
+
+
+            Public Sub AddRow(ByVal cmd As String, ByVal msg() As String)
+                Dim Index As Integer = msg(0)
+                Dim items As String() = Array.ConvertAll(Split(msg(1), ":"), AddressOf Code.FromBase64)
+
+                SyncLock AddRowLock
+                    DataTable.Rows.Add(items)
+                End SyncLock
+                Report("讀取進度", 1 + IIf(TotalRowsCount > 0, DataTable.Rows.Count / TotalRowsCount, 0) * 99)
+
+                '完成
+                If TotalRowsCount = DataTable.Rows.Count Then
+                    result = DataTable
+                    Finish()
+                End If
+
+            End Sub
+
+            Public Sub Finish()
+                Readed = True
+                Waiter.Set()
+                If Progresser IsNot Nothing Then Progresser.Finish()
+            End Sub
+
+            Public Sub Report(ByVal msg As String, ByVal percent As Integer)
+                If Progresser IsNot Nothing Then Progresser.Report(msg, percent)
+            End Sub
+
+
+
         End Class
 
         Public Overrides Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As Access.SalesInformation
@@ -362,12 +443,6 @@
         Public Overrides Sub DeleteFile(ByVal File As String)
             Send("DeleteFile", File)
         End Sub
-
-        'Public Function Base64toByteWithZip(ByVal base64 As String) As Byte()
-        '    Dim zipBytes() As Byte = Convert.FromBase64String(base64)
-        '    Return Code.Unzip(zipBytes)
-        'End Function
-
 
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
             MyBase.Send(cmd, Code.XmlSerializeWithZIP(args))
@@ -434,7 +509,7 @@
                 Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
                 Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
                 Case "DeletedAllLog" : OnDeletedAllLog()
-                Case "ServerVersion" : Version = Repair(Of String)(args)
+                Case "ServerVersion" : Version = Repair(Of String)(args) : GotServerVersion()
                 Case "MsgBox" : OnErrorMessage(Code.XmlDeserializeWithUnzip(Of String)(args)) 'MsgBox(Code.XmlDeserializeWithUnzip(Of String)(args))
                 Case Else
                     'MsgBox("Client:不明指令:" & vbCrLf & Data(0))
@@ -443,8 +518,11 @@
         End Sub
 
         Friend Overrides Sub OnConnectedSuccess()
-            MyBase.OnConnectedSuccess()
             Send("GetServerVersion")
+        End Sub
+
+        Private Sub GotServerVersion()
+            MyBase.OnConnectedSuccess()
         End Sub
 
         Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
