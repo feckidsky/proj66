@@ -1004,7 +1004,7 @@ Public Class TCPTool
             Dim Success As Boolean = True
 
             SyncLock SendLock
-                LastCheckConnectStateTime = Now
+
                 Success = mSend(newMsg)
                 OnLogMessage(New MessageLog(Msg, SR.Send, Now))
             End SyncLock
@@ -1018,6 +1018,7 @@ Public Class TCPTool
             RaiseEvent LogMessage(Me, e)
         End Sub
 
+        Public SendWaiter As New Threading.AutoResetEvent(True)
         Private Function mSend(ByVal Text As String) As Boolean
             Dim Cmd() As Byte = MyEncoding.GetBytes(Text) ' System.Text.Encoding.Unicode.GetBytes(Text)
             Dim Success As Boolean = True
@@ -1033,8 +1034,12 @@ Public Class TCPTool
                     waitCount -= 1
                 Loop
 
+                LastCheckConnectStateTime = Now
                 'µo°e°T®§
-                stream.Write(Cmd, 0, Cmd.Length)
+                'stream.Write(Cmd, 0, Cmd.Length)
+                stream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
+                'SendWaiter.Reset()
+                'SendWaiter.WaitOne(1000 * 60, False)
 
                 'TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
             Catch
@@ -1046,7 +1051,7 @@ Public Class TCPTool
         End Function
 
         Private Sub mSended(ByVal Result As System.IAsyncResult)
-
+            'SendWaiter.Set()
         End Sub
 #End Region
 

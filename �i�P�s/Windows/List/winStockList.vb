@@ -89,7 +89,27 @@
         Catch
 
         End Try
+        'Dim count As Integer = dgItemList.RowCount
+        'For i As Integer = 0 To count - 1
+        '    Dim cell As New DataGridViewRowHeaderCell()
+        '    cell.Value = i
+        '    'cell.
+        '    dgItemList.Rows(i).HeaderCell = cell
+        'Next
+
+        'Dim cell As New DataGridViewRowHeaderCell()
+        'AddHandler cell.
     End Sub
+
+    'Class DataGridViewRowHandlerCellEx
+    '    Inherits DataGridViewRowHeaderCell
+
+    '    Protected Overrides Sub Paint(ByVal graphics As System.Drawing.Graphics, ByVal clipBounds As System.Drawing.Rectangle, ByVal cellBounds As System.Drawing.Rectangle, ByVal rowIndex As Integer, ByVal cellState As System.Windows.Forms.DataGridViewElementStates, ByVal value As Object, ByVal formattedValue As Object, ByVal errorText As String, ByVal cellStyle As System.Windows.Forms.DataGridViewCellStyle, ByVal advancedBorderStyle As System.Windows.Forms.DataGridViewAdvancedBorderStyle, ByVal paintParts As System.Windows.Forms.DataGridViewPaintParts)
+    '        MyBase.Paint(graphics, clipBounds, cellBounds, rowIndex, cellState, value, formattedValue, errorText, cellStyle, advancedBorderStyle, paintParts)
+
+    '    End Sub
+    'End Class
+
 
 
     Private Sub 更新ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -295,4 +315,11 @@
         access.DeleteStock(stock)
     End Sub
 
+    Private Sub dgItemList_RowPostPaint(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowPostPaintEventArgs) Handles dgItemList.RowPostPaint
+        Dim DataGridView As DataGridView = sender
+        Dim solidBrush As SolidBrush = New SolidBrush(DataGridView.RowHeadersDefaultCellStyle.ForeColor)
+        Dim xh As Integer = e.RowIndex + 1
+        Dim StringWidth As Integer = e.Graphics.MeasureString(xh.ToString, DataGridView.Font).Width
+        e.Graphics.DrawString(xh.ToString(), e.InheritedRowStyle.Font, solidBrush, DataGridView.Rows(e.RowIndex).HeaderCell.Size.Width - (StringWidth + 5), e.RowBounds.Location.Y + 4)
+    End Sub
 End Class

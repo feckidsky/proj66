@@ -4,8 +4,10 @@ Imports 進銷存.Database
 Public Class winSales
 
     Enum Form
+        None = -1
         Order = 0
         Sales = 1
+        [Return] = 2
     End Enum
 
     Enum Mode
@@ -53,7 +55,22 @@ Public Class winSales
         btOrder.Text = IIf(Work = Mode.Create, "新增", "更新")
         txtLabel.Enabled = Work = Mode.Create
 
-        FormKind = IIf(txtSalesDate.Text = "", Form.Order, Form.Sales)
+
+        'If FormKind = Form.None Then
+        '    FormKind = IIf(txtSalesDate.Text = "", Form.Order, Form.Sales)
+        'End If
+
+        If FormKind = Form.None Then
+            If dgReturnList.RowCount > 0 Then
+                FormKind = Form.Return
+            ElseIf dgSalesList.RowCount > 0 Then
+                FormKind = Form.Sales
+            Else
+                FormKind = Form.Order
+            End If
+        End If
+
+
         Me.Text = IIf(FormKind = Form.Order, "訂單", "銷貨單")
 
         btOrder.Text = IIf(Work = Mode.Create, "新增訂單", "儲存訂單")
@@ -61,8 +78,13 @@ Public Class winSales
 
         btSales.Text = IIf(Work = Mode.Create Or FormKind = Form.Order, "銷貨", "儲存銷貨單")
 
+        Select Case FormKind
+            Case Form.Order : TabControl1.SelectedTab = tpOrder
+            Case Form.Sales : TabControl1.SelectedTab = tpSales
+            Case Form.Return : TabControl1.SelectedTab = tpReturn
+        End Select
 
-        TabControl1.SelectedTab = IIf(FormKind = Form.Order, tpOrder, tpSales)
+        'TabControl1.SelectedTab = IIf(FormKind = Form.Order, tpOrder, tpSales)
         tpOrder.BackColor = ToColor(Config.OrderBackcolor)
         tpSales.BackColor = ToColor(Config.SalesBackColor)
     End Sub
@@ -90,7 +112,7 @@ Public Class winSales
         End Get
     End Property
 
-    Public Shared Sub Open(ByVal Label As String, ByVal DB As Database.Access)
+    Public Shared Sub Open(ByVal Label As String, ByVal DB As Database.Access, Optional Kind As Form=Form.None)
         'access = DB
         'Dim sales As Sales = access.GetSales(Label)
 
@@ -107,11 +129,11 @@ Public Class winSales
 
         Dim sales As Sales = DB.GetSales(Label)
         Dim win As New winSales
-        win.Open(sales, DB)
+        win.Open(sales, DB, Kind)
     End Sub
 
 
-    Public Sub Open(ByVal Sales As Sales, ByVal DB As Database.Access)
+    Public Sub Open(ByVal Sales As Sales, ByVal DB As Database.Access, Optional ByVal Kind As Form = Form.None)
         access = DB
         txtLabel.Text = Sales.Label
         txtOrderDate.Text = Sales.OrderDate.ToString("yyyy/MM/dd HH:mm:ss")
@@ -136,6 +158,8 @@ Public Class winSales
         ReadReturnList(Sales.Label)
         ReadContractList(Sales.Label)
         Work = Mode.Edit
+        FormKind = Kind
+
         MyBase.Show()
         CalTotalPrice()
     End Sub
@@ -881,5 +905,41 @@ ReadStockList:
     Private Sub dgReturnList_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgReturnList.CellEndEdit
         If e.ColumnIndex = cRNumber.Index Or e.ColumnIndex = cRReturnPrice.Index Then CalTotalPrice()
     End Sub
+
+
+    Private Sub dgSalesList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgSalesList.RowsAdded
+        UpdateTableText(tpSales, "銷貨單", dgSalesList)
+    End Sub
+
+    Private Sub dgSalesList_RowsRemoved(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsRemovedEventArgs) Handles dgSalesList.RowsRemoved
+        UpdateTableText(tpSales, "銷貨單", dgSalesList)
+    End Sub
+
+
+    Private Sub dgOrderList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgOrderList.RowsAdded
+        UpdateTableText(tpOrder, "訂單", dgOrderList)
+    End Sub
+
+    Private Sub dgOrderList_RowsRemoved(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsRemovedEventArgs) Handles dgOrderList.RowsRemoved
+        UpdateTableText(tpOrder, "訂單", dgOrderList)
+    End Sub
+
+    Private Sub dgReturnList_RowsAdded(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsAddedEventArgs) Handles dgReturnList.RowsAdded
+        UpdateTableText(tpReturn, "退貨單", dgReturnList)
+    End Sub
+
+    Private Sub dgReturnList_RowsRemoved(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowsRemovedEventArgs) Handles dgReturnList.RowsRemoved
+        UpdateTableText(tpReturn, "退貨單", dgReturnList)
+    End Sub
+
+    Private Sub UpdateTableText(ByVal tp As TabPage, ByVal Name As String, ByVal dgList As DataGridView)
+        tp.Text = Name & GetCountText(dgList.RowCount)
+    End Sub
+
+
+    Private Function GetCountText(ByVal count As Integer) As String
+        If count = 0 Then Return ""
+        Return "(" & count & ")"
+    End Function
 
 End Class

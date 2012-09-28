@@ -884,6 +884,39 @@
             Return DT
         End Function
 
+        Public Function GetReturnGoodsLis(ByVal StartTime As Date, ByVal EndTime As Date, ByVal condition As String, Optional ByVal Count As Integer = -1) As Data.DataTable
+
+            Dim cndColumns As New List(Of String)
+            cndColumns.Add("SalesGoods.SalesLabel")
+            cndColumns.Add("SalesGoods.StockLabel")
+            cndColumns.Add("Goods.Kind")
+            cndColumns.Add("Goods.Brand")
+            cndColumns.Add("Goods.Name")
+            cndColumns.Add("Personnel.Name")
+            cndColumns.Add("Customer.Name")
+            cndColumns.Add("Sales.Note")
+            cndColumns.Add("ReturnGoods.ReturnLabel")
+            cndColumns.Add("ReturnGoods.ReturnPrice")
+            cndColumns.Add("ReturnGoods.Number")
+            Dim cndColumn As String = "(" & Join(cndColumns.ToArray, " & ") & ")"
+            Dim cntCondition As String = IIf(Count >= 0, " TOP " & Count & " ", "")
+
+            Dim SQLCommand As String = "SELECT " & cntCondition & " ReturnGoods.ReturnLabel, SalesGoods.SalesLabel, Sales.SalesDate, Personnel.Name AS Personnel, Customer.Name AS Customer, SalesGoods.StockLabel, Goods.Label AS GoodsLabel, Goods.Kind, Goods.Brand, Goods.Name, Stock.Cost, SalesGoods.SellingPrice, SalesGoods.Number, ReturnGoods.ReturnPrice, ReturnGoods.Number, Sales.Note " & _
+            " FROM (ReturnGoods LEFT JOIN ((SalesGoods LEFT JOIN Stock ON SalesGoods.StockLabel = Stock.Label) LEFT JOIN ((SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.GoodsLabel=HistoryPrice.GoodsLabel) AND (tmp.Time1=HistoryPrice.Time))  AS history RIGHT JOIN Goods ON history.GoodsLabel = Goods.Label) ON Stock.GoodsLabel = Goods.Label) ON (ReturnGoods.StockLabel = SalesGoods.StockLabel) AND (ReturnGoods.SalesLabel = SalesGoods.SalesLabel)) LEFT JOIN ((Sales LEFT JOIN Customer ON Sales.CustomerLabel = Customer.Label) LEFT JOIN Personnel ON Sales.PersonnelLabel = Personnel.Label) ON ReturnGoods.ReturnLabel = Sales.Label " & _
+            " GROUP BY ReturnGoods.ReturnLabel, SalesGoods.SalesLabel, Sales.SalesDate, Personnel.Name, Customer.Name, SalesGoods.StockLabel, Goods.Label, Goods.Kind, Goods.Brand, Goods.Name, Stock.Cost, SalesGoods.SellingPrice, SalesGoods.Number, ReturnGoods.ReturnPrice, ReturnGoods.Number, Sales.Note "
+
+            Dim conditions As New List(Of String)(SplitConditionText(cndColumn, condition))
+            If StartTime <> Nothing And EndTime <> Nothing Then conditions.Add(" Sales.SalesDate Between " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#"))
+
+            If conditions.Count > 0 Then
+                SQLCommand &= " HAVING " & Join(conditions.ToArray, " AND ")  '& cndColumn & " Like ""%" & condition & "%"" "
+            End If
+
+            SQLCommand &= " ORDER BY Sales.SalesDate DESC;"
+
+            Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
+            Return DT
+        End Function
         Private Function SplitConditionText(ByVal columns As String, ByVal Text As String) As String()
             Dim cnds As String() = Split(Text, " ")
             cnds = Array.ConvertAll(cnds, Function(s As String) Strings.Trim(s))

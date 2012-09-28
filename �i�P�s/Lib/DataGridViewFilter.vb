@@ -406,4 +406,13 @@
     Private Sub DataGrid_Sorted(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGrid.Sorted
         Filter()
     End Sub
+
+
+    Private Sub dgItemList_RowPostPaint(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowPostPaintEventArgs) Handles DataGrid.RowPostPaint
+        Dim DataGridView As DataGridView = sender
+        Dim solidBrush As SolidBrush = New SolidBrush(DataGridView.RowHeadersDefaultCellStyle.ForeColor)
+        Dim xh As Integer = e.RowIndex + 1
+        Dim StringWidth As Integer = e.Graphics.MeasureString(xh.ToString, DataGridView.Font).Width
+        e.Graphics.DrawString(xh.ToString(), e.InheritedRowStyle.Font, solidBrush, DataGridView.Rows(e.RowIndex).HeaderCell.Size.Width - (StringWidth + 5), e.RowBounds.Location.Y + 4)
+    End Sub
 End Class

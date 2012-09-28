@@ -195,6 +195,12 @@
     <Compile Include="Windows\List\winSalesGoodsList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\List\winReturnGoodsList.Designer.vb">
+      <DependentUpon>winReturnGoodsList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\List\winReturnGoodsList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\UserAccount\winClient.Designer.vb">
       <DependentUpon>winClient.vb</DependentUpon>
     </Compile>
@@ -409,6 +415,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Dialog\ProccessDialog.resx">
       <DependentUpon>ProccessDialog.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\List\winReturnGoodsList.resx">
+      <DependentUpon>winReturnGoodsList.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\UserAccount\winAccount.resx">

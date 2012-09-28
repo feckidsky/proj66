@@ -18,6 +18,7 @@
     Public Overloads Sub ShowDialog(ByVal Title As String, ByVal DataGrid As DataGridView)
         Me.DataGrid = DataGrid
         ckList.Items.Clear()
+
         Me.Title = Title
         For Each c As DataGridViewColumn In DataGrid.Columns
             ckList.Items.Add(c.HeaderText, c.Visible)
@@ -74,7 +75,7 @@
 
     Public Function GetValues(ByVal row As DataGridViewRow) As String()
         Dim lst As New List(Of String)
-
+        If ckNumber.Checked Then lst.Add((row.Index + 1).ToString)
         For i As Integer = 0 To ckList.CheckedItems.Count - 1
             lst.Add(GetValue(row, ckList.CheckedItems(i)))
         Next
@@ -83,7 +84,7 @@
 
     Public Function GetColumnNames() As String()
         Dim lst As New List(Of String)
-
+        If ckNumber.Checked Then lst.Add("項次")
         For i As Integer = 0 To ckList.CheckedItems.Count - 1
             lst.Add(ckList.CheckedItems(i))
         Next
@@ -135,7 +136,7 @@
     Public Function GetCellHeight(ByVal Row As DataGridViewRow, ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer
         Dim lineHeight As Integer = 0
         For c As Integer = 0 To Row.Cells.Count - 1
-            Text = Row.Cells(c).Value.ToString
+            Dim text As String = Row.Cells(c).Value.ToString
             lineHeight = Math.Max(e.Graphics.MeasureString(Text, printFont).Height, lineHeight)
         Next
         Return lineHeight
@@ -146,6 +147,9 @@
         Static idxRow As Integer = 0
         Static page As Integer = 1
         Static totPage As Integer() = New Integer() {}
+
+        Me.Text = ""
+
 
         If totPage.Length = 0 Then
             totPage = GetTotalPage(e)

@@ -760,6 +760,10 @@ Public Class winMain
         winSalesGoodsList.Show(access)
     End Sub
 
+    Private Sub 退貨清單ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 退貨清單ToolStripMenuItem.Click
+        winReturnGoodsList.Show(access)
+    End Sub
+
     Private Sub 銷售合約ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 銷售合約ToolStripMenuItem.Click, 銷售合約CToolStripMenuItem.Click
         winSalesContractList.Show(access)
     End Sub
@@ -868,4 +872,6 @@ Public Class winMain
     Private Sub 連線內容ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 連線內容ToolStripMenuItem.Click
         winClient.Show(access)
     End Sub
+
+
 End Class
