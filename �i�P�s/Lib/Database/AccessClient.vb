@@ -326,8 +326,6 @@
                 Return MyBase.Read("DataTable", args, Progresser)
             End Function
 
-
-
         End Class
 
         Public Class AccessReader
@@ -335,6 +333,7 @@
 
             Dim DataTable As DataTable
             Dim TotalRowsCount As Integer = 0
+            Dim CursorRowIndex As Integer = 0
 
             Sub New(ByVal client As TCPTool.Client)
                 MyBase.New(client)
@@ -360,6 +359,9 @@
                         Report("取得資料表結構", 1)
                         If TotalRowsCount = 0 Then Finish()
                         ProccessReceiveBuff()
+
+                        CursorRowIndex = 0
+                        RequestRow(CursorRowIndex)
                     Case "Row"
 
                         If DataTable IsNot Nothing Then
@@ -373,10 +375,14 @@
                                 ReceiveBuff.Add(data)
                             End SyncLock
                         End If
-
+                        RequestRow(CursorRowIndex)
                 End Select
 
                 MyBase.Receive(cmd, msg)
+            End Sub
+
+            Public Sub RequestRow(ByVal Index As Integer)
+                Send("RequestRow", Index)
             End Sub
 
             Public Sub ProccessReceiveBuff()
@@ -396,10 +402,24 @@
 
             Public Sub AddRow(ByVal cmd As String, ByVal msg() As String)
                 Dim Index As Integer = msg(0)
-                Dim items As String() = Array.ConvertAll(Split(msg(1), ":"), AddressOf Code.FromBase64)
+                Dim items As Object() = Array.ConvertAll(Split(msg(1), ":"), AddressOf Code.FromBase64)
+
+                'Dim value(items.Length - 1) As Object
+                'For i As Integer = 0 To items.Length - 1
+                '    Dim t As Type = DataTable.Columns(i).DataType
+                '    value(i) = CType(items(i), t)
+                'Next
 
                 SyncLock AddRowLock
-                    DataTable.Rows.Add(items)
+                    'DataTable.Rows.Add(items)
+                    Dim r As DataRow = DataTable.Rows.Add()
+
+                    For i As Integer = 0 To items.Length - 1
+                        Try
+                            r.Item(i) = items(i)
+                        Catch
+                        End Try
+                    Next
                 End SyncLock
                 Report("讀取進度", 1 + IIf(TotalRowsCount > 0, DataTable.Rows.Count / TotalRowsCount, 0) * 99)
 
@@ -408,13 +428,21 @@
                     result = DataTable
                     Finish()
                 End If
-
+                CursorRowIndex += 1
             End Sub
 
+            Private Function GetValue(ByVal str As String) As Object
+                Dim text As Object = Code.FromBase64(str)
+                If text = "" Then Return Nothing
+                Return text
+            End Function
+
             Public Sub Finish()
+                Send("Finish", "")
                 Readed = True
                 Waiter.Set()
                 If Progresser IsNot Nothing Then Progresser.Finish()
+
             End Sub
 
             Public Sub Report(ByVal msg As String, ByVal percent As Integer)

@@ -119,6 +119,7 @@
         Class AccessSender
             Inherits Access.StreamSender
             Public DataTable As DataTable
+            Dim CursorRow As Integer = 0
 
             Sub New(ByVal client As Client, ByVal guid As String, ByVal DataTable As DataTable)
                 MyBase.New(client, guid)
@@ -133,15 +134,45 @@
 
                 Dim dt As DataTable = DataTable.Clone
                 Send("DataTableStructure", DataTable.Rows.Count & "," & Code.XmlSerializeWithZIP(dt))
-                For i As Integer = 0 To DataTable.Rows.Count - 1
-                    'Send("Row", i & "," & Code.Zip(Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, Function(s As Object) Strings.Trim(s)), ",")))
-                    Send("Row", i & "," & Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, AddressOf Code.ToBase64), ":"))
-                Next
+
+
+                'For i As Integer = 0 To DataTable.Rows.Count - 1
+                '    'Send("Row", i & "," & Code.Zip(Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, Function(s As Object) Strings.Trim(s)), ",")))
+                '    Send("Row", i & "," & Join(Array.ConvertAll(DataTable.Rows(i).ItemArray, AddressOf GetBase64), ":"))
+                'Next
 
             End Sub
 
+            Private Function GetBase64(ByVal obj As Object) As String
+                Return Code.ToBase64(obj.ToString)
+            End Function
+
+
+            Private Sub SendRow(ByVal index As Integer)
+
+                Try
+                    Send("Row", index & "," & Join(Array.ConvertAll(DataTable.Rows(index).ItemArray, AddressOf GetBase64), ":"))
+                Catch
+                    Fail(Err.Description)
+                End Try
+
+
+                CursorRow += 1
+            End Sub
+
+
             Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
                 MyBase.Receive(cmd, msg)
+                Select Case cmd
+                    Case "RequestRow"
+                        Dim index As Integer = msg(0)
+                        SendRow(index)
+                    Case "Finish"
+                        DataTable.Dispose()
+                        parent.Remove(Me)
+                End Select
+
+
             End Sub
 
         End Class

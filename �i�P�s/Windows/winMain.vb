@@ -803,7 +803,10 @@ Public Class winMain
 
     Private Sub SyncMainReport(ByVal msg As String, ByVal percent As Integer)
         If Me.InvokeRequired Then
-            If Not Me.IsDisposed Then Me.Invoke(SyncMainReportHandler, msg, percent)
+            Try
+                If Not Me.IsDisposed Then Me.Invoke(SyncMainReportHandler, msg, percent)
+            Catch
+            End Try
             Exit Sub
         End If
 

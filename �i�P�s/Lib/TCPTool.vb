@@ -997,15 +997,21 @@ Public Class TCPTool
             Return Send(CMD & "," & Para)
         End Function
 
-
+        Dim SendBuff As New Queue(Of String)
+        Dim SendingData As String = Nothing
 
         Public Function Send(ByVal Msg As String) As Boolean
             Dim newMsg As String = "[/" & Msg & "/]"
             Dim Success As Boolean = True
 
             SyncLock SendLock
-
-                Success = mSend(newMsg)
+                If SendingData = Nothing Then
+                    SendingData = newMsg
+                    Success = mSend(newMsg)
+                Else
+                    SendBuff.Enqueue(newMsg)
+                End If
+                'Success = mSend(newMsg)
                 OnLogMessage(New MessageLog(Msg, SR.Send, Now))
             End SyncLock
 
@@ -1019,6 +1025,7 @@ Public Class TCPTool
         End Sub
 
         Public SendWaiter As New Threading.AutoResetEvent(True)
+
         Private Function mSend(ByVal Text As String) As Boolean
             Dim Cmd() As Byte = MyEncoding.GetBytes(Text) ' System.Text.Encoding.Unicode.GetBytes(Text)
             Dim Success As Boolean = True
@@ -1043,6 +1050,9 @@ Public Class TCPTool
 
                 'TcpClient.GetStream.BeginWrite(Cmd, 0, Cmd.Length, AddressOf mSended, Me)
             Catch
+                SyncLock SendLock
+                    SendingData = Nothing
+                End SyncLock
                 Success = False
                 TCPTool.OutputError("傳送訊息: " & Text)
                 OnErrorMessage("傳息發送失敗：" & Text)
@@ -1052,7 +1062,30 @@ Public Class TCPTool
 
         Private Sub mSended(ByVal Result As System.IAsyncResult)
             'SendWaiter.Set()
+
+            'TcpClient.GetStream.EndWrite(Result)
+
+            'TcpClient .
+            SyncLock SendLock
+                If SendBuff.Count > 0 Then
+                    'SendingData = SendBuff.Dequeue()
+                    SendingData = PopData(4096)
+                    'Threading.Thread.Sleep(100)
+                    mSend(SendingData)
+                Else
+                    SendingData = Nothing
+                End If
+            End SyncLock
+
         End Sub
+
+        Private Function PopData(ByVal len As Long) As String
+            Dim res As String = ""
+            Do
+                res &= SendBuff.Dequeue()
+            Loop Until (SendBuff.Count = 0 OrElse res.Length >= len)
+            Return res
+        End Function
 #End Region
 
 #Region "接收資料"
@@ -1274,7 +1307,7 @@ Client_ReceiveThreadStart:
             Try
                 Dim fs As IO.FileStream = New IO.FileStream(destFile, IO.FileMode.Create)
                 Dim Receiver As New StreamReceiver(Me, fs)
-                lstTransmitter.Add(Receiver)
+                'lstTransmitter.Add(Receiver)
                 Receiver.Request("Download", sourceFile)
                 Return Receiver
             Catch ex As Exception
@@ -1314,6 +1347,7 @@ Client_ReceiveThreadStart:
                     MyBase.Remove(item)
                 End SyncLock
             End Sub
+
 
             Public Sub Start(ByVal Client As Client, ByVal para() As String)
                 Dim Guid As String = para(1)
@@ -1434,10 +1468,10 @@ Client_ReceiveThreadStart:
                     Client.OnErrorMessage("StreamSender.StartSend:" & Err.Description)
                 End Try
 
-                Dim index As Integer = 0
-                While Upload(index)
-                    index += 1
-                End While
+                'Dim index As Integer = 0
+                'While Upload(index)
+                '    index += 1
+                'End While
 
             End Sub
 
@@ -1524,8 +1558,10 @@ Client_ReceiveThreadStart:
 
                 Select Case cmd
                     Case "RequestData"
-                        'Dim index As Long = -1
-                        'If msg(3) <> "" Then index = msg(3)
+                        Dim index As Long = -1
+                        If msg(0) <> "" Then index = msg(0)
+                        Upload(index)
+
                         'If msg.Length > 4 Then BufferSize = msg(4)
                         'Upload(index)
                     Case "RequestDataAgain"
@@ -1634,10 +1670,10 @@ Client_ReceiveThreadStart:
             End Sub
 
 
-            'Public Sub RequestData(ByVal idx As Long)
-            '    PartIndex = idx
-            '    Send("RequestData", idx.ToString & "," & 4096)
-            'End Sub
+            Public Sub RequestData(ByVal idx As Long)
+                PartIndex = idx
+                Send("RequestData", idx.ToString & "," & 4096)
+            End Sub
 
             Private Sub CloseFile()
                 OnReceived()
@@ -1699,6 +1735,7 @@ Client_ReceiveThreadStart:
 
                         StartReceiveFile(args)
                         CheckBuff()
+                        RequestData(PartIndex)
                     Case "SendFileData"
                         Dim index As Integer = -1
 
@@ -1718,6 +1755,7 @@ Client_ReceiveThreadStart:
                             BuffData.Add(tmpData)
                         End If
 
+                        RequestData(PartIndex)
                         'WriteFile(args)
                     Case "EndSendFile"
                         'CloseFile()

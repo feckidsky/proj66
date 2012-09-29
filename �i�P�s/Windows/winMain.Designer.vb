@@ -24,7 +24,7 @@ Partial Class winMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(winMain))
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.系統SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.登入IToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -51,6 +51,7 @@ Partial Class winMain
         Me.銷售SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.銷貨清單OToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.銷售合約CToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.退貨清單ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.銷貨ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.選項OToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.結算ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -108,7 +109,6 @@ Partial Class winMain
         Me.lbSyncInfo = New System.Windows.Forms.ToolStripStatusLabel
         Me.lbLoadSales = New System.Windows.Forms.ToolStripStatusLabel
         Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar
-        Me.退貨清單ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         CType(Me.dgSales, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.cmsSales.SuspendLayout()
@@ -274,14 +274,20 @@ Partial Class winMain
         '銷貨清單OToolStripMenuItem1
         '
         Me.銷貨清單OToolStripMenuItem1.Name = "銷貨清單OToolStripMenuItem1"
-        Me.銷貨清單OToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+        Me.銷貨清單OToolStripMenuItem1.Size = New System.Drawing.Size(134, 22)
         Me.銷貨清單OToolStripMenuItem1.Text = "銷貨清單(&O)"
         '
         '銷售合約CToolStripMenuItem
         '
         Me.銷售合約CToolStripMenuItem.Name = "銷售合約CToolStripMenuItem"
-        Me.銷售合約CToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.銷售合約CToolStripMenuItem.Size = New System.Drawing.Size(134, 22)
         Me.銷售合約CToolStripMenuItem.Text = "銷售合約(&C)"
+        '
+        '退貨清單ToolStripMenuItem
+        '
+        Me.退貨清單ToolStripMenuItem.Name = "退貨清單ToolStripMenuItem"
+        Me.退貨清單ToolStripMenuItem.Size = New System.Drawing.Size(134, 22)
+        Me.退貨清單ToolStripMenuItem.Text = "退貨清單(&B)"
         '
         '銷貨ToolStripMenuItem
         '
@@ -637,14 +643,14 @@ Partial Class winMain
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgLog.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells
         Me.dgLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
-        DataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("新細明體", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(136, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.dgLog.DefaultCellStyle = DataGridViewCellStyle1
         Me.dgLog.Location = New System.Drawing.Point(6, 21)
         Me.dgLog.Name = "dgLog"
         Me.dgLog.ReadOnly = True
@@ -731,12 +737,6 @@ Partial Class winMain
         Me.ToolStripProgressBar1.Name = "ToolStripProgressBar1"
         Me.ToolStripProgressBar1.Size = New System.Drawing.Size(100, 19)
         Me.ToolStripProgressBar1.Visible = False
-        '
-        '退貨清單ToolStripMenuItem
-        '
-        Me.退貨清單ToolStripMenuItem.Name = "退貨清單ToolStripMenuItem"
-        Me.退貨清單ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.退貨清單ToolStripMenuItem.Text = "退貨清單(&B)"
         '
         'winMain
         '

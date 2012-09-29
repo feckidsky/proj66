@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.8"
+    Public ProgramVersion As String = "v1.0.9"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public WithEvents Server As New Database.AccessServer
@@ -301,8 +301,12 @@ Public Module Program
 
 
         Public Shared Function ToBase64(ByVal s As String) As String
-            Dim data As Byte() = System.Text.Encoding.UTF8.GetBytes(s)
-            Return Convert.ToBase64String(data)
+            Try
+                Dim data As Byte() = System.Text.Encoding.UTF8.GetBytes(s)
+                Return Convert.ToBase64String(data)
+            Catch
+                Return ""
+            End Try
         End Function
 
         Public Shared Function FromBase64(ByVal s As String) As String

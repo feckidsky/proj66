@@ -7,12 +7,13 @@
 
 
     Private Sub DataGridViewPrintDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-        btFont.Font = printFont
 
-        PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Top = 15
-        PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Bottom = 15
-        PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Left = 15
-        PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Right = 15
+        'Dim setting As New Printing.PageSettings()
+        'setting.
+        'PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Top = 10
+        'PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Bottom = 10
+        'PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Left = 10
+        'PrintDocument1.PrinterSettings.DefaultPageSettings.Margins.Right = 10
     End Sub
 
     Public Overloads Sub ShowDialog(ByVal Title As String, ByVal DataGrid As DataGridView)
@@ -23,6 +24,11 @@
         For Each c As DataGridViewColumn In DataGrid.Columns
             ckList.Items.Add(c.HeaderText, c.Visible)
         Next
+
+        btFont.Font = printFont
+
+
+
         MyBase.ShowDialog()
 
     End Sub
@@ -30,6 +36,10 @@
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPreview.Click
 
         PrintPreviewDialog1.Document = PrintDocument1
+        focusPage = 1
+        startPage = 1
+        endPage = PrintDocument1.PrinterSettings.MaximumPage
+
         PrintPreviewDialog1.ShowDialog()
     End Sub
 
@@ -44,10 +54,33 @@
     End Sub
 
     Private Sub btSetting_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btSetting.Click
-        PrintDialog1.PrinterSettings = PrintDocument1.PrinterSettings
+        'PrintDialog1.PrinterSettings = PrintDocument1.PrinterSettings
         PrintDialog1.Document = PrintDocument1
         Dim result As DialogResult = PrintDialog1.ShowDialog()
-        If result = Windows.Forms.DialogResult.OK Then PrintDocument1.PrinterSettings = PrintDialog1.PrinterSettings
+        PrintDocument1.PrinterSettings = PrintDialog1.PrinterSettings
+        If result = Windows.Forms.DialogResult.OK Then
+            SetPageRange()
+            PrintDocument1.Print()
+        End If
+
+    End Sub
+
+    Dim focusPage As Integer
+    Dim startPage As Integer
+    Dim endPage As Integer
+    Dim LineInterval As Integer = 5
+
+    Private Sub SetPageRange()
+        Dim setting As Printing.PrinterSettings = PrintDocument1.PrinterSettings
+        Select Case setting.PrintRange
+            Case Printing.PrintRange.AllPages
+                focusPage = 1
+                endPage = setting.MaximumPage
+            Case Printing.PrintRange.SomePages
+                focusPage = setting.FromPage
+                endPage = setting.ToPage
+        End Select
+        startPage = focusPage
     End Sub
 
     Private Sub btPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPrint.Click
@@ -111,17 +144,17 @@
         Dim pageSize As Size = e.MarginBounds.Size
         Dim totPage As Integer = 1
 
-        Dim currentHeight As Integer = 0
+        Dim currentHeight As Integer = e.Graphics.MeasureString(Join(GetColumnNames(), ""), printFont).Height + LineInterval
         Dim text As String = ""
         Dim cntRow As Integer = 0
         For i As Integer = 0 To DataGrid.Rows.Count - 1
             '取得行高
-            Dim lineHeight As Integer = GetCellHeight(DataGrid.Rows(i), e) + 5
+            Dim lineHeight As Integer = GetCellHeight(DataGrid.Rows(i), e) + LineInterval
 
             If currentHeight + lineHeight > pageSize.Height Then
                 lstRowCount.Add(cntRow)
                 totPage += 1
-                currentHeight = 0
+                currentHeight = e.Graphics.MeasureString(Join(GetColumnNames(), ""), printFont).Height + LineInterval
                 cntRow = 1
             Else
                 cntRow += 1
@@ -143,9 +176,10 @@
     End Function
 
 
+
     Private Sub PrintDocument1_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles PrintDocument1.PrintPage
         Static idxRow As Integer = 0
-        Static page As Integer = 1
+
         Static totPage As Integer() = New Integer() {}
 
         Me.Text = ""
@@ -153,6 +187,17 @@
 
         If totPage.Length = 0 Then
             totPage = GetTotalPage(e)
+        End If
+
+        If focusPage = 0 Then
+            focusPage = 1
+            startPage = 1
+        End If
+
+
+        If startPage > totPage.Length Then
+            e.Cancel = True
+            MsgBox("頁數 " & startPage & " 頁數超出範圍，該文件只有 " & totPage.Length & " 頁")
         End If
 
         Dim g As System.Drawing.Graphics = e.Graphics
@@ -164,16 +209,28 @@
         Dim Columns As String() = GetColumnNames()
 
         '取得各欄寬度
-        Dim CellWidth() As Single = Array.ConvertAll(Columns, Function(s As String) g.MeasureString(s, printFont).Width)
+        Static CellWidth() As Single
 
         '計算欄寬依最大欄位為基準
-        For i As Integer = 0 To totPage(page - 1) - 1
-            Dim values() As String = GetValues(DataGrid.Rows(i))
-            For j As Integer = 0 To values.Length - 1
-                Dim w As Integer = g.MeasureString(values(j), printFont).Width
-                If CellWidth(j) < w Then CellWidth(j) = w
+        'For i As Integer = 0 To totPage(page - 1) - 1
+        'For i As Integer = idxRow To idxRow + totPage(page - 1) - 1
+        If focusPage = startPage Then
+            CellWidth = Array.ConvertAll(Columns, Function(s As String) g.MeasureString(s, printFont).Width)
+            For i As Integer = 0 To DataGrid.RowCount - 1
+                Dim values() As String = GetValues(DataGrid.Rows(i))
+                For j As Integer = 0 To values.Length - 1
+                    Dim w As Integer = g.MeasureString(values(j), printFont).Width
+                    If CellWidth(j) < w Then CellWidth(j) = w
+                Next
             Next
-        Next
+
+            '取得起始欄
+            idxRow = 0
+            For i As Integer = 0 To startPage - 1 - 1
+                idxRow += totPage(i)
+            Next
+
+        End If
 
         '若總欄寬小於版面寬度，依比例放大欄寬
         Dim totCellWidth As Single = CellWidth.Sum() + CellWidth.Count * 3
@@ -187,13 +244,16 @@
         '列印標題
         g.DrawString(Title, printFont, brush, e.MarginBounds.Left + (e.MarginBounds.Width - g.MeasureString(Title, printFont).Width) / 2, e.MarginBounds.Top - g.MeasureString(Title, printFont).Height - 5)
 
+        '列印時間
         Dim tF As Font = New Font(printFont.FontFamily, 12)
         Dim tS As SizeF = g.MeasureString(Now.ToString, tF)
-        g.DrawString(Now.ToString, tF, brush, e.PageBounds.Width - tS.Width - 10, e.PageBounds.Height - tS.Height - 10)
 
-        Dim txtPage As String = page & "/" & totPage.Length
+        g.DrawString(Now.ToString, tF, brush, e.MarginBounds.Left + e.MarginBounds.Width - tS.Width, e.MarginBounds.Top + e.MarginBounds.Height + 10)
+
+        '列印頁數
+        Dim txtPage As String = focusPage & "/" & totPage.Length
         tS = g.MeasureString(txtPage, tF)
-        g.DrawString(txtPage, tF, brush, e.MarginBounds.Left + (e.MarginBounds.Width + tS.Width) / 2, e.PageBounds.Height - tS.Height - 10)
+        g.DrawString(txtPage, tF, brush, e.MarginBounds.Left + (e.MarginBounds.Width + tS.Width) / 2, e.MarginBounds.Top + e.MarginBounds.Height + 10)
 
         '列印欄位名稱
         Dim cx As Integer = e.MarginBounds.Left
@@ -207,34 +267,33 @@
 
         Dim pen As New Pen(Color.Black)
 
-        cy += TitleLineHeight + 5
+        cy += TitleLineHeight + LineInterval
         g.DrawLine(pen, e.MarginBounds.Left, cy - 5, e.MarginBounds.Right, cy - 5)
 
 
         '印出資料內容
-        For i As Integer = idxRow To idxRow + totPage(page - 1) - 1
+        For i As Integer = idxRow To idxRow + totPage(focusPage - 1) - 1
             Dim values() As String = GetValues(DataGrid.Rows(i))
             Dim x As Integer = e.MarginBounds.Left
             For j As Integer = 0 To values.Length - 1
                 g.DrawString(values(j), printFont, brush, x, cy)
                 x += CellWidth(j) + 3
             Next
-
-            cy += GetCellHeight(DataGrid.Rows(i), e) + 5
-            g.DrawLine(pen, e.MarginBounds.Left, cy - 5, e.MarginBounds.Right, cy - 5)
+            cy += GetCellHeight(DataGrid.Rows(i), e) + LineInterval
+            g.DrawLine(pen, e.MarginBounds.Left, cy - LineInterval, e.MarginBounds.Right, cy - LineInterval)
         Next
 
         '取得最後一列索引值
-        idxRow += totPage(page - 1)
-        page += 1
+        idxRow += totPage(focusPage - 1)
+        focusPage += 1
 
         '判斷是否分頁
-        e.HasMorePages = page <= totPage.Length  'idxRow < DataGrid.Rows.Count
+        e.HasMorePages = focusPage <= IIf(endPage > totPage.Length, totPage.Length, endPage)   'totPage.Length  'idxRow < DataGrid.Rows.Count
 
         '不分頁重置列數索引值
         If Not e.HasMorePages Then
             idxRow = 0
-            page = 1
+            focusPage = 1
             totPage = New Integer() {}
         End If
 
@@ -243,4 +302,15 @@
 
 
 
+    Private Sub btPageSetup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPageSetup.Click
+        PageSetupDialog1.Document = PrintDocument1
+        If PageSetupDialog1.ShowDialog = Windows.Forms.DialogResult.OK Then
+            PrintDocument1 = PageSetupDialog1.Document
+        End If
+
+    End Sub
+
+    Private Sub PrintPreviewDialog1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintPreviewDialog1.Load
+
+    End Sub
 End Class

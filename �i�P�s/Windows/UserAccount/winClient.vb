@@ -1,6 +1,8 @@
 ﻿Public Class winClient
 
     WithEvents access As Database.Access
+    WithEvents server As Database.AccessServer = server
+
     Private Sub winClient_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         cbClient.Items.Clear()
         cbClient.Items.AddRange(ClientManager.GetNameList())
@@ -112,6 +114,16 @@
         End If
     End Sub
 
+    Private Sub server_ErrorMessage(ByVal sender As TCPTool, ByVal ErrorMessage As String) Handles server.ErrorMessage
+        If Me.IsDisposed Then Exit Sub
+        If Me.InvokeRequired Then
+            Me.Invoke(DelegateError, ErrorMessage)
+        Else
+            AddError(ErrorMessage)
+        End If
+    End Sub
+
+
     Private Sub access_LogMessage(ByVal client As TCPTool.Client, ByVal e As TCPTool.Client.MessageLog) Handles access.LogMessage
         If Me.IsDisposed Then Exit Sub
         If Me.InvokeRequired Then
@@ -120,6 +132,7 @@
             AddReceive(e)
         End If
     End Sub
+
 
 
 End Class

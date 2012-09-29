@@ -25,16 +25,17 @@ Partial Class DataGridViewPrintDialog
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(DataGridViewPrintDialog))
         Me.ckList = New System.Windows.Forms.CheckedListBox
         Me.PrintPreviewDialog1 = New System.Windows.Forms.PrintPreviewDialog
+        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument
         Me.PageSetupDialog1 = New System.Windows.Forms.PageSetupDialog
         Me.PrintDialog1 = New System.Windows.Forms.PrintDialog
         Me.btPreview = New System.Windows.Forms.Button
-        Me.PrintDocument1 = New System.Drawing.Printing.PrintDocument
         Me.btFont = New System.Windows.Forms.Button
         Me.FontDialog1 = New System.Windows.Forms.FontDialog
         Me.btCancel = New System.Windows.Forms.Button
         Me.btPrint = New System.Windows.Forms.Button
         Me.btSetting = New System.Windows.Forms.Button
         Me.ckNumber = New System.Windows.Forms.CheckBox
+        Me.btPageSetup = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'ckList
@@ -50,13 +51,25 @@ Partial Class DataGridViewPrintDialog
         Me.PrintPreviewDialog1.AutoScrollMargin = New System.Drawing.Size(0, 0)
         Me.PrintPreviewDialog1.AutoScrollMinSize = New System.Drawing.Size(0, 0)
         Me.PrintPreviewDialog1.ClientSize = New System.Drawing.Size(400, 300)
+        Me.PrintPreviewDialog1.Document = Me.PrintDocument1
         Me.PrintPreviewDialog1.Enabled = True
         Me.PrintPreviewDialog1.Icon = CType(resources.GetObject("PrintPreviewDialog1.Icon"), System.Drawing.Icon)
         Me.PrintPreviewDialog1.Name = "PrintPreviewDialog1"
+        Me.PrintPreviewDialog1.UseAntiAlias = True
         Me.PrintPreviewDialog1.Visible = False
+        '
+        'PrintDocument1
+        '
+        '
+        'PageSetupDialog1
+        '
+        Me.PageSetupDialog1.Document = Me.PrintDocument1
         '
         'PrintDialog1
         '
+        Me.PrintDialog1.AllowPrintToFile = False
+        Me.PrintDialog1.AllowSomePages = True
+        Me.PrintDialog1.Document = Me.PrintDocument1
         Me.PrintDialog1.UseEXDialog = True
         '
         'btPreview
@@ -67,9 +80,6 @@ Partial Class DataGridViewPrintDialog
         Me.btPreview.TabIndex = 2
         Me.btPreview.Text = "預覽列印"
         Me.btPreview.UseVisualStyleBackColor = True
-        '
-        'PrintDocument1
-        '
         '
         'btFont
         '
@@ -91,25 +101,28 @@ Partial Class DataGridViewPrintDialog
         '
         'btPrint
         '
-        Me.btPrint.Location = New System.Drawing.Point(206, 142)
+        Me.btPrint.Location = New System.Drawing.Point(367, 104)
         Me.btPrint.Name = "btPrint"
         Me.btPrint.Size = New System.Drawing.Size(100, 30)
         Me.btPrint.TabIndex = 5
         Me.btPrint.Text = "列印"
         Me.btPrint.UseVisualStyleBackColor = True
+        Me.btPrint.Visible = False
         '
         'btSetting
         '
-        Me.btSetting.Location = New System.Drawing.Point(206, 70)
+        Me.btSetting.Location = New System.Drawing.Point(206, 142)
         Me.btSetting.Name = "btSetting"
         Me.btSetting.Size = New System.Drawing.Size(100, 30)
         Me.btSetting.TabIndex = 6
-        Me.btSetting.Text = "印表機設定"
+        Me.btSetting.Text = "列印"
         Me.btSetting.UseVisualStyleBackColor = True
         '
         'ckNumber
         '
         Me.ckNumber.AutoSize = True
+        Me.ckNumber.Checked = True
+        Me.ckNumber.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ckNumber.Location = New System.Drawing.Point(206, 12)
         Me.ckNumber.Name = "ckNumber"
         Me.ckNumber.Size = New System.Drawing.Size(96, 16)
@@ -117,11 +130,21 @@ Partial Class DataGridViewPrintDialog
         Me.ckNumber.Text = "印出項目編號"
         Me.ckNumber.UseVisualStyleBackColor = True
         '
+        'btPageSetup
+        '
+        Me.btPageSetup.Location = New System.Drawing.Point(206, 70)
+        Me.btPageSetup.Name = "btPageSetup"
+        Me.btPageSetup.Size = New System.Drawing.Size(100, 30)
+        Me.btPageSetup.TabIndex = 8
+        Me.btPageSetup.Text = "邊界設定"
+        Me.btPageSetup.UseVisualStyleBackColor = True
+        '
         'DataGridViewPrintDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(328, 236)
+        Me.ClientSize = New System.Drawing.Size(319, 236)
+        Me.Controls.Add(Me.btPageSetup)
         Me.Controls.Add(Me.ckNumber)
         Me.Controls.Add(Me.btSetting)
         Me.Controls.Add(Me.btPrint)
@@ -148,4 +171,5 @@ Partial Class DataGridViewPrintDialog
     Friend WithEvents btPrint As System.Windows.Forms.Button
     Friend WithEvents btSetting As System.Windows.Forms.Button
     Friend WithEvents ckNumber As System.Windows.Forms.CheckBox
+    Friend WithEvents btPageSetup As System.Windows.Forms.Button
 End Class
