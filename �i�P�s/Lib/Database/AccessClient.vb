@@ -312,6 +312,12 @@
                 Waiter.Set()
                 If Progresser IsNot Nothing Then Progresser.Finish()
             End Sub
+
+            Public Overrides Sub Cancel()
+                MyBase.Cancel()
+                Readed = True
+                Waiter.Set()
+            End Sub
         End Class
 
         Public Class DataTableReader
@@ -357,6 +363,7 @@
                         TotalRowsCount = msg(0)
                         DataTable = Code.XmlDeserializeWithUnzip(Of DataTable)(msg(1))
                         Report("取得資料表結構", 1)
+                        result = DataTable
                         If TotalRowsCount = 0 Then Finish()
                         ProccessReceiveBuff()
 
@@ -380,6 +387,8 @@
 
                 MyBase.Receive(cmd, msg)
             End Sub
+
+
 
             Public Sub RequestRow(ByVal Index As Integer)
                 Send("RequestRow", Index)
@@ -429,6 +438,7 @@
                     Finish()
                 End If
                 CursorRowIndex += 1
+
             End Sub
 
             Private Function GetValue(ByVal str As String) As Object
@@ -439,6 +449,7 @@
 
             Public Sub Finish()
                 Send("Finish", "")
+                result = DataTable
                 Readed = True
                 Waiter.Set()
                 If Progresser IsNot Nothing Then Progresser.Finish()

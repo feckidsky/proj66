@@ -167,9 +167,9 @@
                     Case "RequestRow"
                         Dim index As Integer = msg(0)
                         SendRow(index)
-                    Case "Finish"
-                        DataTable.Dispose()
+                    Case "Finish", "Cancel"
                         parent.Remove(Me)
+                        DataTable.Dispose()
                 End Select
 
 

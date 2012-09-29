@@ -166,6 +166,10 @@ Public Class winSales
 
     Private Sub ReadSalesList(ByVal SalesLabel As String)
         Dim dt As Data.DataTable = access.GetGoodsListBySalesLabelWithHistoryPrice(SalesLabel) 'DB.GetGoodsListBySalesLabel(SalesLabel)
+        If dt Is Nothing Then
+            MsgBox("未取得訂單/銷貨單資料")
+            Exit Sub
+        End If
 
         For Each r As Data.DataRow In dt.Rows
 

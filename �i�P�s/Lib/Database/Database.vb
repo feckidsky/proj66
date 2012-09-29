@@ -347,7 +347,7 @@
             Dim SQLCommand As String = "SELECT * FROM " & Customer.Table & " WHERE Label='" & Label & "';"
             Dim dt As DataTable = Read("table", BasePath, SQLCommand)
 
-            If dt.Rows.Count = 0 Then Return Customer.Null()
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return Customer.Null()
             Return Customer.GetFrom(dt.Rows(0))
         End Function
 

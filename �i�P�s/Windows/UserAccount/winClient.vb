@@ -127,7 +127,11 @@
     Private Sub access_LogMessage(ByVal client As TCPTool.Client, ByVal e As TCPTool.Client.MessageLog) Handles access.LogMessage
         If Me.IsDisposed Then Exit Sub
         If Me.InvokeRequired Then
-            Me.Invoke(DelegateReceive, e)
+            Try
+                Me.Invoke(DelegateReceive, e)
+            Catch
+
+            End Try
         Else
             AddReceive(e)
         End If

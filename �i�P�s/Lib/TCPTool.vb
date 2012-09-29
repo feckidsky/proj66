@@ -1686,7 +1686,7 @@ Client_ReceiveThreadStart:
                 If parent IsNot Nothing Then parent.Remove(Me)
             End Sub
 
-            Public Sub Cancel()
+            Public Overridable Sub Cancel()
                 Send("Cancel", "")
                 Fail("使用者已取消動作")
             End Sub
