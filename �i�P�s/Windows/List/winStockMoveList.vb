@@ -212,7 +212,7 @@ Public Class winStockMoveList
         tsOut.Visible = Array.Exists(OutState, Function(s As String) s = text) And IsSource
     End Sub
 
-    Private Sub access_ConnectStateChanged(ByVal Client As TCPTool.Client) Handles access.ConnectedFail, access.ConnectedSuccess
+    Private Sub access_ConnectStateChanged(ByVal Client As AccessClient) Handles access.ConnectedFail, access.ConnectedSuccess
         UpdateTitle()
     End Sub
 
@@ -277,8 +277,9 @@ Public Class winStockMoveList
             res.Destine.ChangeStockMove(stockMove)
 
             Dim stock As Stock = res.Source.GetStock(stockMove.StockLabel)
-            stock.Number -= stockMove.Number
-            res.Source.ChangeStock(stock)
+            res.Source.StockMoveOut(stock, stockMove.Number)
+            'stock.Number -= stockMove.Number
+            'res.Source.ChangeStock(stock)
         Else
             MsgBox(res.Message)
         End If
@@ -302,15 +303,19 @@ Public Class winStockMoveList
             stockMove.Action = Database.StockMove.Type.In
             res.Destine.ChangeStockMove(stockMove)
 
-            Dim stock As Stock = res.Destine.GetStock(stockMove.StockLabel)
-            If stock.IsNull() Then
-                stock = res.Source.GetStock(stockMove.StockLabel)
-                stock.Number = stockMove.Number
-                res.Destine.AddStock(stock)
-            Else
-                stock.Number += stockMove.Number
-                res.Destine.ChangeStock(stock)
-            End If
+            Dim stock As Stock = res.Source.GetStock(stockMove.StockLabel)
+            res.Destine.StockMoveIn(stock, stockMove.Number)
+
+
+            'Dim stock As Stock = res.Destine.GetStock(stockMove.StockLabel)
+            'If stock.IsNull() Then
+            '    stock = res.Source.GetStock(stockMove.StockLabel)
+            '    stock.Number = stockMove.Number
+            '    res.Destine.AddStock(stock)
+            'Else
+            '    stock.Number += stockMove.Number
+            '    res.Destine.ChangeStock(stock)
+            'End If
 
         Else
             MsgBox(res.Message)

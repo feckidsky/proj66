@@ -45,26 +45,45 @@
     Dim receiveCount As Long
     Dim SendCount As Long
     Private Sub UpdateMessageLog()
-        Dim msg As TCPTool.Client.MessageLog
+        'Dim msg As TCPTool.Client.MessageLog
         receiveCount = 0
         SendCount = 0
         txtReceive.Clear()
+        'Dim s As New System.Text.StringBuilder()
+        'For i As Integer = 0 To access.MessageLogList.Count - 1
+        '    msg = access.MessageLogList(i)
+        '    'AddReceive(access.MessageLogList(i))
+        '    s.AppendLine(GetDisplayMsg(access.MessageLogList(i)))
+        '    If access.MessageLogList(i).SR = TCPTool.Client.SR.Send Then
+        '        SendCount += 1
+        '    Else
+        '        receiveCount += 1
+        '    End If
+        'Next
+        Dim s As System.Text.StringBuilder = GetMessageLog(access)
+        txtReceive.AppendText(s.ToString)
+        Label1.Text = "接收:" & receiveCount & "  傳送:" & SendCount
+    End Sub
+
+
+    Private Function GetMessageLog(ByVal access As Database.Access) As System.Text.StringBuilder
         Dim s As New System.Text.StringBuilder()
-        For i As Integer = 0 To access.MessageLogList.Count - 1
-            msg = access.MessageLogList(i)
+        If access.GetType IsNot GetType(Database.AccessClient) Then Return s
+        Dim client As TCPTool.Client = CType(access, Database.AccessClient).Client
+
+
+        For i As Integer = 0 To client.MessageLogList.Count - 1
+            'msg = client.MessageLogList(i)
             'AddReceive(access.MessageLogList(i))
-            s.AppendLine(GetDisplayMsg(access.MessageLogList(i)))
-            If access.MessageLogList(i).SR = TCPTool.Client.SR.Send Then
+            s.AppendLine(GetDisplayMsg(client.MessageLogList(i)))
+            If client.MessageLogList(i).SR = TCPTool.Client.SR.Send Then
                 SendCount += 1
             Else
                 receiveCount += 1
             End If
         Next
-        txtReceive.AppendText(s.ToString)
-        Label1.Text = "接收:" & receiveCount & "  傳送:" & SendCount
-    End Sub
-
-    'Public Function GetDisplayText()
+        Return s
+    End Function
 
 
     Private Sub AddReceive(ByVal e As TCPTool.Client.MessageLog)
@@ -124,7 +143,7 @@
     End Sub
 
 
-    Private Sub access_LogMessage(ByVal client As TCPTool.Client, ByVal e As TCPTool.Client.MessageLog) Handles access.LogMessage
+    Private Sub access_LogMessage(ByVal client As Database.Access, ByVal e As TCPTool.Client.MessageLog) Handles access.LogMessage
         If Me.IsDisposed Then Exit Sub
         If Me.InvokeRequired Then
             Try

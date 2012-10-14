@@ -28,7 +28,7 @@
                 For Each c As Access In Client
                     If c.GetType IsNot GetType(AccessClient) Then Continue For
                     Dim cc As AccessClient = c
-                    If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(cc.Name, cc.IP, cc.Port))
+                    If c.GetType Is GetType(AccessClient) Then lstInfo.Add(New ClientInfo(cc.Name, cc.Client.IP, cc.Client.Port))
                 Next
 
                 Code.SaveXml(lstInfo.ToArray, Path)
@@ -59,7 +59,8 @@
             For i As Integer = 0 To Client.Length - 1
                 If Client(i).GetType Is GetType(AccessClient) Then
                     RaiseEvent BeforeConnect(Me, Client(i))
-                    CType(Client(i), AccessClient).StartConnect()
+                    'CType(Client(i), AccessClient).StartConnect()
+                    CType(Client(i), AccessClient).Client.StartConnect()
                 End If
             Next
 
@@ -120,25 +121,40 @@
 
     Public Class AccessClient
         Inherits Access
+        Public WithEvents Client As New TCPTool.Client
         Public SyncWorking As Boolean = False
         Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
+
+
 
         Sub New()
             MyBase.New("遠端資料庫")
         End Sub
 
+
         Sub New(ByVal Info As ClientInfo)
             MyClass.New()
-            Me.Name = Info.Name : Me.IP = Info.IP : Me.Port = Info.Port
+            Me.Name = Info.Name : Me.Client.IP = Info.IP : Me.Client.Port = Info.Port
         End Sub
         Sub New(ByVal Name As String, ByVal IP As String, ByVal Port As Integer)
             MyClass.New()
-            Me.Name = Name : Me.IP = IP : Me.Port = Port
+            Me.Name = Name : Me.Client.IP = IP : Me.Client.Port = Port
         End Sub
 
+
         Public Sub Disconnect()
-            EndConnect()
+            Client.EndConnect()
         End Sub
+
+        Public Overrides Function Connected() As Boolean
+            Return Client.Connected()
+        End Function
+
+        Public o
+
+        Public Overrides Function Download(ByVal sourcePath As String, ByVal DestPath As String) As TCPTool.Client.StreamReceiver
+            Return Client.Download(sourcePath, DestPath)
+        End Function
 
         Public Overrides Function Command(ByVal SqlCommand As String, ByVal File As String) As Long
             Dim Count As Long
@@ -225,10 +241,10 @@
 
             Dim dt As DataTable
             If Version = "v1.0.7" Then
-                Dim reader = New DataTableReader(Me)
+                Dim reader = New DataTableReader(Client)
                 dt = reader.Read(args, ProgressAction)
             Else
-                Dim reader = New AccessReader(Me)
+                Dim reader = New AccessReader(Client)
                 dt = reader.Read(args, ProgressAction)
             End If
 
@@ -242,12 +258,12 @@
                 Return Nothing
             End If
 
-            Dim r As New Reader(Of T, ResultT)(Me)
+            Dim r As New Reader(Of T, ResultT)(Client)
             Return r.Read(Cmd, args, Progress)
         End Function
 
         Class Reader(Of ArgsT, ResultT)
-            Inherits StreamReceiver
+            Inherits TCPTool.Client.StreamReceiver
             Public Waiter As New Threading.AutoResetEvent(True)
 
             Public Progresser As Progress
@@ -464,6 +480,10 @@
 
         End Class
 
+
+
+
+
         Public Overrides Function GetSalesInformation(ByVal St As Date, ByVal Ed As Date) As Access.SalesInformation
             Dim args As GetSalesInformationArgs
             args.StartTime = St
@@ -483,21 +503,27 @@
             Send("DeleteFile", File)
         End Sub
 
+        Public Overloads Sub Send(ByVal cmd As String)
+            Client.Send(cmd)
+        End Sub
         Public Overloads Sub Send(Of T)(ByVal cmd As String, ByVal args As T)
-            MyBase.Send(cmd, Code.XmlSerializeWithZIP(args))
+            Client.Send(cmd, Code.XmlSerializeWithZIP(args))
         End Sub
         Public Overloads Sub Send(ByVal cmd As String, ByVal Guid As String, ByVal args As String)
-            MyBase.Send(cmd, Guid & "," & args)
+            Client.Send(cmd, Guid & "," & args)
         End Sub
         Private Shared Function Repair(Of T)(ByVal s As String) As T
             Return Code.XmlDeserializeWithUnzip(Of T)(s)
         End Function
 
-        Private Sub AccessClient_ConnectedFail(ByVal Client As TCPTool.Client) Handles Me.ConnectedFail
+        Private Sub AccessClient_ConnectedFail(ByVal Client As TCPTool.Client) Handles Client.ConnectedFail
             lstReader.Desconnect()
+            OnConnectedFail()
         End Sub
 
-        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles MyBase.ReceiveSplitMessage
+
+
+        Private Sub Client_ReceiveSplitMessage(ByVal Client As TCPTool.Client, ByVal IP As String, ByVal Port As Integer, ByVal Data() As String) Handles Client.ReceiveSplitMessage
 
             Dim args As String = ""
             If Data.Length > 1 Then args = Data(1)
@@ -548,20 +574,53 @@
                 Case "CreatedLog" : OnCreatedLog(Repair(Of Log)(args))
                 Case "DeletedLog" : OnDeletedLog(Repair(Of Log)(args))
                 Case "DeletedAllLog" : OnDeletedAllLog()
+                Case "Account_Login" : OnLogin(Code.XmlDeserializeWithUnzip(Of Database.LoginResult)(args))
+                Case "Account_Logout" : OnLogout(Code.XmlDeserializeWithUnzip(Of Database.LoginResult)(args))
                 Case "ServerVersion" : Version = Repair(Of String)(args) : GotServerVersion()
                 Case "MsgBox" : OnErrorMessage(Code.XmlDeserializeWithUnzip(Of String)(args)) 'MsgBox(Code.XmlDeserializeWithUnzip(Of String)(args))
+                Case "Messaged" : OnMessaged(Code.XmlDeserializeWithUnzip(Of MsgArgs)(args))
                 Case Else
                     'MsgBox("Client:不明指令:" & vbCrLf & Data(0))
                     OnErrorMessage("Client:不明指令:" & vbCrLf & Data(0))
             End Select
         End Sub
 
-        Friend Overrides Sub OnConnectedSuccess()
-            Send("GetServerVersion")
+        Public Overrides Sub LogIn(ByVal ID As String, ByVal Password As String)
+            Dim e As LogInArgs
+            e.ID = ID
+            e.Password = Password
+            Send("Login", e)
+        End Sub
+
+        Public Overrides Sub LogOut()
+            If Client.Connected Then
+                Send("Logout")
+            Else
+                MyBase.LogOut()
+            End If
+        End Sub
+
+
+        Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
+            Client.Send("GetServerVersion") '不觸發連線成功事件，直到取得Client版本資訊才觸發
         End Sub
 
         Private Sub GotServerVersion()
-            MyBase.OnConnectedSuccess()
+            OnConnectedSuccess() '取得版本資訊，觸發ConnectedSuccess事件
+        End Sub
+
+        Public Overrides Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer)
+            Dim e As StockMoveArgs
+            e.Stock = mStock
+            e.Number = number
+            Send("StockMoveIn", e)
+        End Sub
+
+        Public Overrides Sub StockMoveOut(ByVal mStock As Stock, ByVal number As Integer)
+            Dim e As StockMoveArgs
+            e.Stock = mStock
+            e.Number = number
+            Send("StockMoveOut", e)
         End Sub
 
         Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)

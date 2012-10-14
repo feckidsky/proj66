@@ -26,8 +26,8 @@
         dgShop.Rows.Clear()
         For Each c As Database.Access In ClientManager.Client
             If c.GetType() Is GetType(Database.AccessClient) Then
-                Dim cc As Database.Access = c
-                dgShop.Rows.Add(cc.Name, cc.IP, cc.Port)
+                Dim cc As Database.AccessClient = c
+                dgShop.Rows.Add(cc.Name, cc.Client.IP, cc.Client.Port)
             End If
         Next
     End Sub

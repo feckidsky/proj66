@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.10"
+    Public ProgramVersion As String = "v1.0.11"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
 
     Public WithEvents Server As New Database.AccessServer
@@ -163,7 +163,8 @@ Public Module Program
 
         If Config.Mode = Connect.Server Then
             myDatabase.Name = Config.ServerName
-            Server.Access = myDatabase
+            'Server.Access = myDatabase
+            Server.AccessList.Add(New AccessServer.ServiceClient(Server, myDatabase))
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
             Server.Version = ProgramVersion
@@ -181,8 +182,11 @@ Public Module Program
         ClientManager.Client = lstClient.ToArray()
 
         '若預設登入者為Designer時啟動記錄模式
-        For Each c As TCPTool.Client In ClientManager.Client
-            c.EnableMessageLog = LoginSetting.AutoLog And LoginSetting.Password = Personnel.Designer.Password And LoginSetting.ID = Personnel.Designer.ID
+        For Each c As Access In ClientManager.Client
+            If c.GetType Is GetType(AccessClient) Then
+                CType(c, AccessClient).Client.EnableMessageLog = LoginSetting.AutoLog And LoginSetting.Password = Personnel.Designer.Password And LoginSetting.ID = Personnel.Designer.ID
+            End If
+
         Next
 
         ClientManager.StartConnect()
@@ -464,6 +468,22 @@ Public Module Program
     End Class
 #End Region
 
+
+    Public Sub Login(ByVal ID As String, ByVal Password As String)
+        For i As Integer = 0 To ClientManager.Client.Length - 1
+            Dim access As Access = ClientManager.Client(i)
+
+            If access.Connected() Then access.LogIn(ID, Password)
+        Next
+    End Sub
+
+    Public Sub Logout()
+        For i As Integer = 0 To ClientManager.Client.Length - 1
+            Dim access As Access = ClientManager.Client(i)
+            If access.Connected() Then access.LogOut()
+        Next
+    End Sub
+
     WithEvents ccc As Database.AccessClient
     Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles ClientManager.BeforeConnect
 
@@ -495,6 +515,7 @@ Public Module Program
             AddHandler .ConnectedSuccess, AddressOf ConnectSuccess
             AddHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
             AddHandler .ErrorMessage, AddressOf ccc_ErrorMessage
+            AddHandler .Messaged, AddressOf ccc_Messaged
         End With
 
     End Sub
@@ -529,6 +550,7 @@ Public Module Program
             RemoveHandler .ConnectedSuccess, AddressOf ConnectSuccess
             RemoveHandler .ReceiveServerName, AddressOf ccc_ReceiveServerName
             RemoveHandler .ErrorMessage, AddressOf ccc_ErrorMessage
+            RemoveHandler .Messaged, AddressOf ccc_Messaged
         End With
 
     End Sub
@@ -537,6 +559,13 @@ Public Module Program
 
     Private Sub ConnectSuccess(ByVal sender As Object) Handles ccc.ConnectedSuccess
         If Config.Mode = Connect.Client Then Exit Sub
+
+        If Not CurrentUser.IsGuest() Then
+            CType(sender, AccessClient).LogIn(CurrentUser.ID, CurrentUser.Password)
+        ElseIf LoginSetting.AutoLog Then
+            CType(sender, AccessClient).LogIn(LoginSetting.ID, LoginSetting.Password)
+        End If
+
         Dim SyncThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf SyncDatabase))
         SyncThread.IsBackground = True
         SyncThread.Start(sender)
@@ -554,35 +583,10 @@ Public Module Program
         Return CType(obj, Date)
     End Function
 
-    Enum Compare
-        Normal = 0
-        NoExist = 1
-        MoreNew = 2
-    End Enum
+   
 
-    Public Function CompareHistoryPrice(ByVal DT As DataTable, ByVal Label As String, ByVal Time As Date) As Compare
-        For Each r As DataRow In DT.Rows
-            If r("GoodsLabel") = Label And GetTime(r("Time")) = Time Then Return Compare.Normal
-            If Label = "" Then Return Compare.Normal
-        Next
-        Return Compare.NoExist
-    End Function
-
-    Public Function CompareModify(ByVal DT As DataTable, ByVal Label As String, ByVal Modify As Date) As Compare
-        For Each r As DataRow In DT.Rows
-            If r("Label") = Label Then
-                If GetTime(r("Modify")) < Modify Then
-                    Return Compare.MoreNew
-                Else
-                    Return Compare.Normal
-                End If
-            End If
-        Next
-        Return Compare.NoExist
-    End Function
-
-    Private Sub ccc_ErrorMessage(ByVal client As TCPTool.Client, ByVal Message As String) Handles ccc.ErrorMessage
-        ErrorList.Add("[" & CType(client, Access).Name & "]" & Message)
+    Private Sub ccc_ErrorMessage(ByVal sender As Object, ByVal Message As String) Handles ccc.ErrorMessage
+        ErrorList.Add("[" & CType(sender, Access).Name & "]" & Message)
     End Sub
 
     Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.ChangedContract
@@ -666,13 +670,22 @@ Public Module Program
         ClientManager.Save(ClientPath)
     End Sub
 
+    Private Sub ccc_Messaged(ByVal sender As Object, ByVal e As Database.Access.MsgArgs) Handles ccc.Messaged
+        MsgBox(e.Text, e.style, e.Title)
+    End Sub
+
     Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles myDatabase.Account_Logout, myDatabase.Account_LogIn
-        CurrentAccess = sender
+
+
+        CurrentAccess = ClientManager.Item(LoginSetting.Shop)
+
         CurrentUser = result.User
 
         '若登入者為Designer時啟動記錄模式
-        For Each c As TCPTool.Client In ClientManager.Client
-            c.EnableMessageLog = result.User.ID = Personnel.Designer.ID
+        For Each c As Access In ClientManager.Client
+            If c.GetType Is GetType(AccessClient) Then
+                CType(c, AccessClient).Client.EnableMessageLog = result.User.ID = Personnel.Designer.ID
+            End If
         Next
 
     End Sub
@@ -723,4 +736,6 @@ Public Module Program
     Private Sub Server_ErrorMessage(ByVal sender As TCPTool, ByVal ErrorMessage As String) Handles Server.ErrorMessage
         ErrorList.Add("[Server]" & ErrorMessage)
     End Sub
+
+
 End Module

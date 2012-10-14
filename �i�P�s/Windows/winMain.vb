@@ -83,8 +83,8 @@ Public Class winMain
             Dim db As Access = ClientManager(LoginSetting.Shop)
             If db IsNot Nothing Then
                 Me.access = db
-                db.LogIn(LoginSetting.ID, LoginSetting.Password, True)
-                cbClient.SelectedIndex = Array.FindIndex(Of Access)(ClientManager.Client, Function(a As Access) db.Name = a.Name)
+                'db.LogIn(LoginSetting.ID, LoginSetting.Password)
+                Login(LoginSetting.ID, LoginSetting.Password)
             End If
         Else '沒有預設登入的資料庫，選擇第一個Client當預設值
             If cbClient.Items.Count > 0 Then cbClient.SelectedIndex = 0
@@ -157,13 +157,15 @@ Public Class winMain
     End Sub
 
     Private Sub 登出OToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登出OToolStripMenuItem.Click, 登出OToolStripMenuItem1.Click
-        If access IsNot Nothing Then access.LogOut()
+        'If access IsNot Nothing Then access.LogOut()
+        Logout()
     End Sub
 
 
     Private Sub 登入IToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 登入IToolStripMenuItem.Click, 登入IToolStripMenuItem1.Click
-        Dim result As LoginResult = winLogIn.ShowDialog(access)
-        If result.State = LoginState.Success Then access = result.Client
+        Dim dialog As winLogIn = winLogIn
+        Dim result As LoginResult = dialog.ShowDialog(access)  'winLogIn.ShowDialog(access)
+        If result.State = LoginState.Success Then access = dialog.Access 'result.Client
     End Sub
 
 
@@ -551,7 +553,14 @@ Public Class winMain
     End Sub
 #End Region
 
+    Dim LoginHandler As New Action(Of Object, Database.LoginResult)(AddressOf access_Account_LogIn)
     Private Sub access_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles m_access.Account_LogIn, m_access.Account_Logout
+        If Me.InvokeRequired Then
+            Me.Invoke(LoginHandler, sender, result)
+            Exit Sub
+        End If
+
+        cbClient.SelectedIndex = Array.FindIndex(Of Access)(ClientManager.Client, Function(a As Access) sender.Name = a.Name)
 
         If result.State <> Database.LoginState.Success Then
             MsgBox(result.msg, MsgBoxStyle.Information)
@@ -565,12 +574,12 @@ Public Class winMain
         UpdateTitle()
     End Sub
 
-    Private Sub access_ConnectedFail(ByVal Client As TCPTool.Client) Handles m_access.ConnectedFail
+    Private Sub access_ConnectedFail(ByVal Client As Access) Handles m_access.ConnectedFail
         UpdateTitle()
     End Sub
 
     Dim UpdateSalesListHandler As New Action(AddressOf UpdateSalesList)
-    Private Sub access_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles m_access.ConnectedSuccess
+    Private Sub access_ConnectedSuccess(ByVal Client As Access) Handles m_access.ConnectedSuccess
         If Me.InvokeRequired Then
             If Not Me.IsDisposed Then Me.Invoke(UpdateTitleHandler)
             If Not Me.IsDisposed Then Me.Invoke(UpdateSalesListHandler)
@@ -838,7 +847,10 @@ Public Class winMain
     Dim UpdateCbClientLock As String = "UpdateCbClientLock"
     Public Sub UpdateCbClientList()
         If Me.InvokeRequired Then
-            If Not Me.IsDisposed Then Me.Invoke(UpdateCbClinetListHandler)
+            Try
+                If Not Me.IsDisposed Then Me.Invoke(UpdateCbClinetListHandler)
+            Catch
+            End Try
             Exit Sub
         End If
 

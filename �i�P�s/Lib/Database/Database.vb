@@ -57,10 +57,10 @@
         Dim User As Personnel
         Dim State As LoginState
         Dim msg As String
-        Dim Client As Access
+        'Dim Client As Access
 
-        Sub New(ByVal state As LoginState, ByVal msg As String, ByVal user As Personnel, ByVal Client As Access)
-            Me.State = state : Me.msg = msg : Me.User = user : Me.Client = Client
+        Sub New(ByVal state As LoginState, ByVal msg As String, ByVal user As Personnel) ', ByVal Client As Access)
+            Me.State = state : Me.msg = msg : Me.User = user ': Me.Client = Client
         End Sub
     End Structure
 
@@ -73,7 +73,7 @@
 
 #Region "Access"
     Public Class Access
-        Inherits TCPTool.Client
+        'Inherits TCPTool.Client
         Public Name As String = "DefaultName"
         Private Shared Lock As String = "Lock"
         Public Version As String = "none"
@@ -82,6 +82,7 @@
         Public MsgPath As String
         'Public SalesPath As String
         Public Shared Password As String = "36363636"
+        'Public User As Database.Personnel = Personnel.Guest
 
         Shared DBWriteLock As String = " DBWriteLock"
 
@@ -129,6 +130,37 @@
         Event CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
         Event ChangedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
         Event DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
+        Event ErrorMessage(ByVal sender As Object, ByVal Message As String)
+
+
+        Event Messaged(ByVal sender As Object, ByVal e As MsgArgs)
+        Event ConnectedSuccess(ByVal client As Access)
+        Event ConnectedFail(ByVal Client As Access)
+        Event LogMessage(ByVal client As Access, ByVal e As TCPTool.Client.MessageLog)
+
+
+        Public Structure MsgArgs
+            Dim Text As String
+            Dim Title As String
+            Dim style As MsgBoxStyle
+        End Structure
+
+        Public Structure LogInArgs
+            Dim ID As String
+            Dim Password As String
+        End Structure
+
+        Public Overridable Sub OnConnectedSuccess()
+            RaiseEvent ConnectedSuccess(Me)
+        End Sub
+
+        Public Overridable Sub OnConnectedFail()
+            RaiseEvent ConnectedFail(Me)
+        End Sub
+
+        Public Overridable Sub OnLogMessage(ByVal e As TCPTool.Client.MessageLog)
+            RaiseEvent LogMessage(Me, e)
+        End Sub
 #Region "Progress"
         Public Class Progress
             Public Delegate Sub ProgressAction(ByVal Message As String, ByVal Percent As Integer)
@@ -227,40 +259,92 @@
             If Not IO.File.Exists(MsgPath) Then CreateBulletinFile(MsgPath)
         End Sub
 
-        Public Overloads Function Connected() As Boolean
-            If Me.GetType Is GetType(Access) Then Return True
-            Return MyBase.Connected()
+        Public Overridable Function Connected() As Boolean
+            Return True
         End Function
 
-        Public Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
+        'Public Overridable Function LogIn(ByVal ID As String, ByVal Password As String, Optional ByVal TriggerEvent As Boolean = True) As LoginResult
+
+        '    Dim result As LoginResult
+        '    Dim r_user As Personnel = GetPersonnelByID(ID)
+
+        '    If ID = Personnel.Designer.ID And Password = Personnel.Designer.Password Then
+        '        result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Designer, Me)
+        '    ElseIf r_user.IsNull() Then
+        '        result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest, Me)
+        '    ElseIf r_user.Password <> Password Then
+        '        result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest, Me)
+        '    Else
+        '        result = New LoginResult(LoginState.Success, "登入成功!", r_user, Me)
+        '        'CurrentUser = user
+        '    End If
+
+        '    User = result.User
+        '    If TriggerEvent Then OnLogin(result)
+        '    Return result
+        'End Function
+        Public Overridable Sub LogIn(ByVal ID As String, ByVal Password As String)
 
             Dim result As LoginResult
             Dim r_user As Personnel = GetPersonnelByID(ID)
 
             If ID = Personnel.Designer.ID And Password = Personnel.Designer.Password Then
-                result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Designer, Me)
+                result = New LoginResult(LoginState.Success, "登入成功!", Personnel.Designer)
             ElseIf r_user.IsNull() Then
-                result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest, Me)
+                result = New LoginResult(LoginState.IdError, "帳號不存在!", Personnel.Guest)
             ElseIf r_user.Password <> Password Then
-                result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest, Me)
+                result = New LoginResult(LoginState.PasswordError, "密碼錯誤!", Personnel.Guest)
             Else
-                result = New LoginResult(LoginState.Success, "登入成功!", r_user, Me)
+                result = New LoginResult(LoginState.Success, "登入成功!", r_user)
                 'CurrentUser = user
             End If
 
             User = result.User
-            If TriggerEvent Then OnLogin(result)
-            Return result
-        End Function
+            OnLogin(result)
+
+        End Sub
+
+        Public Sub LogIn(ByVal e As LogInArgs)
+            LogIn(e.ID, e.Password)
+        End Sub
 
         Friend Overridable Sub OnLogin(ByVal result As LoginResult)
             RaiseEvent Account_LogIn(Me, result)
         End Sub
 
-        Public Overridable Sub LogOut(Optional ByVal TriggerEvent As Boolean = True)
-            Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest, Me)
-            If TriggerEvent Then RaiseEvent Account_Logout(Me, result)
+        Public Overridable Sub LogOut()
+            Dim result As New LoginResult(LoginState.Success, "已經登出!", Personnel.Guest)
+            OnLogout(result)
         End Sub
+
+        Friend Overridable Sub OnLogout(ByVal result As LoginResult)
+            RaiseEvent Account_Logout(Me, result)
+        End Sub
+
+        Private Sub Message(ByVal Text As String, ByVal style As MsgBoxStyle, ByVal title As String)
+            Dim e As MsgArgs
+            e.Text = Text
+            e.style = style
+            e.Title = title
+            OnMessaged(e)
+        End Sub
+
+
+        Private Function CheckAuthority(ByVal level As Integer, Optional ByVal WithAdmin As Boolean = False) As Boolean
+            If Not WithAdmin And User.IsAdministrator Then
+                'MsgBox(CurrentUser.Name & "無法進行此動作", MsgBoxStyle.Exclamation)
+                Message(User.Name & "無法進行此動作", MsgBoxStyle.Exclamation, Name)
+                Return False
+            End If
+
+            If User.Authority >= level Then
+                Return True
+            Else
+                'MsgBox(CurrentUser.Name & " - 權限等級[" & CurrentUser.Authority & "]不足, 執行此動作的權限等級為[" & level & "]", MsgBoxStyle.Exclamation)
+                Message(User.Name & " - 權限等級[" & CurrentUser.Authority & "]不足, 執行此動作的權限等級為[" & level & "]", MsgBoxStyle.Exclamation, Name)
+                Return False
+            End If
+        End Function
 
         Public Function GetKindList() As String()
             Dim SqlCommand As String = "SELECT Kind FROM goods Group By Kind;"
@@ -380,22 +464,19 @@
             End Try
         End Sub
 
-        Public Overloads Function Download(ByVal sourcePath As String, ByVal DestPath As String) As StreamReceiver
+        Public Overridable Function Download(ByVal sourcePath As String, ByVal DestPath As String) As TCPTool.Client.StreamReceiver
 
-            If Me.GetType Is GetType(Access) Then
-                Dim Receiver As New StreamReceiver(Me)
-                Try
-                    IO.File.Copy(sourcePath, DestPath, True)
-                    Return Receiver
-                Catch
-                    MsgBox(Err.Description)
-                    Return Receiver
-                Finally
-                    Receiver.OnReceived()
-                End Try
-            Else
-                Return MyBase.Download(sourcePath, DestPath)
-            End If
+            Dim Receiver As New TCPTool.Client.StreamReceiver(New TCPTool.Client)
+            Try
+                IO.File.Copy(sourcePath, DestPath, True)
+                Return Receiver
+            Catch
+                MsgBox(Err.Description)
+                Return Receiver
+            Finally
+                Receiver.OnReceived()
+            End Try
+
         End Function
 
 
@@ -467,6 +548,7 @@
 
         '更新庫存內容
         Public Overridable Sub ChangeStock(ByVal newStock As Stock)
+            If Today > newStock.Date.Date AndAlso Not CheckAuthority(3) Then Exit Sub
             Dim goods As Goods = GetGoods(newStock.GoodsLabel)
             Dim stock As Stock = GetStock(newStock.Label)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
@@ -475,14 +557,51 @@
             OnChangedStock(newStock)
         End Sub
 
+
+
         '刪除一筆庫存
         Public Overridable Sub DeleteStock(ByVal dStock As Stock)
+            If Today > dStock.Date.Date AndAlso Not CheckAuthority(3) Then Exit Sub
             If dStock.GoodsLabel = "" Then dStock.GoodsLabel = GetStock(dStock.Label).GoodsLabel
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
             Dim goods As Goods = GetGoods(dStock.GoodsLabel)
             AddLog(Now, "刪除庫存:" & goods.Name)
             OnDeletedStock(dStock)
+        End Sub
+
+        Public Structure StockMoveArgs
+            Dim Stock As Stock
+            Dim Number As Integer
+        End Structure
+
+        Public Overridable Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer)
+            Dim stock As Stock = GetStock(mStock.Label)
+            If stock.IsNull() Then
+                mStock.Number = number
+                AddStock(mStock)
+            Else
+                Dim SQLCommand As String = "UPDATE " & stock.Table & " SET Number=Number-" & number & " WHERE Label='" & mStock.Label & "';"
+                Command(SQLCommand, BasePath)
+                mStock = GetStock(mStock.Label) '取得最新庫存資料
+                OnChangedStock(mStock) '觸發更新庫存事件
+            End If
+
+        End Sub
+
+        Public Overridable Sub StockMoveOut(ByVal mStock As Stock, ByVal number As Integer)
+            Dim SQLCommand As String = "UPDATE " & Stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
+            Command(SQLCommand, BasePath)
+            mStock = GetStock(mStock.Label) '取得最新庫存資料
+            OnChangedStock(mStock) '觸發更新庫存事件
+        End Sub
+
+        Public Sub StockMoveIn(ByVal e As StockMoveArgs)
+            StockMoveIn(e.Stock, e.Number)
+        End Sub
+
+        Public Sub StockMoveOut(ByVal e As StockMoveArgs)
+            StockMoveOut(e.Stock, e.Number)
         End Sub
 
         '讀取庫存資料
@@ -1932,6 +2051,13 @@
             RaiseEvent DeletedAgendum(Me, Agendum)
         End Sub
 
+        Friend Overridable Sub OnMessaged(ByVal e As MsgArgs)
+            RaiseEvent Messaged(Me, e)
+        End Sub
+
+        Friend Overridable Sub OnErrorMessage(ByVal message As String)
+            RaiseEvent ErrorMessage(Me, message)
+        End Sub
 
 
         Structure RepairAccessResult

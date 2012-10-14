@@ -8,8 +8,11 @@ Public Module UpdateBatabase
     Public DatabaseVerson As String = "010201"
 
 #Region "同步資料庫"
+
+
     Dim UpdateDataLock As String = "UpdateDataLock"
     Public syncClient As AccessClient = Nothing
+
     Public Sub SyncDatabase(ByVal client As Database.AccessClient)
         If client.SyncWorking Then Exit Sub
         SyncLock UpdateDataLock
@@ -246,4 +249,31 @@ OpenDialog:
         Return changed
     End Function
 #End Region
+
+    Enum Compare
+        Normal = 0
+        NoExist = 1
+        MoreNew = 2
+    End Enum
+
+    Public Function CompareHistoryPrice(ByVal DT As DataTable, ByVal Label As String, ByVal Time As Date) As Compare
+        For Each r As DataRow In DT.Rows
+            If r("GoodsLabel") = Label And GetTime(r("Time")) = Time Then Return Compare.Normal
+            If Label = "" Then Return Compare.Normal
+        Next
+        Return Compare.NoExist
+    End Function
+
+    Public Function CompareModify(ByVal DT As DataTable, ByVal Label As String, ByVal Modify As Date) As Compare
+        For Each r As DataRow In DT.Rows
+            If r("Label") = Label Then
+                If GetTime(r("Modify")) < Modify Then
+                    Return Compare.MoreNew
+                Else
+                    Return Compare.Normal
+                End If
+            End If
+        Next
+        Return Compare.NoExist
+    End Function
 End Module
