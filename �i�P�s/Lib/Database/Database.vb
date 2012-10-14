@@ -581,18 +581,20 @@
                 mStock.Number = number
                 AddStock(mStock)
             Else
-                Dim SQLCommand As String = "UPDATE " & stock.Table & " SET Number=Number-" & number & " WHERE Label='" & mStock.Label & "';"
+                stock.Number += number
+                Dim SQLCommand As String = stock.GetUpdateSqlCommand() ';"UPDATE " & stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
                 Command(SQLCommand, BasePath)
-                mStock = GetStock(mStock.Label) '取得最新庫存資料
-                OnChangedStock(mStock) '觸發更新庫存事件
+                'mStock = GetStock(mStock.Label) '取得最新庫存資料
+                OnChangedStock(stock) '觸發更新庫存事件
             End If
 
         End Sub
 
         Public Overridable Sub StockMoveOut(ByVal mStock As Stock, ByVal number As Integer)
-            Dim SQLCommand As String = "UPDATE " & Stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
-            Command(SQLCommand, BasePath)
             mStock = GetStock(mStock.Label) '取得最新庫存資料
+            mStock.Number -= number
+            Dim SQLCommand As String = mStock.GetUpdateSqlCommand()  '"UPDATE " & Stock.Table & " SET Number=Number-" & number & " WHERE Label='" & mStock.Label & "';"
+            Command(SQLCommand, BasePath)
             OnChangedStock(mStock) '觸發更新庫存事件
         End Sub
 
