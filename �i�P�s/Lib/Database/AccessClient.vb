@@ -123,7 +123,7 @@
         Inherits Access
         Public WithEvents Client As New TCPTool.Client
         Public SyncWorking As Boolean = False
-        Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
+        'Event ReceiveServerName(ByVal sender As Object, ByVal Name As String)
 
 
 
@@ -533,7 +533,8 @@
                     Dim newName As String = Repair(Of String)(args)
                     If Name <> newName Then
                         Name = newName
-                        RaiseEvent ReceiveServerName(Me, Name)
+                        'RaiseEvent ReceiveServerName(Me, Name)
+                        OnReceiveServerName(Name)
                     End If
                 Case "ReaderResponse"
                     lstReader.Receive(Data(1), Data(2))

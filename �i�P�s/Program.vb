@@ -171,6 +171,7 @@ Public Module Program
             Server.Open(Config.ServerNetIndex)
             myDatabase.Version = ProgramVersion
             myDatabase.CheckDatabaseExist()
+            Client_BeforeConnect(Nothing, myDatabase)
         End If
 
         LoginSetting = LoginInfo.Load(LoginInfoPath)
@@ -485,7 +486,7 @@ Public Module Program
     End Sub
 
     WithEvents ccc As Database.AccessClient
-    Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.AccessClient) Handles ClientManager.BeforeConnect
+    Private Sub Client_BeforeConnect(ByVal sender As Object, ByVal client As Database.Access) Handles ClientManager.BeforeConnect
 
         With client
             AddHandler .Account_LogIn, AddressOf ccc_Account_LogIn
@@ -497,6 +498,7 @@ Public Module Program
             AddHandler .CreatedPersonnel, AddressOf CreatedPersonnel
             AddHandler .CreatedGoods, AddressOf CreatedGoods
             AddHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
+            AddHandler .CreatedStockMove, AddressOf CurrentAccess_ChangedStockMove 'CurrentAccess_CreatedStockMove
 
             AddHandler .ChangedContract, AddressOf ChangedContract
             AddHandler .ChangedCustomer, AddressOf ChangedCustomer
@@ -504,6 +506,7 @@ Public Module Program
             AddHandler .ChangedPersonnel, AddressOf ChangedPersonnel
             AddHandler .ChangedGoods, AddressOf ChangedGoods
             AddHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
+            AddHandler .ChangedStockMove, AddressOf CurrentAccess_ChangedStockMove
 
             AddHandler .DeletedContract, AddressOf DeletedContract
             AddHandler .DeletedCustomer, AddressOf DeletedCustomer
@@ -532,6 +535,7 @@ Public Module Program
             RemoveHandler .CreatedPersonnel, AddressOf CreatedPersonnel
             RemoveHandler .CreatedGoods, AddressOf CreatedGoods
             RemoveHandler .CreatedHistoryPrice, AddressOf CreatedHistoryPrice
+            RemoveHandler .CreatedStockMove, AddressOf CurrentAccess_ChangedStockMove
 
             RemoveHandler .ChangedContract, AddressOf ChangedContract
             RemoveHandler .ChangedCustomer, AddressOf ChangedCustomer
@@ -539,6 +543,7 @@ Public Module Program
             RemoveHandler .ChangedPersonnel, AddressOf ChangedPersonnel
             RemoveHandler .ChangedGoods, AddressOf ChangedGoods
             RemoveHandler .ChangedHistoryPrice, AddressOf ChangedHistoryPrice
+            RemoveHandler .ChangedStockMove, AddressOf CurrentAccess_ChangedStockMove
 
             RemoveHandler .DeletedContract, AddressOf DeletedContract
             RemoveHandler .DeletedCustomer, AddressOf DeletedCustomer
@@ -690,15 +695,27 @@ Public Module Program
 
     End Sub
 
-    Private Sub CurrentAccess_ChangedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.ChangedStockMove
+    Private Sub CurrentAccess_ChangedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) 'Handles CurrentAccess.ChangedStockMove
+        'Dim access As Access = sender
+        'If access.Name <> LoginSetting.Shop Then Exit Sub
+        'If data.DestineShop <> LoginSetting.Shop Then Exit Sub
         Dim goods As Goods = Nothing
-        If data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
+
+        If data.Action = StockMove.Type.Sending AndAlso data.DestineShop = LoginSetting.Shop Then
             Try
                 goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
             Catch
             End Try
             ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
+        ElseIf data.Action = StockMove.Type.Request AndAlso data.SourceShop = LoginSetting.Shop Then
+            Try
+                goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
+            Catch
+
+            End Try
+            ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
         End If
+     
 
     End Sub
 
@@ -707,20 +724,21 @@ Public Module Program
         'Return My.Forms.winMain ' (winMain.Name)(0)
     End Function
 
-    Private Sub CurrentAccess_CreatedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles CurrentAccess.CreatedStockMove
-
-        Dim goods As Goods = Nothing
-        If data.Action = StockMove.Type.Request And data.SourceShop = CurrentAccess.Name Then
-            goods = CurrentAccess.GetGoods(data.GoodsLabel)
-            ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
-        ElseIf data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
-            Try
-                goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
-            Catch
-            End Try
-            ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
-        End If
-    End Sub
+    'Private Sub CurrentAccess_CreatedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) ' Handles CurrentAccess.CreatedStockMove
+    '    'Dim access As Access = sender
+    '    'If access.Name <> LoginSetting.Shop Then Exit Sub
+    '    Dim goods As Goods = Nothing
+    '    If data.Action = StockMove.Type.Request And data.SourceShop = LoginSetting.Shop Then
+    '        goods = CurrentAccess.GetGoods(data.GoodsLabel)
+    '        ShowNotify(data.DestineShop & " 申請調貨" & vbCrLf & goods.Name & " x " & data.Number)
+    '    ElseIf data.Action = StockMove.Type.Receiving And data.DestineShop = CurrentAccess.Name Then
+    '        Try
+    '            goods = ClientManager(data.SourceShop).GetGoods(data.GoodsLabel)
+    '        Catch
+    '        End Try
+    '        ShowNotify(data.SourceShop & " 已調出商品" & vbCrLf & goods.Name & " x " & data.Number)
+    '    End If
+    'End Sub
 
 
     Dim ShowNotifyHandler As New Action(Of String)(AddressOf ShowNotify)

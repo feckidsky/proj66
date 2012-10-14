@@ -132,7 +132,7 @@
         Event DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum)
         Event ErrorMessage(ByVal sender As Object, ByVal Message As String)
 
-
+        Event ReceiveServerName(ByVal sender As Object, ByVal ServerName As String)
         Event Messaged(ByVal sender As Object, ByVal e As MsgArgs)
         Event ConnectedSuccess(ByVal client As Access)
         Event ConnectedFail(ByVal Client As Access)
@@ -156,6 +156,10 @@
 
         Public Overridable Sub OnConnectedFail()
             RaiseEvent ConnectedFail(Me)
+        End Sub
+
+        Public Overridable Sub OnReceiveServerName(ByVal name As String)
+            RaiseEvent ReceiveServerName(Me, name)
         End Sub
 
         Public Overridable Sub OnLogMessage(ByVal e As TCPTool.Client.MessageLog)
