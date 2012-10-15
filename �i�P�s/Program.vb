@@ -163,8 +163,8 @@ Public Module Program
 
         If Config.Mode = Connect.Server Then
             myDatabase.Name = Config.ServerName
-            'Server.Access = myDatabase
-            Server.AccessList.Add(New AccessServer.ServiceClient(Server, myDatabase, myDatabase))
+            Server.Access = myDatabase
+            'Server.AccessList.Add(New AccessServer.ServiceClient(Server, myDatabase, myDatabase))
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
             Server.Version = ProgramVersion
