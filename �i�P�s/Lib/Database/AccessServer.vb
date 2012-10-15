@@ -25,8 +25,7 @@
 
         '有Client連線，建立ServiceClient並加入AccessList清單中以利追蹤
         Private Sub Server_ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As TCPTool.Client) Handles MyBase.ReceiveConnected
-            Dim access As New ServiceClient(Me, Client, Name)
-            access.LocalAccess = myDatabase
+            Dim access As New ServiceClient(Me, Client, Name, myDatabase)
             AccessList.Add(access)
             Client.Send("ServerName", Code.XmlSerializeWithZIP(Name))
         End Sub
@@ -44,16 +43,18 @@
             Public WithEvents Client As TCPTool.Client
             Dim server As TCPTool
 
-            Sub New(ByVal server As TCPTool, ByVal client As TCPTool.Client, ByVal Name As String)
+            Sub New(ByVal server As TCPTool, ByVal client As TCPTool.Client, ByVal Name As String, ByVal local As Access)
                 Access = New Access(Name)
                 Me.Client = client
                 Me.server = server
+                Me.LocalAccess = local
             End Sub
 
-            Sub New(ByVal server As TCPTool, ByVal access As Access)
+            Sub New(ByVal server As TCPTool, ByVal access As Access, ByVal local As Access)
                 Me.Access = access
                 Client = Nothing  'New Client()
                 Me.server = server
+                Me.LocalAccess = local
             End Sub
 
 
