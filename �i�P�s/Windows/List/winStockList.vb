@@ -179,7 +179,9 @@
     Private Sub ChangeRow(ByVal arr() As Object)
         Try
             For i As Integer = 0 To DT.Rows.Count - 1
-                If arr(1) = DT.Rows(i)("庫存編號") Then DT.Rows(i).ItemArray = arr
+                If arr(1) = DT.Rows(i)("庫存編號") Then
+                    DT.Rows(i).ItemArray = arr
+                End If
             Next
         Catch
 
@@ -189,7 +191,7 @@
     Private Sub access_ChangedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.ChangedStock
         Dim dt As DataTable = access.GetStockListWithHistoryPrice(stock.Label)
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
-        Dim arr() As Object = dt.Rows(0).ItemArray
+        Dim arr As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(New Action(Of Object)(AddressOf ChangeRow), arr)
@@ -214,7 +216,7 @@
     Private Sub access_CreatedStock(ByVal sender As Object, ByVal stock As Database.Stock) Handles access.CreatedStock
         Dim dt As DataTable = access.GetStockListWithHistoryPrice(stock.Label)
         If dt Is Nothing OrElse dt.Rows.Count = 0 Then Exit Sub
-        Dim arr() As Object = dt.Rows(0).ItemArray
+        Dim arr As Object = dt.Rows(0).ItemArray
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(New Action(Of Object)(AddressOf AddRow), arr)
