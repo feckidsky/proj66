@@ -2,6 +2,7 @@
     Public Class AccessServer
         Inherits TCPTool
         Public WithEvents Access As Access
+        Public WithEvents WriterByClient As Access
         Public Port As Integer = 3600
         Public Version As String = "none"
         Public Name As String
@@ -17,9 +18,14 @@
             ServerClose()
         End Sub
 
+        Public Overloads Sub ServerSend(ByVal sender As Object, ByVal CMD As String, ByVal Para As String)
+            If sender Is Access Then MyBase.ServerSend(CMD, Para)
+        End Sub
+
+
         Public Sub ChangeName(ByVal newName As String)
             Name = newName
-            ServerSend("ServerName", Code.XmlSerializeWithZIP(Name))
+            ServerSend(Access, "ServerName", Code.XmlSerializeWithZIP(Name))
         End Sub
 
 
@@ -36,153 +42,153 @@
             If access IsNot Nothing Then AccessList.Remove(access)
         End Sub
 
-        Private Sub Access_ChangedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.ChangedAgendum
-            ServerSend("ChangedAgendm", Code.XmlSerializeWithZIP(Agendum))
+        Public Sub ChangedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.ChangedAgendum, WriterByClient.ChangedAgendum
+            ServerSend(sender, "ChangedAgendm", Code.XmlSerializeWithZIP(Agendum))
         End Sub
 
-        Private Sub Access_ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.ChangedBulletin
-            ServerSend("ChangedBulletin", Code.XmlSerializeWithZIP(bulletin))
+        Public Sub ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.ChangedBulletin, WriterByClient.ChangedBulletin
+            ServerSend(sender, "ChangedBulletin", Code.XmlSerializeWithZIP(bulletin))
         End Sub
 
-        Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract
-            ServerSend("ChangedContract", Code.XmlSerializeWithZIP(con))
+        Public Sub ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract, WriterByClient.ChangedContract
+            ServerSend(sender, "ChangedContract", Code.XmlSerializeWithZIP(con))
         End Sub
 
-        Private Sub Access_ChangedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.ChangedCustomer
-            ServerSend("ChangedCustomer", Code.XmlSerializeWithZIP(cus))
+        Public Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.ChangedCustomer, WriterByClient.ChangedCustomer
+            ServerSend(sender, "ChangedCustomer", Code.XmlSerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_ChangedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.ChangedGoods
-            ServerSend("ChangedGoods", Code.XmlSerializeWithZIP(goods))
+        Public Sub ChangedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.ChangedGoods, WriterByClient.ChangedGoods
+            ServerSend(sender, "ChangedGoods", Code.XmlSerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.ChangedHistoryPrice
-            ServerSend("ChangedHistoryPrice", Code.XmlSerializeWithZIP(hp))
+        Public Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.ChangedHistoryPrice, WriterByClient.ChangedHistoryPrice
+            ServerSend(sender, "ChangedHistoryPrice", Code.XmlSerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.ChangedPersonnel
-            ServerSend("ChangedPersonnel", Code.XmlSerializeWithZIP(per))
+        Public Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.ChangedPersonnel, WriterByClient.ChangedPersonnel
+            ServerSend(sender, "ChangedPersonnel", Code.XmlSerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales
-            ServerSend("ChangedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
+        Public Sub ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales, WriterByClient.ChangedSales
+            ServerSend(sender, "ChangedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
         End Sub
 
-        Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.ChangedStock
-            ServerSend("ChangedStock", Code.XmlSerializeWithZIP(stock))
+        Public Sub ChangedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.ChangedStock, WriterByClient.ChangedStock
+            ServerSend(sender, "ChangedStock", Code.XmlSerializeWithZIP(stock))
         End Sub
 
-        Private Sub Access_ChangedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.ChangedStockMove
-            ServerSend("ChangedStockMove", Code.XmlSerializeWithZIP(data))
+        Public Sub ChangedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.ChangedStockMove, WriterByClient.ChangedStockMove
+            ServerSend(sender, "ChangedStockMove", Code.XmlSerializeWithZIP(data))
         End Sub
 
-        Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier
-            ServerSend("ChangedSupplier", Code.XmlSerializeWithZIP(sup))
+        Public Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier, WriterByClient.ChangedSupplier
+            ServerSend(sender, "ChangedSupplier", Code.XmlSerializeWithZIP(sup))
         End Sub
 
-        Private Sub Access_CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.CreatedAgendum
-            ServerSend("CreatedAgendum", Code.XmlSerializeWithZIP(Agendum))
+        Public Sub CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.CreatedAgendum, WriterByClient.CreatedAgendum
+            ServerSend(sender, "CreatedAgendum", Code.XmlSerializeWithZIP(Agendum))
         End Sub
 
-        Private Sub Access_CreatedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.CreatedBulletin
-            ServerSend("CreatedBulletin", Code.XmlSerializeWithZIP(bulletin))
+        Public Sub CreatedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.CreatedBulletin, WriterByClient.CreatedBulletin
+            ServerSend(sender, "CreatedBulletin", Code.XmlSerializeWithZIP(bulletin))
         End Sub
-        Private Sub Access_CreatedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.CreatedContract
-            ServerSend("CreatedContract", Code.XmlSerializeWithZIP(con))
-        End Sub
-
-        Private Sub Access_CreatedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.CreatedCustomer
-            ServerSend("CreatedCustomer", Code.XmlSerializeWithZIP(cus))
+        Public Sub CreatedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.CreatedContract, WriterByClient.CreatedContract
+            ServerSend(sender, "CreatedContract", Code.XmlSerializeWithZIP(con))
         End Sub
 
-        Private Sub Access_CreatedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.CreatedGoods
-            ServerSend("CreatedGoods", Code.XmlSerializeWithZIP(goods))
+        Public Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.CreatedCustomer, WriterByClient.CreatedCustomer
+            ServerSend(sender, "CreatedCustomer", Code.XmlSerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.CreatedHistoryPrice
-            ServerSend("CreatedHistoryPrice", Code.XmlSerializeWithZIP(hp))
+        Public Sub CreatedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.CreatedGoods, WriterByClient.CreatedGoods
+            ServerSend(sender, "CreatedGoods", Code.XmlSerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_CreatedLog(ByVal sender As Object, ByVal log As Log) Handles Access.CreatedLog
-            ServerSend("CreatedLog", Code.XmlSerializeWithZIP(log))
+        Public Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.CreatedHistoryPrice, WriterByClient.CreatedHistoryPrice
+            ServerSend(sender, "CreatedHistoryPrice", Code.XmlSerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.CreatedPersonnel
-            ServerSend("CreatedPersonnel", Code.XmlSerializeWithZIP(per))
+        Public Sub CreatedLog(ByVal sender As Object, ByVal log As Log) Handles Access.CreatedLog, WriterByClient.CreatedLog
+            ServerSend(sender, "CreatedLog", Code.XmlSerializeWithZIP(log))
         End Sub
 
-        Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales
-            ServerSend("CreatedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
+        Public Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.CreatedPersonnel, WriterByClient.CreatedPersonnel
+            ServerSend(sender, "CreatedPersonnel", Code.XmlSerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.CreatedStock
-            ServerSend("CreatedStock", Code.XmlSerializeWithZIP(stock))
+        Public Sub CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales, WriterByClient.CreatedSales
+            ServerSend(sender, "CreatedSales", Code.XmlSerializeWithZIP(New SalesArgs(sales, GoodsList, OrderList, ReturnList, SalesContracts)))
         End Sub
 
-        Private Sub Access_CreatedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.CreatedStockMove
-            ServerSend("CreatedStockMove", Code.XmlSerializeWithZIP(data))
+        Public Sub CreatedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.CreatedStock, WriterByClient.CreatedStock
+            ServerSend(sender, "CreatedStock", Code.XmlSerializeWithZIP(stock))
         End Sub
 
-        Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier
-            ServerSend("CreatedSupplier", Code.XmlSerializeWithZIP(sup))
+        Public Sub CreatedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.CreatedStockMove, WriterByClient.CreatedStockMove
+            ServerSend(sender, "CreatedStockMove", Code.XmlSerializeWithZIP(data))
         End Sub
 
-        Private Sub Access_DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.DeletedAgendum
-            ServerSend("DeletedAgendum", Code.XmlSerializeWithZIP(Agendum))
+        Public Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier, WriterByClient.CreatedSupplier
+            ServerSend(sender, "CreatedSupplier", Code.XmlSerializeWithZIP(sup))
         End Sub
 
-        Private Sub Access_DeletedAllLog(ByVal sender As Object) Handles Access.DeletedAllLog
-            ServerSend("DeletedAllLog")
+        Public Sub DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.DeletedAgendum, WriterByClient.DeletedAgendum
+            ServerSend(sender, "DeletedAgendum", Code.XmlSerializeWithZIP(Agendum))
         End Sub
 
-        Private Sub Access_DeletedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.DeletedBulletin
-            ServerSend("DeletedBulletin", Code.XmlSerializeWithZIP(bulletin))
-        End Sub
-        Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
-            ServerSend("DeletedContract", Code.XmlSerializeWithZIP(con))
+        Public Sub DeletedAllLog(ByVal sender As Object) Handles Access.DeletedAllLog, WriterByClient.DeletedAllLog
+            ServerSend(sender, "DeletedAllLog")
         End Sub
 
-        Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer
-            ServerSend("DeletedCustomer", Code.XmlSerializeWithZIP(cus))
+        Public Sub DeletedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.DeletedBulletin, WriterByClient.DeletedBulletin
+            ServerSend(sender, "DeletedBulletin", Code.XmlSerializeWithZIP(bulletin))
+        End Sub
+        Public Sub DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract, WriterByClient.DeletedContract
+            ServerSend(sender, "DeletedContract", Code.XmlSerializeWithZIP(con))
         End Sub
 
-        Private Sub Access_DeletedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.DeletedGoods
-            ServerSend("DeletedGoods", Code.XmlSerializeWithZIP(goods))
+        Public Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer, WriterByClient.DeletedCustomer
+            ServerSend(sender, "DeletedCustomer", Code.XmlSerializeWithZIP(cus))
         End Sub
 
-        Private Sub Access_DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPrice
-            ServerSend("DeletedHistoryPrice", Code.XmlSerializeWithZIP(hp))
+        Public Sub DeletedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.DeletedGoods, WriterByClient.DeletedGoods
+            ServerSend(sender, "DeletedGoods", Code.XmlSerializeWithZIP(goods))
         End Sub
 
-        Private Sub Access_DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPriceList
-            ServerSend("DeletedHistoryPriceList", Code.XmlSerializeWithZIP(hp))
+        Public Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPrice, WriterByClient.DeletedHistoryPrice
+            ServerSend(sender, "DeletedHistoryPrice", Code.XmlSerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_DeletedLog(ByVal sender As Object, ByVal log As Log) Handles Access.DeletedLog
-            ServerSend("DeletedLog", Code.XmlSerializeWithZIP(log))
+        Public Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPriceList, WriterByClient.DeletedHistoryPriceList
+            ServerSend(sender, "DeletedHistoryPriceList", Code.XmlSerializeWithZIP(hp))
         End Sub
 
-        Private Sub Access_DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.DeletedPersonnel
-            ServerSend("DeletedPersonnel", Code.XmlSerializeWithZIP(per))
+        Public Sub DeletedLog(ByVal sender As Object, ByVal log As Log) Handles Access.DeletedLog, WriterByClient.DeletedLog
+            ServerSend(sender, "DeletedLog", Code.XmlSerializeWithZIP(log))
         End Sub
 
-        Private Sub Access_DeletedSales(ByVal sender As Object, ByVal sales As Sales) Handles Access.DeletedSales
-            ServerSend("DeletedSales", Code.XmlSerializeWithZIP(sales))
+        Public Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.DeletedPersonnel, WriterByClient.DeletedPersonnel
+            ServerSend(sender, "DeletedPersonnel", Code.XmlSerializeWithZIP(per))
         End Sub
 
-        Private Sub Access_DeletedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.DeletedStock
-            ServerSend("DeletedStock", Code.XmlSerializeWithZIP(stock))
+        Public Sub DeletedSales(ByVal sender As Object, ByVal sales As Sales) Handles Access.DeletedSales, WriterByClient.DeletedSales
+            ServerSend(sender, "DeletedSales", Code.XmlSerializeWithZIP(sales))
         End Sub
 
-        Private Sub Access_DeletedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.DeletedStockMove
-            ServerSend("DeletedStockMove", Code.XmlSerializeWithZIP(data))
+        Public Sub DeletedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.DeletedStock, WriterByClient.DeletedStock
+            ServerSend(sender, "DeletedStock", Code.XmlSerializeWithZIP(stock))
         End Sub
 
-        Private Sub Access_DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.DeletedSupplier
-            ServerSend("DeletedSupplier", Code.XmlSerializeWithZIP(sup))
+        Public Sub DeletedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.DeletedStockMove, WriterByClient.DeletedStockMove
+            ServerSend(sender, "DeletedStockMove", Code.XmlSerializeWithZIP(data))
         End Sub
 
-        Private Sub Access_Messaged(ByVal sender As Object, ByVal e As Access.MsgArgs) Handles Access.Messaged
+        Public Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.DeletedSupplier, WriterByClient.DeletedSupplier
+            ServerSend(sender, "DeletedSupplier", Code.XmlSerializeWithZIP(sup))
+        End Sub
+
+        Private Sub Access_Messaged(ByVal sender As Object, ByVal e As Access.MsgArgs) Handles Access.Messaged, WriterByClient.Messaged
             MsgBox(e.Text, e.style, e.Title)
         End Sub
 
@@ -208,13 +214,13 @@
             End Sub
 
 
-            Public Sub ServerSend(ByVal cmd As String, ByVal args As String)
-                server.ServerSend(cmd, args)
-            End Sub
+            'Public Sub ServerSend(ByVal cmd As String, ByVal args As String)
+            '    server.ServerSend(cmd, args)
+            'End Sub
 
-            Public Sub ServerSend(ByVal text As String)
-                server.ServerSend(text)
-            End Sub
+            'Public Sub ServerSend(ByVal text As String)
+            '    server.ServerSend(text)
+            'End Sub
 
 
 
@@ -420,7 +426,7 @@
             End Sub
 
             Private Sub Access_ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.ChangedBulletin
-               LocalAccess.OnChangedBulletin(bulletin)
+                LocalAccess.OnChangedBulletin(bulletin)
             End Sub
 
             Private Sub Access_ChangedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.ChangedContract
@@ -432,7 +438,7 @@
             End Sub
 
             Private Sub Access_ChangedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.ChangedGoods
-               LocalAccess.OnChangedGoods(goods)
+                LocalAccess.OnChangedGoods(goods)
             End Sub
 
             Private Sub Access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.ChangedHistoryPrice
@@ -440,11 +446,11 @@
             End Sub
 
             Private Sub Access_ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.ChangedPersonnel
-               LocalAccess.OnChangedPersonnel(per)
+                LocalAccess.OnChangedPersonnel(per)
             End Sub
 
             Private Sub Access_ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.ChangedSales
-               LocalAccess.OnChangedSales(sales, GoodsList, OrderList, ReturnList, SalesContracts)
+                LocalAccess.OnChangedSales(sales, GoodsList, OrderList, ReturnList, SalesContracts)
             End Sub
 
             Private Sub Access_ChangedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.ChangedStock
@@ -456,7 +462,7 @@
             End Sub
 
             Private Sub Access_ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.ChangedSupplier
-               LocalAccess.OnChangedSupplier(sup)
+                LocalAccess.OnChangedSupplier(sup)
             End Sub
 
             Private Sub Access_CreatedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.CreatedAgendum
@@ -467,94 +473,94 @@
                 LocalAccess.OnCreatedBulletin(bulletin)
             End Sub
             Private Sub Access_CreatedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.CreatedContract
-              LocalAccess.OnCreatedContract(con)
+                LocalAccess.OnCreatedContract(con)
             End Sub
 
             Private Sub Access_CreatedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.CreatedCustomer
-              LocalAccess.OnCreatedCustomer(cus)
+                LocalAccess.OnCreatedCustomer(cus)
             End Sub
 
             Private Sub Access_CreatedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.CreatedGoods
-               LocalAccess.OnCreatedGoods(goods)
+                LocalAccess.OnCreatedGoods(goods)
             End Sub
 
             Private Sub Access_CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.CreatedHistoryPrice
-               LocalAccess.OnCreatedHistoryPrice(hp)
+                LocalAccess.OnCreatedHistoryPrice(hp)
             End Sub
 
             Private Sub Access_CreatedLog(ByVal sender As Object, ByVal log As Log) Handles Access.CreatedLog
-               LocalAccess.OnCreatedLog(log)
+                LocalAccess.OnCreatedLog(log)
             End Sub
 
             Private Sub Access_CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.CreatedPersonnel
-              LocalAccess.OnCreatedPersonnel(per)
+                LocalAccess.OnCreatedPersonnel(per)
             End Sub
 
             Private Sub Access_CreatedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract) Handles Access.CreatedSales
-              LocalAccess.OnCreatedSales(sales, GoodsList, OrderList, ReturnList, SalesContracts)
+                LocalAccess.OnCreatedSales(sales, GoodsList, OrderList, ReturnList, SalesContracts)
             End Sub
 
             Private Sub Access_CreatedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.CreatedStock
-               LocalAccess.OnCreatedStock(stock)
+                LocalAccess.OnCreatedStock(stock)
             End Sub
 
             Private Sub Access_CreatedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.CreatedStockMove
-               LocalAccess.OnCreatedStockMove(data)
+                LocalAccess.OnCreatedStockMove(data)
             End Sub
 
             Private Sub Access_CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.CreatedSupplier
-               LocalAccess.OnCreatedSupplier(sup)
+                LocalAccess.OnCreatedSupplier(sup)
             End Sub
 
             Private Sub Access_DeletedAgendum(ByVal sender As Object, ByVal Agendum As Agendum) Handles Access.DeletedAgendum
-              LocalAccess.OnDeletedAgendum(Agendum)
+                LocalAccess.OnDeletedAgendum(Agendum)
             End Sub
 
             Private Sub Access_DeletedAllLog(ByVal sender As Object) Handles Access.DeletedAllLog
-               LocalAccess.OnDeletedAllLog()
+                LocalAccess.OnDeletedAllLog()
             End Sub
 
             Private Sub Access_DeletedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin) Handles Access.DeletedBulletin
-               LocalAccess.OnDeletedBulletin(bulletin)
+                LocalAccess.OnDeletedBulletin(bulletin)
             End Sub
             Private Sub Access_DeletedContract(ByVal sender As Object, ByVal con As Contract) Handles Access.DeletedContract
-            LocalAccess.OnDeletedContract(con)
+                LocalAccess.OnDeletedContract(con)
             End Sub
 
             Private Sub Access_DeletedCustomer(ByVal sender As Object, ByVal cus As Customer) Handles Access.DeletedCustomer
-             LocalAccess.OnDeletedCustomer(cus)
+                LocalAccess.OnDeletedCustomer(cus)
             End Sub
 
             Private Sub Access_DeletedGoods(ByVal sender As Object, ByVal goods As Goods) Handles Access.DeletedGoods
-              LocalAccess.OnDeletedGoods(goods)
+                LocalAccess.OnDeletedGoods(goods)
             End Sub
 
             Private Sub Access_DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPrice
-            LocalAccess.OnDeletedHistoryPrice(hp)
+                LocalAccess.OnDeletedHistoryPrice(hp)
             End Sub
 
             Private Sub Access_DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice) Handles Access.DeletedHistoryPriceList
-               LocalAccess.OnDeletedHistoryPriceList(hp)
+                LocalAccess.OnDeletedHistoryPriceList(hp)
             End Sub
 
             Private Sub Access_DeletedLog(ByVal sender As Object, ByVal log As Log) Handles Access.DeletedLog
-              LocalAccess.OnDeletedLog(log)
+                LocalAccess.OnDeletedLog(log)
             End Sub
 
             Private Sub Access_DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel) Handles Access.DeletedPersonnel
-             LocalAccess.OnDeletedPersonnel(per)
+                LocalAccess.OnDeletedPersonnel(per)
             End Sub
 
             Private Sub Access_DeletedSales(ByVal sender As Object, ByVal sales As Sales) Handles Access.DeletedSales
-              LocalAccess.OnDeletedSales(sales)
+                LocalAccess.OnDeletedSales(sales)
             End Sub
 
             Private Sub Access_DeletedStock(ByVal sender As Object, ByVal stock As Stock) Handles Access.DeletedStock
-               LocalAccess.OnDeletedStock(stock)
+                LocalAccess.OnDeletedStock(stock)
             End Sub
 
             Private Sub Access_DeletedStockMove(ByVal sender As Object, ByVal data As StockMove) Handles Access.DeletedStockMove
-               LocalAccess.OnDeletedStockMove(data)
+                LocalAccess.OnDeletedStockMove(data)
             End Sub
 
             Private Sub Access_DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier) Handles Access.DeletedSupplier

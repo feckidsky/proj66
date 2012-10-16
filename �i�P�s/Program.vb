@@ -99,6 +99,7 @@ Public Module Program
 
     Public ProgramVersion As String = "v1.0.11"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
+    Public WithEvents AccessWriterByClient As New Database.Access("本機資料庫-根據遠端訊息更新")
 
     Public WithEvents Server As New Database.AccessServer
     Public WithEvents ClientManager As New Database.AccessClientMenage()
@@ -152,6 +153,7 @@ Public Module Program
         If Config.Mode = Connect.Server Then
             myDatabase.Name = Config.ServerName
             Server.Access = myDatabase
+            Server.WriterByClient = AccessWriterByClient
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
             Server.Version = ProgramVersion
@@ -579,80 +581,80 @@ Public Module Program
     End Sub
 
     Private Sub ChangedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.ChangedContract
-        If Config.Mode = Connect.Server Then myDatabase.ChangeContract(con, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangeContract(con, False)
     End Sub
 
     Private Sub ChangedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.ChangedCustomer
-        If Config.Mode = Connect.Server Then myDatabase.ChangeCustomer(cus, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangeCustomer(cus, False)
     End Sub
 
     Private Sub ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.ChangedGoods
-        If Config.Mode = Connect.Server Then myDatabase.ChangeGoods(goods, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangeGoods(goods, False)
     End Sub
 
     Private Sub ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.ChangedHistoryPrice
-        If Config.Mode = Connect.Server Then myDatabase.ChangeHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangeHistoryPrice(hp, False)
     End Sub
 
     Private Sub ChangedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.ChangedPersonnel
-        If Config.Mode = Connect.Server Then myDatabase.ChangePersonnel(per, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangePersonnel(per, False)
     End Sub
 
 
     Private Sub ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.ChangedSupplier
-        If Config.Mode = Connect.Server Then myDatabase.ChangeSupplier(sup, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.ChangeSupplier(sup, False)
     End Sub
 
     Private Sub CreatedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.CreatedContract
-        If Config.Mode = Connect.Server Then myDatabase.AddContract(con, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddContract(con, False)
     End Sub
 
     Private Sub CreatedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.CreatedCustomer
-        If Config.Mode = Connect.Server Then myDatabase.AddCustomer(cus, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddCustomer(cus, False)
     End Sub
 
     Private Sub CreatedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.CreatedGoods
-        If Config.Mode = Connect.Server Then myDatabase.AddGoods(goods, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddGoods(goods, False)
     End Sub
 
     Private Sub CreatedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.CreatedHistoryPrice
-        If Config.Mode = Connect.Server Then myDatabase.AddHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddHistoryPrice(hp, False)
     End Sub
 
     Private Sub CreatedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.CreatedPersonnel
-        If Config.Mode = Connect.Server Then myDatabase.AddPersonnel(per, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddPersonnel(per, False)
     End Sub
 
     Private Sub CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.CreatedSupplier
-        If Config.Mode = Connect.Server Then myDatabase.AddSupplier(sup, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.AddSupplier(sup, False)
     End Sub
 
     Private Sub DeletedContract(ByVal sender As Object, ByVal con As Database.Contract) Handles ccc.DeletedContract
-        If Config.Mode = Connect.Server Then myDatabase.DeleteContract(con, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteContract(con, False)
     End Sub
 
     Private Sub DeletedCustomer(ByVal sender As Object, ByVal cus As Database.Customer) Handles ccc.DeletedCustomer
-        If Config.Mode = Connect.Server Then myDatabase.DeleteCustomer(cus, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteCustomer(cus, False)
     End Sub
 
     Private Sub DeletedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles ccc.DeletedGoods
-        If Config.Mode = Connect.Server Then myDatabase.DeleteGoods(goods, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteGoods(goods, False)
     End Sub
 
     Private Sub DeletedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.DeletedHistoryPrice
-        If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPrice(hp, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteHistoryPrice(hp, False)
     End Sub
 
     Private Sub DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles ccc.DeletedHistoryPriceList
-        If Config.Mode = Connect.Server Then myDatabase.DeleteHistoryPriceList(hp.GoodsLabel, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteHistoryPriceList(hp.GoodsLabel, False)
     End Sub
 
     Private Sub DeletedPersonnel(ByVal sender As Object, ByVal per As Database.Personnel) Handles ccc.DeletedPersonnel
-        If Config.Mode = Connect.Server Then myDatabase.DeletePersonnel(per, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeletePersonnel(per, False)
     End Sub
 
     Private Sub DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles ccc.DeletedSupplier
-        If Config.Mode = Connect.Server Then myDatabase.DeleteSupplier(sup, False)
+        If Config.Mode = Connect.Server Then AccessWriterByClient.DeleteSupplier(sup, False)
     End Sub
 
     Private Sub ccc_ReceiveServerName(ByVal sender As Object, ByVal Name As String) Handles ccc.ReceiveServerName

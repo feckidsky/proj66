@@ -397,7 +397,7 @@ Public Class TCPTool
         End Sub
     End Class
 
-    Dim ServerList As New List(Of Server)
+    Friend ServerList As New List(Of Server)
 
     Public ListenCheckThread As Threading.Thread
 #Region "Server °Ê§@¨ç¦¡"
@@ -592,15 +592,9 @@ Public Class TCPTool
         For Each ser As Server In ServerList
             ser.Send(CMD, Para)
         Next
-        'Dim lstClient() As Client = ServerClientList.ToArray
-        'Dim i As Long
-        'For i = 0 To lstClient.Length - 1
-        '    Try
-        '        lstClient(i).Send(CMD, Para)
-        '    Catch
-        '    End Try
-        'Next
+
     End Sub
+
 
 #End Region
 
