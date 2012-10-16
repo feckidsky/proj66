@@ -111,13 +111,13 @@ Public Module Program
     Public SalesVisiblePath As String = My.Application.Info.DirectoryPath & "\SalesVisible.xml"
     Public StockMoveVisiblePath As String = My.Application.Info.DirectoryPath & "\StockVisible.xml"
     Public LoginInfoPath As String = My.Application.Info.DirectoryPath & "\Login.xml"
-    Public MailInfoPath As String = My.Application.Info.DirectoryPath & "Mail.xml"
+    Public MailInfoPath As String = My.Application.Info.DirectoryPath & "\Mail.xml"
 
     Public CurrentUser As Database.Personnel = Database.Personnel.Guest
     Public LoginSetting As LoginInfo
     Public WithEvents CurrentAccess As Access
     Public ErrorList As New List(Of String)
-
+    Public EnabledMessageLog As Boolean = IO.File.Exists("logmsg")
 
     Public SystemTitle As String = "進銷存管理系統"
 
@@ -146,32 +146,19 @@ Public Module Program
 
     Public Sub InitialProgram()
 
-        'Dim t As String = "G120128180923       ,9103-R              ,手機        ,SAMSUNG   ,,2012/3/16 下午 08:38:06"
-        'Dim tt() As String = Split(t, ",")
-
-        ''Dim tZip As String() = Array.ConvertAll(tt, AddressOf Code.Zip)
-
-        'Dim base64() As String = Array.ConvertAll(tt, AddressOf Code.ToBase64)
-        'Dim jBase64 As String = Code.ToBase64(Join(base64, ","))
-
-        ''Dim tLen() As Integer = Array.ConvertAll(tt, Function(s As String) s.Length)
-        'Dim bLen() As Integer = Array.ConvertAll(base64, Function(s As String) s.Length)
-        ''Dim zLen() As Integer = Array.ConvertAll(tZip, Function(s As String) s.Length)
-
 
         ConfigLoad()
 
         If Config.Mode = Connect.Server Then
             myDatabase.Name = Config.ServerName
             Server.Access = myDatabase
-            'Server.AccessList.Add(New AccessServer.ServiceClient(Server, myDatabase, myDatabase))
             Server.Port = Config.ServerPort
             Server.Name = Config.ServerName
             Server.Version = ProgramVersion
             Server.Open(Config.ServerNetIndex)
             myDatabase.Version = ProgramVersion
             myDatabase.CheckDatabaseExist()
-            Client_BeforeConnect(Nothing, myDatabase)
+            'Client_BeforeConnect(Nothing, myDatabase)
         End If
 
         LoginSetting = LoginInfo.Load(LoginInfoPath)
@@ -185,14 +172,11 @@ Public Module Program
         '若預設登入者為Designer時啟動記錄模式
         For Each c As Access In ClientManager.Client
             If c.GetType Is GetType(AccessClient) Then
-                CType(c, AccessClient).Client.EnableMessageLog = LoginSetting.AutoLog And LoginSetting.Password = Personnel.Designer.Password And LoginSetting.ID = Personnel.Designer.ID
+                CType(c, AccessClient).Client.EnableMessageLog = EnabledMessageLog '= LoginSetting.AutoLog And LoginSetting.Password = Personnel.Designer.Password And LoginSetting.ID = Personnel.Designer.ID
             End If
-
         Next
 
         ClientManager.StartConnect()
-
-
 
         If UpdateDatabase() Then MsgBox("資料庫更新完成!", MsgBoxStyle.Information)
 
@@ -681,17 +665,8 @@ Public Module Program
 
     Private Sub ccc_Account_LogIn(ByVal sender As Object, ByVal result As Database.LoginResult) Handles myDatabase.Account_Logout, myDatabase.Account_LogIn
 
-
         CurrentAccess = ClientManager.Item(LoginSetting.Shop)
-
         CurrentUser = result.User
-
-        '若登入者為Designer時啟動記錄模式
-        For Each c As Access In ClientManager.Client
-            If c.GetType Is GetType(AccessClient) Then
-                CType(c, AccessClient).Client.EnableMessageLog = result.User.ID = Personnel.Designer.ID
-            End If
-        Next
 
     End Sub
 
