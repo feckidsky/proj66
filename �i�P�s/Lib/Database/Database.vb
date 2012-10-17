@@ -83,33 +83,45 @@
         'Public SalesPath As String
         Public Shared Password As String = "36363636"
         'Public User As Database.Personnel = Personnel.Guest
+        Public Mode As FarKind = FarKind.Server
 
         Shared DBWriteLock As String = " DBWriteLock"
 
         Public User As Personnel = Personnel.Guest
 
+
+        Enum FarKind
+            Server = 0
+            Client = 1
+        End Enum
+
+        Enum Source
+            Local = 0
+            Far = 1
+        End Enum
+
         Event Account_Logout(ByVal sender As Object, ByVal result As LoginResult)
         Event Account_LogIn(ByVal sender As Object, ByVal result As LoginResult)
 
-        Event CreatedContract(ByVal sender As Object, ByVal con As Contract)
-        Event ChangedContract(ByVal sender As Object, ByVal con As Contract)
-        Event DeletedContract(ByVal sender As Object, ByVal con As Contract)
+        Event CreatedContract(ByVal sender As Object, ByVal con As Contract, ByVal source As Source)
+        Event ChangedContract(ByVal sender As Object, ByVal con As Contract, ByVal source As Source)
+        Event DeletedContract(ByVal sender As Object, ByVal con As Contract, ByVal source As Source)
 
-        Event CreatedGoods(ByVal sender As Object, ByVal goods As Goods)
-        Event ChangedGoods(ByVal sender As Object, ByVal goods As Goods)
-        Event DeletedGoods(ByVal sender As Object, ByVal goods As Goods)
+        Event CreatedGoods(ByVal sender As Object, ByVal goods As Goods, ByVal source As Source)
+        Event ChangedGoods(ByVal sender As Object, ByVal goods As Goods, ByVal source As Source)
+        Event DeletedGoods(ByVal sender As Object, ByVal goods As Goods, ByVal source As Source)
 
-        Event CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier)
-        Event ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier)
-        Event DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier)
+        Event CreatedSupplier(ByVal sender As Object, ByVal sup As Supplier, ByVal source As Source)
+        Event ChangedSupplier(ByVal sender As Object, ByVal sup As Supplier, ByVal source As Source)
+        Event DeletedSupplier(ByVal sender As Object, ByVal sup As Supplier, ByVal source As Source)
 
-        Event CreatedCustomer(ByVal sender As Object, ByVal cus As Customer)
-        Event ChangedCustomer(ByVal sender As Object, ByVal cus As Customer)
-        Event DeletedCustomer(ByVal sender As Object, ByVal cus As Customer)
+        Event CreatedCustomer(ByVal sender As Object, ByVal cus As Customer, ByVal source As Source)
+        Event ChangedCustomer(ByVal sender As Object, ByVal cus As Customer, ByVal source As Source)
+        Event DeletedCustomer(ByVal sender As Object, ByVal cus As Customer, ByVal source As Source)
 
-        Event CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel)
-        Event ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel)
-        Event DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel)
+        Event CreatedPersonnel(ByVal sender As Object, ByVal per As Personnel, ByVal source As Source)
+        Event ChangedPersonnel(ByVal sender As Object, ByVal per As Personnel, ByVal source As Source)
+        Event DeletedPersonnel(ByVal sender As Object, ByVal per As Personnel, ByVal source As Source)
 
         Event CreatedStock(ByVal sender As Object, ByVal stock As Stock)
         Event ChangedStock(ByVal sender As Object, ByVal stock As Stock)
@@ -119,10 +131,10 @@
         Event ChangedSales(ByVal sender As Object, ByVal sales As Sales, ByVal GoodsList() As SalesGoods, ByVal OrderList() As OrderGoods, ByVal ReturnList() As ReturnGoods, ByVal SalesContracts() As SalesContract)
         Event DeletedSales(ByVal sender As Object, ByVal sales As Sales)
 
-        Event CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
-        Event ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
-        Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice)
-        Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice)
+        Event CreatedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice, ByVal source As Source)
+        Event ChangedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice, ByVal source As Source)
+        Event DeletedHistoryPrice(ByVal sender As Object, ByVal hp As HistoryPrice, ByVal source As Source)
+        Event DeletedHistoryPriceList(ByVal sender As Object, ByVal hp As HistoryPrice, ByVal source As Source)
 
         Event CreatedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin)
         Event ChangedBulletin(ByVal sender As Object, ByVal bulletin As Bulletin)
@@ -1693,22 +1705,22 @@
 
 
         ''' <summary>新增供應商</summary>
-        Public Overridable Sub AddSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             AddLog(Now, "新增供應商:" & data.Name)
-            If trigger Then OnCreatedSupplier(data)
+            OnCreatedSupplier(data, source)
         End Sub
 
-        Public Overridable Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(Supplier.Table, "Label", data.Label), BasePath)
             AddLog(Now, "刪除供應商:" & data.Name)
-            If trigger Then OnDeletedSupplier(data)
+            OnDeletedSupplier(data, source)
         End Sub
 
-        Public Overridable Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             AddLog(Now, "編輯供應商:" & data.Name)
-            If trigger Then OnChangedSupplier(data)
+            OnChangedSupplier(data, source)
         End Sub
 
         Public Overridable Sub AddStockMove(ByVal data As StockMove, Optional ByVal trigger As Boolean = True)
@@ -1775,108 +1787,108 @@
 
 
         ''' <summary>新增客戶</summary>
-        Public Overridable Sub AddCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             AddLog(Now, "新增客戶資料:" & data.Name)
-            If trigger Then OnCreatedCustomer(data)
+            OnCreatedCustomer(data, source)
         End Sub
 
-        Public Overridable Sub DeleteCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(Customer.Table, "Label", data.Label), BasePath)
             AddLog(Now, "刪除客戶資料:" & data.Name)
-            If trigger Then OnDeletedCustomer(data)
+            OnDeletedCustomer(data, source)
         End Sub
 
-        Public Overridable Sub ChangeCustomer(ByVal data As Customer, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             AddLog(Now, "修改客戶資料:" & data.Name)
-            If trigger Then OnChangedCustomer(data)
+            OnChangedCustomer(data, source)
         End Sub
 
         ''' <summary>新增員工</summary>
-        Public Overridable Sub AddPersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddPersonnel(ByVal data As Personnel, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             AddLog(Now, "新增員工資料:" & data.Name)
-            If trigger Then OnCreatedPersonnel(data)
+            OnCreatedPersonnel(data, source)
         End Sub
 
-        Public Overridable Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeletePersonnel(ByVal data As Personnel, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(Personnel.Table, "Label", data.Label), BasePath)
             AddLog(Now, "刪除員工資料:" & data.Name)
-            If trigger Then OnDeletedPersonnel(data)
+            OnDeletedPersonnel(data, source)
         End Sub
 
-        Public Overridable Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangePersonnel(ByVal data As Personnel, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             AddLog(Now, "修改員工資料:" & data.Name)
-            If trigger Then OnChangedPersonnel(data)
+            OnChangedPersonnel(data, source)
         End Sub
 
         ''' <summary>新增商品</summary>
-        Public Overridable Sub AddGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             AddLog(Now, "新增商品項目:" & data.Name)
-            If trigger Then OnCreatedGoods(data)
+            OnCreatedGoods(data, source)
         End Sub
 
-        Public Overridable Sub DeleteGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(Goods.Table, "Label", data.Label), BasePath)
             AddLog(Now, "刪除商品項目:" & data.Name)
-            If trigger Then OnDeletedGoods(data)
+            OnDeletedGoods(data, source)
         End Sub
 
-        Public Overridable Sub ChangeGoods(ByVal data As Goods, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             AddLog(Now, "編輯商品項目:" & data.Name)
-            If trigger Then OnChangedGoods(data)
+            OnChangedGoods(data, source)
         End Sub
 
         ''' <summary>新增門號</summary>
-        Public Overridable Sub AddContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             AddLog(Now, "新增合約種類:" & data.Name)
-            If trigger Then OnCreatedContract(data)
+            OnCreatedContract(data, source)
         End Sub
 
-        Public Overridable Sub ChangeContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             AddLog(Now, "編輯合約種類:" & data.Name)
-            If trigger Then OnChangedContract(data)
+            OnChangedContract(data, source)
         End Sub
 
-        Public Overridable Sub DeleteContract(ByVal data As Contract, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(Contract.Table, "Label", data.Label), BasePath)
             AddLog(Now, "刪除合約種類:" & data.Name)
-            If trigger Then OnDeletedContract(data)
+            OnDeletedContract(data, source)
         End Sub
 
 
-        Public Overridable Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             AddBase(data)
             Dim goods As Goods = GetGoods(data.GoodsLabel)
             AddLog(Now, "新增歷史訂價:" & goods.Name & "-" & data.Price)
-            If trigger Then OnCreatedHistoryPrice(data)
+            OnCreatedHistoryPrice(data, source)
         End Sub
 
-        Public Overridable Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             Command(data.GetUpdateSqlCommand(), BasePath)
             Dim goods As Goods = GetGoods(data.GoodsLabel)
             AddLog(Now, "修改歷史訂價:" & goods.Name & "-" & data.Price)
-            If trigger Then OnChangedHistoryPrice(data)
+            OnChangedHistoryPrice(data, source)
         End Sub
 
-        Public Overridable Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(HistoryPrice.Table, New String() {"GoodsLabel", "Time"}, New Object() {data.GoodsLabel, data.Time}), BasePath)
             Dim goods As Goods = GetGoods(data.GoodsLabel)
             AddLog(Now, "刪除歷史訂價:" & goods.Name & "-" & data.Price)
-            If trigger Then OnDeletedHistoryPrice(data)
+            OnDeletedHistoryPrice(data, source)
         End Sub
 
-        Public Overridable Sub DeleteHistoryPriceList(ByVal GoodsLabel As String, Optional ByVal trigger As Boolean = True)
+        Public Overridable Sub DeleteHistoryPriceList(ByVal GoodsLabel As String, Optional ByVal source As Source = Source.Local)
             Command(GetSqlDelete(HistoryPrice.Table, "GoodsLabel", GoodsLabel), BasePath)
             Dim data As New HistoryPrice
             data.GoodsLabel = GoodsLabel
-            If trigger Then OnDeletedHistoryPriceList(data)
+            OnDeletedHistoryPriceList(data, source)
         End Sub
 
         ''' <summary>新增庫存</summary>
@@ -1947,55 +1959,55 @@
             RaiseEvent DeletedAllLog(Me)
         End Sub
 
-        Friend Sub OnCreatedContract(ByVal con As Contract)
-            RaiseEvent CreatedContract(Me, con)
+        Friend Sub OnCreatedContract(ByVal con As Contract, ByVal source As Source)
+            RaiseEvent CreatedContract(Me, con, source)
         End Sub
 
-        Friend Sub OnChangedContract(ByVal con As Contract)
-            RaiseEvent ChangedContract(Me, con)
+        Friend Sub OnChangedContract(ByVal con As Contract, ByVal source As Source)
+            RaiseEvent ChangedContract(Me, con, source)
         End Sub
-        Friend Sub OnDeletedContract(ByVal con As Contract)
-            RaiseEvent DeletedContract(Me, con)
-        End Sub
-
-        Friend Sub OnCreatedGoods(ByVal goods As Goods)
-            RaiseEvent CreatedGoods(Me, goods)
-        End Sub
-        Friend Sub OnChangedGoods(ByVal goods As Goods)
-            RaiseEvent ChangedGoods(Me, goods)
-        End Sub
-        Friend Sub OnDeletedGoods(ByVal goods As Goods)
-            RaiseEvent DeletedGoods(Me, goods)
+        Friend Sub OnDeletedContract(ByVal con As Contract, ByVal source As Source)
+            RaiseEvent DeletedContract(Me, con, source)
         End Sub
 
-        Friend Sub OnCreatedSupplier(ByVal sup As Supplier)
-            RaiseEvent CreatedSupplier(Me, sup)
+        Friend Sub OnCreatedGoods(ByVal goods As Goods, ByVal source As Source)
+            RaiseEvent CreatedGoods(Me, goods, source)
         End Sub
-        Friend Sub OnChangedSupplier(ByVal sup As Supplier)
-            RaiseEvent ChangedSupplier(Me, sup)
+        Friend Sub OnChangedGoods(ByVal goods As Goods, ByVal source As Source)
+            RaiseEvent ChangedGoods(Me, goods, source)
         End Sub
-        Friend Sub OnDeletedSupplier(ByVal sup As Supplier)
-            RaiseEvent DeletedSupplier(Me, sup)
-        End Sub
-
-        Friend Sub OnCreatedCustomer(ByVal cus As Customer)
-            RaiseEvent CreatedCustomer(Me, cus)
-        End Sub
-        Friend Sub OnChangedCustomer(ByVal cus As Customer)
-            RaiseEvent ChangedCustomer(Me, cus)
-        End Sub
-        Friend Sub OnDeletedCustomer(ByVal cus As Customer)
-            RaiseEvent DeletedCustomer(Me, cus)
+        Friend Sub OnDeletedGoods(ByVal goods As Goods, ByVal source As Source)
+            RaiseEvent DeletedGoods(Me, goods, source)
         End Sub
 
-        Friend Sub OnCreatedPersonnel(ByVal per As Personnel)
-            RaiseEvent CreatedPersonnel(Me, per)
+        Friend Sub OnCreatedSupplier(ByVal sup As Supplier, ByVal source As Source)
+            RaiseEvent CreatedSupplier(Me, sup, source)
         End Sub
-        Friend Sub OnChangedPersonnel(ByVal per As Personnel)
-            RaiseEvent ChangedPersonnel(Me, per)
+        Friend Sub OnChangedSupplier(ByVal sup As Supplier, ByVal source As Source)
+            RaiseEvent ChangedSupplier(Me, sup, source)
         End Sub
-        Friend Sub OnDeletedPersonnel(ByVal per As Personnel)
-            RaiseEvent DeletedPersonnel(Me, per)
+        Friend Sub OnDeletedSupplier(ByVal sup As Supplier, ByVal source As Source)
+            RaiseEvent DeletedSupplier(Me, sup, source)
+        End Sub
+
+        Friend Sub OnCreatedCustomer(ByVal cus As Customer, ByVal source As Source)
+            RaiseEvent CreatedCustomer(Me, cus, source)
+        End Sub
+        Friend Sub OnChangedCustomer(ByVal cus As Customer, ByVal source As Source)
+            RaiseEvent ChangedCustomer(Me, cus, source)
+        End Sub
+        Friend Sub OnDeletedCustomer(ByVal cus As Customer, ByVal source As Source)
+            RaiseEvent DeletedCustomer(Me, cus, source)
+        End Sub
+
+        Friend Sub OnCreatedPersonnel(ByVal per As Personnel, ByVal source As Source)
+            RaiseEvent CreatedPersonnel(Me, per, source)
+        End Sub
+        Friend Sub OnChangedPersonnel(ByVal per As Personnel, ByVal source As Source)
+            RaiseEvent ChangedPersonnel(Me, per, source)
+        End Sub
+        Friend Sub OnDeletedPersonnel(ByVal per As Personnel, ByVal source As Source)
+            RaiseEvent DeletedPersonnel(Me, per, source)
         End Sub
 
         Friend Sub OnCreatedStock(ByVal stock As Stock)
@@ -2024,17 +2036,17 @@
             RaiseEvent DeletedSales(Me, sales)
         End Sub
 
-        Friend Sub OnCreatedHistoryPrice(ByVal hp As HistoryPrice)
-            RaiseEvent CreatedHistoryPrice(Me, hp)
+        Friend Sub OnCreatedHistoryPrice(ByVal hp As HistoryPrice, ByVal source As Source)
+            RaiseEvent CreatedHistoryPrice(Me, hp, source)
         End Sub
-        Friend Sub OnChangedHistoryPrice(ByVal hp As HistoryPrice)
-            RaiseEvent ChangedHistoryPrice(Me, hp)
+        Friend Sub OnChangedHistoryPrice(ByVal hp As HistoryPrice, ByVal source As Source)
+            RaiseEvent ChangedHistoryPrice(Me, hp, source)
         End Sub
-        Friend Sub OnDeletedHistoryPrice(ByVal hp As HistoryPrice)
-            RaiseEvent DeletedHistoryPrice(Me, hp)
+        Friend Sub OnDeletedHistoryPrice(ByVal hp As HistoryPrice, ByVal source As Source)
+            RaiseEvent DeletedHistoryPrice(Me, hp, source)
         End Sub
-        Friend Sub OnDeletedHistoryPriceList(ByVal hp As HistoryPrice)
-            RaiseEvent DeletedHistoryPriceList(Me, hp)
+        Friend Sub OnDeletedHistoryPriceList(ByVal hp As HistoryPrice, ByVal source As Source)
+            RaiseEvent DeletedHistoryPriceList(Me, hp, source)
         End Sub
 
         Friend Sub OnCreatedBulletin(ByVal bulletin As Bulletin)

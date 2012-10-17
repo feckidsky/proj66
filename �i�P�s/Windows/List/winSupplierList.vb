@@ -153,12 +153,12 @@
     End Sub
 
 
-    Delegate Sub DelegateItem(sender As Object ,ByVal sup As Database.Supplier)
+    Delegate Sub DelegateItem(ByVal sender As Object, ByVal sup As Database.Supplier, ByVal source As Database.Access.Source)
     Dim invCreate As New DelegateItem(AddressOf access_CreatedSupplier)
     Dim invDelete As New DelegateItem(AddressOf access_DeletedSupplier)
     Dim invChange As New DelegateItem(AddressOf access_ChangedSupplier)
 
-    Private Sub access_CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.CreatedSupplier
+    Private Sub access_CreatedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier, ByVal source As Database.Access.Source) Handles access.CreatedSupplier
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invCreate, sender, sup)
@@ -169,7 +169,7 @@
         dt.Rows.Add(sup.Label, sup.Name, sup.Tel1, sup.Tel2, sup.Note, sup.Addr, sup.Modify)
     End Sub
 
-    Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.ChangedSupplier
+    Private Sub access_ChangedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier, ByVal source As Database.Access.Source) Handles access.ChangedSupplier
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invChange, sender, sup)
@@ -184,7 +184,7 @@
     End Sub
 
 
-    Private Sub access_DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier) Handles access.DeletedSupplier
+    Private Sub access_DeletedSupplier(ByVal sender As Object, ByVal sup As Database.Supplier, ByVal source As Database.Access.Source) Handles access.DeletedSupplier
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, sup)

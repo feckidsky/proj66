@@ -538,28 +538,28 @@
                     End If
                 Case "ReaderResponse"
                     lstReader.Receive(Data(1), Data(2))
-                Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args))
-                Case "DeletedContract" : OnDeletedContract(Repair(Of Contract)(args))
-                Case "ChangedContract" : OnChangedContract(Repair(Of Contract)(args))
-                Case "CreatedCustomer" : OnCreatedCustomer(Repair(Of Customer)(args))
-                Case "DeletedCustomer" : OnDeletedCustomer(Repair(Of Customer)(args))
-                Case "ChangedCustomer" : OnChangedCustomer(Repair(Of Customer)(args))
-                Case "CreatedSupplier" : OnCreatedSupplier(Repair(Of Supplier)(args))
-                Case "DeletedSupplier" : OnDeletedSupplier(Repair(Of Supplier)(args))
-                Case "ChangedSupplier" : OnChangedSupplier(Repair(Of Supplier)(args))
-                Case "CreatedPersonnel" : OnCreatedPersonnel(Repair(Of Personnel)(args))
-                Case "DeletedPersonnel" : OnDeletedPersonnel(Repair(Of Personnel)(args))
-                Case "ChangedPersonnel" : OnChangedPersonnel(Repair(Of Personnel)(args))
-                Case "CreatedGoods" : OnCreatedGoods(Repair(Of Goods)(args))
-                Case "DeletedGoods" : OnDeletedGoods(Repair(Of Goods)(args))
-                Case "ChangedGoods" : OnChangedGoods(Repair(Of Goods)(args))
+                Case "CreatedContract" : OnCreatedContract(Repair(Of Contract)(args), Source.Far)
+                Case "DeletedContract" : OnDeletedContract(Repair(Of Contract)(args), Source.Far)
+                Case "ChangedContract" : OnChangedContract(Repair(Of Contract)(args), Source.Far)
+                Case "CreatedCustomer" : OnCreatedCustomer(Repair(Of Customer)(args), Source.Far)
+                Case "DeletedCustomer" : OnDeletedCustomer(Repair(Of Customer)(args), Source.Far)
+                Case "ChangedCustomer" : OnChangedCustomer(Repair(Of Customer)(args), Source.Far)
+                Case "CreatedSupplier" : OnCreatedSupplier(Repair(Of Supplier)(args), Source.Far)
+                Case "DeletedSupplier" : OnDeletedSupplier(Repair(Of Supplier)(args), Source.Far)
+                Case "ChangedSupplier" : OnChangedSupplier(Repair(Of Supplier)(args), Source.Far)
+                Case "CreatedPersonnel" : OnCreatedPersonnel(Repair(Of Personnel)(args), Source.Far)
+                Case "DeletedPersonnel" : OnDeletedPersonnel(Repair(Of Personnel)(args), Source.Far)
+                Case "ChangedPersonnel" : OnChangedPersonnel(Repair(Of Personnel)(args), Source.Far)
+                Case "CreatedGoods" : OnCreatedGoods(Repair(Of Goods)(args), Source.Far)
+                Case "DeletedGoods" : OnDeletedGoods(Repair(Of Goods)(args), Source.Far)
+                Case "ChangedGoods" : OnChangedGoods(Repair(Of Goods)(args), Source.Far)
                 Case "CreatedStock" : OnCreatedStock(Repair(Of Stock)(args))
                 Case "DeletedStock" : OnDeletedStock(Repair(Of Stock)(args))
                 Case "ChangedStock" : OnChangedStock(Repair(Of Stock)(args))
-                Case "CreatedHistoryPrice" : OnCreatedHistoryPrice(Repair(Of HistoryPrice)(args))
-                Case "DeletedHistoryPrice" : OnDeletedHistoryPrice(Repair(Of HistoryPrice)(args))
-                Case "ChangedHistoryPrice" : OnChangedHistoryPrice(Repair(Of HistoryPrice)(args))
-                Case "DeletedHistoryPriceList" : OnDeletedHistoryPriceList(Repair(Of HistoryPrice)(args))
+                Case "CreatedHistoryPrice" : OnCreatedHistoryPrice(Repair(Of HistoryPrice)(args), Source.Far)
+                Case "DeletedHistoryPrice" : OnDeletedHistoryPrice(Repair(Of HistoryPrice)(args), Source.Far)
+                Case "ChangedHistoryPrice" : OnChangedHistoryPrice(Repair(Of HistoryPrice)(args), Source.Far)
+                Case "DeletedHistoryPriceList" : OnDeletedHistoryPriceList(Repair(Of HistoryPrice)(args), Source.Far)
                 Case "CreatedSales" : OnCreatedSales(Repair(Of SalesArgs)(args))
                 Case "ChangedSales" : OnChangedSales(Repair(Of SalesArgs)(args))
                 Case "DeletedSales" : OnDeletedSales(Repair(Of Sales)(args))
@@ -603,7 +603,9 @@
 
 
         Private Sub Client_ConnectedSuccess(ByVal Client As TCPTool.Client) Handles Client.ConnectedSuccess
+            Client.Send(IIf(Mode = FarKind.Server, "IsServer", "IsClient"))
             Client.Send("GetServerVersion") '不觸發連線成功事件，直到取得Client版本資訊才觸發
+            'Client.Send("IsServer")
         End Sub
 
         Private Sub GotServerVersion()
@@ -624,53 +626,53 @@
             Send("StockMoveOut", e)
         End Sub
 
-        Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddPersonnel(ByVal pen As Personnel, Optional ByVal source As Source = Source.Local)
             Send("CreatePersonnel", pen)
         End Sub
 
-        Overrides Sub DeletePersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeletePersonnel(ByVal pen As Personnel, Optional ByVal source As Source = Source.Local)
             Send("DeletePersonnel", pen)
         End Sub
-        Overrides Sub ChangePersonnel(ByVal pen As Personnel, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangePersonnel(ByVal pen As Personnel, Optional ByVal source As Source = Source.Local)
             Send("ChangePersonnel", pen)
         End Sub
 
-        Overrides Sub AddSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             Send("CreateSupplier", data)
         End Sub
-        Overrides Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             Send("DeleteSupplier", data)
         End Sub
-        Overrides Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangeSupplier(ByVal data As Supplier, Optional ByVal source As Source = Source.Local)
             Send("ChangeSupplier", data)
         End Sub
 
-        Overrides Sub AddCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             Send("CreateCustomer", data)
         End Sub
-        Overrides Sub DeleteCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             Send("DeleteCustomer", data)
         End Sub
 
-        Overrides Sub ChangeCustomer(ByVal data As Customer, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangeCustomer(ByVal data As Customer, Optional ByVal source As Source = Source.Local)
             Send("ChangeCustomer", data)
         End Sub
-        Overrides Sub AddContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             Send("CreateContract", data)
         End Sub
-        Overrides Sub DeleteContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             Send("DeleteContract", data)
         End Sub
-        Overrides Sub ChangeContract(ByVal data As Contract, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangeContract(ByVal data As Contract, Optional ByVal source As Source = Source.Local)
             Send("ChangeContract", data)
         End Sub
-        Overrides Sub AddGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             Send("CreateGoods", data)
         End Sub
-        Overrides Sub DeleteGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             Send("DeleteGoods", data)
         End Sub
-        Overrides Sub ChangeGoods(ByVal data As Goods, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangeGoods(ByVal data As Goods, Optional ByVal source As Source = Source.Local)
             Send("ChangeGoods", data)
         End Sub
         Overrides Sub AddStock(ByVal data As Stock)
@@ -682,16 +684,16 @@
         Overrides Sub ChangeStock(ByVal data As Stock)
             Send("ChangeStock", data)
         End Sub
-        Overrides Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub AddHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             Send("CreateHistoryPrice", data)
         End Sub
-        Overrides Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             Send("DeleteHistoryPrice", data)
         End Sub
-        Overrides Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub ChangeHistoryPrice(ByVal data As HistoryPrice, Optional ByVal source As Source = Source.Local)
             Send("ChangeHistoryPrice", data)
         End Sub
-        Overrides Sub DeleteHistoryPriceList(ByVal Label As String, Optional ByVal Trigger As Boolean = True)
+        Overrides Sub DeleteHistoryPriceList(ByVal Label As String, Optional ByVal source As Source = Source.Local)
             Send("DeleteHistoryPriceList", Label)
         End Sub
 

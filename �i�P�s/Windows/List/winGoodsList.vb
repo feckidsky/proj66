@@ -170,7 +170,7 @@ Public Class winGoodsList
 
 
     Dim invHistoryPrice As New ItemUpdate(AddressOf UpdateHistory)
-    Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
+    Private Sub access_ChangedHistoryPrice(ByVal sender As Object, ByVal hp As Database.HistoryPrice, ByVal source As Database.Access.Source) Handles access.ChangedHistoryPrice, access.CreatedHistoryPrice, access.DeletedHistoryPrice
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invHistoryPrice)
@@ -185,7 +185,7 @@ Public Class winGoodsList
 
     Delegate Sub ItemUpdate()
     Dim invGoods As New ItemUpdate(AddressOf BeginUpdateGoodsList)
-    Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
+    Private Sub access_ChangedGoods(ByVal sender As Object, ByVal goods As Database.Goods, ByVal source As Database.Access.Source) Handles access.ChangedGoods, access.CreatedGoods, access.DeletedGoods
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invGoods)

@@ -177,12 +177,12 @@
     '    Me.Invoke(inv)
     'End Sub
 
-    Delegate Sub DelegateItem(ByVal sender As Object, ByVal sup As Database.Contract)
+    Delegate Sub DelegateItem(ByVal sender As Object, ByVal sup As Database.Contract, ByVal source As Database.Access.Source)
     Dim invCreate As New DelegateItem(AddressOf access_CreatedItem)
     Dim invDelete As New DelegateItem(AddressOf access_DeletedItem)
     Dim invChange As New DelegateItem(AddressOf access_ChangedItem)
 
-    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.CreatedContract
+    Private Sub access_CreatedItem(ByVal sender As Object, ByVal item As Database.Contract, ByVal source As Database.Access.Source) Handles access.CreatedContract
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invCreate, sender, item)
@@ -193,7 +193,7 @@
         dt.Rows.Add(item.ToObjects())
     End Sub
 
-    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.ChangedContract
+    Private Sub access_ChangedItem(ByVal sender As Object, ByVal item As Database.Contract, ByVal source As Database.Access.Source) Handles access.ChangedContract
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invChange, sender, item)
@@ -208,7 +208,7 @@
     End Sub
 
 
-    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Contract) Handles access.DeletedContract
+    Private Sub access_DeletedItem(ByVal sender As Object, ByVal item As Database.Contract, ByVal source As Database.Access.Source) Handles access.DeletedContract
         If Me.InvokeRequired Then
             Try
                 If Not Me.IsDisposed Then Me.Invoke(invDelete, sender, item)
