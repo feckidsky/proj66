@@ -85,7 +85,7 @@
         'Public User As Database.Personnel = Personnel.Guest
         Public Mode As FarKind = FarKind.Server
 
-        Shared DBWriteLock As String = " DBWriteLock"
+        'Shared DBWriteLock As String = " DBWriteLock"
 
         Public User As Personnel = Personnel.Guest
 
