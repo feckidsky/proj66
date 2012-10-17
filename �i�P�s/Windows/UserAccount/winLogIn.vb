@@ -98,7 +98,7 @@ Public Class winLogIn
             LoginSetting.ID = ""
             LoginSetting.Password = ""
         End If
-        LoginSetting.Shop = cbShop.Text
+        LoginSetting.Shop = CType(sender, Access).Name  'cbShop.Text
         LoginSetting.Save(LoginInfoPath)
 
         If result.State = LoginState.Success Then
