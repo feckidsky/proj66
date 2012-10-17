@@ -69,8 +69,8 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeGoods(Goods.GetFrom(sDT.Rows(i)), False)
-                        Case Compare.NoExist : myDatabase.AddGoods(Goods.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.MoreNew : myDatabase.ChangeGoods(Goods.GetFrom(sDT.Rows(i)), Access.Source.Far)
+                        Case Compare.NoExist : myDatabase.AddGoods(Goods.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End Select
                 Next
 
@@ -90,8 +90,8 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangePersonnel(Personnel.GetFrom(sDT.Rows(i)), False)
-                        Case Compare.NoExist : myDatabase.AddPersonnel(Personnel.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.MoreNew : myDatabase.ChangePersonnel(Personnel.GetFrom(sDT.Rows(i)), Access.Source.Far)
+                        Case Compare.NoExist : myDatabase.AddPersonnel(Personnel.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End Select
                 Next
 
@@ -109,8 +109,8 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeCustomer(Customer.GetFrom(sDT.Rows(i)), False)
-                        Case Compare.NoExist : myDatabase.AddCustomer(Customer.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.MoreNew : myDatabase.ChangeCustomer(Customer.GetFrom(sDT.Rows(i)), Access.Source.Far)
+                        Case Compare.NoExist : myDatabase.AddCustomer(Customer.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End Select
                 Next
 
@@ -128,8 +128,8 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeSupplier(Supplier.GetFrom(sDT.Rows(i)), False)
-                        Case Compare.NoExist : myDatabase.AddSupplier(Supplier.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.MoreNew : myDatabase.ChangeSupplier(Supplier.GetFrom(sDT.Rows(i)), Access.Source.Far)
+                        Case Compare.NoExist : myDatabase.AddSupplier(Supplier.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End Select
                 Next
 
@@ -147,8 +147,8 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     Select Case CompareModify(myDT, sDT.Rows(i)("Label"), GetTime(sDT.Rows(i)("Modify")))
-                        Case Compare.MoreNew : myDatabase.ChangeContract(Contract.GetFrom(sDT.Rows(i)), False)
-                        Case Compare.NoExist : myDatabase.AddContract(Contract.GetFrom(sDT.Rows(i)), False)
+                        Case Compare.MoreNew : myDatabase.ChangeContract(Contract.GetFrom(sDT.Rows(i)), Access.Source.Far)
+                        Case Compare.NoExist : myDatabase.AddContract(Contract.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End Select
                 Next
 
@@ -166,7 +166,7 @@ OpenDialog:
                 For i As Integer = 0 To sDT.Rows.Count - 1 '  As DataRow In sDT.Rows
                     totProgress.Report((i + 1) / sDT.Rows.Count * 100)
                     If CompareHistoryPrice(myDT, sDT.Rows(i)("GoodsLabel"), GetTime(sDT.Rows(i)("Time"))) = Compare.NoExist Then
-                        myDatabase.AddHistoryPrice(HistoryPrice.GetFrom(sDT.Rows(i)), False)
+                        myDatabase.AddHistoryPrice(HistoryPrice.GetFrom(sDT.Rows(i)), Access.Source.Far)
                     End If
                 Next
             Catch
