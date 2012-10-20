@@ -104,7 +104,8 @@ Public Class DialogStockMove
             item.Action = StockMove.Type.Receiving
             DestineShop.AddStockMove(item)
             stock.Number -= item.Number
-            SourceShop.ChangeStock(stock)
+            'SourceShop.ChangeStock(stock)
+            SourceShop.StockMoveOut(stock, item.Number)
         Else
             item.Action = StockMove.Type.Request
             SourceShop.AddStockMove(item)

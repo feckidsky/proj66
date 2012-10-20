@@ -53,6 +53,7 @@
         '有Client連線，建立ServiceClient並加入AccessList清單中以利追蹤
         Private Sub Server_ReceiveConnected(ByVal Sender As TCPTool, ByVal Client As TCPTool.Client) Handles MyBase.ReceiveConnected
             Dim access As New ServiceClient(Me, Client, Name, myDatabase)
+            access.Access.Version = Version
             AccessList.Add(access)
             Client.Send("ServerName", Code.XmlSerializeWithZIP(Name))
         End Sub
