@@ -216,8 +216,6 @@ Public Class winStockMoveList
         UpdateTitle()
     End Sub
 
-
-
     Private Sub access_CreatedStockMove(ByVal sender As Object, ByVal data As Database.StockMove) Handles access.CreatedStockMove
         Dim arr() As Object = access.GetStockMoveRow(data.Label).ItemArray
         AddRowInfo(arr)
@@ -242,8 +240,9 @@ Public Class winStockMoveList
 
             If stockMove.Action = Database.StockMove.Type.Sending Then
                 Dim stock As Stock = res.Source.GetStock(stockMove.StockLabel)
-                stock.Number += stockMove.Number
-                res.Source.ChangeStock(stock)
+                'stock.Number += stockMove.Number
+                res.Source.StockMoveIn(stock, stockMove.Number)
+                'res.Source.ChangeStock(stock)
             End If
 
             stockMove.Action = Database.StockMove.Type.Cancel

@@ -108,7 +108,10 @@
         Dim text As String = Strings.Trim(cbKeyWord.Text)
         If text <> "" AndAlso Not cbKeyWord.Items.Exists(Function(s As String) s = text) Then
             cbKeyWord.Items.Add(text)
-            If cbKeyWord.Items.Count > 50 Then cbKeyWord.Items.RemoveRange(50, cbKeyWord.Items.Count - 50 + 1)
+            Do Until cbKeyWord.Items.Count <= 50
+                cbKeyWord.Items.RemoveAt(0)
+            Loop
+            'If cbKeyWord.Items.Count > 50 Then cbKeyWord.Items.RemoveRange(50, cbKeyWord.Items.Count - 50 + 1)
             Code.SaveXml(cbKeyWord.Items.ToArray, SalesGoodsListFilterPatch)
         End If
 

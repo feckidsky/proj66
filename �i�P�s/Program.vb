@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.12"
+    Public ProgramVersion As String = "v1.0.13"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
     'Public WithEvents AccessWriterByClient As New Database.Access("本機資料庫-根據遠端訊息更新")
 
