@@ -357,18 +357,12 @@ Public Class winStockMoveList
         Return result
     End Function
 
-
-
-
-
     Private Sub 欄位顯示ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles 欄位顯示ToolStripMenuItem.Click
         If DataGridViewVisibleDialog.ShowDialog(dgList) Then Code.SaveXml(DataGridViewVisibleDialog.GetVisibleColumns(dgList), StockMoveVisiblePath)
     End Sub
 
 
-
-
-
-
-
+    Private Sub winStockMoveList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
 End Class

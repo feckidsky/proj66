@@ -97,4 +97,9 @@
         DownloadDialog.Show()
 
     End Sub
+
+    Private Sub DialogErrorFileList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
+
 End Class

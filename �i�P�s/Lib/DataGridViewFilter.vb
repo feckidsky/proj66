@@ -294,7 +294,11 @@
         Next
 
         For Each c As BoolFilter In BoolFilters
-            Match = Match And c.Match(GetCellValue(row, c.HeaderName))
+            Try
+                Match = Match And c.Match(GetCellValue(row, c.HeaderName))
+            Catch
+
+            End Try
         Next
 
         Try
@@ -415,4 +419,6 @@
         Dim StringWidth As Integer = e.Graphics.MeasureString(xh.ToString, DataGridView.Font).Width
         e.Graphics.DrawString(xh.ToString(), e.InheritedRowStyle.Font, solidBrush, DataGridView.Rows(e.RowIndex).HeaderCell.Size.Width - (StringWidth + 5), e.RowBounds.Location.Y + 4)
     End Sub
+
+
 End Class

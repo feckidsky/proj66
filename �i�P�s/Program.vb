@@ -97,7 +97,7 @@ Public Module Program
 
 #End Region
 
-    Public ProgramVersion As String = "v1.0.13"
+    'Public ProgramVersion As String = "v1.0.14"
     Public WithEvents myDatabase As New Database.Access("本機資料庫")
     'Public WithEvents AccessWriterByClient As New Database.Access("本機資料庫-根據遠端訊息更新")
 
@@ -121,6 +121,13 @@ Public Module Program
     Public EnabledMessageLog As Boolean = IO.File.Exists("logmsg")
 
     Public SystemTitle As String = "進銷存管理系統"
+
+    Public ReadOnly Property ProgramVersion() As String
+        Get
+            Dim ver As System.Version = My.Application.Info.Version
+            Return "v" & ver.Major & "." & ver.Minor & "." & ver.Build
+        End Get
+    End Property
 
 
     <Extension()> _

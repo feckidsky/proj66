@@ -17,6 +17,10 @@
         Filter.AddNumberFilter("數量", "售價")
     End Sub
 
+    Private Sub winStockList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
+
     Private Sub winStockList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
 
         Config()
@@ -73,7 +77,7 @@
             If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), DT)
         Catch
         End Try
-        Progress.Finish()
+        If Progress.Finished Then Progress.Finish()
     End Sub
 
     Public Sub UpdateDataTable(ByVal dt As DataTable)

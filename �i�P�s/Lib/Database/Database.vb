@@ -193,6 +193,8 @@
             Public Delegate Sub CancelAction()
 
             Public Percent As Integer
+            Public Finished As Boolean = False
+            Public Thread As Threading.Thread
 
             'Property Message() As String
             '    Get
@@ -219,6 +221,12 @@
                 'End If
             End Sub
 
+            Public Sub WaitFinish()
+                Do Until Finished
+                    Threading.Thread.Sleep(10)
+                Loop
+            End Sub
+
             Public Sub Reset(ByVal Text As String, ByVal StartPercent As Integer, ByVal EndPercent As Integer)
                 Me.Text = Text
                 Me.StartPercent = StartPercent
@@ -235,6 +243,7 @@
             End Sub
 
             Public Sub Finish()
+                Finished = True
                 If FinishCallback IsNot Nothing Then FinishCallback()
             End Sub
 
@@ -247,12 +256,14 @@
             End Function
 
             Public Sub Report(ByVal Message As String, ByVal percent As Integer)
+                If percent < 100 Then Finished = False
                 Me.Percent = percent
                 ProgressCallback(Text & IIf(Text = "", "", ":") & Message, GetPercent(percent))
                 If SubProgress IsNot Nothing Then SubProgress.Report(Message, percent)
             End Sub
 
             Public Sub Report(ByVal Percent As Integer)
+                If Percent < 100 Then Finished = False
                 Me.Percent = Percent
                 ProgressCallback(Text, GetPercent(Percent))
                 If SubProgress IsNot Nothing Then SubProgress.Report(Percent)
@@ -357,7 +368,7 @@
                 Return True
             Else
                 'MsgBox(CurrentUser.Name & " - 權限等級[" & CurrentUser.Authority & "]不足, 執行此動作的權限等級為[" & level & "]", MsgBoxStyle.Exclamation)
-                Message(User.Name & " - 權限等級[" & CurrentUser.Authority & "]不足, 執行此動作的權限等級為[" & level & "]", MsgBoxStyle.Exclamation, Name)
+                Message(User.Name & " - 權限等級[" & User.Authority & "]不足, 執行此動作的權限等級為[" & level & "]", MsgBoxStyle.Exclamation, Name)
                 Return False
             End If
         End Function
@@ -418,7 +429,7 @@
         End Function
 
         Public Function GetGoodsList(Optional ByVal ProgressBackcall As Progress = Nothing) As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & ";"
+            Dim SQLCommand As String = "SELECT * FROM " & Goods.Table & " ORDER BY Label DESC;"
             Return Read("table", BasePath, SQLCommand, ProgressBackcall)
         End Function
 
@@ -439,7 +450,7 @@
 
         Public Function GetCustomerList(Optional ByVal Progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Customer.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
-            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Customer.Table & ";"
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Customer.Table & " ORDER By Label DESC;"
             Return Read("table", BasePath, SQLCommand, Progress)
         End Function
 
@@ -507,7 +518,7 @@
 
         Public Function GetSupplierList(Optional ByVal Progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Supplier.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
-            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Supplier.Table & ";"
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Supplier.Table & " ORDER BY Label DESC;"
             Return Read("table", BasePath, SQLCommand, Progress)
         End Function
 
@@ -527,7 +538,7 @@
         End Sub
 
         Public Function GetContractList(Optional ByVal progress As Progress = Nothing) As Data.DataTable
-            Dim SQLCommand As String = "SELECT * FROM " & Contract.Table & ";"
+            Dim SQLCommand As String = "SELECT * FROM " & Contract.Table & " ORDER BY Label DESC;"
             Dim dt As DataTable = Read("table", BasePath, SQLCommand, progress)
             RaiseEvent ReadedContractList(Me, dt)
             Return dt
@@ -542,7 +553,7 @@
 
         Public Function GetPersonnelList(Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim name() As String = Array.ConvertAll(Change(Personnel.ToColumns(), "Addr", "Note"), Function(c As Column) c.Name)
-            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Personnel.Table & ";"
+            Dim SQLCommand As String = "SELECT " & Join(name, ",") & " FROM " & Personnel.Table & " ORDER BY Label DESC;"
             Return Read("table", BasePath, SQLCommand, progress)
         End Function
 
@@ -564,7 +575,7 @@
 
         '更新庫存內容
         Public Overridable Sub ChangeStock(ByVal newStock As Stock)
-            If Today > newStock.Date.Date AndAlso Not CheckAuthority(3) Then Exit Sub
+            If (Today - newStock.Date.Date).TotalDays > 3 AndAlso Not CheckAuthority(3) Then Exit Sub
             Dim goods As Goods = GetGoods(newStock.GoodsLabel)
             Dim stock As Stock = GetStock(newStock.Label)
             Dim SQLCommand As String = newStock.GetUpdateSqlCommand()
@@ -577,7 +588,7 @@
 
         '刪除一筆庫存
         Public Overridable Sub DeleteStock(ByVal dStock As Stock)
-            If Today > dStock.Date.Date AndAlso Not CheckAuthority(3) Then Exit Sub
+            If (Today - dStock.Date.Date).TotalDays > 3 AndAlso Not CheckAuthority(3) Then Exit Sub
             If dStock.GoodsLabel = "" Then dStock.GoodsLabel = GetStock(dStock.Label).GoodsLabel
             Dim SQLCommand As String = "DELETE FROM " & Stock.Table & " WHERE Label='" & dStock.Label & "';"
             Command(SQLCommand, BasePath)
@@ -673,7 +684,7 @@
 
             Dim SqlCommand As String = "SELECT stock.GoodsLabel AS 商品編號, stock.label AS 庫存編號, stock.IMEI, Goods.Kind AS 種類, Goods.Brand AS 廠牌, Goods.Name AS 品名, stock.number AS 進貨數量, [stock].[number]-IIf(IsNull([nn]),0,[nn])+IIf(IsNull([returnnumber]),0,[returnnumber]) AS 數量, stock.Cost AS 進價, history.Price AS 售價, stock.Note AS 備註, Supplier.Name AS 供應商 " & _
             " FROM ((((stock LEFT JOIN (SELECT StockLabel, sum(number) AS nn FROM SalesGoods GROUP BY StockLabel " & withoutSalesCondition & ")  AS cc ON stock.Label = cc.StockLabel) LEFT JOIN (SELECT HistoryPrice.GoodsLabel, HistoryPrice.Price FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS Time1 FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel)  AS tmp LEFT JOIN HistoryPrice ON (tmp.GoodsLabel=HistoryPrice.GoodsLabel) AND (tmp.Time1=HistoryPrice.Time))  AS history ON stock.GoodsLabel = history.GoodsLabel) LEFT JOIN Goods ON stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON stock.SupplierLabel = Supplier.Label) LEFT JOIN (SELECT StockLabel, sum(number) as ReturnNumber FROM ReturnGoods GROUP BY StockLabel )  AS rt ON stock.Label = rt.StockLabel " & _
-            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn])+IIf(IsNull([returnnumber]),0,[returnnumber]))>0) " & stockCondition & ");"
+            " WHERE ((([stock].[number]-IIf(IsNull([nn]),0,[nn])+IIf(IsNull([returnnumber]),0,[returnnumber]))>0) " & stockCondition & ") ORDER BY stock.GoodsLabel DESC;"
             Dim DT As Data.DataTable = Read("table", BasePath, SqlCommand, progress)
             Return DT
         End Function
@@ -694,7 +705,7 @@
 
         Public Function GetStockMoveList(ByVal StartTime As Date, ByVal EndTime As Date, Optional ByVal progress As Progress = Nothing) As Data.DataTable
             Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
-            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " ; "
+            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " ORDER BY StockMove.Label DESC; "
             Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
@@ -723,7 +734,7 @@
 
             Dim SQLCommand As String = "SELECT Stock.Label as 庫存編號, Stock.Date as 進貨日期, Supplier.Name as 供應商, Goods.Kind as 種類, Goods.Brand as 廠牌, Stock.IMEI, Goods.Name as 品名, Stock.Cost as 進貨價,  Stock.Number as 數量, Stock.Note as 備註" & _
             " FROM (Stock LEFT JOIN Goods ON Stock.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON Stock.SupplierLabel = Supplier.Label " & _
-            " WHERE ((Stock.[date] Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)" & StockCondition & ");"
+            " WHERE ((Stock.[date] Between #" & StartTime.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & EndTime.ToString("yyyy/MM/dd HH:mm:ss") & "#)" & StockCondition & ") ORDER BY Stock.Date DESC;"
             Dim DT As Data.DataTable = Read("table", BasePath, SQLCommand)
             Return DT
         End Function
@@ -1530,7 +1541,12 @@
                 End SyncLock
             Next
 
-            If ProgressAction IsNot Nothing Then ProgressAction.Report(100)
+            If ProgressAction IsNot Nothing Then
+                ProgressAction.Report(100)
+                ProgressAction.Finished = True
+            End If
+
+
             Return DS.Tables(Table)
         End Function
 

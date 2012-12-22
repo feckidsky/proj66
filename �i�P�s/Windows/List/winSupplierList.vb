@@ -8,7 +8,11 @@
 
     Dim work As Mode
 
-    WithEvents access As Database.Access '= Program.DB
+    WithEvents access As Database.Access
+
+    Private Sub winSupplierList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub '= Program.DB
 
     Private Sub winSupplierList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgList)
@@ -56,7 +60,7 @@
             If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
         Catch
         End Try
-        progress.Finish()
+        If progress.Finished Then progress.Finish()
     End Sub
 
     Private Sub UpdateDataTable(ByVal dt As DataTable)

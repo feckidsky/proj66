@@ -14,6 +14,7 @@ Public Module UpdateBatabase
     Public syncClient As AccessClient = Nothing
 
     Public Sub SyncDatabase(ByVal client As Database.AccessClient)
+        'Exit Sub
         If client.SyncWorking Then Exit Sub
         SyncLock UpdateDataLock
             If Not client.Connected Then Exit Sub
@@ -52,12 +53,15 @@ OpenDialog:
 
             Try
 
+
+                'GoTo SyncPrice '測試用-直接跳到同步歷史售價的動作
                 totProgress.Reset(0, 10)
                 partProgress.Text = "讀取" & client.Name & "商品項目"
-                Dim sDT As DataTable = client.GetGoodsList(totProgress)
+                Dim sDT As DataTable = Nothing  '= client.GetGoodsList(totProgress)
 
                 Do While sDT Is Nothing
                     sDT = client.GetGoodsList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
 
                 totProgress.Reset(10, 15)
@@ -76,9 +80,10 @@ OpenDialog:
 
                 totProgress.Reset(20, 25)
                 partProgress.Text = "讀取" & client.Name & "員工資料"
-                sDT = client.GetPersonnelList(totProgress)
+                sDT = Nothing  'lient.GetPersonnelList(totProgress)
                 Do While sDT Is Nothing
                     sDT = client.GetPersonnelList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
                 totProgress.Reset(25, 35)
                 partProgress.Text = "讀取本機員工資料"
@@ -97,9 +102,10 @@ OpenDialog:
 
                 totProgress.Reset(40, 45)
                 partProgress.Text = "讀取" & client.Name & " 客戶資料"
-                sDT = client.GetCustomerList(totProgress)
+                sDT = Nothing  'client.GetCustomerList(totProgress)
                 Do While sDT Is Nothing
                     sDT = client.GetCustomerList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
                 totProgress.Reset(45, 50)
                 partProgress.Text = "讀取本機員工資料"
@@ -116,9 +122,10 @@ OpenDialog:
 
                 totProgress.Reset(55, 60)
                 partProgress.Text = "讀取" & client.Name & "供應商資料"
-                sDT = client.GetSupplierList(totProgress)
+                sDT = Nothing  'client.GetSupplierList(totProgress)
                 Do While sDT Is Nothing
                     sDT = client.GetSupplierList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
                 totProgress.Reset(60, 65)
                 partProgress.Text = "讀取本機供應商資料"
@@ -135,9 +142,10 @@ OpenDialog:
 
                 totProgress.Reset(70, 75)
                 partProgress.Text = "讀取" & client.Name & "合約項目"
-                sDT = client.GetContractList(totProgress)
+                sDT = Nothing 'client.GetContractList(totProgress)
                 Do While sDT Is Nothing
                     sDT = client.GetContractList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
                 totProgress.Reset(75, 80)
                 partProgress.Text = "讀取本機合約項目"
@@ -152,11 +160,14 @@ OpenDialog:
                     End Select
                 Next
 
+SyncPrice:
+
                 totProgress.Reset(85, 90)
                 partProgress.Text = "讀取" & client.Name & "歷史售價"
-                sDT = client.GetHistoryPriceList(totProgress)
+                sDT = Nothing ' client.GetHistoryPriceList(totProgress)
                 Do While sDT Is Nothing
-                    sDT = client.GetContractList(totProgress)
+                    sDT = client.GetHistoryPriceList(totProgress)
+                    totProgress.WaitFinish()
                 Loop
                 totProgress.Reset(90, 95)
                 partProgress.Text = "讀取本機歷史售價"

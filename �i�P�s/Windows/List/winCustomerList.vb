@@ -10,6 +10,10 @@
     WithEvents access As Database.Access '= Program.DB
     Dim Filter As DataGridViewFilter
 
+    Private Sub winCustomerList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
+
     Private Sub winCustomerList_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
         Filter = New DataGridViewFilter(dgList)
         Filter.AddTextFilter("編號", "名稱", "電話1", "電話2", "地址", "備註")
@@ -61,7 +65,7 @@
             If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataTable), dt)
         Catch
         End Try
-        progress.Finish()
+        If progress.Finished Then progress.Finish()
     End Sub
 
     Private Sub UpdateDataTable(ByVal newDT As DataTable)

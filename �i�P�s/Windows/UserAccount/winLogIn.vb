@@ -20,6 +20,10 @@ Public Class winLogIn
         Return result
     End Function
 
+    Private Sub winLogIn_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        Access = Nothing
+    End Sub
+
     Private Sub winLogIn_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         If txtID.Enabled Then txtID.Focus()
         If Not txtID.Enabled Then txtPassword.Focus()

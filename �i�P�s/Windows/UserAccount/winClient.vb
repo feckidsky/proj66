@@ -1,9 +1,15 @@
 ﻿Public Class winClient
 
     WithEvents access As Database.Access
-    WithEvents server As Database.AccessServer = server
+    WithEvents server As Database.AccessServer
+
+    Private Sub winClient_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+        server = Nothing
+    End Sub
 
     Private Sub winClient_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        server = Program.Server
         cbClient.Items.Clear()
         cbClient.Items.AddRange(ClientManager.GetNameList())
         cbClient_UpdateState()

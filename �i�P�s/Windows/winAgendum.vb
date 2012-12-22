@@ -11,6 +11,7 @@
                 End If
             End If
         Next
+        access = Nothing
     End Sub
 
 

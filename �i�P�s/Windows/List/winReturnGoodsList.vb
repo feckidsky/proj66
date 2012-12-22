@@ -25,6 +25,10 @@
     End Sub
     Dim SalesGoodsListVisiblePath As String = My.Application.Info.DirectoryPath & "\ReturnGoodsListVisible.xml"
     Dim SalesGoodsListFilterPatch As String = My.Application.Info.DirectoryPath & "\ReturnGoodsListFilterHis.xml"
+
+    Private Sub winReturnGoodsList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
     Private Sub winSalesGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim lst As String() = Code.LoadXml(Of String())(SalesGoodsListFilterPatch, New String() {})
         cbKeyWord.Items.Clear()

@@ -12,6 +12,10 @@
 
     Dim FilterEffect As Boolean = False
 
+    Private Sub winContractList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
+
     Private Sub winContractList_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         BeginUpdateList()
     End Sub
@@ -73,7 +77,7 @@
             If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
         Catch
         End Try
-        progress.Finish()
+        If progress.Finished Then progress.Finish()
     End Sub
 
     Private Sub UpdateDataGridView(ByVal dt As DataTable)

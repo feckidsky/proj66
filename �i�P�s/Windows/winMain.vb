@@ -297,18 +297,20 @@ Public Class winMain
             'Environment.Exit(Environment.ExitCode)
             'Application.Exit()
         End If
-
+        m_access = Nothing
     End Sub
 
 #Region "銷貨/訂單顯示更新"
     Public Sub UpdateSalesList()
-        If Not Me.Created Or access Is Nothing Then Exit Sub
-        If access.GetType Is GetType(Database.AccessClient) AndAlso Not access.Connected Then dgSales.Rows.Clear()
-
         If Me.InvokeRequired Then
             If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateSalesList))
             Exit Sub
         End If
+
+        If Not Me.Created Or access Is Nothing Then Exit Sub
+        If access.GetType Is GetType(Database.AccessClient) AndAlso Not access.Connected Then dgSales.Rows.Clear()
+
+
 
         If rToday.Checked Then
             StartTime = Today.Date
@@ -378,6 +380,7 @@ Public Class winMain
         args.progress.Reset("讀取訂單/銷貨單資料", 0, 50)
         ' Dim dt As Data.DataTable = access.GetSalesListWithContract(args.StartTime, args.EndTime, args.ListType, , , args.progress)
         Dim dt As Data.DataTable = access.GetSalesListInfo(args.StartTime, args.EndTime, args.ListType, , True, args.progress)
+        args.progress.WaitFinish()
         If dt Is Nothing Then
             args.Dialog.Close()
             Exit Sub

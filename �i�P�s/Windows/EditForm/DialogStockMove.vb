@@ -13,6 +13,11 @@ Public Class DialogStockMove
     End Enum
     Dim mode As Action
 
+    Private Sub DialogStockMove_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        SourceShop = Nothing
+        DestineShop = Nothing
+    End Sub
+
     Private Sub DialogStockMove_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btOK.Text = IIf(mode = Action.Out, "調出", "申請")
         txtSource.Text = SourceShop.Name

@@ -14,6 +14,10 @@ Public Class winStockIn
     Private SelectedGoods As Database.Goods = Database.Goods.Null()
     Private SelectedSupplier As Database.Supplier = Database.Supplier.Null()
 
+    Private Sub winStockIn_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
+
 
     Private Sub winStockIn_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         btOK.Text = IIf(Work = Mode.Create, "入庫", "修改")

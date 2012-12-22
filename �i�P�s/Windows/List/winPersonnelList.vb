@@ -7,7 +7,11 @@
 
     Dim work As Mode
 
-    WithEvents access As Database.Access '= Program.DB
+    WithEvents access As Database.Access
+
+    Private Sub winPersonnelList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub '= Program.DB
 
     Private Sub winPersonnelList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
       

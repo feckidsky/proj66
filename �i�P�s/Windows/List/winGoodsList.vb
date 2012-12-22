@@ -18,6 +18,10 @@ Public Class winGoodsList
         Filter = New DataGridViewFilter(dgGoodsList)
         Filter.AddTextFilter("編號", "品名", "種類", "廠牌", "備註")
     End Sub
+
+    Private Sub winGoodsList_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        access = Nothing
+    End Sub
     Private Sub winGoodsList_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
       
         BeginUpdateGoodsList()
@@ -54,11 +58,22 @@ Public Class winGoodsList
     End Sub
 
     Public Sub UpdateGoodsList(ByVal progress As Database.Access.Progress)
+
+
+
         Dim dt As DataTable = access.GetGoodsList(progress)
-        Try
-            If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateGoodsDataTable), dt)
-        Catch
-        End Try
+        progress.WaitFinish()
+
+        If Me.InvokeRequired Then
+            Try
+                If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateGoodsDataTable), dt)
+            Catch
+            End Try
+
+        Else
+            UpdateGoodsDataTable(dt)
+        End If
+
         progress.Finish()
     End Sub
 
@@ -81,6 +96,7 @@ Public Class winGoodsList
         End Try
         If dgGoodsList.Rows.Count > 0 Then
             dgGoodsList.Rows(0).Selected = True
+        Else
             UpdateHistory()
         End If
 
@@ -212,10 +228,11 @@ Public Class winGoodsList
         If GoodsLoading Then Exit Sub
         Dim goods As Database.Goods = GetSelectedGoods()
         If goods.IsNull Then Exit Sub
-        gbHistory.Text = "歷史售價 - " & goods.Name
+        gbHistory.Text = "歷史售價 - " & goods.Name & " - 讀取中..."
         Dim dt As Data.DataTable = access.GetHistoryPriceList(goods.Label)
         dgHistory.DataSource = dt
         If dt Is Nothing Then Exit Sub
+        gbHistory.Text = "歷史售價 - " & goods.Name
         Try
             dgHistory.Columns(0).Visible = False
         Catch

@@ -76,7 +76,7 @@ Partial Class winSalesContractList
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(208, 26)
+        Me.Label1.Location = New System.Drawing.Point(227, 26)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(11, 12)
         Me.Label1.TabIndex = 5
@@ -126,19 +126,19 @@ Partial Class winSalesContractList
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.欄位顯示CToolStripMenuItem, Me.開啟銷貨SToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(152, 48)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(145, 48)
         '
         '欄位顯示CToolStripMenuItem
         '
         Me.欄位顯示CToolStripMenuItem.Name = "欄位顯示CToolStripMenuItem"
-        Me.欄位顯示CToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.欄位顯示CToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.欄位顯示CToolStripMenuItem.Text = "欄位顯示(&C)"
         Me.欄位顯示CToolStripMenuItem.Visible = False
         '
         '開啟銷貨SToolStripMenuItem
         '
         Me.開啟銷貨SToolStripMenuItem.Name = "開啟銷貨SToolStripMenuItem"
-        Me.開啟銷貨SToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
+        Me.開啟銷貨SToolStripMenuItem.Size = New System.Drawing.Size(144, 22)
         Me.開啟銷貨SToolStripMenuItem.Text = "開啟銷貨單(&S)"
         '
         'winSalesContractList

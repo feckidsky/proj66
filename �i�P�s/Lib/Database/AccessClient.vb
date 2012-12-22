@@ -245,6 +245,7 @@
                 dt = reader.Read(args, ProgressAction)
             Else
                 Dim reader = New AccessReader(Client)
+                reader.InvokeObject = My.Application.OpenForms(0)
                 dt = reader.Read(args, ProgressAction)
             End If
 
@@ -304,11 +305,14 @@
 
 
                 Do Until Readed
+                    Application.DoEvents()
                     Waiter.Reset()
-                    Waiter.WaitOne(1000, False)
+                    Waiter.WaitOne(10, False)
                 Loop
                 Return result
             End Function
+
+
 
             Private Sub Reader_Progress(ByVal sender As Object, ByVal percent As Integer) Handles Me.Progress
                 If Progresser IsNot Nothing Then Progresser.Report(percent)
@@ -357,6 +361,11 @@
             Dim TotalRowsCount As Integer = 0
             Dim CursorRowIndex As Integer = 0
 
+            Event ReceivedDataTable(ByVal sender As Object, ByVal dt As DataTable)
+            Public InvokeObject As Control
+
+
+
             Sub New(ByVal client As TCPTool.Client)
                 MyBase.New(client)
             End Sub
@@ -373,13 +382,43 @@
             Dim ReceiveBuffLock As String = "ReceiveBuffLock"
             Dim ReceiveBuff As New List(Of ReceiveData)
 
+            Friend Sub OnReceiveDataTable(ByVal dt As DataTable)
+                RaiseEvent ReceivedDataTable(Me, dt)
+            End Sub
+
+
+            Dim CreateTableAction As New Action(Of String)(AddressOf CreateTable)
+            Public Sub CreateTable(ByVal data As String)
+                If InvokeObject IsNot Nothing And InvokeObject.InvokeRequired Then
+                    'Dim act As New Action(Of String)(AddressOf CreateTable)
+                    Try
+                        InvokeObject.Invoke(CreateTableAction, data)
+                    Catch
+
+                    End Try
+                    Exit Sub
+                End If
+                DataTable = Code.XmlDeserializeWithUnzip(Of DataTable)(data)
+                Report("取得資料表結構", 1)
+                OnReceiveDataTable(DataTable)
+                result = DataTable
+                If Progresser IsNot Nothing Then Readed = True
+                Waiter.Set()
+
+            End Sub
+
             Public Overrides Sub Receive(ByVal cmd As String, ByVal msg() As String)
                 Select Case cmd
                     Case "DataTableStructure"
+                        CreateTable(msg(1))
+                        'InvokeObject.InvokeRequired
                         TotalRowsCount = msg(0)
-                        DataTable = Code.XmlDeserializeWithUnzip(Of DataTable)(msg(1))
-                        Report("取得資料表結構", 1)
-                        result = DataTable
+                        'DataTable = Code.XmlDeserializeWithUnzip(Of DataTable)(msg(1))
+                        'Report("取得資料表結構", 1)
+                        'OnReceiveDataTable(DataTable)
+                        'result = DataTable
+                        'Readed = True
+                        'Waiter.Set()
                         If TotalRowsCount = 0 Then Finish()
                         ProccessReceiveBuff()
 
@@ -388,7 +427,7 @@
                     Case "Row"
 
                         If DataTable IsNot Nothing Then
-                            AddRow(cmd, msg)
+                            InvokeAddRow(cmd, msg)
                             ProccessReceiveBuff()
                         Else
                             Dim data As ReceiveData
@@ -415,7 +454,7 @@
                 SyncLock ReceiveBuffLock
                     For i As Integer = 0 To ReceiveBuff.Count - 1
                         Dim data As ReceiveData = ReceiveBuff(i)
-                        AddRow(data.cmd, data.msg)
+                        InvokeAddRow(data.cmd, data.msg)
                     Next
                     ReceiveBuff.Clear()
                 End SyncLock
@@ -423,7 +462,19 @@
 
             Private AddRowLock As String = "AddRowLock"
 
+            Dim AddRowAction As New Action(Of String, String())(AddressOf AddRow)
+            Public Sub InvokeAddRow(ByVal data As String, ByVal msg() As String)
+                If InvokeObject IsNot Nothing And InvokeObject.InvokeRequired Then
+                    Try
+                        InvokeObject.Invoke(AddRowAction, data, msg)
+                    Catch
 
+                    End Try
+                    Exit Sub
+                End If
+
+                AddRow(data, msg)
+            End Sub
 
             Public Sub AddRow(ByVal cmd As String, ByVal msg() As String)
                 Dim Index As Integer = msg(0)
