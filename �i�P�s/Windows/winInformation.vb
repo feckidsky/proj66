@@ -16,10 +16,12 @@
 
     Public Overloads Sub ShowDialog(ByVal DB As Database.Access, Optional ByVal old As Boolean = False)
         access = DB
-        If old Then
-            getInfo = AddressOf DB.OldGetSalesInformation
-        Else
-            getInfo = AddressOf DB.GetSalesInformation
+        If DB IsNot Nothing Then
+            If old Then
+                getInfo = AddressOf DB.OldGetSalesInformation
+            Else
+                getInfo = AddressOf DB.GetSalesInformation
+            End If
         End If
 
         MyBase.ShowDialog()

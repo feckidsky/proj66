@@ -294,10 +294,11 @@ Public Class winMain
         Else
 
             Program.FinishProgram()
+            m_access = Nothing
             'Environment.Exit(Environment.ExitCode)
             'Application.Exit()
         End If
-        m_access = Nothing
+
     End Sub
 
 #Region "銷貨/訂單顯示更新"

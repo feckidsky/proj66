@@ -72,6 +72,11 @@
 
 
     Private Sub UpdateList(ByVal progress As Database.Access.Progress)
+        'If dt Is Nothing Then
+        '    progress.Finish()
+        '    Exit Sub
+        'End If
+
         dt = access.GetContractList(progress)
         Try
             If Not Me.IsDisposed Then Me.Invoke(New Action(Of DataTable)(AddressOf UpdateDataGridView), dt)
