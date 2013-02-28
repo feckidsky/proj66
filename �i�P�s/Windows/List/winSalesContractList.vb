@@ -47,7 +47,7 @@
             dt.Columns("Commission").ColumnName = "佣金"
             dt.Columns("Name").ColumnName = "合約名稱"
             dt.Columns("Note").ColumnName = "合約備註"
-            dt.Columns("ReturnDate").ColumnName = "退佣日期"
+            dt.Columns("ReturnDate").ColumnName = "扣佣日期"
         End If
 
         dgItemList.DataSource = dt

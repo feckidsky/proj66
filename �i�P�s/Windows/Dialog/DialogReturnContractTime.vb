@@ -1,14 +1,14 @@
 ﻿Imports System.Windows.Forms
 
-Public Class DialogTime
+Public Class DialogReturnContractTime
 
     Property Value() As Date
         Get
-            If ckNothing.Checked Then Return Nothing
+            If Not ckEnable.Checked Then Return Nothing
             Return dtpDate.Value.Date.Add(New TimeSpan(lstHour.Value, lstMinute.Value, lstSecond.Value))
         End Get
         Set(ByVal value As Date)
-            ckNothing.Checked = value = Nothing
+            ckEnable.Checked = value <> Nothing
             If value = Nothing Then
                 dtpDate.Value = Today
 
@@ -21,10 +21,10 @@ Public Class DialogTime
                 lstMinute.Value = value.Minute
                 lstSecond.Value = value.Second
             End If
-            dtpDate.Enabled = Not ckNothing.Checked
-            lstHour.Enabled = Not ckNothing.Checked
-            lstMinute.Enabled = Not ckNothing.Checked
-            lstSecond.Enabled = Not ckNothing.Checked
+            dtpDate.Enabled = ckEnable.Checked
+            lstHour.Enabled = ckEnable.Checked
+            lstMinute.Enabled = ckEnable.Checked
+            lstSecond.Enabled = ckEnable.Checked
 
         End Set
     End Property
@@ -43,10 +43,10 @@ Public Class DialogTime
 
     End Sub
 
-    Private Sub ckNothing_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckNothing.CheckedChanged
-        dtpDate.Enabled = Not ckNothing.Checked
-        lstHour.Enabled = Not ckNothing.Checked
-        lstMinute.Enabled = Not ckNothing.Checked
-        lstSecond.Enabled = Not ckNothing.Checked
+    Private Sub ckNothing_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ckEnable.CheckedChanged
+        dtpDate.Enabled = ckEnable.Checked
+        lstHour.Enabled = ckEnable.Checked
+        lstMinute.Enabled = ckEnable.Checked
+        lstSecond.Enabled = ckEnable.Checked
     End Sub
 End Class

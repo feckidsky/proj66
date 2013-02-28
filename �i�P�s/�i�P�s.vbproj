@@ -141,6 +141,12 @@
     <Compile Include="Windows\Dialog\DialogTime.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Dialog\DialogReturnContractTime.Designer.vb">
+      <DependentUpon>DialogReturnContractTime.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Dialog\DialogReturnContractTime.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\EditForm\DialogStockMove.Designer.vb">
       <DependentUpon>DialogStockMove.vb</DependentUpon>
     </Compile>
@@ -371,6 +377,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Dialog\DialogTime.resx">
       <DependentUpon>DialogTime.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Dialog\DialogReturnContractTime.resx">
+      <DependentUpon>DialogReturnContractTime.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\EditForm\DialogStockMove.resx">
