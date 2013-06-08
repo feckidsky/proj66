@@ -792,9 +792,12 @@ ReadStockList:
     '修改退佣日期
     Private Sub dgContract_CellClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellClick
         If e.RowIndex < 0 Or e.ColumnIndex <> cCReturnDate.Index Then Exit Sub
-        DialogTime.Value = GetDate(dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value)
-        If DialogTime.ShowDialog = Windows.Forms.DialogResult.OK Then
-            dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = GetDbDate(DialogTime.Value)
+
+        Dim dialog As New DialogReturnContractTime
+
+        dialog.Value = GetDate(dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value)
+        If dialog.ShowDialog = Windows.Forms.DialogResult.OK Then
+            dgContract.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = GetDbDate(dialog.Value)
         End If
     End Sub
 
@@ -946,4 +949,7 @@ ReadStockList:
         Return "(" & count & ")"
     End Function
 
+    Private Sub dgContract_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgContract.CellContentClick
+
+    End Sub
 End Class

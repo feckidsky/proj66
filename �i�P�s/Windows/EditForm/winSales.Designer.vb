@@ -368,10 +368,10 @@ Partial Class winSales
         Me.tpOrder.Controls.Add(Me.btDeleteOrderItem)
         Me.tpOrder.Controls.Add(Me.btAddOrderItem)
         Me.tpOrder.Controls.Add(Me.dgOrderList)
-        Me.tpOrder.Location = New System.Drawing.Point(4, 22)
+        Me.tpOrder.Location = New System.Drawing.Point(4, 21)
         Me.tpOrder.Name = "tpOrder"
         Me.tpOrder.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpOrder.Size = New System.Drawing.Size(662, 213)
+        Me.tpOrder.Size = New System.Drawing.Size(662, 214)
         Me.tpOrder.TabIndex = 0
         Me.tpOrder.Text = "訂單"
         Me.tpOrder.UseVisualStyleBackColor = True
@@ -481,10 +481,10 @@ Partial Class winSales
         Me.tpSales.Controls.Add(Me.dgSalesList)
         Me.tpSales.Controls.Add(Me.btDeleteSalesItem)
         Me.tpSales.Controls.Add(Me.btAddSalesItem)
-        Me.tpSales.Location = New System.Drawing.Point(4, 22)
+        Me.tpSales.Location = New System.Drawing.Point(4, 21)
         Me.tpSales.Name = "tpSales"
         Me.tpSales.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpSales.Size = New System.Drawing.Size(662, 213)
+        Me.tpSales.Size = New System.Drawing.Size(662, 214)
         Me.tpSales.TabIndex = 1
         Me.tpSales.Text = "銷貨單"
         Me.tpSales.UseVisualStyleBackColor = True
@@ -629,10 +629,10 @@ Partial Class winSales
         Me.tpReturn.Controls.Add(Me.btDelReturnGoods)
         Me.tpReturn.Controls.Add(Me.btAddReturnGoods)
         Me.tpReturn.Controls.Add(Me.dgReturnList)
-        Me.tpReturn.Location = New System.Drawing.Point(4, 22)
+        Me.tpReturn.Location = New System.Drawing.Point(4, 21)
         Me.tpReturn.Name = "tpReturn"
         Me.tpReturn.Padding = New System.Windows.Forms.Padding(3)
-        Me.tpReturn.Size = New System.Drawing.Size(662, 213)
+        Me.tpReturn.Size = New System.Drawing.Size(662, 214)
         Me.tpReturn.TabIndex = 2
         Me.tpReturn.Text = "退貨單"
         Me.tpReturn.UseVisualStyleBackColor = True
@@ -829,7 +829,7 @@ Partial Class winSales
         '
         'cCReturnDate
         '
-        Me.cCReturnDate.HeaderText = "退佣日期"
+        Me.cCReturnDate.HeaderText = "扣佣日期"
         Me.cCReturnDate.Name = "cCReturnDate"
         Me.cCReturnDate.ReadOnly = True
         Me.cCReturnDate.Width = 78
@@ -1072,13 +1072,6 @@ Partial Class winSales
     Friend WithEvents cSNumber As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSSubTotal As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents cSSalesDate As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCLabel As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCName As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCPrepay As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCCommission As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCDiscount As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCPhone As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents cCReturnDate As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents Label10 As System.Windows.Forms.Label
     Friend WithEvents Label11 As System.Windows.Forms.Label
     Friend WithEvents txtPayByCash As 進銷存.NumberBox
@@ -1087,5 +1080,12 @@ Partial Class winSales
     Friend WithEvents txtPayCharge As 進銷存.NumberBox
     Friend WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents cCLabel As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCName As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCPrepay As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCCommission As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCDiscount As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCPhone As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents cCReturnDate As System.Windows.Forms.DataGridViewTextBoxColumn
     'Friend WithEvents cSSalesDate As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class

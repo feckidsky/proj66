@@ -218,49 +218,49 @@ Partial Class winMain
         '查詢庫存ToolStripMenuItem
         '
         Me.查詢庫存ToolStripMenuItem.Name = "查詢庫存ToolStripMenuItem"
-        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.查詢庫存ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.查詢庫存ToolStripMenuItem.Text = "查詢庫存(&S)"
         '
         '商品項目GToolStripMenuItem
         '
         Me.商品項目GToolStripMenuItem.Name = "商品項目GToolStripMenuItem"
-        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.商品項目GToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.商品項目GToolStripMenuItem.Text = "商品項目(&G)"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(133, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(149, 6)
         '
         '進貨記錄ToolStripMenuItem1
         '
         Me.進貨記錄ToolStripMenuItem1.Name = "進貨記錄ToolStripMenuItem1"
-        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(136, 22)
+        Me.進貨記錄ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
         Me.進貨記錄ToolStripMenuItem1.Text = "進貨記錄(&I)"
         '
         '調貨ToolStripMenuItem
         '
         Me.調貨ToolStripMenuItem.Name = "調貨ToolStripMenuItem"
-        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.調貨ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.調貨ToolStripMenuItem.Text = "調貨記錄(&M)"
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(133, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(149, 6)
         Me.ToolStripSeparator6.Visible = False
         '
         '銷貨清單OToolStripMenuItem
         '
         Me.銷貨清單OToolStripMenuItem.Name = "銷貨清單OToolStripMenuItem"
-        Me.銷貨清單OToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.銷貨清單OToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.銷貨清單OToolStripMenuItem.Text = "銷貨清單(&O)"
         Me.銷貨清單OToolStripMenuItem.Visible = False
         '
         '銷售合約ToolStripMenuItem
         '
         Me.銷售合約ToolStripMenuItem.Name = "銷售合約ToolStripMenuItem"
-        Me.銷售合約ToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.銷售合約ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.銷售合約ToolStripMenuItem.Text = "銷售合約(&C)"
         Me.銷售合約ToolStripMenuItem.Visible = False
         '

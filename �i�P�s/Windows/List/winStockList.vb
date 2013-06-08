@@ -242,7 +242,8 @@
 
     Private Sub UpdateTitleText()
         Dim connectState As String = ""
-        If access.GetType Is GetType(Database.AccessClient) Then
+        If access IsNot Nothing AndAlso access.GetType Is GetType(Database.AccessClient) Then
+            'If access.GetType Is GetType(Database.AccessClient) Then
             Dim c As Database.Access = access
             connectState = IIf(c.Connected, "-已連線", "-斷線")
         End If

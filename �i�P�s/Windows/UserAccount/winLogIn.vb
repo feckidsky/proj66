@@ -20,8 +20,12 @@ Public Class winLogIn
         Return result
     End Function
 
-    Private Sub winLogIn_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub winLogIn_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Disposed
         Access = Nothing
+    End Sub
+
+    Private Sub winLogIn_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+
     End Sub
 
     Private Sub winLogIn_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
