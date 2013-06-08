@@ -421,4 +421,19 @@
     End Sub
 
 
+    Private Sub DataGrid_RowStateChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowStateChangedEventArgs) Handles DataGrid.RowStateChanged
+
+    End Sub
+
+    Private Sub DataGrid_RowHeadersDefaultCellStyleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGrid.RowHeadersDefaultCellStyleChanged
+
+    End Sub
+
+    Private Sub DataGrid_RowDefaultCellStyleChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewRowEventArgs) Handles DataGrid.RowDefaultCellStyleChanged
+        'Dim num As Integer = 0
+        'For i As Integer = 0 To e.Row.Index
+        '    If e.Row.Visible Then num = +1
+        'Next
+        'e.Row.Tag = num
+    End Sub
 End Class

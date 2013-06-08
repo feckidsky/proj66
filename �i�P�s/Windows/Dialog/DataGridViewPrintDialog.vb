@@ -1,6 +1,7 @@
 ﻿Public Class DataGridViewPrintDialog
 
     Dim DataGrid As DataGridView
+    Dim printGrid As DataTable
     Dim printFont As Font = New Font("新細明體", 12)
 
     Dim Title As String = ""
@@ -40,8 +41,34 @@
         startPage = 1
         endPage = PrintDocument1.PrinterSettings.MaximumPage
 
+        printGrid = GetPrintGrid()
         PrintPreviewDialog1.ShowDialog()
     End Sub
+
+    Private Function GetPrintGrid() As DataTable
+        Dim grid As New DataTable
+        'For i As Integer = 0 To DataGrid.Columns.Count - 1
+
+        '    grid.Columns.Add(DataGrid.Columns(i).HeaderText)
+        'Next
+        grid.Columns.AddRange(Array.ConvertAll(GetColumnNames(), Function(s As String) New DataColumn(s)))
+
+        For i As Integer = 0 To DataGrid.Rows.Count - 1
+            If DataGrid.Rows(i).Visible Then
+                'Dim items As New List(Of Object)
+                'For Each item As DataGridViewCell In DataGrid.Rows(i).Cells
+                '    items.Add(item.Value)
+                'Next
+
+                Dim items As String() = GetValues(DataGrid.Rows(i))
+                ' If ckNumber.Checked Then items(0) = grid.Rows.Count + 1
+                grid.Rows.Add(items)
+
+            End If
+        Next
+        Return grid
+    End Function
+
 
     Private Sub btFont_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btFont.Click
         Me.FontDialog1.Font = printFont
@@ -59,6 +86,7 @@
         Dim result As DialogResult = PrintDialog1.ShowDialog()
         PrintDocument1.PrinterSettings = PrintDialog1.PrinterSettings
         If result = Windows.Forms.DialogResult.OK Then
+            printGrid = GetPrintGrid()
             SetPageRange()
             PrintDocument1.Print()
         End If
@@ -84,6 +112,7 @@
     End Sub
 
     Private Sub btPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btPrint.Click
+        printGrid = GetPrintGrid()
         PrintDocument1.Print()
     End Sub
 
@@ -125,19 +154,19 @@
 
     End Function
 
-    Private Function GetRows(ByVal idx As Integer, ByVal count As Integer) As DataGridViewRow()
-        Dim rows As New List(Of DataGridViewRow)
+    'Private Function GetRows(ByVal idx As Integer, ByVal count As Integer) As DataGridViewRow()
+    '    Dim rows As New List(Of DataGridViewRow)
 
-        Do While count > 0 And idx < DataGrid.Rows.Count
-            If DataGrid.Rows(idx).Visible Then
-                rows.Add(DataGrid.Rows(idx))
-                count -= 1
-            End If
-            idx += 1
-        Loop
+    '    Do While count > 0 And idx < DataGrid.Rows.Count
+    '        If DataGrid.Rows(idx).Visible Then
+    '            rows.Add(DataGrid.Rows(idx))
+    '            count -= 1
+    '        End If
+    '        idx += 1
+    '    Loop
 
-        Return rows.ToArray()
-    End Function
+    '    Return rows.ToArray()
+    'End Function
 
     Public Function GetTotalPage(ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer()
         Dim lstRowCount As New List(Of Integer)
@@ -147,9 +176,9 @@
         Dim currentHeight As Integer = e.Graphics.MeasureString(Join(GetColumnNames(), ""), printFont).Height + LineInterval
         Dim text As String = ""
         Dim cntRow As Integer = 0
-        For i As Integer = 0 To DataGrid.Rows.Count - 1
+        For i As Integer = 0 To printGrid.Rows.Count - 1
             '取得行高
-            Dim lineHeight As Integer = GetCellHeight(DataGrid.Rows(i), e) + LineInterval
+            Dim lineHeight As Integer = GetCellHeight(printGrid.Rows(i), e) + LineInterval
 
             If currentHeight + lineHeight > pageSize.Height Then
                 lstRowCount.Add(cntRow)
@@ -166,11 +195,16 @@
         Return lstRowCount.ToArray
     End Function
 
-    Public Function GetCellHeight(ByVal Row As DataGridViewRow, ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer
+    Public Function GetCellHeight(ByVal Row As DataRow, ByVal e As System.Drawing.Printing.PrintPageEventArgs) As Integer
         Dim lineHeight As Integer = 0
-        For c As Integer = 0 To Row.Cells.Count - 1
-            Dim text As String = Row.Cells(c).Value.ToString
-            lineHeight = Math.Max(e.Graphics.MeasureString(Text, printFont).Height, lineHeight)
+        'For c As Integer = 0 To Row.Cells.Count - 1
+        '    Dim text As String = Row.Cells(c).Value.ToString
+        '    lineHeight = Math.Max(e.Graphics.MeasureString(text, printFont).Height, lineHeight)
+        'Next
+
+        For Each o As Object In Row.ItemArray
+            Dim text As String = o.ToString
+            lineHeight = Math.Max(e.Graphics.MeasureString(text, printFont).Height, lineHeight)
         Next
         Return lineHeight
     End Function
@@ -216,10 +250,10 @@
         'For i As Integer = idxRow To idxRow + totPage(page - 1) - 1
         If focusPage = startPage Then
             CellWidth = Array.ConvertAll(Columns, Function(s As String) g.MeasureString(s, printFont).Width)
-            For i As Integer = 0 To DataGrid.RowCount - 1
-                Dim values() As String = GetValues(DataGrid.Rows(i))
+            For i As Integer = 0 To printGrid.Rows.Count - 1 'DataGrid.RowCount - 1
+                Dim values() As Object = printGrid.Rows(i).ItemArray()  'GetValues(DataGrid.Rows(i))
                 For j As Integer = 0 To values.Length - 1
-                    Dim w As Integer = g.MeasureString(values(j), printFont).Width
+                    Dim w As Integer = g.MeasureString(values(j).ToString, printFont).Width
                     If CellWidth(j) < w Then CellWidth(j) = w
                 Next
             Next
@@ -273,13 +307,13 @@
 
         '印出資料內容
         For i As Integer = idxRow To idxRow + totPage(focusPage - 1) - 1
-            Dim values() As String = GetValues(DataGrid.Rows(i))
+            Dim values() As Object = printGrid.Rows(i).ItemArray  'GetValues(DataGrid.Rows(i))
             Dim x As Integer = e.MarginBounds.Left
             For j As Integer = 0 To values.Length - 1
-                g.DrawString(values(j), printFont, brush, x, cy)
+                g.DrawString(values(j).ToString, printFont, brush, x, cy)
                 x += CellWidth(j) + 3
             Next
-            cy += GetCellHeight(DataGrid.Rows(i), e) + LineInterval
+            cy += GetCellHeight(printGrid.Rows(i), e) + LineInterval 'GetCellHeight(DataGrid.Rows(i), e) + LineInterval
             g.DrawLine(pen, e.MarginBounds.Left, cy - LineInterval, e.MarginBounds.Right, cy - LineInterval)
         Next
 
