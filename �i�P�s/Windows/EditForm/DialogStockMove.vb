@@ -24,7 +24,8 @@ Public Class DialogStockMove
         txtNumber.Text = 1
         Goods = SourceShop.GetGoods(stock.GoodsLabel)
         txtName.Text = Goods.Name
-
+        txtTransferPrice.Text = SourceShop.GetListHistoryPrice(Goods.Label).Cost
+        txtCost.Text = stock.Cost
         cbDestine.Items.Clear()
         cbDestine.Items.AddRange(ClientManager.GetNameList())
         If DestineShop IsNot Nothing Then
@@ -83,6 +84,12 @@ Public Class DialogStockMove
         item.StockLabel = stock.Label
         item.SupplierLabel = stock.SupplierLabel
         item.GoodsLabel = stock.GoodsLabel
+        Try
+            item.TransferPrice = Val(txtTransferPrice.Text)
+        Catch ex As Exception
+            MsgBox(ex.Message)
+            Exit Sub
+        End Try
 
         If mode = Action.Out Then
             item.SourcePersonnel = CurrentUser.Label
@@ -120,4 +127,5 @@ Public Class DialogStockMove
 
         DialogResult = Windows.Forms.DialogResult.OK
     End Sub
+
 End Class

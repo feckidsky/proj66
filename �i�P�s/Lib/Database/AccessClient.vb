@@ -663,10 +663,19 @@
             OnConnectedSuccess() '取得版本資訊，觸發ConnectedSuccess事件
         End Sub
 
-        Public Overrides Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer)
+
+        Public Overrides Sub StockMoveCancel(ByVal mStock As Stock, ByVal number As Integer)
             Dim e As StockMoveArgs
             e.Stock = mStock
             e.Number = number
+            Send("StockMoveCancel", e)
+        End Sub
+
+        Public Overrides Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer, ByVal TransferPrice As Integer)
+            Dim e As StockMoveArgs
+            e.Stock = mStock
+            e.Number = number
+            e.TransferPrice = TransferPrice
             Send("StockMoveIn", e)
         End Sub
 

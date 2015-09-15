@@ -282,6 +282,7 @@
                     Case "CreateStockMove" : Access.AddStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
                     Case "ChangeStockMove" : Access.ChangeStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
                     Case "DeleteStockMove" : Access.DeleteStockMove(Code.XmlDeserializeWithUnzip(Of StockMove)(Data(1)))
+
                     Case "CreateAgendum" : Access.AddAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
                     Case "ChangeAgendum" : Access.ChangeAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
                     Case "DeleteAgendum" : Access.DeleteAgendum(Code.XmlDeserializeWithUnzip(Of Agendum)(Data(1)))
@@ -296,6 +297,7 @@
                     Case "Logout" : Access.LogOut()
                     Case "StockMoveIn" : Access.StockMoveIn(Code.XmlDeserializeWithUnzip(Of Access.StockMoveArgs)(Data(1)))
                     Case "StockMoveOut" : Access.StockMoveOut(Code.XmlDeserializeWithUnzip(Of Access.StockMoveArgs)(Data(1)))
+                    Case "StockMoveCancel" : Access.StockMoveCancel(Code.XmlDeserializeWithUnzip(Of Access.StockMoveArgs)(Data(1)))
                     Case "GetSalesInformation"
                         Dim args As Access.GetSalesInformationArgs = Code.XmlDeserializeWithUnzip(Of Access.GetSalesInformationArgs)(Data(1))
                         Client.Send("ResponseSalesInformationArgs", Code.XmlSerializeWithZIP(Access.GetSalesInformation(args.StartTime, args.EndTime)))

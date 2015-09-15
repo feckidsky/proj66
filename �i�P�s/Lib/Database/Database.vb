@@ -419,9 +419,9 @@
             Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
-        Public Function GetListHistoryPrice(ByVal Label As String) As HistoryPrice
+        Public Function GetListHistoryPrice(ByVal GoodsLabel As String) As HistoryPrice
             Dim SqlCommand As String = "SELECT HistoryPrice.GoodsLabel, HistoryPrice.Time, HistoryPrice.Cost, HistoryPrice.Price " & _
-            " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS [Time] FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel HAVING (HistoryPrice.GoodsLabel='" & Label & "'))  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel)" & _
+            " FROM (SELECT HistoryPrice.GoodsLabel, Max(HistoryPrice.Time) AS [Time] FROM HistoryPrice GROUP BY HistoryPrice.GoodsLabel HAVING (HistoryPrice.GoodsLabel='" & GoodsLabel & "'))  AS tmp LEFT JOIN HistoryPrice ON (tmp.Time=HistoryPrice.Time) AND (tmp.GoodsLabel=HistoryPrice.GoodsLabel)" & _
             " GROUP BY HistoryPrice.GoodsLabel, HistoryPrice.Time, HistoryPrice.Cost, HistoryPrice.Price;"
             Dim dt As DataTable = Read("table", BasePath, SqlCommand)
             If dt.Rows.Count = 0 Then Return HistoryPrice.Null()
@@ -600,20 +600,42 @@
         Public Structure StockMoveArgs
             Dim Stock As Stock
             Dim Number As Integer
+            Dim TransferPrice As Integer
         End Structure
 
-        Public Overridable Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer)
+
+        Public Sub StockMoveCancel(ByVal e As StockMoveArgs)
+            StockMoveCancel(e.Stock, e.Number)
+        End Sub
+
+        Public Overridable Sub StockMoveCancel(ByVal mStock As Stock, ByVal number As Integer)
             Dim stock As Stock = GetStock(mStock.Label)
-            If stock.IsNull() Then
-                mStock.Number = number
-                AddStock(mStock)
-            Else
-                stock.Number += number
-                Dim SQLCommand As String = stock.GetUpdateSqlCommand() ';"UPDATE " & stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
-                Command(SQLCommand, BasePath)
-                'mStock = GetStock(mStock.Label) '取得最新庫存資料
-                OnChangedStock(stock) '觸發更新庫存事件
-            End If
+            stock.Number += number
+            Dim SQLCommand As String = stock.GetUpdateSqlCommand() ';"UPDATE " & stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
+            Command(SQLCommand, BasePath)
+            'mStock = GetStock(mStock.Label) '取得最新庫存資料
+            OnChangedStock(stock) '觸發更新庫存事件
+        End Sub
+
+        Public Overridable Sub StockMoveIn(ByVal mStock As Stock, ByVal number As Integer, ByVal TransferPrice As Integer)
+            Dim stock As Stock = GetStock(mStock.Label)
+            Dim new_stock As Stock = GetNewStock()
+            mStock.Label = new_stock.Label
+            mStock.Date = Now
+            mStock.Number = number
+            mStock.Cost = TransferPrice
+            AddStock(mStock)
+
+            'If stock.IsNull() Then
+            '    mStock.Number = number
+            '    AddStock(mStock)
+            'Else
+            '    stock.Number += number
+            '    Dim SQLCommand As String = stock.GetUpdateSqlCommand() ';"UPDATE " & stock.Table & " SET Number=Number+" & number & " WHERE Label='" & mStock.Label & "';"
+            '    Command(SQLCommand, BasePath)
+            '    'mStock = GetStock(mStock.Label) '取得最新庫存資料
+            '    OnChangedStock(stock) '觸發更新庫存事件
+            'End If
 
         End Sub
 
@@ -626,7 +648,7 @@
         End Sub
 
         Public Sub StockMoveIn(ByVal e As StockMoveArgs)
-            StockMoveIn(e.Stock, e.Number)
+            StockMoveIn(e.Stock, e.Number, e.TransferPrice)
         End Sub
 
         Public Sub StockMoveOut(ByVal e As StockMoveArgs)
@@ -704,13 +726,13 @@
         'End Function
 
         Public Function GetStockMoveList(ByVal StartTime As Date, ByVal EndTime As Date, Optional ByVal progress As Progress = Nothing) As Data.DataTable
-            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
+            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 ,StockMove.TransferPrice AS 調貨價 " & _
             "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Date BETWEEN " & StartTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " AND " & EndTime.ToString("#yyyy/MM/dd HH:mm:ss#") & " ORDER BY StockMove.Label DESC; "
             Return Read("table", BasePath, SqlCommand, progress)
         End Function
 
         Public Function GetStockMoveRow(ByVal StockMoveLabel As String) As DataRow
-            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 " & _
+            Dim SqlCommand As String = "SELECT StockMove.Label AS 調貨編號, StockMove.StockLabel AS 庫存編號, StockMove.Date AS 調貨日期, Supplier.Name AS 供應商, Goods.Kind AS 種類, Goods.Brand AS 廠牌, StockMove.IMEI, Goods.Name AS 品名, StockMove.Cost AS 進貨價, StockMove.Number AS 數量, StockMove.SourceShop as 來源, Personnel.Name as 出貨, StockMove.DestineShop as 目地, Personnel_1.Name as [申請/收件] , StockMove.Action AS 狀態 ,StockMove.TransferPrice AS 調貨價 " & _
            "FROM (((StockMove LEFT JOIN Goods ON StockMove.GoodsLabel = Goods.Label) LEFT JOIN Supplier ON StockMove.SupplierLabel = Supplier.Label) LEFT JOIN Personnel ON StockMove.SourcePersonnel = Personnel.Label) LEFT JOIN Personnel AS Personnel_1 ON StockMove.DestinePersonnel = Personnel_1.Label WHERE StockMove.Label='" & StockMoveLabel & "' ; "
             Try
                 Return Read("table", BasePath, SqlCommand).Rows(0)
@@ -1123,6 +1145,7 @@
 
             'Dim dt As DataTable = GetOrderListWithContract(St, Ed)
             Dim dt As DataTable = GetSalesListInfo(St, Ed, GetSalesListType.OrderWithoutType, , True)
+            Dim dt_transfer As DataTable = GetStockMoveList(St, Ed, )
             Dim DepositByCash As Single = 0
             Dim DepositByCard As Single = 0
             For Each row As DataRow In dt.Rows
@@ -1158,6 +1181,10 @@
             For Each row As DataRow In dt.Select("付款方式=" & Val(Database.Payment.Finish))
                 Profit += GetSingle(row.Item("利潤"))
                 SalesVolume += GetSingle(row.Item("金額"))
+            Next
+
+            For Each row As DataRow In dt_transfer.Select("狀態=" & Val(Database.StockMove.Type.Out))
+                Profit += row.Item("調貨價") - row.Item("進貨價")
             Next
 
             dt = GetReturnContractTotalPrice(St, Ed)

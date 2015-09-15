@@ -5,7 +5,7 @@ Imports 進銷存.Database
 Public Module UpdateBatabase
 
     ''' <summary>資料庫板本編號</summary>
-    Public DatabaseVerson As String = "010201"
+    Public DatabaseVerson As String = "010203"
 
 #Region "同步資料庫"
 
@@ -238,6 +238,12 @@ SyncPrice:
         If Not IO.File.Exists(myDatabase.MsgPath) Then Access.CreateBulletinFile(myDatabase.MsgPath)
     End Sub
 
+    Public Sub UpdateDatabase010202()
+        myDatabase.Command("UPDATE Personnel SET [Note]= 'DbVerson=010203' WHERE Label='Administrator' AND ([Note]='DbVerson=010202')")
+        myDatabase.AddColumn(StockMove.Table, "TransferPrice", Database.DBTypeInteger)
+        myDatabase.Command("UPDATE " & StockMove.Table & " SET [TransferPrice]= Cost WHERE isnull(TransferPrice)")
+    End Sub
+
     Public Function UpdateDatabase() As Boolean
         If Config.Mode = Connect.Client Then Return False
         Dim info As Access.DbInfo = myDatabase.ReadDbInfo
@@ -253,7 +259,8 @@ SyncPrice:
 
         If info.IsNull Then UpdateDatabaseFirst()
         If info.DbVerson <= 10200 Then UpdateDatabase010200()
-        'If info.DbVerson <= 10201 Then UpdateDatabase010201()
+        If info.DbVerson <= 10201 Then UpdateDatabase010201()
+        If info.DbVerson <= 10202 Then UpdateDatabase010202()
 
         '壓縮/修復資料庫
         If changed Then Access.RepairAccess(myDatabase.BasePath)

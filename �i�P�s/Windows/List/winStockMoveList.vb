@@ -13,7 +13,7 @@ Public Class winStockMoveList
         ' 在 InitializeComponent() 呼叫之後加入任何初始設定。
         Filter = New DataGridViewFilter(dgList)
 
-        Filter.AddTextFilter("庫存編號", "調貨編號", "品名", "種類", "廠牌", "供應商", "IMEI", "狀態")
+        Filter.AddTextFilter("庫存編號", "調貨編號", "品名", "種類", "廠牌", "供應商", "IMEI", "狀態", "調貨價")
         Filter.AddNumberFilter("數量", "進貨價")
     End Sub
 
@@ -240,9 +240,12 @@ Public Class winStockMoveList
 
             If stockMove.Action = Database.StockMove.Type.Sending Then
                 Dim stock As Stock = res.Source.GetStock(stockMove.StockLabel)
-                'stock.Number += stockMove.Number
-                res.Source.StockMoveIn(stock, stockMove.Number)
-                'res.Source.ChangeStock(stock)
+
+                'res.Source.StockMoveIn(stock, stockMove.Number)
+
+                '取消調貨，將該筆資料加回庫存數量
+                res.Source.StockMoveCancel(stock, stockMove.Number)
+
             End If
 
             stockMove.Action = Database.StockMove.Type.Cancel
@@ -303,7 +306,7 @@ Public Class winStockMoveList
             res.Destine.ChangeStockMove(stockMove)
 
             Dim stock As Stock = res.Source.GetStock(stockMove.StockLabel)
-            res.Destine.StockMoveIn(stock, stockMove.Number)
+            res.Destine.StockMoveIn(stock, stockMove.Number, stockMove.TransferPrice)
 
 
             'Dim stock As Stock = res.Destine.GetStock(stockMove.StockLabel)

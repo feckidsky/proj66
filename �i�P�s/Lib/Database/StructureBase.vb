@@ -736,6 +736,7 @@ Namespace Database
         Dim SourcePersonnel As String
         Dim DestinePersonnel As String
         Dim Action As Type
+        Dim TransferPrice As Integer
 
         Public Enum Type
             Request = 0
@@ -764,11 +765,12 @@ Namespace Database
             Columns.Add("SourcePersonnel", DBTypeLabel)
             Columns.Add("DestinePersonnel", DBTypeLabel)
             Columns.Add("Action", DBTypeInteger)
+            Columns.Add("TransferPrice", DBTypeInteger)
             Return Columns.ToArray
         End Function
 
         Function ToObjects() As Object()
-            Return New Object() {Label, Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, CType(Action, Int16)}
+            Return New Object() {Label, Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, CType(Action, Int16), TransferPrice}
         End Function
 
         Public Shared Function GetFrom(ByVal Row As Data.DataRow) As StockMove
@@ -787,6 +789,7 @@ Namespace Database
             data.SourcePersonnel = R("SourcePersonnel")
             data.DestinePersonnel = R("DestinePersonnel")
             data.Action = CType(R("Action"), Type)
+            data.TransferPrice = R("TransferPrice")
             Return data
         End Function
 
@@ -804,8 +807,8 @@ Namespace Database
         End Function
 
         Public Function GetUpdateSqlCommand() As String
-            Dim Column As String() = New String() {"Date", "GoodsLabel", "StockLabel", "SupplierLabel", "Number", "Cost", "IMEI", "SourceShop", "DestineShop", "SourcePersonnel", "DestinePersonnel", "Action"}
-            Dim Value As String() = New String() {Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, Action}
+            Dim Column As String() = New String() {"Date", "GoodsLabel", "StockLabel", "SupplierLabel", "Number", "Cost", "IMEI", "SourceShop", "DestineShop", "SourcePersonnel", "DestinePersonnel", "Action", "TransferPrice"}
+            Dim Value As String() = New String() {Me.Date, GoodsLabel, StockLabel, SupplierLabel, Number, Cost, IMEI, SourceShop, DestineShop, SourcePersonnel, DestinePersonnel, Action, TransferPrice}
             Return Access.GetUpdateSqlCommand(Table, Column, Value, "Label", Label)
         End Function
 
