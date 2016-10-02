@@ -20,6 +20,7 @@ Public Module Program
         Dim BackupDir As String
         Dim EmailBackupEnable As Boolean
         Dim DirBackupEnable As Boolean
+        Dim StoreCode As String
         Shared ReadOnly Property DefaultConfig()
             Get
                 Dim def As SystemOptional
@@ -232,37 +233,37 @@ Public Module Program
 
     Public Function GetNewSupplier() As Supplier
         Dim data As Supplier = Nothing
-        data.Label = "SU" & Now.ToString("yyMMddHHmmss")
+        data.Label = "SU" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
     Public Function GetNewPersonnel() As Personnel
         Dim data As Personnel = Nothing
-        data.Label = "P" & Now.ToString("yyMMddHHmmss")
+        data.Label = "P" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
     Public Function GetNewCustomer() As Customer
         Dim data As Customer = Nothing
-        data.Label = "C" & Now.ToString("yyMMddHHmmss")
+        data.Label = "C" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
     Public Function GetNewGoods() As Goods
         Dim data As Goods = Nothing
-        data.Label = "G" & Now.ToString("yyMMddHHmmss")
+        data.Label = "G" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
     Public Function GetNewMobile() As Contract
         Dim data As Contract = Nothing
-        data.Label = "M" & Now.ToString("yyMMddHHmmss")
+        data.Label = "M" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         Return data
     End Function
 
     Public Function GetNewStock() As Stock
         Dim data As Stock = Nothing
-        data.Label = "ST" & Now.ToString("yyMMddHHmmss")
+        data.Label = "ST" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         data.Date = Now
         data.Number = 1
         Return data
@@ -270,7 +271,7 @@ Public Module Program
 
     Public Function GetNewSales() As Sales
         Dim data As Sales = Nothing
-        data.Label = "SA" & Now.ToString("yyMMddHHmmss")
+        data.Label = "SA" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         data.OrderDate = Now
         data.PayCardCharge = 0.02
         data.DepositCardCharge = 0.02
@@ -286,7 +287,7 @@ Public Module Program
 
     Public Function GetNewContract() As Contract
         Dim data As New Contract
-        data.Label = "C" & Now.ToString("yyMMddHHmmss")
+        data.Label = "C" & Config.StoreCode & Now.ToString("yyMMddHHmmss")
         data.Enable = True
         Return data
     End Function

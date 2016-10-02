@@ -45,6 +45,7 @@ Partial Class winOptional
         Me.txtPort = New System.Windows.Forms.TextBox
         Me.txtServerName = New System.Windows.Forms.TextBox
         Me.GroupBox5 = New System.Windows.Forms.GroupBox
+        Me.btUseGmail = New System.Windows.Forms.Button
         Me.Button1 = New System.Windows.Forms.Button
         Me.Label8 = New System.Windows.Forms.Label
         Me.Label10 = New System.Windows.Forms.Label
@@ -53,6 +54,7 @@ Partial Class winOptional
         Me.Label6 = New System.Windows.Forms.Label
         Me.Label9 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
+        Me.txtMailPort = New 進銷存.NumberBox
         Me.txtMailReceiverAddr = New System.Windows.Forms.TextBox
         Me.txtMailPassword = New System.Windows.Forms.TextBox
         Me.txtMailID = New System.Windows.Forms.TextBox
@@ -60,8 +62,8 @@ Partial Class winOptional
         Me.txtBackupDir = New System.Windows.Forms.TextBox
         Me.txtMailServer = New System.Windows.Forms.TextBox
         Me.FolderBrowserDialog1 = New System.Windows.Forms.FolderBrowserDialog
-        Me.txtMailPort = New 進銷存.NumberBox
-        Me.btUseGmail = New System.Windows.Forms.Button
+        Me.Label11 = New System.Windows.Forms.Label
+        Me.txtStoreCode = New System.Windows.Forms.TextBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.dgShop, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -198,7 +200,7 @@ Partial Class winOptional
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(14, 21)
+        Me.Label1.Location = New System.Drawing.Point(14, 24)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(53, 12)
         Me.Label1.TabIndex = 6
@@ -208,8 +210,10 @@ Partial Class winOptional
         '
         Me.GroupBox4.Controls.Add(Me.txtNetIndex)
         Me.GroupBox4.Controls.Add(Me.Label3)
+        Me.GroupBox4.Controls.Add(Me.Label11)
         Me.GroupBox4.Controls.Add(Me.Label2)
         Me.GroupBox4.Controls.Add(Me.txtPort)
+        Me.GroupBox4.Controls.Add(Me.txtStoreCode)
         Me.GroupBox4.Controls.Add(Me.txtServerName)
         Me.GroupBox4.Controls.Add(Me.cbMode)
         Me.GroupBox4.Controls.Add(Me.Label1)
@@ -222,15 +226,15 @@ Partial Class winOptional
         '
         'txtNetIndex
         '
-        Me.txtNetIndex.Location = New System.Drawing.Point(366, 45)
+        Me.txtNetIndex.Location = New System.Drawing.Point(378, 45)
         Me.txtNetIndex.Name = "txtNetIndex"
-        Me.txtNetIndex.Size = New System.Drawing.Size(34, 22)
+        Me.txtNetIndex.Size = New System.Drawing.Size(22, 22)
         Me.txtNetIndex.TabIndex = 9
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(258, 21)
+        Me.Label3.Location = New System.Drawing.Point(322, 23)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(41, 12)
         Me.Label3.TabIndex = 8
@@ -239,7 +243,7 @@ Partial Class winOptional
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(129, 21)
+        Me.Label2.Location = New System.Drawing.Point(132, 24)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(65, 12)
         Me.Label2.TabIndex = 8
@@ -247,9 +251,9 @@ Partial Class winOptional
         '
         'txtPort
         '
-        Me.txtPort.Location = New System.Drawing.Point(260, 45)
+        Me.txtPort.Location = New System.Drawing.Point(321, 45)
         Me.txtPort.Name = "txtPort"
-        Me.txtPort.Size = New System.Drawing.Size(100, 22)
+        Me.txtPort.Size = New System.Drawing.Size(51, 22)
         Me.txtPort.TabIndex = 7
         '
         'txtServerName
@@ -283,6 +287,15 @@ Partial Class winOptional
         Me.GroupBox5.TabIndex = 8
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "備份"
+        '
+        'btUseGmail
+        '
+        Me.btUseGmail.Location = New System.Drawing.Point(290, 17)
+        Me.btUseGmail.Name = "btUseGmail"
+        Me.btUseGmail.Size = New System.Drawing.Size(75, 23)
+        Me.btUseGmail.TabIndex = 3
+        Me.btUseGmail.Text = "使用Gmail"
+        Me.btUseGmail.UseVisualStyleBackColor = True
         '
         'Button1
         '
@@ -356,6 +369,13 @@ Partial Class winOptional
         Me.Label4.TabIndex = 1
         Me.Label4.Text = "伺服器"
         '
+        'txtMailPort
+        '
+        Me.txtMailPort.Location = New System.Drawing.Point(241, 18)
+        Me.txtMailPort.Name = "txtMailPort"
+        Me.txtMailPort.Size = New System.Drawing.Size(43, 22)
+        Me.txtMailPort.TabIndex = 0
+        '
         'txtMailReceiverAddr
         '
         Me.txtMailReceiverAddr.Location = New System.Drawing.Point(241, 82)
@@ -399,21 +419,21 @@ Partial Class winOptional
         Me.txtMailServer.Size = New System.Drawing.Size(116, 22)
         Me.txtMailServer.TabIndex = 0
         '
-        'txtMailPort
+        'Label11
         '
-        Me.txtMailPort.Location = New System.Drawing.Point(241, 18)
-        Me.txtMailPort.Name = "txtMailPort"
-        Me.txtMailPort.Size = New System.Drawing.Size(43, 22)
-        Me.txtMailPort.TabIndex = 0
+        Me.Label11.AutoSize = True
+        Me.Label11.Location = New System.Drawing.Point(238, 24)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(53, 12)
+        Me.Label11.TabIndex = 8
+        Me.Label11.Text = "分店代號"
         '
-        'btUseGmail
+        'txtStoreCode
         '
-        Me.btUseGmail.Location = New System.Drawing.Point(290, 17)
-        Me.btUseGmail.Name = "btUseGmail"
-        Me.btUseGmail.Size = New System.Drawing.Size(75, 23)
-        Me.btUseGmail.TabIndex = 3
-        Me.btUseGmail.Text = "使用Gmail"
-        Me.btUseGmail.UseVisualStyleBackColor = True
+        Me.txtStoreCode.Location = New System.Drawing.Point(237, 45)
+        Me.txtStoreCode.Name = "txtStoreCode"
+        Me.txtStoreCode.Size = New System.Drawing.Size(66, 22)
+        Me.txtStoreCode.TabIndex = 7
         '
         'winOptional
         '
@@ -481,4 +501,6 @@ Partial Class winOptional
     Friend WithEvents txtMailID As System.Windows.Forms.TextBox
     Friend WithEvents txtMailPassword As System.Windows.Forms.TextBox
     Friend WithEvents btUseGmail As System.Windows.Forms.Button
+    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents txtStoreCode As System.Windows.Forms.TextBox
 End Class

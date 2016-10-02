@@ -8,6 +8,8 @@
 
         txtServerName.Text = Config.ServerName
         txtPort.Text = Config.ServerPort
+        txtStoreCode.Text = Config.StoreCode
+        txtStoreCode_TextChanged(txtStoreCode, e)
         txtNetIndex.Text = Config.ServerNetIndex
         txtBackupDir.Text = Config.BackupDir
         UpdateShopList()
@@ -58,6 +60,7 @@
         Config.BackupDir = txtBackupDir.Text
         Config.OrderBackcolor = btOrderBackColor.BackColor.ToArgb
         Config.SalesBackColor = btSalesBackColor.BackColor.ToArgb
+        Config.StoreCode = txtStoreCode.Text
 
         Config.ServerName = txtServerName.Text
         Try
@@ -161,5 +164,13 @@
     Private Sub btUseGmail_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btUseGmail.Click
         txtMailServer.Text = "smtp.gmail.com"
         txtMailPort.Text = 587
+    End Sub
+
+    Private Sub txtStoreCode_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtStoreCode.TextChanged
+        If Strings.Trim(txtStoreCode.Text).Length = 0 Then
+            txtStoreCode.BackColor = Color.Red
+        Else
+            txtStoreCode.BackColor = Color.White
+        End If
     End Sub
 End Class
