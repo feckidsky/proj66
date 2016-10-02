@@ -37,6 +37,7 @@
         lbYesterdayProfit.Text = infoYesterday.Profit
         lbYesterdaySalesVolume.Text = infoYesterday.Sales
         lbYesterdayCard.Text = infoYesterday.Card
+        lbYesterdayPrepay.Text = infoYesterday.Prepay
     End Sub
 
     Public Sub UpdateToday()
@@ -44,6 +45,7 @@
         lbTodayProfit.Text = infoToday.Profit
         lbTodaySales.Text = infoToday.Sales
         lbTodayCard.Text = infoToday.Card
+        lbTodayPrepay.Text = infoToday.Prepay
     End Sub
 
     Public Sub UpdateLastMonth()
@@ -51,6 +53,7 @@
         lbLastMonthProfit.Text = infoLastMonth.Profit
         lbLastMonthSales.Text = infoLastMonth.Sales
         lbLastMonthCard.Text = infoLastMonth.Card
+        lbLastMonthPrepay.Text = infoLastMonth.Prepay
     End Sub
 
     Public Sub UpdateTheMonth()
@@ -58,6 +61,7 @@
         lbTheMonthProfit.Text = infoMonth.Profit
         lbTheMonthSales.Text = infoMonth.Sales
         lbTheMonthCard.Text = infoMonth.Card
+        lbTheMonthPrepay.Text = infoMonth.Prepay
     End Sub
 
     Public Sub UpdateUserInfo()
@@ -65,6 +69,7 @@
         lbUserProfit.Text = infoUser.Profit
         lbUserSales.Text = infoUser.Sales
         lbUserCard.Text = infoUser.Card
+        lbUserPrepay.Text = infoUser.Prepay
     End Sub
 
     Private Sub winInformation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -164,5 +169,9 @@
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
         Dim win As New winInformation
         win.ShowDialog(access, old:=True)
+    End Sub
+
+    Private Sub lbTodaySales_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lbTodaySales.Click
+
     End Sub
 End Class

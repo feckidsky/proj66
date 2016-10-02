@@ -968,6 +968,20 @@
             Return dt
         End Function
 
+        Public Function GetPrepay(ByVal st As Date, ByVal ed As Date) As Integer
+            Dim cmd As String = "SELECT SUM(Prepay) as TotalPrepay FROM (SELECT Sales.OrderDate, Contract.Prepay " & _
+            "FROM (SalesContract LEFT JOIN Sales ON SalesContract.SalesLabel = Sales.Label) INNER JOIN Contract ON SalesContract.ContractLabel = Contract.Label " & _
+            "WHERE (((Sales.OrderDate) Between #" & st.ToString("yyyy/MM/dd HH:mm:ss") & "# And #" & ed.ToString("yyyy/MM/dd HH:mm:ss") & "#))) "
+
+            Dim dt As DataTable = Read("table", BasePath, cmd)
+            Try
+                Dim prepay As Integer = dt.Rows(0).Item("TotalPrepay")
+                Return prepay
+            Catch
+                Return 0
+            End Try
+        End Function
+
         Public Function GetSalesTip(ByVal Label As String, ByVal style As Database.Payment) As String
             Dim lst As New List(Of String)
             Dim dt As DataTable = GetContractListBySalesLabel(Label)
@@ -1131,8 +1145,9 @@
             Dim Profit As Single
             Dim Cash As Single
             Dim Card As Single
-            Sub New(ByVal Sales As Single, ByVal Profit As Single, ByVal Cash As Single, ByVal Card As Single)
-                Me.Sales = Sales : Me.Profit = Profit : Me.Cash = Cash : Me.Card = Card
+            Dim Prepay As Single
+            Sub New(ByVal Sales As Single, ByVal Profit As Single, ByVal Cash As Single, ByVal Card As Single, ByVal Prepay As Single)
+                Me.Sales = Sales : Me.Profit = Profit : Me.Cash = Cash : Me.Card = Card : Me.Prepay = Prepay
             End Sub
         End Structure
 
@@ -1190,8 +1205,8 @@
             dt = GetReturnContractTotalPrice(St, Ed)
             Dim ReturnCommission As Single = GetSingle(dt.Rows(0).Item("ReturnCommission"))
 
-
-            Return New SalesInformation(SalesVolume, Profit - ReturnCommission, Cash + DepositByCash - cancel, Card + DepositByCard)
+            Dim prepay As Single = GetPrepay(St, Ed)
+            Return New SalesInformation(SalesVolume, Profit - ReturnCommission, Cash + DepositByCash - cancel, Card + DepositByCard, prepay)
         End Function
 
 
@@ -1230,7 +1245,9 @@
                 SalesVolume += GetSingle(row.Item("金額"))
             Next
 
-            Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard)
+            Dim Prepay As Single = GetPrepay(St, Ed)
+
+            Return New SalesInformation(SalesVolume, Profit, Cash + DepositByCash - cancel, Card + DepositByCard, Prepay)
         End Function
 
         Public Function GetSingle(ByVal obj As Object) As Single

@@ -72,6 +72,16 @@ Partial Class winInformation
         Me.Label22 = New System.Windows.Forms.Label
         Me.btClose = New System.Windows.Forms.Button
         Me.Button1 = New System.Windows.Forms.Button
+        Me.Label13 = New System.Windows.Forms.Label
+        Me.lbYesterdayPrepay = New System.Windows.Forms.Label
+        Me.lbTodayPrepay = New System.Windows.Forms.Label
+        Me.Label18 = New System.Windows.Forms.Label
+        Me.lbLastMonthPrepay = New System.Windows.Forms.Label
+        Me.Label19 = New System.Windows.Forms.Label
+        Me.lbTheMonthPrepay = New System.Windows.Forms.Label
+        Me.Label27 = New System.Windows.Forms.Label
+        Me.lbUserPrepay = New System.Windows.Forms.Label
+        Me.Label26 = New System.Windows.Forms.Label
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -91,7 +101,7 @@ Partial Class winInformation
         'lbYesterdaySalesVolume
         '
         Me.lbYesterdaySalesVolume.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbYesterdaySalesVolume.Location = New System.Drawing.Point(77, 18)
+        Me.lbYesterdaySalesVolume.Location = New System.Drawing.Point(77, 21)
         Me.lbYesterdaySalesVolume.Name = "lbYesterdaySalesVolume"
         Me.lbYesterdaySalesVolume.Size = New System.Drawing.Size(70, 12)
         Me.lbYesterdaySalesVolume.TabIndex = 1
@@ -101,7 +111,7 @@ Partial Class winInformation
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(24, 46)
+        Me.Label2.Location = New System.Drawing.Point(24, 72)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(32, 12)
         Me.Label2.TabIndex = 0
@@ -110,7 +120,7 @@ Partial Class winInformation
         'lbYesterdayProfit
         '
         Me.lbYesterdayProfit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbYesterdayProfit.Location = New System.Drawing.Point(77, 43)
+        Me.lbYesterdayProfit.Location = New System.Drawing.Point(77, 69)
         Me.lbYesterdayProfit.Name = "lbYesterdayProfit"
         Me.lbYesterdayProfit.Size = New System.Drawing.Size(70, 12)
         Me.lbYesterdayProfit.TabIndex = 1
@@ -120,7 +130,7 @@ Partial Class winInformation
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(24, 72)
+        Me.Label4.Location = New System.Drawing.Point(24, 98)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(32, 12)
         Me.Label4.TabIndex = 0
@@ -129,7 +139,7 @@ Partial Class winInformation
         'lbYesterdayCash
         '
         Me.lbYesterdayCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbYesterdayCash.Location = New System.Drawing.Point(77, 69)
+        Me.lbYesterdayCash.Location = New System.Drawing.Point(77, 95)
         Me.lbYesterdayCash.Name = "lbYesterdayCash"
         Me.lbYesterdayCash.Size = New System.Drawing.Size(70, 12)
         Me.lbYesterdayCash.TabIndex = 1
@@ -138,8 +148,10 @@ Partial Class winInformation
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.lbYesterdayPrepay)
         Me.GroupBox1.Controls.Add(Me.lbYesterdayCard)
         Me.GroupBox1.Controls.Add(Me.lbYesterdayCash)
+        Me.GroupBox1.Controls.Add(Me.Label13)
         Me.GroupBox1.Controls.Add(Me.lbYesterdayProfit)
         Me.GroupBox1.Controls.Add(Me.lbYesterdaySalesVolume)
         Me.GroupBox1.Controls.Add(Me.Label5)
@@ -148,7 +160,7 @@ Partial Class winInformation
         Me.GroupBox1.Controls.Add(Me.Label1)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(185, 124)
+        Me.GroupBox1.Size = New System.Drawing.Size(185, 141)
         Me.GroupBox1.TabIndex = 2
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "昨日資訊"
@@ -156,7 +168,7 @@ Partial Class winInformation
         'lbYesterdayCard
         '
         Me.lbYesterdayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbYesterdayCard.Location = New System.Drawing.Point(77, 94)
+        Me.lbYesterdayCard.Location = New System.Drawing.Point(77, 120)
         Me.lbYesterdayCard.Name = "lbYesterdayCard"
         Me.lbYesterdayCard.Size = New System.Drawing.Size(70, 12)
         Me.lbYesterdayCard.TabIndex = 1
@@ -166,7 +178,7 @@ Partial Class winInformation
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(24, 97)
+        Me.Label5.Location = New System.Drawing.Point(24, 123)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(32, 12)
         Me.Label5.TabIndex = 0
@@ -174,6 +186,8 @@ Partial Class winInformation
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.lbUserPrepay)
+        Me.GroupBox2.Controls.Add(Me.Label26)
         Me.GroupBox2.Controls.Add(Me.lbUserCard)
         Me.GroupBox2.Controls.Add(Me.lbUserCash)
         Me.GroupBox2.Controls.Add(Me.Label3)
@@ -185,9 +199,9 @@ Partial Class winInformation
         Me.GroupBox2.Controls.Add(Me.Label25)
         Me.GroupBox2.Controls.Add(Me.Label24)
         Me.GroupBox2.Controls.Add(Me.Label23)
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 272)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 332)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(397, 112)
+        Me.GroupBox2.Size = New System.Drawing.Size(397, 122)
         Me.GroupBox2.TabIndex = 4
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "指定時間"
@@ -223,7 +237,7 @@ Partial Class winInformation
         '
         'lbUserProfit
         '
-        Me.lbUserProfit.Location = New System.Drawing.Point(77, 85)
+        Me.lbUserProfit.Location = New System.Drawing.Point(77, 104)
         Me.lbUserProfit.Name = "lbUserProfit"
         Me.lbUserProfit.Size = New System.Drawing.Size(70, 12)
         Me.lbUserProfit.TabIndex = 1
@@ -274,7 +288,7 @@ Partial Class winInformation
         'Label24
         '
         Me.Label24.AutoSize = True
-        Me.Label24.Location = New System.Drawing.Point(24, 85)
+        Me.Label24.Location = New System.Drawing.Point(24, 104)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(32, 12)
         Me.Label24.TabIndex = 0
@@ -291,6 +305,8 @@ Partial Class winInformation
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.lbTodayPrepay)
+        Me.GroupBox3.Controls.Add(Me.Label18)
         Me.GroupBox3.Controls.Add(Me.lbTodayCard)
         Me.GroupBox3.Controls.Add(Me.lbTodayCash)
         Me.GroupBox3.Controls.Add(Me.lbTodayProfit)
@@ -301,7 +317,7 @@ Partial Class winInformation
         Me.GroupBox3.Controls.Add(Me.Label10)
         Me.GroupBox3.Location = New System.Drawing.Point(224, 12)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(185, 124)
+        Me.GroupBox3.Size = New System.Drawing.Size(185, 141)
         Me.GroupBox3.TabIndex = 2
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "今日資訊"
@@ -309,7 +325,7 @@ Partial Class winInformation
         'lbTodayCard
         '
         Me.lbTodayCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTodayCard.Location = New System.Drawing.Point(78, 97)
+        Me.lbTodayCard.Location = New System.Drawing.Point(78, 120)
         Me.lbTodayCard.Name = "lbTodayCard"
         Me.lbTodayCard.Size = New System.Drawing.Size(70, 12)
         Me.lbTodayCard.TabIndex = 1
@@ -319,7 +335,7 @@ Partial Class winInformation
         'lbTodayCash
         '
         Me.lbTodayCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTodayCash.Location = New System.Drawing.Point(78, 72)
+        Me.lbTodayCash.Location = New System.Drawing.Point(78, 95)
         Me.lbTodayCash.Name = "lbTodayCash"
         Me.lbTodayCash.Size = New System.Drawing.Size(70, 12)
         Me.lbTodayCash.TabIndex = 1
@@ -329,7 +345,7 @@ Partial Class winInformation
         'lbTodayProfit
         '
         Me.lbTodayProfit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTodayProfit.Location = New System.Drawing.Point(78, 46)
+        Me.lbTodayProfit.Location = New System.Drawing.Point(78, 69)
         Me.lbTodayProfit.Name = "lbTodayProfit"
         Me.lbTodayProfit.Size = New System.Drawing.Size(70, 12)
         Me.lbTodayProfit.TabIndex = 1
@@ -349,7 +365,7 @@ Partial Class winInformation
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(24, 97)
+        Me.Label6.Location = New System.Drawing.Point(24, 120)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(32, 12)
         Me.Label6.TabIndex = 0
@@ -358,7 +374,7 @@ Partial Class winInformation
         'Label8
         '
         Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(24, 72)
+        Me.Label8.Location = New System.Drawing.Point(24, 95)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(32, 12)
         Me.Label8.TabIndex = 0
@@ -367,7 +383,7 @@ Partial Class winInformation
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(24, 46)
+        Me.Label9.Location = New System.Drawing.Point(24, 69)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(32, 12)
         Me.Label9.TabIndex = 0
@@ -384,6 +400,8 @@ Partial Class winInformation
         '
         'GroupBox4
         '
+        Me.GroupBox4.Controls.Add(Me.lbLastMonthPrepay)
+        Me.GroupBox4.Controls.Add(Me.Label19)
         Me.GroupBox4.Controls.Add(Me.lbLastMonthCard)
         Me.GroupBox4.Controls.Add(Me.lbLastMonthCash)
         Me.GroupBox4.Controls.Add(Me.lbLastMonthProfit)
@@ -392,9 +410,9 @@ Partial Class winInformation
         Me.GroupBox4.Controls.Add(Me.Label14)
         Me.GroupBox4.Controls.Add(Me.Label15)
         Me.GroupBox4.Controls.Add(Me.Label16)
-        Me.GroupBox4.Location = New System.Drawing.Point(12, 142)
+        Me.GroupBox4.Location = New System.Drawing.Point(12, 171)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(185, 124)
+        Me.GroupBox4.Size = New System.Drawing.Size(185, 147)
         Me.GroupBox4.TabIndex = 2
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "上月資訊"
@@ -402,7 +420,7 @@ Partial Class winInformation
         'lbLastMonthCard
         '
         Me.lbLastMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbLastMonthCard.Location = New System.Drawing.Point(77, 99)
+        Me.lbLastMonthCard.Location = New System.Drawing.Point(77, 123)
         Me.lbLastMonthCard.Name = "lbLastMonthCard"
         Me.lbLastMonthCard.Size = New System.Drawing.Size(70, 12)
         Me.lbLastMonthCard.TabIndex = 1
@@ -412,7 +430,7 @@ Partial Class winInformation
         'lbLastMonthCash
         '
         Me.lbLastMonthCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbLastMonthCash.Location = New System.Drawing.Point(77, 75)
+        Me.lbLastMonthCash.Location = New System.Drawing.Point(77, 99)
         Me.lbLastMonthCash.Name = "lbLastMonthCash"
         Me.lbLastMonthCash.Size = New System.Drawing.Size(70, 12)
         Me.lbLastMonthCash.TabIndex = 1
@@ -422,7 +440,7 @@ Partial Class winInformation
         'lbLastMonthProfit
         '
         Me.lbLastMonthProfit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbLastMonthProfit.Location = New System.Drawing.Point(77, 51)
+        Me.lbLastMonthProfit.Location = New System.Drawing.Point(77, 75)
         Me.lbLastMonthProfit.Name = "lbLastMonthProfit"
         Me.lbLastMonthProfit.Size = New System.Drawing.Size(70, 12)
         Me.lbLastMonthProfit.TabIndex = 1
@@ -442,7 +460,7 @@ Partial Class winInformation
         'Label7
         '
         Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(24, 99)
+        Me.Label7.Location = New System.Drawing.Point(24, 123)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(32, 12)
         Me.Label7.TabIndex = 0
@@ -451,7 +469,7 @@ Partial Class winInformation
         'Label14
         '
         Me.Label14.AutoSize = True
-        Me.Label14.Location = New System.Drawing.Point(24, 75)
+        Me.Label14.Location = New System.Drawing.Point(24, 99)
         Me.Label14.Name = "Label14"
         Me.Label14.Size = New System.Drawing.Size(32, 12)
         Me.Label14.TabIndex = 0
@@ -460,7 +478,7 @@ Partial Class winInformation
         'Label15
         '
         Me.Label15.AutoSize = True
-        Me.Label15.Location = New System.Drawing.Point(24, 51)
+        Me.Label15.Location = New System.Drawing.Point(24, 75)
         Me.Label15.Name = "Label15"
         Me.Label15.Size = New System.Drawing.Size(32, 12)
         Me.Label15.TabIndex = 0
@@ -477,6 +495,8 @@ Partial Class winInformation
         '
         'GroupBox5
         '
+        Me.GroupBox5.Controls.Add(Me.lbTheMonthPrepay)
+        Me.GroupBox5.Controls.Add(Me.Label27)
         Me.GroupBox5.Controls.Add(Me.lbTheMonthCard)
         Me.GroupBox5.Controls.Add(Me.lbTheMonthCash)
         Me.GroupBox5.Controls.Add(Me.lbTheMonthProfit)
@@ -485,9 +505,9 @@ Partial Class winInformation
         Me.GroupBox5.Controls.Add(Me.Label20)
         Me.GroupBox5.Controls.Add(Me.Label21)
         Me.GroupBox5.Controls.Add(Me.Label22)
-        Me.GroupBox5.Location = New System.Drawing.Point(224, 142)
+        Me.GroupBox5.Location = New System.Drawing.Point(224, 171)
         Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(185, 124)
+        Me.GroupBox5.Size = New System.Drawing.Size(185, 147)
         Me.GroupBox5.TabIndex = 2
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "本月資訊"
@@ -495,7 +515,7 @@ Partial Class winInformation
         'lbTheMonthCard
         '
         Me.lbTheMonthCard.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTheMonthCard.Location = New System.Drawing.Point(78, 99)
+        Me.lbTheMonthCard.Location = New System.Drawing.Point(78, 123)
         Me.lbTheMonthCard.Name = "lbTheMonthCard"
         Me.lbTheMonthCard.Size = New System.Drawing.Size(70, 12)
         Me.lbTheMonthCard.TabIndex = 1
@@ -505,7 +525,7 @@ Partial Class winInformation
         'lbTheMonthCash
         '
         Me.lbTheMonthCash.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTheMonthCash.Location = New System.Drawing.Point(78, 75)
+        Me.lbTheMonthCash.Location = New System.Drawing.Point(78, 99)
         Me.lbTheMonthCash.Name = "lbTheMonthCash"
         Me.lbTheMonthCash.Size = New System.Drawing.Size(70, 12)
         Me.lbTheMonthCash.TabIndex = 1
@@ -515,7 +535,7 @@ Partial Class winInformation
         'lbTheMonthProfit
         '
         Me.lbTheMonthProfit.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbTheMonthProfit.Location = New System.Drawing.Point(78, 51)
+        Me.lbTheMonthProfit.Location = New System.Drawing.Point(78, 75)
         Me.lbTheMonthProfit.Name = "lbTheMonthProfit"
         Me.lbTheMonthProfit.Size = New System.Drawing.Size(70, 12)
         Me.lbTheMonthProfit.TabIndex = 1
@@ -535,7 +555,7 @@ Partial Class winInformation
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(24, 99)
+        Me.Label11.Location = New System.Drawing.Point(24, 123)
         Me.Label11.Name = "Label11"
         Me.Label11.Size = New System.Drawing.Size(32, 12)
         Me.Label11.TabIndex = 0
@@ -544,7 +564,7 @@ Partial Class winInformation
         'Label20
         '
         Me.Label20.AutoSize = True
-        Me.Label20.Location = New System.Drawing.Point(24, 75)
+        Me.Label20.Location = New System.Drawing.Point(24, 99)
         Me.Label20.Name = "Label20"
         Me.Label20.Size = New System.Drawing.Size(32, 12)
         Me.Label20.TabIndex = 0
@@ -553,7 +573,7 @@ Partial Class winInformation
         'Label21
         '
         Me.Label21.AutoSize = True
-        Me.Label21.Location = New System.Drawing.Point(24, 51)
+        Me.Label21.Location = New System.Drawing.Point(24, 75)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(32, 12)
         Me.Label21.TabIndex = 0
@@ -570,7 +590,8 @@ Partial Class winInformation
         '
         'btClose
         '
-        Me.btClose.Location = New System.Drawing.Point(334, 399)
+        Me.btClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btClose.Location = New System.Drawing.Point(344, 468)
         Me.btClose.Name = "btClose"
         Me.btClose.Size = New System.Drawing.Size(75, 23)
         Me.btClose.TabIndex = 5
@@ -579,7 +600,8 @@ Partial Class winInformation
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(12, 399)
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(12, 468)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(75, 23)
         Me.Button1.TabIndex = 6
@@ -587,11 +609,106 @@ Partial Class winInformation
         Me.Button1.UseVisualStyleBackColor = True
         Me.Button1.Visible = False
         '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Location = New System.Drawing.Point(24, 46)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(44, 12)
+        Me.Label13.TabIndex = 2
+        Me.Label13.Text = "預付額:"
+        '
+        'lbYesterdayPrepay
+        '
+        Me.lbYesterdayPrepay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbYesterdayPrepay.Location = New System.Drawing.Point(77, 46)
+        Me.lbYesterdayPrepay.Name = "lbYesterdayPrepay"
+        Me.lbYesterdayPrepay.Size = New System.Drawing.Size(70, 12)
+        Me.lbYesterdayPrepay.TabIndex = 3
+        Me.lbYesterdayPrepay.Text = "0"
+        Me.lbYesterdayPrepay.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lbTodayPrepay
+        '
+        Me.lbTodayPrepay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbTodayPrepay.Location = New System.Drawing.Point(77, 46)
+        Me.lbTodayPrepay.Name = "lbTodayPrepay"
+        Me.lbTodayPrepay.Size = New System.Drawing.Size(70, 12)
+        Me.lbTodayPrepay.TabIndex = 5
+        Me.lbTodayPrepay.Text = "0"
+        Me.lbTodayPrepay.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label18
+        '
+        Me.Label18.AutoSize = True
+        Me.Label18.Location = New System.Drawing.Point(24, 46)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(44, 12)
+        Me.Label18.TabIndex = 4
+        Me.Label18.Text = "預付額:"
+        '
+        'lbLastMonthPrepay
+        '
+        Me.lbLastMonthPrepay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbLastMonthPrepay.Location = New System.Drawing.Point(77, 51)
+        Me.lbLastMonthPrepay.Name = "lbLastMonthPrepay"
+        Me.lbLastMonthPrepay.Size = New System.Drawing.Size(70, 12)
+        Me.lbLastMonthPrepay.TabIndex = 5
+        Me.lbLastMonthPrepay.Text = "0"
+        Me.lbLastMonthPrepay.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Location = New System.Drawing.Point(24, 51)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(44, 12)
+        Me.Label19.TabIndex = 4
+        Me.Label19.Text = "預付額:"
+        '
+        'lbTheMonthPrepay
+        '
+        Me.lbTheMonthPrepay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbTheMonthPrepay.Location = New System.Drawing.Point(77, 51)
+        Me.lbTheMonthPrepay.Name = "lbTheMonthPrepay"
+        Me.lbTheMonthPrepay.Size = New System.Drawing.Size(70, 12)
+        Me.lbTheMonthPrepay.TabIndex = 7
+        Me.lbTheMonthPrepay.Text = "0"
+        Me.lbTheMonthPrepay.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label27
+        '
+        Me.Label27.AutoSize = True
+        Me.Label27.Location = New System.Drawing.Point(24, 51)
+        Me.Label27.Name = "Label27"
+        Me.Label27.Size = New System.Drawing.Size(44, 12)
+        Me.Label27.TabIndex = 6
+        Me.Label27.Text = "預付額:"
+        '
+        'lbUserPrepay
+        '
+        Me.lbUserPrepay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbUserPrepay.Location = New System.Drawing.Point(77, 84)
+        Me.lbUserPrepay.Name = "lbUserPrepay"
+        Me.lbUserPrepay.Size = New System.Drawing.Size(70, 12)
+        Me.lbUserPrepay.TabIndex = 7
+        Me.lbUserPrepay.Text = "0"
+        Me.lbUserPrepay.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label26
+        '
+        Me.Label26.AutoSize = True
+        Me.Label26.Location = New System.Drawing.Point(24, 84)
+        Me.Label26.Name = "Label26"
+        Me.Label26.Size = New System.Drawing.Size(44, 12)
+        Me.Label26.TabIndex = 6
+        Me.Label26.Text = "預付額:"
+        '
         'winInformation
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(422, 434)
+        Me.ClientSize = New System.Drawing.Size(432, 503)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.btClose)
         Me.Controls.Add(Me.GroupBox2)
@@ -665,4 +782,14 @@ Partial Class winInformation
     Friend WithEvents lbUserCard As System.Windows.Forms.Label
     Friend WithEvents Label12 As System.Windows.Forms.Label
     Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents lbYesterdayPrepay As System.Windows.Forms.Label
+    Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents lbUserPrepay As System.Windows.Forms.Label
+    Friend WithEvents Label26 As System.Windows.Forms.Label
+    Friend WithEvents lbTodayPrepay As System.Windows.Forms.Label
+    Friend WithEvents Label18 As System.Windows.Forms.Label
+    Friend WithEvents lbLastMonthPrepay As System.Windows.Forms.Label
+    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents lbTheMonthPrepay As System.Windows.Forms.Label
+    Friend WithEvents Label27 As System.Windows.Forms.Label
 End Class

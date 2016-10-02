@@ -7,7 +7,7 @@ Module Mail
         files.Add("C:\Documents and Settings\Administrator\桌面\新增文字文件.txt")
         files.Add("C:\Documents and Settings\Administrator\桌面\base.rar")
 
-        MsgBox(SendMail("smtp.gmail.com", 587, "feckidsky", "yqtaa3883", "title", "content", "就是我<feckidsky@gmail.com>", "kid.sky@yahoo.com.tw", files.ToArray))
+        MsgBox(SendMail("smtp.gmail.com", 587, "id", "password", "title", "content", "就是我<feckidsky@gmail.com>", "kid.sky@yahoo.com.tw", files.ToArray))
     End Sub
 
     Public Class MailSender

@@ -3,20 +3,30 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "進銷存", "進銷存\進銷存.vbproj", "{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "通訊行進銷存", "通訊行進銷存\通訊行進銷存.vdproj", "{50A2853C-75E5-4DEE-B401-9046B35EDDC4}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "通信行進銷存", "通訊行進銷存\通訊行進銷存.vdproj", "{50A2853C-75E5-4DEE-B401-9046B35EDDC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Debug|x86.ActiveCfg = Debug|x86
+		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Debug|x86.Build.0 = Debug|x86
 		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Release|x86.ActiveCfg = Release|x86
+		{9B56ECFA-B1BE-4C50-9C3A-BDFE17E1711D}.Release|x86.Build.0 = Release|x86
 		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Debug|Any CPU.ActiveCfg = Debug
+		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Debug|x86.ActiveCfg = Debug
+		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Debug|x86.Build.0 = Debug
 		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Release|Any CPU.ActiveCfg = Release
+		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Release|x86.ActiveCfg = Release
+		{50A2853C-75E5-4DEE-B401-9046B35EDDC4}.Release|x86.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
