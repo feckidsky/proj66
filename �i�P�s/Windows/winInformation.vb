@@ -94,31 +94,35 @@
 
     Public Sub UpdateSalesInformation(ByVal progress As Database.Access.Progress)
 
-        progress.Report("讀取昨日資訊", 15)
-        infoYesterday = getInfo(Today.AddDays(-1), Today.AddSeconds(-1))
-        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateYesterday))
+        Try
+            progress.Report("讀取昨日資訊", 15)
+            infoYesterday = getInfo(Today.AddDays(-1), Today.AddSeconds(-1))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateYesterday))
 
-        progress.Report("讀取今日資訊", 30)
-        infoToday = getInfo(Today, Today.AddDays(1).AddSeconds(-1))
-        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateToday))
+            progress.Report("讀取今日資訊", 30)
+            infoToday = getInfo(Today, Today.AddDays(1).AddSeconds(-1))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateToday))
 
-        progress.Report("讀取上個資訊", 45)
-        Dim LastMonth As Date = New Date(Now.AddMonths(-1).Year, Now.AddMonths(-1).Month, 1)
-        infoLastMonth = getInfo(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
-        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateLastMonth))
+            progress.Report("讀取上個資訊", 45)
+            Dim LastMonth As Date = New Date(Now.AddMonths(-1).Year, Now.AddMonths(-1).Month, 1)
+            infoLastMonth = getInfo(LastMonth, LastMonth.AddMonths(1).AddSeconds(-1))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateLastMonth))
 
-        progress.Report("讀取本月資訊", 60)
-        Dim Month As Date = New Date(Now.Year, Now.Month, 1)
-        infoMonth = getInfo(Month, Month.AddMonths(1).AddSeconds(-1))
-        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateTheMonth))
+            progress.Report("讀取本月資訊", 60)
+            Dim Month As Date = New Date(Now.Year, Now.Month, 1)
+            infoMonth = getInfo(Month, Month.AddMonths(1).AddSeconds(-1))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateTheMonth))
 
-        progress.Report("讀取自訂日期資訊", 75)
-        Dim st As Date '= Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
-        Dim ed As Date '= Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
-        If Not Me.IsDisposed Then st = Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
-        If Not Me.IsDisposed Then ed = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
-        infoUser = getInfo(st, ed.AddDays(1).AddSeconds(-1))
-        If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateUserInfo))
+            progress.Report("讀取自訂日期資訊", 75)
+            Dim st As Date '= Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
+            Dim ed As Date '= Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
+            If Not Me.IsDisposed Then st = Me.Invoke(New Func(Of Date)(AddressOf GetStartTime))
+            If Not Me.IsDisposed Then ed = Me.Invoke(New Func(Of Date)(AddressOf GetEndTime))
+            infoUser = getInfo(st, ed.AddDays(1).AddSeconds(-1))
+            If Not Me.IsDisposed Then Me.Invoke(New Action(AddressOf UpdateUserInfo))
+        Catch
+
+        End Try
 
         progress.Finish()
     End Sub

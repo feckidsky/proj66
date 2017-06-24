@@ -322,11 +322,13 @@ Public Class TCPTool
         Public Clients As New List(Of Client)
         Public Addr As IPAddress
         Event ReceiveClient(ByVal sender As Object, ByVal Client As Client)
+        Dim parent As TCPTool
 
-        Sub New(ByVal addr As IPAddress, ByVal port As Integer, ByVal encoding As Client.Encoding)
+        Sub New(ByVal addr As IPAddress, ByVal port As Integer, ByVal encoding As Client.Encoding, ByVal parent As TCPTool)
             MyBase.New(addr, port)
             Me.encoding = encoding
             Me.Addr = addr
+            Me.parent = parent
         End Sub
 
         Public Sub BeginListen()
@@ -347,7 +349,7 @@ Public Class TCPTool
             Threading.Thread.Sleep(3000)
 
             Do
-                Dim GetClient As New TcpClient
+                Dim GetClient As TcpClient
                 Try
                     '監聽連線
                     GetClient = AcceptTcpClient()
@@ -357,7 +359,8 @@ Public Class TCPTool
                 Catch
                     OutputError("Server 監聽")
                     'MsgBox(Err.Description & " Listen")
-                    Exit Sub
+                    'Exit Sub
+                    Exit Do
                 End Try
 
                 '建立Client元件
@@ -365,6 +368,26 @@ Public Class TCPTool
                 Clients.Add(cClient)
                 RaiseEvent ReceiveClient(Me, cClient)
             Loop
+
+            Try
+                MyBase.Stop()
+            Catch
+
+            End Try
+
+            Clients.ForEach(AddressOf mClinet_Close)
+            Clients.Clear()
+
+            parent.ServerList.Remove(Me)
+        End Sub
+
+        Private Sub mClinet_Close(ByVal client As Client)
+            Try
+                client.Close()
+            Catch ex As Exception
+
+            End Try
+
         End Sub
 
         Public Sub Close()
@@ -399,6 +422,8 @@ Public Class TCPTool
 
     Friend ServerList As New List(Of Server)
 
+
+
     Public ListenCheckThread As Threading.Thread
 #Region "Server 動作函式"
     '===========================================================================================================
@@ -426,7 +451,7 @@ Public Class TCPTool
             For Each addr As IPAddress In Addrs
                 Dim addr1 As IPAddress = addr
                 If Not ServerList.Exists(Function(s As Server) IPAddress.Equals(s.Addr, addr1)) Then
-                    Dim newServer As New Server(addr, ServerPort, mEncode)
+                    Dim newServer As New Server(addr, ServerPort, mEncode, Me)
                     AddHandler newServer.ReceiveClient, AddressOf OnReceiveConnected
                     ServerList.Add(newServer)
                     newServer.BeginListen()

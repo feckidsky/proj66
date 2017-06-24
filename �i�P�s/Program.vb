@@ -33,6 +33,7 @@ Public Module Program
                 def.BackupDir = My.Application.Info.DirectoryPath & "\Data\Backup\"
                 def.EmailBackupEnable = False
                 def.DirBackupEnable = False
+                def.StoreCode = ""
                 Return def
             End Get
         End Property
